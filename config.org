@@ -1,0 +1,2075 @@
+#+TITLE: Emacs Configuration
+#+AUTHOR: Benson Chu
+
+* Set customizations file
+  #+BEGIN_SRC emacs-lisp
+  (setq custom-file "~/.emacs.d/custom.el")
+  (load custom-file 'noerror)
+  (setq backup-directory-alist `(("." . ,(concat user-emacs-directory "backups"))))
+  #+END_SRC
+* Accessibility
+** Reloading config
+ #+BEGIN_SRC emacs-lisp
+ (defun reload-config () (interactive) (load-file "~/.emacs.d/init.el"))
+ #+END_SRC
+
+** Half Scroll
+ #+BEGIN_SRC emacs-lisp
+    (defun window-half-height ()
+      (max 1 (/ (1- (window-height (selected-window))) 2)))
+   
+    (defun scroll-up-half ()
+      (interactive)
+      (scroll-up (window-half-height)))
+   
+    (defun scroll-down-half ()         
+      (interactive)                    
+      (scroll-down (window-half-height)))
+   
+    (global-set-key (kbd "M-n") 'scroll-up-half)
+    (global-set-key (kbd "M-p") 'scroll-down-half)
+ #+END_SRC
+** Add to load-path ~/bin
+ #+BEGIN_SRC emacs-lisp
+ (add-to-list 'exec-path "~/bin")
+ #+END_SRC
+** M-1 = windresize
+ #+BEGIN_SRC emacs-lisp
+ (global-set-key (kbd "M-1") 'windresize)
+ #+END_SRC
+** Emacs which key
+#+BEGIN_SRC emacs-lisp
+(require 'which-key)
+(which-key-mode)
+#+END_SRC
+** help window select
+   #+BEGIN_SRC emacs-lisp
+   (setq help-window-select t)
+   #+END_SRC
+** Multi-term
+   #+BEGIN_SRC emacs-lisp
+     (add-hook 'term-mode-hook
+               (lambda ()
+                 (add-to-list 'term-bind-key-alist '("M-[" . multi-term-prev))
+                 (add-to-list 'term-bind-key-alist '("M-]" . multi-term-next))))
+   #+END_SRC
+** beacon
+   #+BEGIN_SRC emacs-lisp
+     (require 'beacon)
+     (beacon-mode 1)
+     (setq beacon-color "#006400")
+   #+END_SRC
+** Dashboard
+   #+BEGIN_SRC emacs-lisp
+   (require 'dashboard)
+   (dashboard-setup-startup-hook)
+   #+END_SRC
+** Volume
+   #+BEGIN_SRC emacs-lisp
+   (global-set-key (kbd "C-c v") 'volume)
+   #+END_SRC
+* Neo keyboard issues
+  #+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "M-Ä") 'eval-expression)
+  (global-set-key (kbd "M-–") 'beginning-of-buffer)
+  (global-set-key (kbd "M-•") 'end-of-buffer)
+  #+END_SRC
+* EXWM
+** Config
+#+BEGIN_SRC emacs-lisp
+  ;(add-to-list 'load-path "~/.emacs.d/custom/exwm")
+  (require 'exwm)  
+  (require 'exwm-systemtray)
+  (require 'exwm-config)
+  (exwm-config-default)
+  ;(setq exwm-input-line-mode-passthrough t)
+#+END_SRC
+** Global keys
+   #+BEGIN_SRC emacs-lisp
+     (setq exwm-input-global-keys
+      `(([?\s-r] . exwm-reset)
+        ([?\s-w] . exwm-workspace-switch)
+        ,@(mapcar (lambda (i)
+                    `(,(kbd (format "s-%d" i)) .
+                      (lambda ()
+                        (interactive)
+                        (exwm-workspace-switch-create ,i))))
+                  (number-sequence 0 9))))
+     (global-set-key (kbd "M-T") 'flop-frame)
+     (global-set-key (kbd "C-x p") 'launch-program)
+     (global-set-key (kbd "M-…") 'multi-term)
+     (global-set-key (kbd "C-ö") 'undo-tree-undo)
+   #+END_SRC
+** Custom
+   #+BEGIN_SRC emacs-lisp
+     (defvar workspace-list '(("s" 0 "school")
+                              ("y" 1 "youtube")
+                              ("w" 2 "work")
+                              ("r" 3 "research")
+                              ("c" 4 "code"))
+       "My custom workspace list")
+
+     (defun workspace-switch-prompt ()
+       (exwm-workspace--update-switch-history)
+       (let* ((current-workspace (exwm-workspace--position exwm-workspace--current))
+              (workspace-string (elt exwm-workspace--switch-history current-workspace)))
+         (mapcar (lambda (x)
+                   (setq workspace-string
+                         (replace-regexp-in-string (number-to-string (cadr x))
+                                                   (caddr x)
+                                                   workspace-string)))
+                 workspace-list)
+         workspace-string))
+
+     (defun my-workspace-switch ()
+       (interactive)
+       (let* ((letter (read-char (workspace-switch-prompt)))
+             (ws-info (assoc (char-to-string letter)
+                             workspace-list)))
+         (if ws-info
+           (exwm-workspace-switch (cadr ws-info))
+           (exwm-workspace-switch (string-to-number
+                                   (char-to-string
+                                    letter))))))
+
+     (global-set-key (kbd "s-w") 'my-workspace-switch)
+     (global-set-key (kbd "s-l") '(lambda () (interactive) (launch-program "i3lock-fancy")))
+   #+END_SRC
+** Helper functions
+   #+BEGIN_SRC emacs-lisp
+     (defvar wallpaper-path "~/.emacs.d/res/digital_space_universe_4k_8k-wide.jpg")
+     (defvar live-wallpaper-path "/home/benson/MEGA/pictures/wallpapers/videos/bg.mp4")
+     (defvar exwm-startup-programs
+       '("megasync"
+         ("compton -f -i .7 -b" "compton")))
+     (defvar hard-drive-space "")
+
+     (setq enable-recursive-minibuffers t)
+     (defun counsel-shell-command ()
+       "Forward to `shell-command'."
+       (interactive)
+       (ivy-read "Shell Command: "
+                 shell-command-history
+                 :caller 'counsel-shell-command))
+
+     (defun launch-program (command &optional process-name)
+       (interactive (list (read-shell-command "$ ")))
+       (let ((name (or process-name command)))
+         (start-process-shell-command name nil command)))
+
+     (defun dmenu-run ()
+       (interactive)
+       (shell-command "dmenu" nil "dmenu_run -b"))
+
+     (defun call-startup-programs ()
+       (dolist (program exwm-startup-programs)
+         (if (listp program)
+           (launch-program (car program) (cadr program))
+           (launch-program program))))
+
+     (defun setup-wallpaper ()
+       (launch-program (concat "feh --bg-fill " wallpaper-path) "feh"))
+
+     (defun setup-live-wallpaper () 
+       (if (get-process "xwinwrap")
+         (delete-process "xwinwrap"))
+       (launch-program (concat "xwinwrap -ni -ov -g 1920x1080+1280+0 -s -st -sp -nf -- mpv --loop=inf -wid WID " live-wallpaper-path) "xwinwrap"))
+
+     (defun get-hard-drive-space ()
+       (shell-command-to-string "df -h -P -l ~/ | tail -n 1 | tr -s ' ' | cut -d ' ' -f 4"))
+
+     (defun update-hard-drive-space-string ()
+       (setq hard-drive-space
+             (let ((space-left (get-hard-drive-space)))
+               (concat " "
+                       (substring space-left
+                                  0
+                                  (1- (length space-left)))))))
+
+     (defun display-hard-drive-space-mode ()
+       (if (not (member 'hard-drive-space
+                        global-mode-string))
+           (add-to-list 'global-mode-string
+                        'hard-drive-space
+                        t)))
+   #+END_SRC
+** Simulation keys
+#+BEGIN_SRC emacs-lisp
+(setq exwm-input-simulation-keys
+ '(
+    ;; movement
+    ([?\C-b] . left)
+    ([?\M-b] . C-left)
+    ([?\C-f] . right)
+    ([?\M-f] . C-right)
+    ([?\C-p] . up)
+    ([?\C-n] . down)
+    ([?\C-a] . home)
+    ([?\C-e] . end)
+    ([?\M-v] . prior)
+    ([?\C-v] . next)
+    ([?\C-d] . delete)
+    ([?\M-d] . backspace)
+    ([?\C-k] . (S-end delete))
+    ;; cut/paste.
+    ([?\C-w] . ?\C-x)
+    ([?\M-w] . ?\C-c)
+    ([?\C-y] . ?\C-v)
+    ;; search
+    ([?\C-s] . ?\C-f)
+    ([?\C-.] . ?\C-w)
+    ([?\C-/] . ?\C-z)
+    ([?\M-s] . ?\C-s)
+))
+#+END_SRC
+** xrandr
+#+BEGIN_SRC emacs-lisp
+(require 'exwm-randr)
+;No dash when using intel driver
+(setq exwm-randr-workspace-output-plist '(1 "HDMI1" 3 "HDMI1"))
+(exwm-randr-enable)
+#+END_SRC
+** Startup
+#+BEGIN_SRC emacs-lisp   
+  (add-hook 'exwm-init-hook 'server-start)
+
+  ; Reminder: Hooks execute in order. Make sure megasync launches after systemtray is enabled
+  (add-hook 'exwm-init-hook 'call-startup-programs)
+  (add-hook 'exwm-init-hook 'setup-wallpaper)
+
+  (exwm-systemtray-enable)
+  (setq display-time-day-and-date t)
+
+  (defvar my/exclude-buffer-modes '(helm-major-mode messages-buffer-mode special-mode))
+
+  (defun my-buffer-predicate (buf)
+    (with-current-buffer buf
+      (if (memq major-mode my/exclude-buffer-modes)
+          nil
+        (exwm-layout--other-buffer-predicate buf))))
+
+  (add-hook 'exwm-init-hook
+            (lambda ()
+              (interactive) 
+              (modify-all-frames-parameters
+               '((buffer-predicate . my-buffer-predicate)))))
+
+  ;(add-to-list 'default-frame-alist '(alpha . (85 . 50)))
+  (setq window-system-default-frame-alist '((x . ((alpha . (85 . 50)) ))))
+  ;Display hard drive space
+
+  (add-hook 'display-time-hook 'update-hard-drive-space-string)
+
+  (display-time-mode)
+  (display-battery-mode)
+  (display-hard-drive-space-mode)
+#+END_SRC
+** Shutdown
+   #+BEGIN_SRC emacs-lisp
+     (add-hook 'exwm-exit-hook 'org-save-all-org-buffers)
+     (add-hook 'exwm-exit-hook 'save-org-agenda-files)
+     (eval-after-load "term"
+       '(progn 
+          (define-key term-raw-map (kbd "C-c C-y") 'term-paste)
+          (define-key term-raw-map (kbd "M-x") 'helm-M-x)))
+   #+END_SRC
+  
+* My variables alist
+#+BEGIN_SRC emacs-lisp
+  (defvar my/variable-alist-file "~/.emacs.d/codertilldeath_variables.el")
+  (defvar my/variable-alist '())
+
+  (save-excursion
+     (set-buffer (find-file-noselect my/variable-alist-file))
+     (setq my/variable-alist (eval (read (buffer-string))))
+     (kill-buffer))
+
+  (defun my/set-variable (key value)
+    (let ((res (assq key my-variable-alist)))
+      (setcdr res value))
+    (my/save-variables))
+
+  (defun my/add-variable (key value)
+    (add-to-list 'my/variable-alist
+                 '(key value))
+    (my/save-variables))
+
+  (defun my/get-variable (key)
+    (assoc key my/variable-alist))
+
+  (defun my/save-variables ()
+    (interactive)
+    (save-excursion
+      (let ((buf (find-file-noselect my/variable-alist-file)))
+        (set-buffer buf)
+        (erase-buffer)
+        (print (list 'quote my/variable-alist) buf)
+        (save-buffer)
+        (kill-buffer)
+        (message "variable-alist file list saved to: %s" my/variable-alist-file))))
+
+#+END_SRC
+* UI
+** Turn off menu bar and toolbar
+ #+BEGIN_SRC emacs-lisp
+(menu-bar-mode -1)
+(tool-bar-mode -1)
+#+END_SRC
+** Theming
+*** Calm forest theme
+#+BEGIN_SRC emacs-lisp
+(load-theme 'calm-forest t)
+#+END_SRC
+*** powerline
+**** Test new mode-line
+#+BEGIN_SRC emacs-lisp
+  (defun my-airline-theme ()
+    "Set the airline mode-line-format"
+    (interactive)
+    (setq-default mode-line-format
+		  '("%e"
+		    (:eval
+		     (let* ((active (powerline-selected-window-active))
+			    (separator-left (intern (format "powerline-%s-%s"
+							    (powerline-current-separator)
+							    (car powerline-default-separator-dir))))
+			    (separator-right (intern (format "powerline-%s-%s"
+							     (powerline-current-separator)
+							     (cdr powerline-default-separator-dir))))
+			    (mode-line-face (if active 'mode-line 'mode-line-inactive))
+			    (visual-block (if (featurep 'evil)
+					      (and (evil-visual-state-p)
+						   (eq evil-visual-selection 'block))
+					    nil))
+			    (visual-line (if (featurep 'evil)
+					     (and (evil-visual-state-p)
+						  (eq evil-visual-selection 'line))
+					   nil))
+			    (current-evil-state-string (if (featurep 'evil)
+							   (upcase (concat (symbol-name evil-state)
+									   (cond (visual-block "-BLOCK")
+										 (visual-line "-LINE"))))
+							 nil))
+
+			    (outer-face
+			     (if (powerline-selected-window-active)
+				 (if (featurep 'evil)
+				     (cond ((eq evil-state (intern "normal"))  'airline-normal-outer)
+					   ((eq evil-state (intern "insert"))  'airline-insert-outer)
+					   ((eq evil-state (intern "visual"))  'airline-visual-outer)
+					   ((eq evil-state (intern "replace")) 'airline-replace-outer)
+					   ((eq evil-state (intern "emacs"))   'airline-emacs-outer)
+					   (t                                  'airline-normal-outer))
+				   'airline-normal-outer)
+			       'powerline-inactive1))
+
+			    (inner-face
+			     (if (powerline-selected-window-active)
+				 (if (featurep 'evil)
+				     (cond ((eq evil-state (intern "normal")) 'airline-normal-inner)
+					   ((eq evil-state (intern "insert")) 'airline-insert-inner)
+					   ((eq evil-state (intern "visual")) 'airline-visual-inner)
+					   ((eq evil-state (intern "replace")) 'airline-replace-inner)
+					   ((eq evil-state (intern "emacs"))   'airline-emacs-inner)
+					   (t                                 'airline-normal-inner))
+				   'airline-normal-inner)
+			       'powerline-inactive2))
+
+			    (center-face
+			     (if (powerline-selected-window-active)
+				 (if (featurep 'evil)
+				     (cond ((eq evil-state (intern "normal")) 'airline-normal-center)
+					   ((eq evil-state (intern "insert")) 'airline-insert-center)
+					   ((eq evil-state (intern "visual")) 'airline-visual-center)
+					   ((eq evil-state (intern "replace")) 'airline-replace-center)
+					   ((eq evil-state (intern "emacs"))   'airline-emacs-center)
+					   (t                                 'airline-normal-center))
+				   'airline-normal-center)
+			       'airline-inactive3))
+
+			    ;; Left Hand Side
+			    (lhs-mode (if (featurep 'evil)
+					  (list
+					   ;; Evil Mode Name
+					   (powerline-raw (concat " " current-evil-state-string " ") outer-face)
+					   (funcall separator-left outer-face inner-face)
+					   ;; Modified string
+					   (powerline-raw "%*" inner-face 'l)
+					   )
+					  (list
+					   ;; Modified string
+					   (powerline-raw "%*" outer-face 'l)
+					   ;; Separator >
+					   (powerline-raw " " outer-face)
+					   (funcall separator-left outer-face inner-face))))
+
+			    (lhs-rest (list
+				       ;; ;; Separator >
+				       ;; (powerline-raw (char-to-string #x2b81) inner-face 'l)
+
+				       ;; Eyebrowse current tab/window config
+				       (if (featurep 'eyebrowse)
+					   (powerline-raw (concat " " (eyebrowse-mode-line-indicator)) inner-face))
+
+				       ;; Git Branch
+				       (powerline-raw (airline-get-vc) inner-face)
+
+				       ;; Separator >
+				       (powerline-raw " " inner-face)
+				       (funcall separator-left inner-face center-face)
+
+				       ;; Directory
+				       ;(when (eq airline-display-directory 'airline-directory-shortened)
+				       ;  (powerline-raw (airline-shorten-directory default-directory airline-shortened-directory-length) center-face 'l))
+				       ;(when (eq airline-display-directory 'airline-directory-full)
+				       ;  (powerline-raw default-directory center-face 'l))
+				       ;(when (eq airline-display-directory nil)
+				       ;  (powerline-raw " " center-face))
+
+				       ;; Buffer ID
+				       ;; (powerline-buffer-id center-face)
+				       ;; (powerline-raw "%b" center-face)
+				       (powerline-buffer-id center-face)
+
+				       (powerline-major-mode center-face 'l)
+				       (powerline-process center-face)
+				       ;(powerline-minor-modes center-face 'l)
+
+				       ;; Current Function (which-function-mode)
+				       (when (and (boundp 'which-func-mode) which-func-mode)
+					 ;; (powerline-raw which-func-format 'l nil))
+					 (powerline-raw which-func-format center-face 'l))
+
+				       ;; ;; Separator >
+				       ;; (powerline-raw " " center-face)
+				       ;; (funcall separator-left mode-line face1)
+
+				       (when (boundp 'erc-modified-channels-object)
+					 (powerline-raw erc-modified-channels-object center-face 'l))
+
+				       ;; ;; Separator <
+				       ;; (powerline-raw " " face1)
+				       ;; (funcall separator-right face1 face2)
+				     ))
+
+			    (lhs (append lhs-mode lhs-rest))
+
+			    ;; Right Hand Side
+			    (rhs (list (powerline-raw global-mode-string center-face 'r)
+
+				       ;; ;; Separator <
+				       ;; (powerline-raw (char-to-string #x2b83) center-face 'l)
+
+				       ;; Minor Modes
+				       ;(powerline-minor-modes center-face 'l)
+				       ;; (powerline-narrow center-face 'l)
+
+				       ;; Subseparator <
+				       (powerline-raw (char-to-string airline-utf-glyph-subseparator-right) center-face 'l)
+
+				       ;; Major Mode
+				       ;(powerline-major-mode center-face 'l)
+				       ;(powerline-process center-face)
+
+				       ;; Separator <
+				       (powerline-raw " " center-face)
+				       (funcall separator-right center-face inner-face)
+
+				       ;; Buffer Size
+				       (when powerline-display-buffer-size
+					 (powerline-buffer-size inner-face 'l))
+
+				       ;; Mule Info
+				       (when powerline-display-mule-info
+					 (powerline-raw mode-line-mule-info inner-face 'l))
+
+				       (powerline-raw " " inner-face)
+
+				       ;; Separator <
+				       (funcall separator-right inner-face outer-face)
+
+				       ;; LN charachter
+				       (powerline-raw (char-to-string airline-utf-glyph-linenumber) outer-face 'l)
+
+				       ;; Current Line
+				       (powerline-raw "%4l" outer-face 'l)
+				       (powerline-raw ":" outer-face 'l)
+				       ;; Current Column
+				       (powerline-raw "%3c" outer-face 'r)
+
+				       ;; % location in file
+				       (powerline-raw "%6p" outer-face 'r)
+
+				       ;; position in file image
+				       (when powerline-display-hud
+					 (powerline-hud inner-face outer-face)))
+				 ))
+
+		       ;; Combine Left and Right Hand Sides
+		       (concat (powerline-render lhs)
+			       (powerline-fill center-face (powerline-width rhs))
+			       (powerline-render rhs))))))
+    (powerline-reset)
+    (kill-local-variable 'mode-line-format))
+
+    (defun my-show-minor-modes ()
+    "Set the airline mode-line-format"
+    (interactive)
+    (setq-default mode-line-format
+		  '("%e"
+		    (:eval
+		     (let* ((active (powerline-selected-window-active))
+			    (separator-left (intern (format "powerline-%s-%s"
+							    (powerline-current-separator)
+							    (car powerline-default-separator-dir))))
+			    (separator-right (intern (format "powerline-%s-%s"
+							     (powerline-current-separator)
+							     (cdr powerline-default-separator-dir))))
+			    (mode-line-face (if active 'mode-line 'mode-line-inactive))
+			    (visual-block (if (featurep 'evil)
+					      (and (evil-visual-state-p)
+						   (eq evil-visual-selection 'block))
+					    nil))
+			    (visual-line (if (featurep 'evil)
+					     (and (evil-visual-state-p)
+						  (eq evil-visual-selection 'line))
+					   nil))
+			    (current-evil-state-string (if (featurep 'evil)
+							   (upcase (concat (symbol-name evil-state)
+									   (cond (visual-block "-BLOCK")
+										 (visual-line "-LINE"))))
+							 nil))
+
+			    (outer-face
+			     (if (powerline-selected-window-active)
+				 (if (featurep 'evil)
+				     (cond ((eq evil-state (intern "normal"))  'airline-normal-outer)
+					   ((eq evil-state (intern "insert"))  'airline-insert-outer)
+					   ((eq evil-state (intern "visual"))  'airline-visual-outer)
+					   ((eq evil-state (intern "replace")) 'airline-replace-outer)
+					   ((eq evil-state (intern "emacs"))   'airline-emacs-outer)
+					   (t                                  'airline-normal-outer))
+				   'airline-normal-outer)
+			       'powerline-inactive1))
+
+			    (inner-face
+			     (if (powerline-selected-window-active)
+				 (if (featurep 'evil)
+				     (cond ((eq evil-state (intern "normal")) 'airline-normal-inner)
+					   ((eq evil-state (intern "insert")) 'airline-insert-inner)
+					   ((eq evil-state (intern "visual")) 'airline-visual-inner)
+					   ((eq evil-state (intern "replace")) 'airline-replace-inner)
+					   ((eq evil-state (intern "emacs"))   'airline-emacs-inner)
+					   (t                                 'airline-normal-inner))
+				   'airline-normal-inner)
+			       'powerline-inactive2))
+
+			    (center-face
+			     (if (powerline-selected-window-active)
+				 (if (featurep 'evil)
+				     (cond ((eq evil-state (intern "normal")) 'airline-normal-center)
+					   ((eq evil-state (intern "insert")) 'airline-insert-center)
+					   ((eq evil-state (intern "visual")) 'airline-visual-center)
+					   ((eq evil-state (intern "replace")) 'airline-replace-center)
+					   ((eq evil-state (intern "emacs"))   'airline-emacs-center)
+					   (t                                 'airline-normal-center))
+				   'airline-normal-center)
+			       'airline-inactive3))
+
+			    ;; Left Hand Side
+			    (lhs-mode (if (featurep 'evil)
+					  (list
+					   ;; Evil Mode Name
+					   (powerline-raw (concat " " current-evil-state-string " ") outer-face)
+					   (funcall separator-left outer-face inner-face)
+					   ;; Modified string
+					   (powerline-raw "%*" inner-face 'l)
+					   )
+					  (list
+					   ;; Modified string
+					   (powerline-raw "%*" outer-face 'l)
+					   ;; Separator >
+					   (powerline-raw " " outer-face)
+					   (funcall separator-left outer-face inner-face))))
+
+			    (lhs-rest (list
+				       ;; ;; Separator >
+				       ;; (powerline-raw (char-to-string #x2b81) inner-face 'l)
+
+				       ;; Eyebrowse current tab/window config
+				       (if (featurep 'eyebrowse)
+					   (powerline-raw (concat " " (eyebrowse-mode-line-indicator)) inner-face))
+
+				       ;; Git Branch
+				       (powerline-raw (airline-get-vc) inner-face)
+
+				       ;; Separator >
+				       (powerline-raw " " inner-face)
+				       (funcall separator-left inner-face center-face)
+
+				       ;; Directory
+				       ;(when (eq airline-display-directory 'airline-directory-shortened)
+				       ;  (powerline-raw (airline-shorten-directory default-directory airline-shortened-directory-length) center-face 'l))
+				       ;(when (eq airline-display-directory 'airline-directory-full)
+				       ;  (powerline-raw default-directory center-face 'l))
+				       ;(when (eq airline-display-directory nil)
+				       ;  (powerline-raw " " center-face))
+
+				       ;; Buffer ID
+				       ;; (powerline-buffer-id center-face)
+				       ;; (powerline-raw "%b" center-face)
+				       (powerline-buffer-id center-face)
+
+				       (powerline-major-mode center-face 'l)
+				       (powerline-process center-face)
+				       (powerline-minor-modes center-face 'l)
+
+				       ;; Current Function (which-function-mode)
+				       (when (and (boundp 'which-func-mode) which-func-mode)
+					 ;; (powerline-raw which-func-format 'l nil))
+					 (powerline-raw which-func-format center-face 'l))
+
+				       ;; ;; Separator >
+				       ;; (powerline-raw " " center-face)
+				       ;; (funcall separator-left mode-line face1)
+
+				       (when (boundp 'erc-modified-channels-object)
+					 (powerline-raw erc-modified-channels-object center-face 'l))
+
+				       ;; ;; Separator <
+				       ;; (powerline-raw " " face1)
+				       ;; (funcall separator-right face1 face2)
+				     ))
+
+			    (lhs (append lhs-mode lhs-rest))
+
+			    ;; Right Hand Side
+			    (rhs (list (powerline-raw global-mode-string center-face 'r)
+
+				       ;; ;; Separator <
+				       ;; (powerline-raw (char-to-string #x2b83) center-face 'l)
+
+				       ;; Minor Modes
+				       ;(powerline-minor-modes center-face 'l)
+				       ;; (powerline-narrow center-face 'l)
+
+				       ;; Subseparator <
+				       (powerline-raw (char-to-string airline-utf-glyph-subseparator-right) center-face 'l)
+
+				       ;; Major Mode
+				       ;(powerline-major-mode center-face 'l)
+				       ;(powerline-process center-face)
+
+				       ;; Separator <
+				       (powerline-raw " " center-face)
+				       (funcall separator-right center-face inner-face)
+
+				       ;; Buffer Size
+				       (when powerline-display-buffer-size
+					 (powerline-buffer-size inner-face 'l))
+
+				       ;; Mule Info
+				       (when powerline-display-mule-info
+					 (powerline-raw mode-line-mule-info inner-face 'l))
+
+				       (powerline-raw " " inner-face)
+
+				       ;; Separator <
+				       (funcall separator-right inner-face outer-face)
+
+				       ;; LN charachter
+				       (powerline-raw (char-to-string airline-utf-glyph-linenumber) outer-face 'l)
+
+				       ;; Current Line
+				       (powerline-raw "%4l" outer-face 'l)
+				       (powerline-raw ":" outer-face 'l)
+				       ;; Current Column
+				       (powerline-raw "%3c" outer-face 'r)
+
+				       ;; % location in file
+				       (powerline-raw "%6p" outer-face 'r)
+
+				       ;; position in file image
+				       (when powerline-display-hud
+					 (powerline-hud inner-face outer-face)))
+				 ))
+
+		       ;; Combine Left and Right Hand Sides
+		       (concat (powerline-render lhs)
+			       (powerline-fill center-face (powerline-width rhs))
+			       (powerline-render rhs))))))
+    (powerline-reset)
+    (kill-local-variable 'mode-line-format))
+#+END_SRC
+**** Config
+#+BEGIN_SRC emacs-lisp
+(require 'powerline)
+(require 'airline-themes)
+;(setq sml/theme 'powerline)
+;(sml/setup)
+
+(setq powerline-default-separator 'arrow)
+(load-theme 'airline-powerlineish)
+(my-airline-theme)
+(setq battery-mode-line-format "[%b%p%%%%]")
+
+;(powerline-default-theme)
+
+;(setq sml/no-confirm-load-theme t)
+;(setq sml/theme 'powerline)
+;(sml/setup)
+#+END_SRC
+*** Splash image
+    #+BEGIN_SRC emacs-lisp
+    (setq fancy-splash-image "~/.emacs.d/res/icon.png")
+    #+END_SRC
+** Navigation
+*** Helm & counsel
+#+BEGIN_SRC emacs-lisp
+  (require 'helm-config)
+  (require 'company)
+  (helm-mode 1)
+  ;(setq ivy-initial-inputs-alist nil)
+  (require 'ivy)
+  (require 'smex)
+  (add-to-list 'ivy-initial-inputs-alist '(counsel-M-x . ""))
+  (global-set-key (kbd "C-h M-x") 'helm-M-x)
+  (global-set-key (kbd "M-x") 'counsel-M-x)
+  (global-set-key (kbd "C-x b") 'helm-buffers-list)
+#+END_SRC
+*** Evil mode
+#+BEGIN_SRC emacs-lisp
+  (require 'evil)
+  (global-set-key (kbd "C-z") 'evil-local-mode)
+  (setq evil-default-state 'emacs)
+  (evil-set-initial-state 'term-mode 'emacs)
+  (evil-set-initial-state 'help-mode 'emacs)
+  (evil-mode 1)
+#+END_SRC
+*** Buffer handling
+**** Ido mode
+#+BEGIN_SRC emacs-lisp
+(require 'ido)
+(ido-mode t)
+#+END_SRC
+**** ibuffer
+***** Keybindings
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+#+END_SRC
+***** Config
+#+BEGIN_SRC emacs-lisp
+  (require 'ibuf-ext)
+  (autoload 'ibuffer "ibuffer" "List buffers." t)
+  (add-to-list 'ibuffer-never-show-predicates
+               '(lambda (buf)
+                  (with-current-buffer buf
+                    (eq major-mode 'helm-major-mode))))
+
+  (setq ibuffer-saved-filter-groups
+        '(("General"
+           ("X-Windows" (mode . exwm-mode))
+           ("Terminals" (mode . term-mode))
+           ("emacs-config" (or (filename . ".emacs.d")
+                               (filename . "emacs-config")))
+           ("code" (or (mode . clojure-mode)
+                       (mode . c++-mode)
+                       (mode . c-mode)
+                       (mode . scala-mode)
+                       (mode . emacs-lisp-mode)
+                       (mode . java-mode)
+                       (mode . js-mode)
+                       (mode . python-mode)))
+           ("Org Mode" (not or (not mode . org-mode)
+                            (directory-name . "agenda")))
+           ("text" (filename . "\\.txt"))
+           ("Agenda Buffers" (mode . org-agenda-mode))
+           ("Agenda Files" (mode . org-mode))
+           ("Help" (or (name . "\*Help\*")
+                       (name . "\*Apropos\*")
+                       (name . "\*info\*")))
+           )))
+
+  (setq ibuffer-show-empty-filter-groups nil)
+
+  (add-hook 'ibuffer-mode-hook
+            '(lambda ()
+               (ibuffer-auto-mode 1)
+               (ibuffer-switch-to-saved-filter-groups "General")
+               (ibuffer-do-sort-by-alphabetic)))
+#+END_SRC
+***** Custom Filters
+#+BEGIN_SRC emacs-lisp
+  (eval-after-load "ibuf-ext"
+    '(define-ibuffer-filter directory-name
+         "Filter files in the agenda folder"
+       (:description "agenda")
+       (and (buffer-file-name buf) 
+            (string-match qualifier
+                          (buffer-file-name buf)))))
+
+  ;(add-hook 'exwm-workspace-switch-hook 'ibuffer)
+#+END_SRC
+**** Ace window
+#+BEGIN_SRC emacs-lisp
+(require 'switch-window)
+(global-set-key (kbd "C-x o") 'switch-window)
+(setq switch-window-shortcut-style 'qwerty)
+(setq switch-window-qwerty-shortcuts
+      '("a" "o" "e" "u" "i" "d" "h" "t" "n" "s"))
+#+END_SRC
+*** Ace jump
+#+BEGIN_SRC emacs-lisp
+(require 'ace-jump-mode)
+(global-set-key (kbd "C-c SPC") 'ace-jump-mode)
+(global-set-key (kbd "C-c j") 'ace-jump-line-mode)
+#+END_SRC
+** Font
+ #+BEGIN_SRC emacs-lisp
+   ;(set-face-attribute 'default t :font "Dotsies Training Wheels-20")
+   ;(add-to-list 'default-frame-alist '(font . "Dotsies Training Wheels-20"))
+   (let ((font (format "%s"
+                       "RobotoMono-11"
+                       ;; "Tamzen"
+                       ;; "SourceCodePro"
+                       ;; "Gohu Gohufont"
+                       )))
+     (add-to-list 'default-frame-alist `(font . ,font)))
+ #+END_SRC
+* Tools
+** Encryption
+#+BEGIN_SRC emacs-lisp
+  (require 'epa-file)
+  (epa-file-enable)
+  (setq epa-pinentry-mode 'loopback)
+  (setq epa-file-cache-passphrase-for-symmetric-encryption t)
+#+END_SRC
+** Org Mode
+*** Keybindings
+#+BEGIN_SRC emacs-lisp
+(global-set-key "\C-cl" 'org-store-link)
+(global-set-key "\C-ca" 'org-agenda)
+(global-set-key "\C-cc" 'org-capture)
+(global-set-key "\C-cb" 'org-iswitchb)
+(global-set-key (kbd "<f12>") 'org-agenda)
+(global-set-key (kbd "<f11>") (lambda () (interactive) (org-agenda "" "g")))
+(global-set-key (kbd "<f9>") 'org-capture)
+(global-set-key (kbd "C-x C-o") 'org-switchb)
+(define-key org-mode-map (kbd "C-c SPC") nil)
+#+END_SRC
+*** Should always use visual-line-mode
+#+BEGIN_SRC emacs-lisp
+(add-hook 'org-mode-hook (lambda () (visual-line-mode 1)))
+#+END_SRC
+*** Custom Journal
+**** Attempt 3
+#+BEGIN_SRC emacs-lisp
+  (defvar yearly-theme "Surpass")
+
+  (defun completed-tags-search (start-date end-date)
+    (let ((org-agenda-overriding-header "* Log")
+          (tag-search (concat (format "TODO=\"DONE\"&CLOSED>=\"<%s>\"&CLOSED<=\"<%s>\""
+                      start-date
+                      end-date))))
+      (org-tags-view nil tag-search)))
+
+  (defun get-tasks-from (start-date end-date)
+    (let (string)
+      (save-window-excursion
+        (completed-tags-search start-date end-date)
+        (setq string (mapconcat 'identity
+                                (mapcar (lambda (a)
+                                          (concat "**" a))
+                                        (butlast (cdr (split-string (buffer-string) "\n")) 1)) 
+                                "\n"))
+        (kill-buffer))
+      string))
+
+  (defun get-journal-entries-from (start-date end-date)
+    (let ((string "")
+      match)
+      (save-window-excursion
+    (switch-to-buffer (find-file "~/MEGA/org/entries/journal.gpg"))
+    (goto-char (point-min))
+    (while (setq match (re-search-forward "^\\*\\*\\* \\(2[0-9]\\{3\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\) \\w+$" nil t))
+    (let ((date (match-string 1)))
+      (when (and (org-time< start-date date)
+             (or (not end-date) (org-time< date end-date)))
+        (org-narrow-to-subtree)
+        (org-shiftmetaleft)
+        (setq string (concat string "\n" (buffer-string)))
+        (org-shiftmetaright)
+        (widen))))
+    (not-modified)
+    (kill-buffer))
+      string))
+
+  (defun weekly-review-file ()
+    (set-buffer
+     (org-capture-target-buffer (format "~/MEGA/org/entries/review/%s/Year of %s, Week %s.org"
+                                        (format-time-string "%Y")
+                                        yearly-theme
+                                        (format-time-string "%V")))))
+  (defun make-up-review-file ()
+    (let* ((date (org-read-date))
+           (week (number-to-string
+                  (org-days-to-iso-week
+                   (org-time-string-to-absolute date)))))
+      (org-capture-put :start-date date)
+      (org-capture-put :start-week week)
+      (set-buffer 
+       (org-capture-target-buffer
+        (format "~/MEGA/org/entries/review/%s/Year of %s, Week %s-%s.org"
+                (format-time-string "%Y")
+                yearly-theme
+                week
+                (format-time-string "%V"))))))
+#+END_SRC
+*** Capture templates
+#+BEGIN_SRC emacs-lisp
+  (setq org-default-notes-file "~/MEGA/org-old/notes.org")
+  (setq org-capture-templates
+        '(("t" "Todo" entry (file "~/MEGA/org/agenda/refile.org")
+           "* TODO %?\n%U\n%a\n")
+          ("s" "Stuff" entry (file "~/MEGA/org/agenda/refile.org")
+           "* TODO %?\n%U")
+          ("f" "Reference" entry (file "~/MEGA/org/agenda/reference.org")
+          "* %?\n%i%U")
+          ("a" "Appointment" entry (file "~/MEGA/org/agenda/refile.org")
+           "* TODO %? :APT:")
+          ;("p" "Panic" entry (file "~/MEGA/org/agenda/panic.org")
+          ; "* TODO %?")
+          ("r" "Reviews")
+          ("rm" "Make-up Weekly Review" plain (function make-up-review-file)
+           (file "~/MEGA/org/templates/review-interactive.org"))
+          ("rw" "Weekly Review" plain (function weekly-review-file)
+           (file "~/MEGA/org/templates/weekly-review-template.org"))
+          ("i" "Important information" entry (file "~/MEGA/org/entries/important.gpg")
+           "* %?")
+          ("e" "Entries")
+          ("ed" "Dream" entry (file+olp+datetree "~/MEGA/org/entries/dream.org")
+           "* %?")
+          ("ee" "Exercise" table-line (file "~/MEGA/org/entries/exercise.org")
+           "| %u | %^{Push-ups} | %^{Leg-lifts} | %^{Squats}")
+          ("em" "Expenditures" table-line (file "~/MEGA/org/entries/expenses.org")
+           "| %u | $%^{Amount} | %^{Description}" )
+          ("ej" "Journal")
+          ("eje" "Journal Entry" entry (file+olp+datetree "~/MEGA/org/entries/journal.gpg")
+           "* %<%R> %?\n%U\n\n")
+          ("ejp" "Plan your day" entry (file+olp+datetree "~/MEGA/org/entries/journal.gpg")
+           (file "~/MEGA/org/templates/daily-plan.org"))
+          ("l" "Later")
+          ("lr" "Read Later" entry (file "~/MEGA/org/agenda/reads.org")
+           "* TODO %?\n%U\n")
+          ("ll" "Links for life" entry (file "~/MEGA/org/entries/links.org")
+           "* %?")
+          ;("w" "Weekly Thoughts" entry (function org-capture-function)
+          ;  "** %<%R> %?")
+          ("p" "Protocol" entry (file+headline "~/MEGA/org/entries/org-protocol.org" "Inbox")
+           "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
+          ("L" "Protocol Link" entry (file+headline "~/MEGA/org/entries/org-protocol.org" "Inbox")
+           "* %? [[%:link][%:description]] \nCaptured On: %U")))
+#+END_SRC
+*** org-agenda
+**** Agenda Files
+     #+BEGIN_SRC emacs-lisp
+       (defvar org-agenda-files-list
+         "~/.emacs.d/agenda-files.el"
+         "Path to save org-agenda-files list")
+
+       (defun save-org-agenda-files ()
+         ""
+         (interactive)
+         (save-excursion
+           (let ((buf (find-file-noselect org-agenda-files-list)))
+             (set-buffer buf)
+             (erase-buffer)
+             (print (list 'quote org-agenda-files) buf)
+             (save-buffer)
+             (kill-buffer)
+             (message "org-agenda file list saved to: %s" org-agenda-files-list))))
+
+       (defun org-agenda-load-file-list ()
+         ""
+         (interactive)
+         (save-excursion
+           (let ((buf (find-file-noselect org-agenda-files-list)))
+             (set-buffer buf)
+             (setq org-agenda-files (eval (read (buffer-string))))
+             (kill-buffer)
+             (message "org-agenda-files-list loaded from: %s" org-agenda-files-list))))
+
+     #+END_SRC
+**** General config
+#+BEGIN_SRC emacs-lisp
+  (setq org-log-done 'time)
+  (setq org-todo-keywords
+         '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
+           (sequence  "WAIT(w@/!)" "HOLD(h)" "|" "CANCELLED(c@/!)")))
+
+  (setq org-todo-keyword-faces 
+        '(("NEXT" :foreground "cyan" :weight bold)
+          ("WAIT" :foreground "yellow" :weight bold)
+          ("HOLD" :foreground "red" :weight bold)
+          ("CANCELLED" :foreground "dark gray" :weight bold)))
+
+  (setq org-use-fast-todo-selection t)
+
+  ;(setq org-agenda-files (quote ("~/MEGA/org/agenda")))
+  (org-agenda-load-file-list)
+
+  (setq my/non-agenda-refiles
+        '(("~/MEGA/org/agenda/someday.org" :maxlevel . 9)
+          ("~/MEGA/org/agenda/tickler.org" :maxlevel . 9)
+          ("~/MEGA/org/agenda/reference.org" :maxlevel . 9)))
+  ; Targets include this file and any file contributing to the agenda - up to 9 levels deep
+  (setq org-refile-targets `((nil :maxlevel . 9)
+                             (org-agenda-files :maxlevel . 9)
+                             ,@my/non-agenda-refiles))
+
+  (setq org-refile-target-verify-function
+        (lambda () 
+          (not (member "ARCHIVE" (org-get-tags-at (point) nil)))))
+
+  ; Use full outline paths for refile targets - we file directly with IDO
+  (setq org-refile-use-outline-path 'file)
+
+  ; Targets complete directly with IDO
+  (setq org-outline-path-complete-in-steps nil)
+
+  ; Allow refile to create parent tasks with confirmation
+  (setq org-refile-allow-creating-parent-nodes (quote confirm))
+
+  ; Use the current window for indirect buffer display
+  (setq org-indirect-buffer-display 'current-window)
+
+  ;; Do not dim blocked tasks
+  (setq org-agenda-dim-blocked-tasks nil)
+
+  (setq org-agenda-compact-blocks t)
+#+END_SRC
+**** Norang Projects code
+     #+BEGIN_SRC emacs-lisp
+       (require 'org-habit)
+
+       (defun bh/find-project-task ()
+         "Move point to the parent (project) task if any"
+         (save-restriction
+           (widen)
+           (let ((parent-task (save-excursion (org-back-to-heading 'invisible-ok) (point))))
+             (while (org-up-heading-safe)
+               (when (member (nth 2 (org-heading-components)) org-todo-keywords-1)
+                 (setq parent-task (point))))
+             (goto-char parent-task)
+             parent-task)))
+
+       (defun bh/is-project-p ()
+         "Any task with a todo keyword subtask"
+         (save-restriction
+           (widen)
+           (let ((has-subtask)
+                 (subtree-end (save-excursion (org-end-of-subtree t)))
+                 (is-a-task (member (nth 2 (org-heading-components)) org-todo-keywords-1)))
+             (save-excursion
+               (forward-line 1)
+               (while (and (not has-subtask)
+                           (< (point) subtree-end)
+                           (re-search-forward "^\*+ " subtree-end t))
+                 (when (member (org-get-todo-state) org-todo-keywords-1)
+                   (setq has-subtask t))))
+             (and is-a-task has-subtask))))
+
+       (defun bh/is-project-subtree-p ()
+         "Any task with a todo keyword that is in a project subtree.
+       Callers of this function already widen the buffer view."
+         (let ((task (save-excursion (org-back-to-heading 'invisible-ok)
+                                     (point))))
+           (save-excursion
+             (bh/find-project-task)
+             (if (equal (point) task)
+                 nil
+               t))))
+
+       (defun bh/is-task-p ()
+         "Any task with a todo keyword and no subtask"
+         (save-restriction
+           (widen)
+           (let ((has-subtask)
+                 (subtree-end (save-excursion (org-end-of-subtree t)))
+                 (is-a-task (member (nth 2 (org-heading-components)) org-todo-keywords-1)))
+             (save-excursion
+               (forward-line 1)
+               (while (and (not has-subtask)
+                           (< (point) subtree-end)
+                           (re-search-forward "^\*+ " subtree-end t))
+                 (when (member (org-get-todo-state) org-todo-keywords-1)
+                   (setq has-subtask t))))
+             (and is-a-task (not has-subtask)))))
+
+       (defun bh/is-subproject-p ()
+         "Any task which is a subtask of another project"
+         (let ((is-subproject)
+               (is-a-task (member (nth 2 (org-heading-components)) org-todo-keywords-1)))
+           (save-excursion
+             (while (and (not is-subproject) (org-up-heading-safe))
+               (when (member (nth 2 (org-heading-components)) org-todo-keywords-1)
+                 (setq is-subproject t))))
+           (and is-a-task is-subproject)))
+
+       (defun bh/list-sublevels-for-projects-indented ()
+         "Set org-tags-match-list-sublevels so when restricted to a subtree we list all subtasks.
+         This is normally used by skipping functions where this variable is already local to the agenda."
+         (if (marker-buffer org-agenda-restrict-begin)
+             (setq org-tags-match-list-sublevels 'indented)
+           (setq org-tags-match-list-sublevels nil))
+         nil)
+
+       (defun bh/list-sublevels-for-projects ()
+         "Set org-tags-match-list-sublevels so when restricted to a subtree we list all subtasks.
+         This is normally used by skipping functions where this variable is already local to the agenda."
+         (if (marker-buffer org-agenda-restrict-begin)
+             (setq org-tags-match-list-sublevels t)
+           (setq org-tags-match-list-sublevels nil))
+         nil)
+
+       (defvar bh/hide-scheduled-and-waiting-next-tasks t)
+
+       (defun bh/toggle-next-task-display ()
+         (interactive)
+         (setq bh/hide-scheduled-and-waiting-next-tasks (not bh/hide-scheduled-and-waiting-next-tasks))
+         (when  (equal major-mode 'org-agenda-mode)
+           (org-agenda-redo))
+         (message "%s WAITING and SCHEDULED NEXT Tasks" (if bh/hide-scheduled-and-waiting-next-tasks "Hide" "Show")))
+
+       (defun bh/skip-stuck-projects ()
+         "Skip trees that are not stuck projects"
+         (save-restriction
+           (widen)
+           (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+             (if (bh/is-project-p)
+                 (let* ((subtree-end (save-excursion (org-end-of-subtree t)))
+                        (has-next ))
+                   (save-excursion
+                     (forward-line 1)
+                     (while (and (not has-next) (< (point) subtree-end) (re-search-forward "^\\*+ NEXT " subtree-end t))
+                       (unless (member "WAITING" (org-get-tags-at))
+                         (setq has-next t))))
+                   (if has-next
+                       nil
+                     next-headline)) ; a stuck project, has subtasks but no next task
+               nil))))
+
+       (defun bh/skip-non-stuck-projects ()
+         "Only show subtrees that are stuck projects"
+         ;; (bh/list-sublevels-for-projects-indented)
+         (save-restriction
+           (widen)
+           (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+             (if (bh/is-project-p)
+                 (let* ((subtree-end (save-excursion (org-end-of-subtree t)))
+                        (has-next ))
+                   (save-excursion
+                     (forward-line 1)
+                     (while (and (not has-next)
+                                 (< (point) subtree-end)
+                                 (re-search-forward "^\\*+ NEXT " subtree-end t))
+                       (unless (member "WAITING" (org-get-tags-at))
+                         (setq has-next t))))
+                   (if has-next
+                       next-headline
+                     nil)) ; a stuck project, has subtasks but no next task
+               next-headline))))
+
+       (defun bh/skip-non-projects ()
+         "Skip trees that are not projects"
+         ;; (bh/list-sublevels-for-projects-indented)
+         (if (save-excursion (bh/skip-non-stuck-projects))
+             (save-restriction
+               (widen)
+               (let ((subtree-end (save-excursion (org-end-of-subtree t))))
+                 (cond
+                  ((bh/is-project-p)
+                   nil)
+                  ((and (bh/is-project-subtree-p) (not (bh/is-task-p)))
+                   nil)
+                  (t
+                   subtree-end))))
+           (save-excursion (org-end-of-subtree t))))
+
+       (defun bh/skip-non-tasks ()
+         "Show non-project tasks.
+       Skip project and sub-project tasks, habits, and project related tasks."
+         (save-restriction
+           (widen)
+           (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+             (cond
+              ((bh/is-task-p)
+               nil)
+              (t
+               next-headline)))))
+
+       (defun bh/skip-project-trees-and-habits ()
+         "Skip trees that are projects"
+         (save-restriction
+           (widen)
+           (let ((subtree-end (save-excursion (org-end-of-subtree t))))
+             (cond
+              ((bh/is-project-p)
+               subtree-end)
+              ((org-is-habit-p)
+               subtree-end)
+              (t
+               nil)))))
+
+       (defun bh/skip-projects-and-habits-and-single-tasks ()
+         "Skip trees that are projects, tasks that are habits, single non-project tasks"
+         (save-restriction
+           (widen)
+           (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+             (cond
+              ((org-is-habit-p)
+               next-headline)
+              ((and bh/hide-scheduled-and-waiting-next-tasks
+                    (member "WAITING" (org-get-tags-at)))
+               next-headline)
+              ((bh/is-project-p)
+               next-headline)
+              ((and (bh/is-task-p) (not (bh/is-project-subtree-p)))
+               next-headline)
+              (t
+               nil)))))
+
+       (defun bh/skip-project-tasks-maybe ()
+         "Show tasks related to the current restriction.
+       When restricted to a project, skip project and sub project tasks, habits, NEXT tasks, and loose tasks.
+       When not restricted, skip project and sub-project tasks, habits, and project related tasks."
+         (save-restriction
+           (widen)
+           (let* ((subtree-end (save-excursion (org-end-of-subtree t)))
+                  (next-headline (save-excursion (or (outline-next-heading) (point-max))))
+                  (limit-to-project (marker-buffer org-agenda-restrict-begin)))
+             (cond
+              ((bh/is-project-p)
+               next-headline)
+              ((org-is-habit-p)
+               subtree-end)
+              ((and (not limit-to-project)
+                    (bh/is-project-subtree-p))
+               subtree-end)
+              ((and limit-to-project
+                    (bh/is-project-subtree-p)
+                    (member (org-get-todo-state) (list "NEXT")))
+               subtree-end)
+              (t
+               nil)))))
+
+       (defun bh/skip-project-tasks ()
+         "Show non-project tasks.
+       Skip project and sub-project tasks, habits, and project related tasks."
+         (save-restriction
+           (widen)
+           (let* ((subtree-end (save-excursion (org-end-of-subtree t))))
+             (cond
+              ((bh/is-project-p)
+               subtree-end)
+              ((org-is-habit-p)
+               subtree-end)
+              ((bh/is-project-subtree-p)
+               subtree-end)
+              (t
+               nil)))))
+
+       (defun bh/skip-non-project-tasks ()
+         "Show project tasks.
+       Skip project and sub-project tasks, habits, and loose non-project tasks."
+         (save-restriction
+           (widen)
+           (let* ((subtree-end (save-excursion (org-end-of-subtree t)))
+                  (next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+             (cond
+              ((bh/is-project-p)
+               next-headline)
+              ((org-is-habit-p)
+               subtree-end)
+              ((and (bh/is-project-subtree-p)
+                    (member (org-get-todo-state) (list "NEXT")))
+               subtree-end)
+              ((not (bh/is-project-subtree-p))
+               subtree-end)
+              (t
+               nil)))))
+
+       (defun bh/skip-projects-and-habits ()
+         "Skip trees that are projects and tasks that are habits"
+         (save-restriction
+           (widen)
+           (let ((subtree-end (save-excursion (org-end-of-subtree t))))
+             (cond
+              ((bh/is-project-p)
+               subtree-end)
+              ((org-is-habit-p)
+               subtree-end)
+              (t
+               nil)))))
+
+       (defun bh/skip-non-subprojects ()
+         "Skip trees that are not projects"
+         (let ((next-headline (save-excursion (outline-next-heading))))
+           (if (bh/is-subproject-p)
+               nil
+             next-headline)))
+     #+END_SRC
+**** Views
+#+BEGIN_SRC emacs-lisp
+  (defun test (throwaway)
+    (insert throwaway))
+
+  (setq org-todo-state-tags-triggers
+        (quote (("HOLD" ("HOLD" . t))
+                ("WAIT" ("WAITING" . t))
+                ("TODO" ("HOLD") ("WAITING")))))
+
+  (setq org-agenda-tags-todo-honor-ignore-options t)
+
+  (defun bh/org-auto-exclude-function (tag)
+    "Automatic task exclusion in the agenda with / RET"
+    (and (cond
+          ((string= tag "hold")
+           t)
+          ((string= tag "farm")
+           t))
+         (concat "-" tag)))
+
+  (add-hook 'org-agenda-mode-hook
+            '(lambda ()
+               (org-defkey org-agenda-mode-map
+                           "W"
+                           (lambda ()
+                             (interactive)
+                             (setq bh/hide-scheduled-and-waiting-next-tasks
+                                   (not bh/hide-scheduled-and-waiting-next-tasks))
+                             (bh/widen))))
+            'append)
+
+  (defun bh/widen ()
+    (interactive)
+    (if (equal major-mode 'org-agenda-mode)
+        (progn
+          (org-agenda-remove-restriction-lock)
+          (when org-agenda-sticky
+            (org-agenda-redo)))
+      (widen)))
+
+
+  (setq org-agenda-auto-exclude-function 'bh/org-auto-exclude-function)
+  (setq org-agenda-skip-deadline-prewarning-if-scheduled t)
+
+  (defun cap/ignore-schedule-deadline (tag)
+        `((org-agenda-overriding-header (concat ,tag
+                                                              (if bh/hide-scheduled-and-waiting-next-tasks
+                                                                  ""
+                                                                " (including WAITING and SCHEDULED tasks)")))
+                        (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
+                        (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)
+                        (org-agenda-todo-ignore-with-date bh/hide-scheduled-and-waiting-next-tasks)))
+
+
+  (setq org-agenda-custom-commands
+        `(("g" "General View"
+           ((agenda "" ((org-agenda-log-mode 1)))
+            (tags-todo "+TODO=\"STAGED\""
+              ((org-agenda-overriding-header "------------------------------------\nStaged Tasks")))
+            (tags-todo "+REFILE"
+              ((org-agenda-overriding-header "Refile tasks")))
+            (tags-todo "WORK|SCHOOL-APT-TODO=\"STAGED\""
+              ((org-agenda-overriding-header "Important Tasks")))
+            (tags-todo "+APT"
+              ((org-agenda-overriding-header "Appointments")))
+            (tags-todo "+TODO=\"WAIT\""
+              ((org-agenda-overriding-header "Tasks on hold")))
+            (tags-todo "-WORK-SCHOOL+TODO=\"TODO\""
+              ((org-agenda-overriding-header "All tasks")))))
+          ("n" . "Norang overhaul")
+          ("nv" "Norang View"
+           ((agenda "" (;; (org-agenda-log-mode 1)
+                        (org-agenda-skip-scheduled-if-done t)
+                        (org-agenda-skip-deadline-if-done t)
+                        (org-agenda-span 1)
+                        ))
+            (tags-todo "+REFILE"
+                       ((org-agenda-overriding-header "-------------------------------------\nRefile tasks")))
+            (tags-todo "SCHEDULED<\"<today>\""
+                       ((org-agenda-files '("~/MEGA/org/agenda/tickler.org"))
+                        (org-agenda-overriding-header "Tickler")))
+            (tags-todo "-REFILE-HOLD-DOESNOTAPPLY/!NEXT"
+                       (,@(cap/ignore-schedule-deadline "Project Next Tasks")
+                        (org-agenda-skip-function 'bh/skip-projects-and-habits-and-single-tasks)
+                        (org-tags-match-list-sublevels t)))
+            (tags-todo "-REFILE-HOLD-DOESNOTAPPLY/!"
+                       (,@(cap/ignore-schedule-deadline "Standalone Tasks")
+                        (org-agenda-skip-function 'bh/skip-project-tasks)))
+            (tags-todo "+HOLD"
+                       (,@(cap/ignore-schedule-deadline "On Hold Tasks")
+                        (org-agenda-skip-function 'bh/skip-project-tasks)))))
+          ("nn" "Next tasks" 
+           ((tags-todo "+PLAN"
+                       ((org-agenda-overriding-header "Today's plan")))
+            (tags-todo "+REFILE"
+                       ((org-agenda-overriding-header "Refile tasks")))
+            (tags-todo "SCHEDULED<\"<today>\""
+                       ((org-agenda-files '("~/MEGA/org/agenda/tickler.org"))
+                        (org-agenda-overriding-header "Tickler")))
+            (tags-todo "-REFILE-DOESNOTAPPLY/!"
+                       ((org-agenda-overriding-header "Stuck Projects")
+                        (org-tags-match-list-sublevels 'indented)
+                        (org-agenda-skip-function 'bh/skip-non-stuck-projects)
+                        (org-agenda-sorting-strategy
+                         '(category-keep))))
+            (tags-todo "-REFILE-HOLD-DOESNOTAPPLY/!"
+                       ((org-agenda-overriding-header "Active Projects")
+                        (org-agenda-skip-function 'bh/skip-non-projects)
+                        (org-tags-match-list-sublevels 'indented)))
+            (tags-todo "-REFILE-HOLD-DOESNOTAPPLY/!NEXT"
+                       ((org-agenda-skip-function 'bh/skip-projects-and-habits-and-single-tasks)
+                        (org-agenda-overriding-header "Next Tasks")
+                        (org-tags-match-list-sublevels t)
+                        (org-agenda-sorting-strategy '(deadline-up))))
+            (tags-todo "-REFILE-HOLD-PLAN-DOESNOTAPPLY/!"
+                       ((org-agenda-skip-function 'bh/skip-project-tasks)
+                        (org-agenda-overriding-header "Standalone Tasks (including WAITING and SCHEDULED tasks)")
+                        (org-agenda-sorting-strategy '(deadline-up))))))
+          ("nh" "Projects on hold" todo "HOLD" ((org-tags-match-list-sublevels 'indented)))
+          ("nt" "Tickler" agenda "" ((org-agenda-files '("/home/benson/MEGA/org/agenda/tickler.org"))))
+          ("nd" "DOESNOTAPPLY" tags "DOESNOTAPPLY")
+          ("u" "Test"
+           ((agenda "")
+            (test "Hello")))
+          ("c" . "Custom Commands")
+          ("ca" "Appointments" tags-todo "+APT")
+          ("cs" "School"
+           ((tags-todo "SCHOOL")))
+          ("cr" "Archive" tags "TODO=\"DONE\"-PLAN")
+          ("cf" "Refile" tags-todo "+REFILE")
+          ("cp" "Post-panic" tags-todo "+PANIC")))
+#+END_SRC
+**** Face
+     #+BEGIN_SRC emacs-lisp
+       (custom-set-faces
+	'(org-agenda-date-today ((t (:inherit org-agenda-date :foreground "cyan" :slant italic :weight bold :height 1.1)))))
+     #+END_SRC
+*** Plugins
+**** org-bullets
+#+BEGIN_SRC emacs-lisp
+(require 'org-bullets)
+(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+#+END_SRC
+**** calfw-org
+   #+BEGIN_SRC emacs-lisp
+   (require 'calfw-org)
+   (global-set-key (kbd "C-c A") 'cfw:open-org-calendar)
+   (setq cfw:org-overwrite-default-keybinding t)
+   #+END_SRC
+**** sync with google calendar
+     #+BEGIN_SRC emacs-lisp
+       (require 'org-caldav)
+       (require 'oauth2)
+       (setq epa-pinentry-mode 'loopback)
+       (setq plstore-cache-passphrase-for-symmetric-encryption t)
+
+       (save-excursion
+         (let ((filename "google-calendar-secret.el"))
+           (when (file-exists-p filename)
+             (set-buffer (find-file-noselect filename))
+             (let ((var (eval (read (buffer-string)))))
+               (setq org-caldav-oauth2-client-id (car var)
+                     org-caldav-oauth2-client-secret (cadr var))))))
+
+       (setq org-caldav-url 'google
+             org-caldav-calendar-id "jqeua8pamjrclakq3bg8mpnlis@group.calendar.google.com"
+             org-caldav-inbox "~/MEGA/org/agenda/test.org"
+             org-caldav-files '("~/MEGA/org/agenda/school.org" "~/MEGA/org/agenda/people.org") 
+             org-icalendar-include-todo nil
+             org-icalendar-include-sexp t
+             org-icalendar-categories '(all-tags category)
+             org-icalendar-use-deadline '(event-if-todo event-if-not-todo todo-due)
+             org-icalendar-use-scheduled '(event-if-todo event-if-not-todo todo-start)
+             org-icalendar-with-timestamps nil
+             org-caldav-delete-org-entries 'never)
+       (defun always-use-loopback (fun context args)
+         (setf (epg-context-pinentry-mode context) epa-pinentry-mode)
+         (funcall fun context args))
+       (advice-add 'epg--start :around #'always-use-loopback)
+       (setq org-caldav-skip-conditions 
+             '(nottodo ("TODO" "NEXT"))
+             )
+       (setq org-caldav-exclude-tags '("ARCHIVE"))
+     #+END_SRC
+*** Code-blocks
+   #+BEGIN_SRC emacs-lisp
+   (require 'ob-core)
+   (require 'ob-clojure)
+   (setq org-babel-clojure-backend 'cider)
+   (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((clojure . t)))
+   #+END_SRC
+*** View org files
+ #+BEGIN_SRC emacs-lisp
+ (defun make-org-file (filename)
+   "Make an org buffer in folder for all new incoming org files"
+   (interactive "MName: ")
+   (switch-to-buffer (find-file-noselect (concat "~/MEGA/org/random/" filename ".org"))))
+   
+ (defun make-encrypted-org-file (filename) 
+   (interactive "MName: ")
+   (switch-to-buffer (find-file-noselect (concat "~/MEGA/org/random/" filename ".gpg")))
+   (insert "# -*- mode:org; epa-file-encrypt-to: (\"bensonchu457@gmail.com\") -*-\n\n")
+   (org-mode))
+   
+
+ (defun view-org-files ()
+   "Convenient way for openning up org folder in dired"
+   (interactive)
+   (dired "~/MEGA/org/"))
+ #+END_SRC
+*** Reveal.js
+#+BEGIN_SRC emacs-lisp
+(require 'ox-reveal)
+(setq org-reveal-root "file:///home/benson/reveal.js")
+#+END_SRC
+*** Require org-protocol
+    #+BEGIN_SRC emacs-lisp
+    (require 'org-protocol)
+    #+END_SRC
+*** Allow alphabetic lists
+    #+BEGIN_SRC emacs-lisp
+      (setq org-list-allow-alphabetical t)
+    #+END_SRC
+*** My Template
+    #+BEGIN_SRC emacs-lisp
+    (add-to-list 'org-structure-template-alist
+     '("sv" "#+BEGIN_SRC ? :results value\n\n#+END_SRC"))
+    (add-to-list 'org-structure-template-alist
+     '("so" "#+BEGIN_SRC ? :results output\n\n#+END_SRC"))
+    #+END_SRC
+** mu4e
+*** General config
+ #+BEGIN_SRC emacs-lisp
+ (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e")
+ (setq mu4e-msg2pdf "~/.emacs.d/el-get/mu4e/toys/msg2pdf/msg2pdf")
+
+ (require 'mu4e)
+ (add-to-list 'mu4e-view-actions
+   '("ViewInBrowser" . mu4e-action-view-in-browser) t)
+(global-set-key (kbd "<f8>") 'mu4e)
+ #+END_SRC
+*** Multiple accounts
+   #+BEGIN_SRC emacs-lisp
+   (setq mu4e-sent-folder "/Gmail/[Gmail].Sent Mail"
+   mu4e-drafts-folder "/Gmail/[Gmail].Drafts"
+   mu4e-refile-folder "/Gmail/[Gmail].Archive"
+   user-mail-address "bensonchu457@gmail.com"
+   smtpmail-default-smtp-server "smtp.gmail.com"
+   smtpmail-smtp-server "smtp.gmail.com")
+   
+   (defvar my-mu4e-account-alist
+   '(("Gmail"
+   (mu4e-sent-folder "/work/Sent Mail")
+   (mu4e-drafts-folder "/Gmail/[Gmail].Drafts")
+   (mu4e-refile-folder "/Gmail/[Gmail].Archive")
+   (user-mail-address "bensonchu457@gmail.com")
+   (smtpmail-default-smtp-server "smtp.gmail.com")
+   (smtpmail-smtp-user "bensonchu457")
+   (smtpmail-smtp-server "smtp.gmail.com"))
+   ("work"
+   (mu4e-sent-folder "/work/Sent")
+   (mu4e-drafts-folder "/work/Drafts")
+   (mu4e-refile-folder "/work/Archive")
+   (user-mail-address "bchu3@uh.edu")
+   (smtpmail-default-smtp-server "smtp.account2.example.com")
+   (smtpmail-smtp-user "bchu3")
+   (smtpmail-smtp-server "smtp.account2.example.com"))))
+
+
+
+;(defun my-mu4e-set-account ()
+;  "Set the account for composing a message."
+;  (let* ((account
+;	  (if mu4e-compose-parent-message
+;	      (let ((maildir (mu4e-message-field mu4e-compose-parent-message :maildir)))
+;		(string-match "/\\(.*?\\)/" maildir)
+;		(match-string 1 maildir))
+;	    (completing-read (format "Compose with account: (%s) "
+;				     (mapconcat #'(lambda (var) (car var))
+;						my-mu4e-account-alist "/"))
+;			     (mapcar #'(lambda (var) (car var)) my-mu4e-account-alist)
+;			     nil t nil nil (caar my-mu4e-account-alist))))
+;	 (account-vars (cdr (assoc account my-mu4e-account-alist))))
+;    (if account-vars
+;        (mapc #'(lambda (var)
+;		  (set (car var) (cadr var)))
+;	      account-vars)
+;      (error "No email account found"))))
+
+;	(add-hook 'mu4e~headers-jump-to-maildir 'my-mu4e-set-account)
+
+
+   #+END_SRC
+** Elfeed
+#+BEGIN_SRC emacs-lisp
+  ;; Load elfeed-org
+  (require 'elfeed)
+  (require 'elfeed-org)
+
+  ;; Initialize elfeed-org
+  ;; This hooks up elfeed-org to read the configuration when elfeed
+  ;; is started with =M-x elfeed=
+
+  ;; Optionally specify a number of files containing elfeed
+  ;; configuration. If not set then the location below is used.
+  ;; Note: The customize interface is also supported.
+  (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org"))
+  (elfeed-org)
+  (setq-default elfeed-search-filter "@6-months-ago +unread -youtube")
+  (define-key elfeed-search-mode-map "U" 'elfeed-search-fetch-visible)
+  (define-key elfeed-search-mode-map "Y" (lambda ()
+					   (interactive)
+					   (elfeed-search-set-filter "+youtube +unread")))
+  (define-key elfeed-search-mode-map "h" (lambda ()
+					   (interactive)
+					   (elfeed-search-set-filter nil)))
+
+  (defun elfeed-show-youtube-dl ()
+    "Download the current entry with youtube-dl."
+    (interactive)
+    (pop-to-buffer (youtube-dl (elfeed-entry-link elfeed-show-entry))))
+
+  (cl-defun elfeed-search-youtube-dl (&key slow)
+    "Download the current entry with youtube-dl."
+    (interactive)
+    (let ((entries (elfeed-search-selected)))
+      (dolist (entry entries)
+	(if (null (youtube-dl (elfeed-entry-link entry)
+			      :title (elfeed-entry-title entry)
+			      :slow slow))
+	    (message "Entry is not a YouTube link!")
+	  (message "Downloading %s" (elfeed-entry-title entry)))
+	(elfeed-untag entry 'unread)
+	(elfeed-search-update-entry entry)
+	(unless (use-region-p) (forward-line)))))
+
+  (define-key elfeed-search-mode-map "d" 'elfeed-search-youtube-dl)
+  (setq youtube-dl-directory "~/big_files/Videos/youtube-dl")
+
+(require 'dired-aux)
+
+(defvar dired-filelist-cmd
+  '(("vlc" "-L")))
+
+(defun dired-start-process (cmd &optional file-list)
+  (interactive
+   (let ((files (dired-get-marked-files
+                 t current-prefix-arg)))
+     (list
+      (dired-read-shell-command "& on %s: "
+                                current-prefix-arg files)
+      files)))
+  (let (list-switch)
+    (start-process
+     cmd nil shell-file-name
+     shell-command-switch
+     (format
+      "nohup 1>/dev/null 2>/dev/null %s \"%s\""
+      (if (and (> (length file-list) 1)
+               (setq list-switch
+                     (cadr (assoc cmd dired-filelist-cmd))))
+          (format "%s %s" cmd list-switch)
+        cmd)
+      (mapconcat #'expand-file-name file-list "\" \"")))))
+
+  (defun watch-youtube ()
+    (interactive)
+    (dired "~/big_files/Videos/youtube-dl")
+    (local-set-key (kbd "RET") 'dired-start-process))
+#+END_SRC
+** Programming
+*** Autocompletion
+#+BEGIN_SRC emacs-lisp
+  (require 'company)
+  (require 'irony)
+  (add-hook 'c++-mode-hook 'irony-mode)
+  (add-hook 'c-mode-hook 'irony-mode)
+  (add-hook 'objc-mode-hook 'irony-mode)
+
+  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+
+  (global-company-mode)
+#+END_SRC
+*** Yasnippets
+    #+BEGIN_SRC emacs-lisp
+    (require 'yasnippet)
+    (define-key yas-minor-mode-map (kbd "<backtab>") 'yas-expand)
+    (yas-global-mode 1)
+    #+END_SRC
+*** Projectile
+#+BEGIN_SRC emacs-lisp
+  (require 'projectile)
+  (require 'helm-projectile)
+  (require 'counsel-projectile)
+
+  (projectile-global-mode)
+  ; Deprecated?
+  ;(counsel-projectile-on)
+  (cons 'projectile-root-bottom-up
+        (remove 'projectile-root-bottom-up
+                projectile-project-root-files-functions))
+  (setq projectile-indexing-method 'native)
+  (setq projectile-completion-system 'ivy)
+  (setq projectile-switch-project-action 'neotree-projectile-action)
+#+END_SRC
+*** hs-minor-mode
+#+BEGIN_SRC emacs-lisp
+  (defun set-hiding-indentation (column)
+    (interactive "P")
+    (set-selective-display
+     (or column
+         (unless selective-display
+           (1+ (current-column))))))
+
+  (defun set-hiding-indentation-to-point (column)
+    (interactive "P")
+    (if hs-minor-mode
+        (if (condition-case nil
+                (hs-toggle-hiding)
+              (error t))
+            (hs-show-all))
+      (set-hiding-indentation column)))
+
+  (global-set-key (kbd "C-=") 'hs-toggle-hiding)
+  (global-set-key (kbd "C--") 'set-hiding-indentation-to-point)
+  (add-hook 'c-mode-common-hook   'hs-minor-mode)
+  (add-hook 'emacs-lisp-mode-hook 'hs-minor-mode)
+  (add-hook 'java-mode-hook       'hs-minor-mode)
+  (add-hook 'lisp-mode-hook       'hs-minor-mode)
+  (add-hook 'perl-mode-hook       'hs-minor-mode)
+  (add-hook 'sh-mode-hook         'hs-minor-mode)
+#+END_SRC
+*** Ensime (scala)
+    #+BEGIN_SRC emacs-lisp
+    (require 'ensime)
+    #+END_SRC
+*** Magit
+    #+BEGIN_SRC emacs-lisp
+      (require 'magit)
+      (global-set-key (kbd "C-x g") 'magit-status)
+      (global-set-key (kbd "C-x M-g") 'magit-dispatch-popup)
+    #+END_SRC
+*** SPACES
+    #+BEGIN_SRC emacs-lisp
+      (setq TeX-auto-untabify 't)
+      (setq indent-tabs-mode nil)
+      (add-hook 'java-mode-hook
+                (lambda () 
+                  (setq indent-tabs-mode nil)))
+      (add-hook 'clojure-mode
+                 (lambda ()
+                  (setq indent-tabs-mode nil)))
+    #+END_SRC
+** Freekeys
+   #+BEGIN_SRC emacs-lisp
+   (require 'free-keys)
+   (bind-key "C-h C-k" 'free-keys)
+   #+END_SRC 
+** Eww
+   #+BEGIN_SRC emacs-lisp
+     (global-set-key (kbd "C-c g")
+		     (lambda ()
+		       (interactive)
+		       (w3m-goto-url "https://google.com")))
+   #+END_SRC
+* New
+** Swiper or counsel-grep
+   #+BEGIN_SRC emacs-lisp
+     (global-set-key (kbd "C-s") 'counsel-grep-or-swiper)
+   #+END_SRC
+** Youtube-dl
+   #+BEGIN_SRC emacs-lisp
+     (add-to-list 'load-path "~/.emacs.d/custom/youtube-dl-emacs/")
+     (require 'youtube-dl)
+   #+END_SRC
+** Spaces
+   #+BEGIN_SRC emacs-lisp
+   (setq default-tab-width 4)
+   (setq-default indent-tabs-mode nil)
+   #+END_SRC
+** glsl-mode
+   #+BEGIN_SRC emacs-lisp
+   (autoload 'glsl-mode "glsl-mode" nil t)
+   (add-to-list 'auto-mode-alist '("\\.glsl\\'" . glsl-mode))
+   (add-to-list 'auto-mode-alist '("\\.vert\\'" . glsl-mode))
+   (add-to-list 'auto-mode-alist '("\\.frag\\'" . glsl-mode))
+   (add-to-list 'auto-mode-alist '("\\.geom\\'" . glsl-mode))
+   #+END_SRC
+* Disabled 
+** nnreddit
+ #+BEGIN_SRC emacs-lisp#
+ (require 'nnredit "~/.emacs.d/nnreddit/nnreddit.el")
+ (add-to-list 'gnus-secondary-select-methods '(nnreddit ""))
+ #+END_SRC
+** xwidget
+   #+BEGIN_SRC emacs-lisp#
+   (define-key xwidget-webkit-mode-map [mouse-4] 'xwidget-webkit-scroll-down)
+   (define-key xwidget-webkit-mode-map [mouse-5] 'xwidget-webkit-scroll-up)
+   #+END_SRC 
+** Slime mode
+ #+BEGIN_SRC emacs-lisp#
+ (require 'slime)
+ (add-hook 'lisp-mode-hook (lambda () (slime-mode t)))
+ (add-hook 'inferior-lisp-mode-hook (lambda () (inferior-slime-mode t)))
+ (setq inferior-lisp-program "/usr/bin/sbcl")
+ (load (expand-file-name "~/quicklisp/slime-helper.el"))
+ #+END_SRC
+** i3wm interaction
+  #+BEGIN_SRC emacs-lisp#
+  (require 'i3wm)
+  (defun insert-mode ()
+    (interactive)
+    (i3wm-command "mode insert"))
+  (global-set-key (kbd "M-\"") 'insert-mode)
+  #+END_SRC
+** Cyberpunk Theme
+ #+BEGIN_SRC #emacs-lisp
+ (load-theme 'cyberpunk t)
+(require 'moe-theme)
+(moe-dark)
+(powerline-moe-theme)
+ #+END_SRC
+** Wanderlust
+#+BEGIN_SRC emacs-lisp#
+(autoload 'wl "wl" "Wanderlust" t)
+#+END_SRC
+** linum
+ #+BEGIN_SRC emacs-lisp#
+ (require 'linum)
+ (linum-relative-global-mode)
+ (setq linum-relative-current-symbol "")
+
+ ;(setq linum-format 
+ ;  (lambda (line) 
+ ;    (propertize (format (let ((w (length (number-to-string (count-lines (point-min) (point-max))))))
+ ;                          (concat "%" (number-to-string w) "d ")) 
+ ;		        line) 
+ ;		'face 
+ ;		'linum)))
+
+ ;(setq linum-relative-format "%3s\u2502 ")
+ #+END_SRC
+ 
+** CTD Minor Mode
+*** Keybinding
+    #+BEGIN_SRC emacs-lisp#
+    (require 'multi-term)
+      (define-minor-mode ctd-mode
+	"This is the mode for the CoderTillDeath"
+	:init-value t
+	:lighter " ctd"
+	:keymap (let ((map (make-sparse-keymap)))
+		  (define-key map (kbd "M-e") 'launch-program)
+		  (define-key map (kbd "C-x p") 'launch-program)
+		  (define-key map (kbd "M-`") 'multi-term)
+		  (define-key map (kbd "M-1") 'windresize)
+		  map))
+      (ctd-mode 1)
+    #+END_SRC
+*** Precedence
+ #+BEGIN_SRC emacs-lisp#
+ (add-hook 'after-load-functions 'ctd-mode-priority)
+
+ (defun ctd-mode-priority (_file)
+   "Try to ensure that my keybindings retain priority over other minor modes.
+
+ Called via the `after-load-functions' special hook."
+   (unless (eq (caar minor-mode-map-alist) 'ctd-mode)
+     (let ((mykeys (assq 'ctd-mode minor-mode-map-alist)))
+       (assq-delete-all 'ctd-mode minor-mode-map-alist)
+       (add-to-list 'minor-mode-map-alist mykeys))))
+ #+END_SRC
+** Screw delete
+   #+BEGIN_SRC emacs-lisp#
+     (global-set-key (kbd "C-d") 'delete-backward-char)
+     (global-set-key (kbd "M-d") 'backward-kill-word)
+   #+END_SRC
+   
+** Custom Journal Attempt 1
+#+BEGIN_SRC emacs-lisp#
+(defvar yearly-theme "Insight")
+
+  (defun insert-time-stamp ()
+    (insert "** "
+            (format-time-string "%A, %x")))
+
+  (defun current-date-exists? () 
+    (save-excursion
+      (let ((match (re-search-forward (format-time-string "\\(* %A, %x\\)")
+                                      nil t)))
+        (match-beginning 1))))
+
+  (defun add-date () 
+    (search-forward "* Journal")
+    (beginning-of-line)
+    (org-narrow-to-subtree)
+    (let ((point (current-date-exists?)))
+      (if point
+          (goto-char point)
+        (goto-char (point-max))
+        (insert-time-stamp)))
+    (widen))
+
+  (defun add-weekly-journal-entry () 
+    (add-date))
+
+  (defun org-capture-function ()
+    (unless (file-exists-p "~/MEGA/org/entries/review/current.org")
+      (create-weekly-review-file))
+    (set-buffer (org-capture-target-buffer "~/MEGA/org/entries/review/current.org"))
+    (let ((m (point-marker)))
+      (set-buffer (marker-buffer m))
+      (org-capture-put-target-region-and-position)
+      (widen)
+      (goto-char m)
+      (set-marker m nil)
+      (add-weekly-journal-entry)))
+
+  (defun create-weekly-review-file ()
+    (save-excursion
+      (let ((entry-path "~/MEGA/org/entries/review/current.org"))
+        (find-file-other-window entry-path)
+        (insert (format "#+TITLE: Year of %s, week %s\n\n"
+                        yearly-theme
+                        (format-time-string "%V"))
+                "* Log\n"
+                "* Journal\n")
+        (save-buffer)
+        (kill-buffer))))
+
+  (defun weekly-review ()
+    (interactive)
+    (let ((entry-path "~/MEGA/org/entries/review/current.org"))
+      (find-file entry-path)
+      (goto-char (point-max))
+      (insert "\n* Review\n")))
+
+  (defun wr/done ()
+    (interactive)
+    (save-buffer)
+    (kill-buffer)
+    (unless (file-directory-p (format-time-string "~/MEGA/org/entries/review/%Y"))
+      (make-directory (format-time-string "~/MEGA/org/entries/review/%Y")))
+    (rename-file "~/MEGA/org/entries/review/current.org" 
+                 (format-time-string "~/MEGA/org/entries/review/%Y/Year of Insight, Week %V.org")
+                 t)
+    (create-weekly-review-file))
+
+
+#+END_SRC
+** Custom Journal Attempt 2
+#+BEGIN_SRC emacs-lisp#
+  (defvar yearly-theme "Surpass")
+
+  (defun completed-tags-search (start-date end-date)
+    (let ((org-agenda-overriding-header "* Log")
+          (tag-search (concat (format "TODO=\"DONE\"&CLOSED>=\"[%s]\"&CLOSED<=\"[%s]\""
+                      start-date
+                      end-date))))
+      (org-tags-view nil tag-search)))
+
+  (defun get-tasks-from (start-date end-date)
+    (let (string)
+      (save-window-excursion
+        (completed-tags-search start-date end-date)
+        (setq string (mapconcat 'identity
+                                (mapcar (lambda (a)
+                                          (concat "**" a))
+                                        (butlast (cdr (split-string (buffer-string) "\n")) 1)) 
+                                "\n"))
+        (kill-buffer))
+      string))
+
+  (defun get-journal-entries-from (start-date end-date)
+    (let ((string "")
+      match)
+      (save-window-excursion
+    (switch-to-buffer (find-file "~/MEGA/org/entries/journal.gpg"))
+    (goto-char (point-min))
+    (while (setq match (re-search-forward "^\\*\\*\\* \\(2[0-9]\\{3\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\) \\w+$" nil t))
+    (let ((date (match-string 1)))
+      (when (and (org-time< start-date date)
+             (or (not end-date) (org-time< date end-date)))
+        (org-narrow-to-subtree)
+        (org-shiftmetaleft)
+        (setq string (concat string "\n" (buffer-string)))
+        (org-shiftmetaright)
+        (widen))))
+    (not-modified)
+    (kill-buffer))
+      string))
+
+  (defun generate-view-between (start-date end-date)
+    (let ((start-date (or start-date
+              (org-read-date)))
+      (end-date (or end-date
+            (org-read-date)))
+      (org-agenda-skip-archived-trees nil))
+      (get-buffer-create "review.org")
+      (switch-to-buffer "review.org")
+      (org-mode)
+      (insert (format "#+Title of %s, Week %s\n\n"
+              yearly-theme
+              (format-time-string "%V")))
+      (insert "* Log\n")
+      (insert (get-tasks-from start-date end-date))
+      (insert "\n* Journal"))
+      (insert (get-journal-entries-from start-date end-date))
+      (when (> (funcall outline-level) 1) (outline-up-heading 2))
+      (org-cycle)
+      (org-cycle)
+      (goto-char (point-max)))
+
+  (defun generate-view-from ()
+    (interactive)
+    (let ((date (org-read-date)))
+      (generate-view-between date
+                 (org-read-date nil nil ""))))
+
+  (defun generate-weekly-view () 
+    (interactive)
+    (let ((start-date (org-read-date nil nil "-1w"))
+      (end-date (org-read-date nil nil "")))
+      (generate-view-between start-date end-date)))
+
+  (defun weekly-review ()
+    (interactive)
+    (generate-weekly-view)
+    (goto-char (point-max))
+    (insert "\n* Review\n"))
+
+  (defun offday-review ()
+    (interactive)
+    (generate-view-from)
+    (goto-char (point-max))
+    (insert "\n* Review\n"))
+
+  (defun wr/done ()
+    (interactive)
+    (write-file (concat "~/MEGA/org/entries/review/"
+            (format-time-string "%Y/")
+            (format "Year of %s, Week "
+                yearly-theme)
+            (format-time-string "%V")
+            ".org"))
+    (kill-buffer))
+
+  (defun view-reports ()
+    (interactive)
+    (dired (format-time-string "~/MEGA/org/entries/review/%Y/")))
+#+END_SRC

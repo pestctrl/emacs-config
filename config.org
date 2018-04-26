@@ -317,6 +317,7 @@
 ** Theming
 *** Calm forest theme
 #+BEGIN_SRC emacs-lisp
+(use-package color-theme-modern)
 (load-theme 'calm-forest t)
 #+END_SRC
 *** powerline

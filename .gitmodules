@@ -1,3 +1,6 @@
 [submodule "custom/mu"]
 	path = custom/mu
 	url = https://github.com/djcb/mu
+[submodule "custom/youtube-dl-emacs"]
+	path = custom/youtube-dl-emacs
+	url = https://github.com/skeeto/youtube-dl-emacs

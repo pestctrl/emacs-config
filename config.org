@@ -78,8 +78,8 @@
 ** Config
 #+BEGIN_SRC emacs-lisp
   (use-package exwm)  
-  (use-package exwm-systemtray)
-  (use-package exwm-config)
+  (require 'exwm-systemtray)
+  (require 'exwm-config)
   (exwm-config-default)
   ;(setq exwm-input-line-mode-passthrough t)
 #+END_SRC
@@ -223,7 +223,7 @@
 #+END_SRC
 ** xrandr
 #+BEGIN_SRC emacs-lisp
-(use-package exwm-randr)
+(require 'exwm-randr)
 ;No dash when using intel driver
 (setq exwm-randr-workspace-output-plist '(1 "HDMI1" 3 "HDMI1"))
 (exwm-randr-enable)
@@ -726,7 +726,7 @@
 ** Navigation
 *** Helm & counsel
 #+BEGIN_SRC emacs-lisp
-  (use-package helm-config)
+  (require 'helm-config)
   (use-package company)
   (helm-mode 1)
   ;(setq ivy-initial-inputs-alist nil)
@@ -759,7 +759,7 @@
 #+END_SRC
 ***** Config
 #+BEGIN_SRC emacs-lisp
-  (use-package ibuf-ext)
+  (require 'ibuf-ext)
   (autoload 'ibuffer "ibuffer" "List buffers." t)
   (add-to-list 'ibuffer-never-show-predicates
                '(lambda (buf)
@@ -839,7 +839,7 @@
 * Tools
 ** Encryption
 #+BEGIN_SRC emacs-lisp
-  (use-package epa-file)
+  (require 'epa-file)
   (epa-file-enable)
   (setq epa-pinentry-mode 'loopback)
   (setq epa-file-cache-passphrase-for-symmetric-encryption t)
@@ -1058,7 +1058,7 @@
 #+END_SRC
 **** Norang Projects code
      #+BEGIN_SRC emacs-lisp
-          (use-package org-habit)
+          (require 'org-habit)
 
           (defun bh/find-project-task ()
             "Move point to the parent (project) task if any"
@@ -1474,6 +1474,9 @@
 #+END_SRC
 **** calfw-org
    #+BEGIN_SRC emacs-lisp
+   (use-package calfw)
+   (use-package calfw-ical)
+   (use-package calfw-gcal)
    (use-package calfw-org)
    (global-set-key (kbd "C-c A") 'cfw:open-org-calendar)
    (setq cfw:org-overwrite-default-keybinding t)
@@ -1515,8 +1518,8 @@
      #+END_SRC
 *** Code-blocks
    #+BEGIN_SRC emacs-lisp
-   (use-package ob-core)
-   (use-package ob-clojure)
+   (require 'ob-core)
+   (require 'ob-clojure)
    (setq org-babel-clojure-backend 'cider)
    (org-babel-do-load-languages
      'org-babel-load-languages
@@ -1548,7 +1551,7 @@
 #+END_SRC
 *** Require org-protocol
     #+BEGIN_SRC emacs-lisp
-    (use-package org-protocol)
+    (require 'org-protocol)
     #+END_SRC
 *** Allow alphabetic lists
     #+BEGIN_SRC emacs-lisp
@@ -1561,69 +1564,6 @@
     (add-to-list 'org-structure-template-alist
      '("so" "#+BEGIN_SRC ? :results output\n\n#+END_SRC"))
     #+END_SRC
-** mu4e
-*** General config
- #+BEGIN_SRC emacs-lisp
- (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e")
- (setq mu4e-msg2pdf "~/.emacs.d/el-get/mu4e/toys/msg2pdf/msg2pdf")
-
- (use-package mu4e)
- (add-to-list 'mu4e-view-actions
-   '("ViewInBrowser" . mu4e-action-view-in-browser) t)
-   (global-set-key (kbd "<f8>") 'mu4e)
- #+END_SRC
-*** Multiple accounts
-   #+BEGIN_SRC emacs-lisp
-   (setq mu4e-sent-folder "/Gmail/[Gmail].Sent Mail"
-   mu4e-drafts-folder "/Gmail/[Gmail].Drafts"
-   mu4e-refile-folder "/Gmail/[Gmail].Archive"
-   user-mail-address "bensonchu457@gmail.com"
-   smtpmail-default-smtp-server "smtp.gmail.com"
-   smtpmail-smtp-server "smtp.gmail.com")
-   
-   (defvar my-mu4e-account-alist
-   '(("Gmail"
-   (mu4e-sent-folder "/work/Sent Mail")
-   (mu4e-drafts-folder "/Gmail/[Gmail].Drafts")
-   (mu4e-refile-folder "/Gmail/[Gmail].Archive")
-   (user-mail-address "bensonchu457@gmail.com")
-   (smtpmail-default-smtp-server "smtp.gmail.com")
-   (smtpmail-smtp-user "bensonchu457")
-   (smtpmail-smtp-server "smtp.gmail.com"))
-   ("work"
-   (mu4e-sent-folder "/work/Sent")
-   (mu4e-drafts-folder "/work/Drafts")
-   (mu4e-refile-folder "/work/Archive")
-   (user-mail-address "bchu3@uh.edu")
-   (smtpmail-default-smtp-server "smtp.account2.example.com")
-   (smtpmail-smtp-user "bchu3")
-   (smtpmail-smtp-server "smtp.account2.example.com"))))
-
-
-
-;(defun my-mu4e-set-account ()
-;  "Set the account for composing a message."
-;  (let* ((account
-;	  (if mu4e-compose-parent-message
-;	      (let ((maildir (mu4e-message-field mu4e-compose-parent-message :maildir)))
-;		(string-match "/\\(.*?\\)/" maildir)
-;		(match-string 1 maildir))
-;	    (completing-read (format "Compose with account: (%s) "
-;				     (mapconcat #'(lambda (var) (car var))
-;						my-mu4e-account-alist "/"))
-;			     (mapcar #'(lambda (var) (car var)) my-mu4e-account-alist)
-;			     nil t nil nil (caar my-mu4e-account-alist))))
-;	 (account-vars (cdr (assoc account my-mu4e-account-alist))))
-;    (if account-vars
-;        (mapc #'(lambda (var)
-;		  (set (car var) (cadr var)))
-;	      account-vars)
-;      (error "No email account found"))))
-
-;	(add-hook 'mu4e~headers-jump-to-maildir 'my-mu4e-set-account)
-
-
-   #+END_SRC
 ** Elfeed
 #+BEGIN_SRC emacs-lisp
   ;; Load elfeed-org
@@ -1670,7 +1610,7 @@
   (define-key elfeed-search-mode-map "d" 'elfeed-search-youtube-dl)
   (setq youtube-dl-directory "~/big_files/Videos/youtube-dl")
 
-(use-package dired-aux)
+(require 'dired-aux)
 
 (defvar dired-filelist-cmd
   '(("vlc" "-L")))
@@ -1804,7 +1744,7 @@
 ** Youtube-dl
    #+BEGIN_SRC emacs-lisp
      (add-to-list 'load-path "~/.emacs.d/custom/youtube-dl-emacs/")
-     (use-package youtube-dl)
+     (require 'youtube-dl)
    #+END_SRC
 ** Spaces
    #+BEGIN_SRC emacs-lisp
@@ -1819,6 +1759,70 @@
    (add-to-list 'auto-mode-alist '("\\.frag\\'" . glsl-mode))
    (add-to-list 'auto-mode-alist '("\\.geom\\'" . glsl-mode))
    #+END_SRC
+* Broken
+** mu4e
+*** General config
+ #+BEGIN_SRC emacs-lisp
+ (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e")
+ (setq mu4e-msg2pdf "~/.emacs.d/el-get/mu4e/toys/msg2pdf/msg2pdf")
+
+ (require 'mu4e)
+ (add-to-list 'mu4e-view-actions
+   '("ViewInBrowser" . mu4e-action-view-in-browser) t)
+   (global-set-key (kbd "<f8>") 'mu4e)
+ #+END_SRC
+*** Multiple accounts
+    #+BEGIN_SRC emacs-lisp
+    (setq mu4e-sent-folder "/Gmail/[Gmail].Sent Mail"
+    mu4e-drafts-folder "/Gmail/[Gmail].Drafts"
+    mu4e-refile-folder "/Gmail/[Gmail].Archive"
+    user-mail-address "bensonchu457@gmail.com"
+    smtpmail-default-smtp-server "smtp.gmail.com"
+    smtpmail-smtp-server "smtp.gmail.com")
+   
+    (defvar my-mu4e-account-alist
+    '(("Gmail"
+    (mu4e-sent-folder "/work/Sent Mail")
+    (mu4e-drafts-folder "/Gmail/[Gmail].Drafts")
+    (mu4e-refile-folder "/Gmail/[Gmail].Archive")
+    (user-mail-address "bensonchu457@gmail.com")
+    (smtpmail-default-smtp-server "smtp.gmail.com")
+    (smtpmail-smtp-user "bensonchu457")
+    (smtpmail-smtp-server "smtp.gmail.com"))
+    ("work"
+    (mu4e-sent-folder "/work/Sent")
+    (mu4e-drafts-folder "/work/Drafts")
+    (mu4e-refile-folder "/work/Archive")
+    (user-mail-address "bchu3@uh.edu")
+    (smtpmail-default-smtp-server "smtp.account2.example.com")
+    (smtpmail-smtp-user "bchu3")
+    (smtpmail-smtp-server "smtp.account2.example.com"))))
+
+
+
+ ;(defun my-mu4e-set-account ()
+ ;  "Set the account for composing a message."
+ ;  (let* ((account
+ ;	  (if mu4e-compose-parent-message
+ ;	      (let ((maildir (mu4e-message-field mu4e-compose-parent-message :maildir)))
+ ;		(string-match "/\\(.*?\\)/" maildir)
+ ;		(match-string 1 maildir))
+ ;	    (completing-read (format "Compose with account: (%s) "
+ ;				     (mapconcat #'(lambda (var) (car var))
+ ;						my-mu4e-account-alist "/"))
+ ;			     (mapcar #'(lambda (var) (car var)) my-mu4e-account-alist)
+ ;			     nil t nil nil (caar my-mu4e-account-alist))))
+ ;	 (account-vars (cdr (assoc account my-mu4e-account-alist))))
+ ;    (if account-vars
+ ;        (mapc #'(lambda (var)
+ ;		  (set (car var) (cadr var)))
+ ;	      account-vars)
+ ;      (error "No email account found"))))
+
+ ;	(add-hook 'mu4e~headers-jump-to-maildir 'my-mu4e-set-account)
+
+
+    #+END_SRC
 * Disabled 
 ** nnreddit
  #+BEGIN_SRC emacs-lisp#

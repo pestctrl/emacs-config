@@ -1764,9 +1764,11 @@
 ** mu4e
 *** General config
  #+BEGIN_SRC emacs-lisp
- (add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e")
- (setq mu4e-msg2pdf "~/.emacs.d/el-get/mu4e/toys/msg2pdf/msg2pdf")
+ (add-to-list 'load-path "~/.emacs.d/custom/mu/mu4e/")
+ (load "mu4e-meta.el.in")
+ (setq mu4e-msg2pdf "~/.emacs.d/custom/mu/toys/msg2pdf/msg2pdf")
 
+ (require 'mu4e-meta)
  (require 'mu4e)
  (add-to-list 'mu4e-view-actions
    '("ViewInBrowser" . mu4e-action-view-in-browser) t)

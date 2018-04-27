@@ -22,8 +22,8 @@
  '(sml/mode-width
    (if
        (eq
-        (powerline-current-separator)
-        (quote arrow))
+	(powerline-current-separator)
+	(quote arrow))
        (quote right)
      (quote full)))
  '(sml/pos-id-separator
@@ -32,14 +32,14 @@
      (:propertize " " face powerline-active1)
      (:eval
       (propertize " "
-                  (quote display)
-                  (funcall
-                   (intern
-                    (format "powerline-%s-%s"
-                            (powerline-current-separator)
-                            (car powerline-default-separator-dir)))
-                   (quote powerline-active1)
-                   (quote powerline-active2))))
+		  (quote display)
+		  (funcall
+		   (intern
+		    (format "powerline-%s-%s"
+			    (powerline-current-separator)
+			    (car powerline-default-separator-dir)))
+		   (quote powerline-active1)
+		   (quote powerline-active2))))
      (:propertize " " face powerline-active2))))
  '(sml/pos-minor-modes-separator
    (quote
@@ -47,14 +47,14 @@
      (:propertize " " face powerline-active1)
      (:eval
       (propertize " "
-                  (quote display)
-                  (funcall
-                   (intern
-                    (format "powerline-%s-%s"
-                            (powerline-current-separator)
-                            (cdr powerline-default-separator-dir)))
-                   (quote powerline-active1)
-                   (quote sml/global))))
+		  (quote display)
+		  (funcall
+		   (intern
+		    (format "powerline-%s-%s"
+			    (powerline-current-separator)
+			    (cdr powerline-default-separator-dir)))
+		   (quote powerline-active1)
+		   (quote sml/global))))
      (:propertize " " face sml/global))))
  '(sml/pre-id-separator
    (quote
@@ -62,14 +62,14 @@
      (:propertize " " face sml/global)
      (:eval
       (propertize " "
-                  (quote display)
-                  (funcall
-                   (intern
-                    (format "powerline-%s-%s"
-                            (powerline-current-separator)
-                            (car powerline-default-separator-dir)))
-                   (quote sml/global)
-                   (quote powerline-active1))))
+		  (quote display)
+		  (funcall
+		   (intern
+		    (format "powerline-%s-%s"
+			    (powerline-current-separator)
+			    (car powerline-default-separator-dir)))
+		   (quote sml/global)
+		   (quote powerline-active1))))
      (:propertize " " face powerline-active1))))
  '(sml/pre-minor-modes-separator
    (quote
@@ -77,14 +77,14 @@
      (:propertize " " face powerline-active2)
      (:eval
       (propertize " "
-                  (quote display)
-                  (funcall
-                   (intern
-                    (format "powerline-%s-%s"
-                            (powerline-current-separator)
-                            (cdr powerline-default-separator-dir)))
-                   (quote powerline-active2)
-                   (quote powerline-active1))))
+		  (quote display)
+		  (funcall
+		   (intern
+		    (format "powerline-%s-%s"
+			    (powerline-current-separator)
+			    (cdr powerline-default-separator-dir)))
+		   (quote powerline-active2)
+		   (quote powerline-active1))))
      (:propertize " " face powerline-active1))))
  '(sml/pre-modes-separator (propertize " " (quote face) (quote sml/modes)))
  '(yas-global-mode t))

@@ -10,9 +10,7 @@
  '(global-company-mode t)
  '(iswitchb-mode t)
  '(line-number-mode nil)
- '(org-agenda-files
-   (quote
-    ("~/MEGA/org/agenda/people.org" "/home/benson/MEGA/org/agenda/work.org" "/home/benson/MEGA/org/agenda/refile.org" "/home/benson/MEGA/org/agenda/school.org" "~/MEGA/org/entries/journal.gpg" "~/MEGA/org/agenda/tech.org" "/home/benson/MEGA/org/agenda/personal.org")))
+ '(org-agenda-files nil)
  '(org-export-backends (quote (ascii beamer html icalendar latex)))
  '(package-selected-packages
    (quote

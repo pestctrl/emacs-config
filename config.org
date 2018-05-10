@@ -231,7 +231,7 @@
 #+BEGIN_SRC emacs-lisp
 (require 'exwm-randr)
 ;No dash when using intel driver
-(setq exwm-randr-workspace-output-plist '(1 "HDMI1" 3 "HDMI1"))
+(setq exwm-randr-workspace-output-plist '(2 "HDMI1" 3 "HDMI1"))
 (exwm-randr-enable)
 #+END_SRC
 ** Startup
@@ -754,6 +754,7 @@
 #+BEGIN_SRC emacs-lisp
   (use-package evil)
   (global-set-key (kbd "C-z") 'evil-local-mode)
+  (setq evil-insert-state-modes nil)
   (setq evil-default-state 'emacs)
   (evil-set-initial-state 'term-mode 'emacs)
   (evil-set-initial-state 'help-mode 'emacs)
@@ -851,6 +852,7 @@
                        ;; "Gohu Gohufont"
                        )))
      (add-to-list 'default-frame-alist `(font . ,font)))
+   ;;(set-frame-font "RobotoMono-11")
  #+END_SRC
 * Tools
 ** Encryption
@@ -872,6 +874,7 @@
 (global-set-key (kbd "<f9>") 'org-capture)
 (global-set-key (kbd "C-x C-o") 'org-switchb)
 (define-key org-mode-map (kbd "C-c SPC") nil)
+(define-key org-agenda-mode-map (kbd "a") 'org-agenda)
 #+END_SRC
 *** Should always use visual-line-mode
 #+BEGIN_SRC emacs-lisp
@@ -946,9 +949,9 @@
   (setq org-default-notes-file "~/MEGA/org-old/notes.org")
   (setq org-capture-templates
         '(("t" "Todo" entry (file "~/MEGA/org/agenda/refile.org")
-           "* TODO %?\n%U\n%a\n")
+           "* STUFF %?\n  :PROPERTIES:\n  :CREATED: %U\n  :VIEWING: %a\n  :END:")
           ("s" "Stuff" entry (file "~/MEGA/org/agenda/refile.org")
-           "* TODO %?\n%U")
+           "* STUFF %?\n  :PROPERTIES:\n  :CREATED: %U\n  :VIEWING: %a\n  :END:")
           ("f" "Reference" entry (file "~/MEGA/org/agenda/reference.org")
           "* %?\n%i%U")
           ("a" "Appointment" entry (file "~/MEGA/org/agenda/refile.org")
@@ -1022,11 +1025,13 @@
   (setq org-agenda-window-setup 'other-window)
   (setq org-agenda-restore-windows-after-quit t)
   (setq org-todo-keywords
-         '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
+         '((sequence "STUFF(s)" "|")
+           (sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
            (sequence  "WAIT(w@/!)" "HOLD(h)" "|" "CANCELLED(c@/!)")))
 
   (setq org-todo-keyword-faces 
-        '(("NEXT" :foreground "cyan" :weight bold)
+        '(("STUFF" :foreground "goldenrod" :weight bold)
+          ("NEXT" :foreground "cyan" :weight bold)
           ("WAIT" :foreground "yellow" :weight bold)
           ("HOLD" :foreground "red" :weight bold)
           ("CANCELLED" :foreground "dark gray" :weight bold)))
@@ -1046,7 +1051,8 @@
         '(("~/MEGA/org/agenda/someday.org" :maxlevel . 9)
           ("~/MEGA/org/agenda/tickler.org" :maxlevel . 9)
           ("~/MEGA/org/agenda/reference.org" :maxlevel . 9)
-	  ("~/MEGA/org/agenda/reads.org" :maxlevel . 9)))
+          ("~/MEGA/org/agenda/reads.org" :maxlevel . 9)
+          ("~/MEGA/org/entries/important.gpg" :maxlevel . 9)))
   ; Targets include this file and any file contributing to the agenda - up to 9 levels deep
   (setq org-refile-targets `((nil :maxlevel . 9)
                              (org-agenda-files :maxlevel . 9)
@@ -1055,9 +1061,6 @@
   (setq org-refile-target-verify-function
         (lambda () 
           (not (member "ARCHIVE" (org-get-tags-at (point) nil)))))
-
-  ; Use full outline paths for refile targets - we file directly with IDO
-  (setq org-refile-use-outline-path 'file)
 
   ; Targets complete directly with IDO
   (setq org-outline-path-complete-in-steps nil)
@@ -1652,6 +1655,7 @@
    #+END_SRC
 **** sync with google calendar
      #+BEGIN_SRC emacs-lisp
+       (require 'url-http)
        (use-package org-caldav)
        (use-package oauth2)
        (setq epa-pinentry-mode 'loopback)
@@ -1663,7 +1667,8 @@
              (set-buffer (find-file-noselect filename))
              (let ((var (eval (read (buffer-string)))))
                (setq org-caldav-oauth2-client-id (car var)
-                     org-caldav-oauth2-client-secret (cadr var))))))
+                     org-caldav-oauth2-client-secret (cadr var)))
+             (kill-buffer))))
 
        (setq org-caldav-url 'google
              org-caldav-calendar-id "jqeua8pamjrclakq3bg8mpnlis@group.calendar.google.com"
@@ -1751,11 +1756,11 @@
   (setq-default elfeed-search-filter "@6-months-ago +unread -youtube")
   (define-key elfeed-search-mode-map "U" 'elfeed-search-fetch-visible)
   (define-key elfeed-search-mode-map "Y" (lambda ()
-					   (interactive)
-					   (elfeed-search-set-filter "+youtube +unread")))
+                       (interactive)
+                       (elfeed-search-set-filter "+youtube +unread")))
   (define-key elfeed-search-mode-map "h" (lambda ()
-					   (interactive)
-					   (elfeed-search-set-filter nil)))
+                       (interactive)
+                       (elfeed-search-set-filter nil)))
 
   (defun elfeed-show-youtube-dl ()
     "Download the current entry with youtube-dl."
@@ -1804,6 +1809,8 @@
           (format "%s %s" cmd list-switch)
         cmd)
       (mapconcat #'expand-file-name file-list "\" \"")))))
+      
+      (define-key dired-mode-map "r" 'dired-start-process)
 
   (defun watch-youtube ()
     (interactive)
@@ -1893,6 +1900,15 @@
                  (lambda ()
                   (setq indent-tabs-mode nil)))
     #+END_SRC
+*** Geiser
+    #+BEGIN_SRC emacs-lisp
+    (use-package geiser)
+    (setq geiser-default-implementation 'chez)
+    #+END_SRC
+*** Paredit
+    #+BEGIN_SRC emacs-lisp
+    (use-package paredit)
+    #+END_SRC
 ** Freekeys
    #+BEGIN_SRC emacs-lisp
    (use-package free-keys)
@@ -1901,9 +1917,9 @@
 ** Eww
    #+BEGIN_SRC emacs-lisp
      (global-set-key (kbd "C-c g")
-		     (lambda ()
-		       (interactive)
-		       (w3m-goto-url "https://google.com")))
+             (lambda ()
+               (interactive)
+               (w3m-goto-url "https://google.com")))
    #+END_SRC
 * New
 ** Swiper or counsel-grep
@@ -1927,6 +1943,13 @@
    (add-to-list 'auto-mode-alist '("\\.vert\\'" . glsl-mode))
    (add-to-list 'auto-mode-alist '("\\.frag\\'" . glsl-mode))
    (add-to-list 'auto-mode-alist '("\\.geom\\'" . glsl-mode))
+   #+END_SRC
+** pdf-tools use isearch
+   #+BEGIN_SRC emacs-lisp
+     (require 'pdf-tools)
+     (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
+     (define-key pdf-view-mode-map (kbd "d") (lambda () (interactive) (pdf-view-next-line-or-next-page 8)))
+     (define-key pdf-view-mode-map (kbd "u") (lambda () (interactive) (pdf-view-previous-line-or-previous-page 8)))
    #+END_SRC
 * Broken
 ** mu4e
@@ -2083,15 +2106,15 @@
     #+BEGIN_SRC emacs-lisp#
     (use-package multi-term)
     (define-minor-mode ctd-mode
-	"This is the mode for the CoderTillDeath"
-	:init-value t
-	:lighter " ctd"
-	:keymap (let ((map (make-sparse-keymap)))
-		  (define-key map (kbd "M-e") 'launch-program)
-		  (define-key map (kbd "C-x p") 'launch-program)
-		  (define-key map (kbd "M-`") 'multi-term)
-		  (define-key map (kbd "M-1") 'windresize)
-		  map))
+    "This is the mode for the CoderTillDeath"
+    :init-value t
+    :lighter " ctd"
+    :keymap (let ((map (make-sparse-keymap)))
+          (define-key map (kbd "M-e") 'launch-program)
+          (define-key map (kbd "C-x p") 'launch-program)
+          (define-key map (kbd "M-`") 'multi-term)
+          (define-key map (kbd "M-1") 'windresize)
+          map))
       (ctd-mode 1)
     #+END_SRC
 *** Precedence

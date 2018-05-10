@@ -89,7 +89,7 @@
      (setq exwm-input-global-keys
       `(([?\s-r] . exwm-reset)
         ([?\s-w] . exwm-workspace-switch)
-	([?\s-l] . lock-screen)
+        ([?\s-l] . lock-screen)
         ,@(mapcar (lambda (i)
                     `(,(kbd (format "s-%d" (mod (1+ i) 10))) .
                       (lambda ()
@@ -333,188 +333,188 @@
     "Set the airline mode-line-format"
     (interactive)
     (setq-default mode-line-format
-		  '("%e"
-		    (:eval
-		     (let* ((active (powerline-selected-window-active))
-			    (separator-left (intern (format "powerline-%s-%s"
-							    (powerline-current-separator)
-							    (car powerline-default-separator-dir))))
-			    (separator-right (intern (format "powerline-%s-%s"
-							     (powerline-current-separator)
-							     (cdr powerline-default-separator-dir))))
-			    (mode-line-face (if active 'mode-line 'mode-line-inactive))
-			    (visual-block (if (featurep 'evil)
-					      (and (evil-visual-state-p)
-						   (eq evil-visual-selection 'block))
-					    nil))
-			    (visual-line (if (featurep 'evil)
-					     (and (evil-visual-state-p)
-						  (eq evil-visual-selection 'line))
-					   nil))
-			    (current-evil-state-string (if (featurep 'evil)
-							   (upcase (concat (symbol-name evil-state)
-									   (cond (visual-block "-BLOCK")
-										 (visual-line "-LINE"))))
-							 nil))
+          '("%e"
+            (:eval
+             (let* ((active (powerline-selected-window-active))
+                (separator-left (intern (format "powerline-%s-%s"
+                                (powerline-current-separator)
+                                (car powerline-default-separator-dir))))
+                (separator-right (intern (format "powerline-%s-%s"
+                                 (powerline-current-separator)
+                                 (cdr powerline-default-separator-dir))))
+                (mode-line-face (if active 'mode-line 'mode-line-inactive))
+                (visual-block (if (featurep 'evil)
+                          (and (evil-visual-state-p)
+                           (eq evil-visual-selection 'block))
+                        nil))
+                (visual-line (if (featurep 'evil)
+                         (and (evil-visual-state-p)
+                          (eq evil-visual-selection 'line))
+                       nil))
+                (current-evil-state-string (if (featurep 'evil)
+                               (upcase (concat (symbol-name evil-state)
+                                       (cond (visual-block "-BLOCK")
+                                         (visual-line "-LINE"))))
+                             nil))
 
-			    (outer-face
-			     (if (powerline-selected-window-active)
-				 (if (featurep 'evil)
-				     (cond ((eq evil-state (intern "normal"))  'airline-normal-outer)
-					   ((eq evil-state (intern "insert"))  'airline-insert-outer)
-					   ((eq evil-state (intern "visual"))  'airline-visual-outer)
-					   ((eq evil-state (intern "replace")) 'airline-replace-outer)
-					   ((eq evil-state (intern "emacs"))   'airline-emacs-outer)
-					   (t                                  'airline-normal-outer))
-				   'airline-normal-outer)
-			       'powerline-inactive1))
+                (outer-face
+                 (if (powerline-selected-window-active)
+                 (if (featurep 'evil)
+                     (cond ((eq evil-state (intern "normal"))  'airline-normal-outer)
+                       ((eq evil-state (intern "insert"))  'airline-insert-outer)
+                       ((eq evil-state (intern "visual"))  'airline-visual-outer)
+                       ((eq evil-state (intern "replace")) 'airline-replace-outer)
+                       ((eq evil-state (intern "emacs"))   'airline-emacs-outer)
+                       (t                                  'airline-normal-outer))
+                   'airline-normal-outer)
+                   'powerline-inactive1))
 
-			    (inner-face
-			     (if (powerline-selected-window-active)
-				 (if (featurep 'evil)
-				     (cond ((eq evil-state (intern "normal")) 'airline-normal-inner)
-					   ((eq evil-state (intern "insert")) 'airline-insert-inner)
-					   ((eq evil-state (intern "visual")) 'airline-visual-inner)
-					   ((eq evil-state (intern "replace")) 'airline-replace-inner)
-					   ((eq evil-state (intern "emacs"))   'airline-emacs-inner)
-					   (t                                 'airline-normal-inner))
-				   'airline-normal-inner)
-			       'powerline-inactive2))
+                (inner-face
+                 (if (powerline-selected-window-active)
+                 (if (featurep 'evil)
+                     (cond ((eq evil-state (intern "normal")) 'airline-normal-inner)
+                       ((eq evil-state (intern "insert")) 'airline-insert-inner)
+                       ((eq evil-state (intern "visual")) 'airline-visual-inner)
+                       ((eq evil-state (intern "replace")) 'airline-replace-inner)
+                       ((eq evil-state (intern "emacs"))   'airline-emacs-inner)
+                       (t                                 'airline-normal-inner))
+                   'airline-normal-inner)
+                   'powerline-inactive2))
 
-			    (center-face
-			     (if (powerline-selected-window-active)
-				 (if (featurep 'evil)
-				     (cond ((eq evil-state (intern "normal")) 'airline-normal-center)
-					   ((eq evil-state (intern "insert")) 'airline-insert-center)
-					   ((eq evil-state (intern "visual")) 'airline-visual-center)
-					   ((eq evil-state (intern "replace")) 'airline-replace-center)
-					   ((eq evil-state (intern "emacs"))   'airline-emacs-center)
-					   (t                                 'airline-normal-center))
-				   'airline-normal-center)
-			       'airline-inactive3))
+                (center-face
+                 (if (powerline-selected-window-active)
+                 (if (featurep 'evil)
+                     (cond ((eq evil-state (intern "normal")) 'airline-normal-center)
+                       ((eq evil-state (intern "insert")) 'airline-insert-center)
+                       ((eq evil-state (intern "visual")) 'airline-visual-center)
+                       ((eq evil-state (intern "replace")) 'airline-replace-center)
+                       ((eq evil-state (intern "emacs"))   'airline-emacs-center)
+                       (t                                 'airline-normal-center))
+                   'airline-normal-center)
+                   'airline-inactive3))
 
-			    ;; Left Hand Side
-			    (lhs-mode (if (featurep 'evil)
-					  (list
-					   ;; Evil Mode Name
-					   (powerline-raw (concat " " current-evil-state-string " ") outer-face)
-					   (funcall separator-left outer-face inner-face)
-					   ;; Modified string
-					   (powerline-raw "%*" inner-face 'l)
-					   )
-					  (list
-					   ;; Modified string
-					   (powerline-raw "%*" outer-face 'l)
-					   ;; Separator >
-					   (powerline-raw " " outer-face)
-					   (funcall separator-left outer-face inner-face))))
+                ;; Left Hand Side
+                (lhs-mode (if (featurep 'evil)
+                      (list
+                       ;; Evil Mode Name
+                       (powerline-raw (concat " " current-evil-state-string " ") outer-face)
+                       (funcall separator-left outer-face inner-face)
+                       ;; Modified string
+                       (powerline-raw "%*" inner-face 'l)
+                       )
+                      (list
+                       ;; Modified string
+                       (powerline-raw "%*" outer-face 'l)
+                       ;; Separator >
+                       (powerline-raw " " outer-face)
+                       (funcall separator-left outer-face inner-face))))
 
-			    (lhs-rest (list
-				       ;; ;; Separator >
-				       ;; (powerline-raw (char-to-string #x2b81) inner-face 'l)
+                (lhs-rest (list
+                       ;; ;; Separator >
+                       ;; (powerline-raw (char-to-string #x2b81) inner-face 'l)
 
-				       ;; Eyebrowse current tab/window config
-				       (if (featurep 'eyebrowse)
-					   (powerline-raw (concat " " (eyebrowse-mode-line-indicator)) inner-face))
+                       ;; Eyebrowse current tab/window config
+                       (if (featurep 'eyebrowse)
+                       (powerline-raw (concat " " (eyebrowse-mode-line-indicator)) inner-face))
 
-				       ;; Git Branch
-				       (powerline-raw (airline-get-vc) inner-face)
+                       ;; Git Branch
+                       (powerline-raw (airline-get-vc) inner-face)
 
-				       ;; Separator >
-				       (powerline-raw " " inner-face)
-				       (funcall separator-left inner-face center-face)
+                       ;; Separator >
+                       (powerline-raw " " inner-face)
+                       (funcall separator-left inner-face center-face)
 
-				       ;; Directory
-				       ;(when (eq airline-display-directory 'airline-directory-shortened)
-				       ;  (powerline-raw (airline-shorten-directory default-directory airline-shortened-directory-length) center-face 'l))
-				       ;(when (eq airline-display-directory 'airline-directory-full)
-				       ;  (powerline-raw default-directory center-face 'l))
-				       ;(when (eq airline-display-directory nil)
-				       ;  (powerline-raw " " center-face))
+                       ;; Directory
+                       ;(when (eq airline-display-directory 'airline-directory-shortened)
+                       ;  (powerline-raw (airline-shorten-directory default-directory airline-shortened-directory-length) center-face 'l))
+                       ;(when (eq airline-display-directory 'airline-directory-full)
+                       ;  (powerline-raw default-directory center-face 'l))
+                       ;(when (eq airline-display-directory nil)
+                       ;  (powerline-raw " " center-face))
 
-				       ;; Buffer ID
-				       ;; (powerline-buffer-id center-face)
-				       ;; (powerline-raw "%b" center-face)
-				       (powerline-buffer-id center-face)
+                       ;; Buffer ID
+                       ;; (powerline-buffer-id center-face)
+                       ;; (powerline-raw "%b" center-face)
+                       (powerline-buffer-id center-face)
 
-				       (powerline-major-mode center-face 'l)
-				       (powerline-process center-face)
-				       ;(powerline-minor-modes center-face 'l)
+                       (powerline-major-mode center-face 'l)
+                       (powerline-process center-face)
+                       ;(powerline-minor-modes center-face 'l)
 
-				       ;; Current Function (which-function-mode)
-				       (when (and (boundp 'which-func-mode) which-func-mode)
-					 ;; (powerline-raw which-func-format 'l nil))
-					 (powerline-raw which-func-format center-face 'l))
+                       ;; Current Function (which-function-mode)
+                       (when (and (boundp 'which-func-mode) which-func-mode)
+                     ;; (powerline-raw which-func-format 'l nil))
+                     (powerline-raw which-func-format center-face 'l))
 
-				       ;; ;; Separator >
-				       ;; (powerline-raw " " center-face)
-				       ;; (funcall separator-left mode-line face1)
+                       ;; ;; Separator >
+                       ;; (powerline-raw " " center-face)
+                       ;; (funcall separator-left mode-line face1)
 
-				       (when (boundp 'erc-modified-channels-object)
-					 (powerline-raw erc-modified-channels-object center-face 'l))
+                       (when (boundp 'erc-modified-channels-object)
+                     (powerline-raw erc-modified-channels-object center-face 'l))
 
-				       ;; ;; Separator <
-				       ;; (powerline-raw " " face1)
-				       ;; (funcall separator-right face1 face2)
-				     ))
+                       ;; ;; Separator <
+                       ;; (powerline-raw " " face1)
+                       ;; (funcall separator-right face1 face2)
+                     ))
 
-			    (lhs (append lhs-mode lhs-rest))
+                (lhs (append lhs-mode lhs-rest))
 
-			    ;; Right Hand Side
-			    (rhs (list (powerline-raw global-mode-string center-face 'r)
+                ;; Right Hand Side
+                (rhs (list (powerline-raw global-mode-string center-face 'r)
 
-				       ;; ;; Separator <
-				       ;; (powerline-raw (char-to-string #x2b83) center-face 'l)
+                       ;; ;; Separator <
+                       ;; (powerline-raw (char-to-string #x2b83) center-face 'l)
 
-				       ;; Minor Modes
-				       ;(powerline-minor-modes center-face 'l)
-				       ;; (powerline-narrow center-face 'l)
+                       ;; Minor Modes
+                       ;(powerline-minor-modes center-face 'l)
+                       ;; (powerline-narrow center-face 'l)
 
-				       ;; Subseparator <
-				       (powerline-raw (char-to-string airline-utf-glyph-subseparator-right) center-face 'l)
+                       ;; Subseparator <
+                       (powerline-raw (char-to-string airline-utf-glyph-subseparator-right) center-face 'l)
 
-				       ;; Major Mode
-				       ;(powerline-major-mode center-face 'l)
-				       ;(powerline-process center-face)
+                       ;; Major Mode
+                       ;(powerline-major-mode center-face 'l)
+                       ;(powerline-process center-face)
 
-				       ;; Separator <
-				       (powerline-raw " " center-face)
-				       (funcall separator-right center-face inner-face)
+                       ;; Separator <
+                       (powerline-raw " " center-face)
+                       (funcall separator-right center-face inner-face)
 
-				       ;; Buffer Size
-				       (when powerline-display-buffer-size
-					 (powerline-buffer-size inner-face 'l))
+                       ;; Buffer Size
+                       (when powerline-display-buffer-size
+                     (powerline-buffer-size inner-face 'l))
 
-				       ;; Mule Info
-				       (when powerline-display-mule-info
-					 (powerline-raw mode-line-mule-info inner-face 'l))
+                       ;; Mule Info
+                       (when powerline-display-mule-info
+                     (powerline-raw mode-line-mule-info inner-face 'l))
 
-				       (powerline-raw " " inner-face)
+                       (powerline-raw " " inner-face)
 
-				       ;; Separator <
-				       (funcall separator-right inner-face outer-face)
+                       ;; Separator <
+                       (funcall separator-right inner-face outer-face)
 
-				       ;; LN charachter
-				       (powerline-raw (char-to-string airline-utf-glyph-linenumber) outer-face 'l)
+                       ;; LN charachter
+                       (powerline-raw (char-to-string airline-utf-glyph-linenumber) outer-face 'l)
 
-				       ;; Current Line
-				       (powerline-raw "%4l" outer-face 'l)
-				       (powerline-raw ":" outer-face 'l)
-				       ;; Current Column
-				       (powerline-raw "%3c" outer-face 'r)
+                       ;; Current Line
+                       (powerline-raw "%4l" outer-face 'l)
+                       (powerline-raw ":" outer-face 'l)
+                       ;; Current Column
+                       (powerline-raw "%3c" outer-face 'r)
 
-				       ;; % location in file
-				       (powerline-raw "%6p" outer-face 'r)
+                       ;; % location in file
+                       (powerline-raw "%6p" outer-face 'r)
 
-				       ;; position in file image
-				       (when powerline-display-hud
-					 (powerline-hud inner-face outer-face)))
-				 ))
+                       ;; position in file image
+                       (when powerline-display-hud
+                     (powerline-hud inner-face outer-face)))
+                 ))
 
-		       ;; Combine Left and Right Hand Sides
-		       (concat (powerline-render lhs)
-			       (powerline-fill center-face (powerline-width rhs))
-			       (powerline-render rhs))))))
+               ;; Combine Left and Right Hand Sides
+               (concat (powerline-render lhs)
+                   (powerline-fill center-face (powerline-width rhs))
+                   (powerline-render rhs))))))
     (powerline-reset)
     (kill-local-variable 'mode-line-format))
 
@@ -522,188 +522,188 @@
     "Set the airline mode-line-format"
     (interactive)
     (setq-default mode-line-format
-		  '("%e"
-		    (:eval
-		     (let* ((active (powerline-selected-window-active))
-			    (separator-left (intern (format "powerline-%s-%s"
-							    (powerline-current-separator)
-							    (car powerline-default-separator-dir))))
-			    (separator-right (intern (format "powerline-%s-%s"
-							     (powerline-current-separator)
-							     (cdr powerline-default-separator-dir))))
-			    (mode-line-face (if active 'mode-line 'mode-line-inactive))
-			    (visual-block (if (featurep 'evil)
-					      (and (evil-visual-state-p)
-						   (eq evil-visual-selection 'block))
-					    nil))
-			    (visual-line (if (featurep 'evil)
-					     (and (evil-visual-state-p)
-						  (eq evil-visual-selection 'line))
-					   nil))
-			    (current-evil-state-string (if (featurep 'evil)
-							   (upcase (concat (symbol-name evil-state)
-									   (cond (visual-block "-BLOCK")
-										 (visual-line "-LINE"))))
-							 nil))
+          '("%e"
+            (:eval
+             (let* ((active (powerline-selected-window-active))
+                (separator-left (intern (format "powerline-%s-%s"
+                                (powerline-current-separator)
+                                (car powerline-default-separator-dir))))
+                (separator-right (intern (format "powerline-%s-%s"
+                                 (powerline-current-separator)
+                                 (cdr powerline-default-separator-dir))))
+                (mode-line-face (if active 'mode-line 'mode-line-inactive))
+                (visual-block (if (featurep 'evil)
+                          (and (evil-visual-state-p)
+                           (eq evil-visual-selection 'block))
+                        nil))
+                (visual-line (if (featurep 'evil)
+                         (and (evil-visual-state-p)
+                          (eq evil-visual-selection 'line))
+                       nil))
+                (current-evil-state-string (if (featurep 'evil)
+                               (upcase (concat (symbol-name evil-state)
+                                       (cond (visual-block "-BLOCK")
+                                         (visual-line "-LINE"))))
+                             nil))
 
-			    (outer-face
-			     (if (powerline-selected-window-active)
-				 (if (featurep 'evil)
-				     (cond ((eq evil-state (intern "normal"))  'airline-normal-outer)
-					   ((eq evil-state (intern "insert"))  'airline-insert-outer)
-					   ((eq evil-state (intern "visual"))  'airline-visual-outer)
-					   ((eq evil-state (intern "replace")) 'airline-replace-outer)
-					   ((eq evil-state (intern "emacs"))   'airline-emacs-outer)
-					   (t                                  'airline-normal-outer))
-				   'airline-normal-outer)
-			       'powerline-inactive1))
+                (outer-face
+                 (if (powerline-selected-window-active)
+                 (if (featurep 'evil)
+                     (cond ((eq evil-state (intern "normal"))  'airline-normal-outer)
+                       ((eq evil-state (intern "insert"))  'airline-insert-outer)
+                       ((eq evil-state (intern "visual"))  'airline-visual-outer)
+                       ((eq evil-state (intern "replace")) 'airline-replace-outer)
+                       ((eq evil-state (intern "emacs"))   'airline-emacs-outer)
+                       (t                                  'airline-normal-outer))
+                   'airline-normal-outer)
+                   'powerline-inactive1))
 
-			    (inner-face
-			     (if (powerline-selected-window-active)
-				 (if (featurep 'evil)
-				     (cond ((eq evil-state (intern "normal")) 'airline-normal-inner)
-					   ((eq evil-state (intern "insert")) 'airline-insert-inner)
-					   ((eq evil-state (intern "visual")) 'airline-visual-inner)
-					   ((eq evil-state (intern "replace")) 'airline-replace-inner)
-					   ((eq evil-state (intern "emacs"))   'airline-emacs-inner)
-					   (t                                 'airline-normal-inner))
-				   'airline-normal-inner)
-			       'powerline-inactive2))
+                (inner-face
+                 (if (powerline-selected-window-active)
+                 (if (featurep 'evil)
+                     (cond ((eq evil-state (intern "normal")) 'airline-normal-inner)
+                       ((eq evil-state (intern "insert")) 'airline-insert-inner)
+                       ((eq evil-state (intern "visual")) 'airline-visual-inner)
+                       ((eq evil-state (intern "replace")) 'airline-replace-inner)
+                       ((eq evil-state (intern "emacs"))   'airline-emacs-inner)
+                       (t                                 'airline-normal-inner))
+                   'airline-normal-inner)
+                   'powerline-inactive2))
 
-			    (center-face
-			     (if (powerline-selected-window-active)
-				 (if (featurep 'evil)
-				     (cond ((eq evil-state (intern "normal")) 'airline-normal-center)
-					   ((eq evil-state (intern "insert")) 'airline-insert-center)
-					   ((eq evil-state (intern "visual")) 'airline-visual-center)
-					   ((eq evil-state (intern "replace")) 'airline-replace-center)
-					   ((eq evil-state (intern "emacs"))   'airline-emacs-center)
-					   (t                                 'airline-normal-center))
-				   'airline-normal-center)
-			       'airline-inactive3))
+                (center-face
+                 (if (powerline-selected-window-active)
+                 (if (featurep 'evil)
+                     (cond ((eq evil-state (intern "normal")) 'airline-normal-center)
+                       ((eq evil-state (intern "insert")) 'airline-insert-center)
+                       ((eq evil-state (intern "visual")) 'airline-visual-center)
+                       ((eq evil-state (intern "replace")) 'airline-replace-center)
+                       ((eq evil-state (intern "emacs"))   'airline-emacs-center)
+                       (t                                 'airline-normal-center))
+                   'airline-normal-center)
+                   'airline-inactive3))
 
-			    ;; Left Hand Side
-			    (lhs-mode (if (featurep 'evil)
-					  (list
-					   ;; Evil Mode Name
-					   (powerline-raw (concat " " current-evil-state-string " ") outer-face)
-					   (funcall separator-left outer-face inner-face)
-					   ;; Modified string
-					   (powerline-raw "%*" inner-face 'l)
-					   )
-					  (list
-					   ;; Modified string
-					   (powerline-raw "%*" outer-face 'l)
-					   ;; Separator >
-					   (powerline-raw " " outer-face)
-					   (funcall separator-left outer-face inner-face))))
+                ;; Left Hand Side
+                (lhs-mode (if (featurep 'evil)
+                      (list
+                       ;; Evil Mode Name
+                       (powerline-raw (concat " " current-evil-state-string " ") outer-face)
+                       (funcall separator-left outer-face inner-face)
+                       ;; Modified string
+                       (powerline-raw "%*" inner-face 'l)
+                       )
+                      (list
+                       ;; Modified string
+                       (powerline-raw "%*" outer-face 'l)
+                       ;; Separator >
+                       (powerline-raw " " outer-face)
+                       (funcall separator-left outer-face inner-face))))
 
-			    (lhs-rest (list
-				       ;; ;; Separator >
-				       ;; (powerline-raw (char-to-string #x2b81) inner-face 'l)
+                (lhs-rest (list
+                       ;; ;; Separator >
+                       ;; (powerline-raw (char-to-string #x2b81) inner-face 'l)
 
-				       ;; Eyebrowse current tab/window config
-				       (if (featurep 'eyebrowse)
-					   (powerline-raw (concat " " (eyebrowse-mode-line-indicator)) inner-face))
+                       ;; Eyebrowse current tab/window config
+                       (if (featurep 'eyebrowse)
+                       (powerline-raw (concat " " (eyebrowse-mode-line-indicator)) inner-face))
 
-				       ;; Git Branch
-				       (powerline-raw (airline-get-vc) inner-face)
+                       ;; Git Branch
+                       (powerline-raw (airline-get-vc) inner-face)
 
-				       ;; Separator >
-				       (powerline-raw " " inner-face)
-				       (funcall separator-left inner-face center-face)
+                       ;; Separator >
+                       (powerline-raw " " inner-face)
+                       (funcall separator-left inner-face center-face)
 
-				       ;; Directory
-				       ;(when (eq airline-display-directory 'airline-directory-shortened)
-				       ;  (powerline-raw (airline-shorten-directory default-directory airline-shortened-directory-length) center-face 'l))
-				       ;(when (eq airline-display-directory 'airline-directory-full)
-				       ;  (powerline-raw default-directory center-face 'l))
-				       ;(when (eq airline-display-directory nil)
-				       ;  (powerline-raw " " center-face))
+                       ;; Directory
+                       ;(when (eq airline-display-directory 'airline-directory-shortened)
+                       ;  (powerline-raw (airline-shorten-directory default-directory airline-shortened-directory-length) center-face 'l))
+                       ;(when (eq airline-display-directory 'airline-directory-full)
+                       ;  (powerline-raw default-directory center-face 'l))
+                       ;(when (eq airline-display-directory nil)
+                       ;  (powerline-raw " " center-face))
 
-				       ;; Buffer ID
-				       ;; (powerline-buffer-id center-face)
-				       ;; (powerline-raw "%b" center-face)
-				       (powerline-buffer-id center-face)
+                       ;; Buffer ID
+                       ;; (powerline-buffer-id center-face)
+                       ;; (powerline-raw "%b" center-face)
+                       (powerline-buffer-id center-face)
 
-				       (powerline-major-mode center-face 'l)
-				       (powerline-process center-face)
-				       (powerline-minor-modes center-face 'l)
+                       (powerline-major-mode center-face 'l)
+                       (powerline-process center-face)
+                       (powerline-minor-modes center-face 'l)
 
-				       ;; Current Function (which-function-mode)
-				       (when (and (boundp 'which-func-mode) which-func-mode)
-					 ;; (powerline-raw which-func-format 'l nil))
-					 (powerline-raw which-func-format center-face 'l))
+                       ;; Current Function (which-function-mode)
+                       (when (and (boundp 'which-func-mode) which-func-mode)
+                     ;; (powerline-raw which-func-format 'l nil))
+                     (powerline-raw which-func-format center-face 'l))
 
-				       ;; ;; Separator >
-				       ;; (powerline-raw " " center-face)
-				       ;; (funcall separator-left mode-line face1)
+                       ;; ;; Separator >
+                       ;; (powerline-raw " " center-face)
+                       ;; (funcall separator-left mode-line face1)
 
-				       (when (boundp 'erc-modified-channels-object)
-					 (powerline-raw erc-modified-channels-object center-face 'l))
+                       (when (boundp 'erc-modified-channels-object)
+                     (powerline-raw erc-modified-channels-object center-face 'l))
 
-				       ;; ;; Separator <
-				       ;; (powerline-raw " " face1)
-				       ;; (funcall separator-right face1 face2)
-				     ))
+                       ;; ;; Separator <
+                       ;; (powerline-raw " " face1)
+                       ;; (funcall separator-right face1 face2)
+                     ))
 
-			    (lhs (append lhs-mode lhs-rest))
+                (lhs (append lhs-mode lhs-rest))
 
-			    ;; Right Hand Side
-			    (rhs (list (powerline-raw global-mode-string center-face 'r)
+                ;; Right Hand Side
+                (rhs (list (powerline-raw global-mode-string center-face 'r)
 
-				       ;; ;; Separator <
-				       ;; (powerline-raw (char-to-string #x2b83) center-face 'l)
+                       ;; ;; Separator <
+                       ;; (powerline-raw (char-to-string #x2b83) center-face 'l)
 
-				       ;; Minor Modes
-				       ;(powerline-minor-modes center-face 'l)
-				       ;; (powerline-narrow center-face 'l)
+                       ;; Minor Modes
+                       ;(powerline-minor-modes center-face 'l)
+                       ;; (powerline-narrow center-face 'l)
 
-				       ;; Subseparator <
-				       (powerline-raw (char-to-string airline-utf-glyph-subseparator-right) center-face 'l)
+                       ;; Subseparator <
+                       (powerline-raw (char-to-string airline-utf-glyph-subseparator-right) center-face 'l)
 
-				       ;; Major Mode
-				       ;(powerline-major-mode center-face 'l)
-				       ;(powerline-process center-face)
+                       ;; Major Mode
+                       ;(powerline-major-mode center-face 'l)
+                       ;(powerline-process center-face)
 
-				       ;; Separator <
-				       (powerline-raw " " center-face)
-				       (funcall separator-right center-face inner-face)
+                       ;; Separator <
+                       (powerline-raw " " center-face)
+                       (funcall separator-right center-face inner-face)
 
-				       ;; Buffer Size
-				       (when powerline-display-buffer-size
-					 (powerline-buffer-size inner-face 'l))
+                       ;; Buffer Size
+                       (when powerline-display-buffer-size
+                     (powerline-buffer-size inner-face 'l))
 
-				       ;; Mule Info
-				       (when powerline-display-mule-info
-					 (powerline-raw mode-line-mule-info inner-face 'l))
+                       ;; Mule Info
+                       (when powerline-display-mule-info
+                     (powerline-raw mode-line-mule-info inner-face 'l))
 
-				       (powerline-raw " " inner-face)
+                       (powerline-raw " " inner-face)
 
-				       ;; Separator <
-				       (funcall separator-right inner-face outer-face)
+                       ;; Separator <
+                       (funcall separator-right inner-face outer-face)
 
-				       ;; LN charachter
-				       (powerline-raw (char-to-string airline-utf-glyph-linenumber) outer-face 'l)
+                       ;; LN charachter
+                       (powerline-raw (char-to-string airline-utf-glyph-linenumber) outer-face 'l)
 
-				       ;; Current Line
-				       (powerline-raw "%4l" outer-face 'l)
-				       (powerline-raw ":" outer-face 'l)
-				       ;; Current Column
-				       (powerline-raw "%3c" outer-face 'r)
+                       ;; Current Line
+                       (powerline-raw "%4l" outer-face 'l)
+                       (powerline-raw ":" outer-face 'l)
+                       ;; Current Column
+                       (powerline-raw "%3c" outer-face 'r)
 
-				       ;; % location in file
-				       (powerline-raw "%6p" outer-face 'r)
+                       ;; % location in file
+                       (powerline-raw "%6p" outer-face 'r)
 
-				       ;; position in file image
-				       (when powerline-display-hud
-					 (powerline-hud inner-face outer-face)))
-				 ))
+                       ;; position in file image
+                       (when powerline-display-hud
+                     (powerline-hud inner-face outer-face)))
+                 ))
 
-		       ;; Combine Left and Right Hand Sides
-		       (concat (powerline-render lhs)
-			       (powerline-fill center-face (powerline-width rhs))
-			       (powerline-render rhs))))))
+               ;; Combine Left and Right Hand Sides
+               (concat (powerline-render lhs)
+                   (powerline-fill center-face (powerline-width rhs))
+                   (powerline-render rhs))))))
     (powerline-reset)
     (kill-local-variable 'mode-line-format))
 #+END_SRC
@@ -743,6 +743,9 @@
   (add-to-list 'ivy-initial-inputs-alist '(org-agenda-refile . ""))
   (add-to-list 'ivy-initial-inputs-alist '(org-capture-refile . ""))
   (add-to-list 'ivy-initial-inputs-alist '(counsel-M-x . ""))
+  
+  (define-key ivy-minibuffer-map (kbd "<return>") 'ivy-alt-done)
+  (define-key ivy-minibuffer-map (kbd "C-<return>") 'ivy-done)
   (global-set-key (kbd "C-h M-x") 'helm-M-x)
   (global-set-key (kbd "M-x") 'counsel-M-x)
   (global-set-key (kbd "C-x b") 'ivy-switch-buffer)
@@ -778,27 +781,30 @@
 
   (setq ibuffer-saved-filter-groups
         '(("General"
-           ("X-Windows" (mode . exwm-mode))
-           ("Terminals" (mode . term-mode))
-           ("emacs-config" (or (filename . ".emacs.d")
-                               (filename . "emacs-config")))
-           ("code" (or (mode . clojure-mode)
-                       (mode . c++-mode)
-                       (mode . c-mode)
-                       (mode . scala-mode)
-                       (mode . emacs-lisp-mode)
-                       (mode . java-mode)
-                       (mode . js-mode)
-                       (mode . python-mode)))
-           ("Org Mode" (not or (not mode . org-mode)
-                            (directory-name . "agenda")))
-           ("text" (filename . "\\.txt"))
-           ("Agenda Buffers" (mode . org-agenda-mode))
-           ("Agenda Files" (mode . org-mode))
-           ("Help" (or (name . "\*Help\*")
-                       (name . "\*Apropos\*")
-                       (name . "\*info\*")))
-           )))
+           ("X-Windows"       (mode . exwm-mode))
+           ("Terminals"       (mode . term-mode))
+           ("emacs-config"    (or (filename . ".emacs.d")
+                                  (filename . "emacs-config")))
+           ("code"            (or (mode . clojure-mode)
+                                  (mode . c++-mode)
+                                  (mode . c-mode)
+                                  (mode . scala-mode)
+                                  (mode . emacs-lisp-mode)
+                                  (mode . java-mode)
+                                  (mode . js-mode)
+                                  (mode . python-mode)
+                                  (mode . ng2-ts-mode)))
+           ("Org Mode"        (not or (not mode . org-mode)
+                                      (directory-name . "agenda")))
+           ("text"            (filename . "\\.txt"))
+           ("pdfs"            (or (mode . doc-view-mode)
+                                  (mode . pdf-view-mode)))
+           ("Agenda Buffers"  (mode . org-agenda-mode))
+           ("Agenda Files"    (mode . org-mode))
+           ("folders"         (mode . dired-mode))
+           ("Help"            (or (name . "\*Help\*")
+                                  (name . "\*Apropos\*")
+                                  (name . "\*info\*"))))))
 
   (setq ibuffer-show-empty-filter-groups nil)
 
@@ -1072,299 +1078,300 @@
        (require 'org-habit)
 
        (defun bh/find-project-task ()
-	 "Move point to the parent (project) task if any"
-	 (save-restriction
-	   (widen)
-	   (let ((parent-task (save-excursion (org-back-to-heading 'invisible-ok) (point))))
-	     (while (org-up-heading-safe)
-	       (when (member (nth 2 (org-heading-components)) org-todo-keywords-1)
-		 (setq parent-task (point))))
-	     (goto-char parent-task)
-	     parent-task)))
+         "Move point to the parent (project) task if any"
+         (save-restriction
+           (widen)
+           (let ((parent-task (save-excursion (org-back-to-heading 'invisible-ok) (point))))
+             (while (org-up-heading-safe)
+               (when (member (nth 2 (org-heading-components)) org-todo-keywords-1)
+                 (setq parent-task (point))))
+             (goto-char parent-task)
+             parent-task)))
 
        (defun bh/is-project-p ()
-	 "Any task with a todo keyword subtask"
-	 (save-restriction
-	   (widen)
-	   (let ((has-subtask)
-		 (subtree-end (save-excursion (org-end-of-subtree t)))
-		 (is-a-task (member (nth 2 (org-heading-components)) org-todo-keywords-1)))
-	     (save-excursion
-	       (forward-line 1)
-	       (while (and (not has-subtask)
-			   (< (point) subtree-end)
-			   (re-search-forward "^\*+ " subtree-end t))
-		 (when (member (org-get-todo-state) org-todo-keywords-1)
-		   (setq has-subtask t))))
-	     (and is-a-task has-subtask))))
+         "Any task with a todo keyword subtask"
+         (save-restriction
+           (widen)
+           (let ((has-subtask)
+                 (subtree-end (save-excursion (org-end-of-subtree t)))
+                 (is-a-task (member (nth 2 (org-heading-components)) org-todo-keywords-1)))
+             (save-excursion
+               (forward-line 1)
+               (while (and (not has-subtask)
+                           (< (point) subtree-end)
+                           (re-search-forward "^\*+ " subtree-end t))
+                 (when (member (org-get-todo-state) org-todo-keywords-1)
+                   (setq has-subtask t))))
+             (and is-a-task has-subtask))))
 
        (defun bh/is-project-subtree-p ()
-	 "Any task with a todo keyword that is in a project subtree.
-	  Callers of this function already widen the buffer view."
-	 (let ((task (save-excursion (org-back-to-heading 'invisible-ok)
-				     (point))))
-	   (save-excursion
-	     (bh/find-project-task)
-	     (if (equal (point) task)
-		 nil
-	       t))))
+         "Any task with a todo keyword that is in a project subtree.
+        Callers of this function already widen the buffer view."
+         (let ((task (save-excursion (org-back-to-heading 'invisible-ok)
+                                     (point))))
+           (save-excursion
+             (bh/find-project-task)
+             (if (equal (point) task)
+                 nil
+               t))))
 
        (defun bh/is-task-p ()
-	 "Any task with a todo keyword and no subtask"
-	 (save-restriction
-	   (widen)
-	   (let ((has-subtask)
-		 (subtree-end (save-excursion (org-end-of-subtree t)))
-		 (is-a-task (member (nth 2 (org-heading-components)) org-todo-keywords-1)))
-	     (save-excursion
-	       (forward-line 1)
-	       (while (and (not has-subtask)
-			   (< (point) subtree-end)
-			   (re-search-forward "^\*+ " subtree-end t))
-		 (when (member (org-get-todo-state) org-todo-keywords-1)
-		   (setq has-subtask t))))
-	     (and is-a-task (not has-subtask)))))
+         "Any task with a todo keyword and no subtask"
+         (save-restriction
+           (widen)
+           (let ((has-subtask)
+                 (subtree-end (save-excursion (org-end-of-subtree t)))
+                 (is-a-task (member (nth 2 (org-heading-components)) org-todo-keywords-1)))
+             (save-excursion
+               (forward-line 1)
+               (while (and (not has-subtask)
+                           (< (point) subtree-end)
+                           (re-search-forward "^\*+ " subtree-end t))
+                 (when (member (org-get-todo-state) org-todo-keywords-1)
+                   (setq has-subtask t))))
+             (and is-a-task (not has-subtask)))))
 
        (defun bh/is-subproject-p ()
-	 "Any task which is a subtask of another project"
-	 (let ((is-subproject)
-	       (is-a-task (member (nth 2 (org-heading-components)) org-todo-keywords-1)))
-	   (save-excursion
-	     (while (and (not is-subproject) (org-up-heading-safe))
-	       (when (member (nth 2 (org-heading-components)) org-todo-keywords-1)
-		 (setq is-subproject t))))
-	   (and is-a-task is-subproject)))
+         "Any task which is a subtask of another project"
+         (let ((is-subproject)
+               (is-a-task (member (nth 2 (org-heading-components)) org-todo-keywords-1)))
+           (save-excursion
+             (while (and (not is-subproject) (org-up-heading-safe))
+               (when (member (nth 2 (org-heading-components)) org-todo-keywords-1)
+                 (setq is-subproject t))))
+           (and is-a-task is-subproject)))
 
        (defun bh/list-sublevels-for-projects-indented ()
-	 "Set org-tags-match-list-sublevels so when restricted to a subtree we list all subtasks.
-	    This is normally used by skipping functions where this variable is already local to the agenda."
-	 (if (marker-buffer org-agenda-restrict-begin)
-	     (setq org-tags-match-list-sublevels 'indented)
-	   (setq org-tags-match-list-sublevels nil))
-	 nil)
+         "Set org-tags-match-list-sublevels so when restricted to a subtree we list all subtasks.
+          This is normally used by skipping functions where this variable is already local to the agenda."
+         (if (marker-buffer org-agenda-restrict-begin)
+             (setq org-tags-match-list-sublevels 'indented)
+           (setq org-tags-match-list-sublevels nil))
+         nil)
 
        (defun bh/list-sublevels-for-projects ()
-	 "Set org-tags-match-list-sublevels so when restricted to a subtree we list all subtasks.
-	    This is normally used by skipping functions where this variable is already local to the agenda."
-	 (if (marker-buffer org-agenda-restrict-begin)
-	     (setq org-tags-match-list-sublevels t)
-	   (setq org-tags-match-list-sublevels nil))
-	 nil)
+         "Set org-tags-match-list-sublevels so when restricted to a subtree we list all subtasks.
+          This is normally used by skipping functions where this variable is already local to the agenda."
+         (if (marker-buffer org-agenda-restrict-begin)
+             (setq org-tags-match-list-sublevels t)
+           (setq org-tags-match-list-sublevels nil))
+         nil)
 
        (defvar bh/hide-scheduled-and-waiting-next-tasks t)
 
        (defun bh/toggle-next-task-display ()
-	 (interactive)
-	 (setq bh/hide-scheduled-and-waiting-next-tasks (not bh/hide-scheduled-and-waiting-next-tasks))
-	 (when  (equal major-mode 'org-agenda-mode)
-	   (org-agenda-redo))
-	 (message "%s WAITING and SCHEDULED NEXT Tasks" (if bh/hide-scheduled-and-waiting-next-tasks "Hide" "Show")))
+         (interactive)
+         (setq bh/hide-scheduled-and-waiting-next-tasks (not bh/hide-scheduled-and-waiting-next-tasks))
+         (when  (equal major-mode 'org-agenda-mode)
+           (org-agenda-redo))
+         (message "%s WAITING and SCHEDULED NEXT Tasks" (if bh/hide-scheduled-and-waiting-next-tasks "Hide" "Show")))
 
        (defun bh/skip-stuck-projects ()
-	 "Skip trees that are not stuck projects"
-	 (save-restriction
-	   (widen)
-	   (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
-	     (if (bh/is-project-p)
-		 (let* ((subtree-end (save-excursion (org-end-of-subtree t)))
-			(has-next ))
-		   (save-excursion
-		     (forward-line 1)
-		     (while (and (not has-next) (< (point) subtree-end) (re-search-forward "^\\*+ NEXT " subtree-end t))
-		       (unless (member "WAITING" (org-get-tags-at))
-			 (setq has-next t))))
-		   (if has-next
-		       nil
-		     next-headline)) ; a stuck project, has subtasks but no next task
-	       nil))))
+         "Skip trees that are not stuck projects"
+         (save-restriction
+           (widen)
+           (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+             (if (bh/is-project-p)
+                 (let* ((subtree-end (save-excursion (org-end-of-subtree t)))
+                        (has-next ))
+                   (save-excursion
+                     (forward-line 1)
+                     (while (and (not has-next) (< (point) subtree-end) (re-search-forward "^\\*+ NEXT " subtree-end t))
+                       (unless (member "WAITING" (org-get-tags-at))
+                         (setq has-next t))))
+                   (if has-next
+                       nil
+                     next-headline)) ; a stuck project, has subtasks but no next task
+               nil))))
 
        (defun bh/skip-non-stuck-projects ()
-	 "Only show subtrees that are stuck projects"
-	 ;; (bh/list-sublevels-for-projects-indented)
-	 (save-restriction
-	   (widen)
-	   (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
-	     (if (bh/is-project-p)
-		 (let* ((subtree-end (save-excursion (org-end-of-subtree t)))
-			(has-next ))
-		   (save-excursion
-		     (forward-line 1)
-		     (while (and (not has-next)
-				 (< (point) subtree-end)
-				 (re-search-forward "^\\*+ NEXT " subtree-end t))
-		       (unless (member "WAITING" (org-get-tags-at))
-			 (setq has-next t))))
-		   (if has-next
-		       next-headline
-		     nil)) ; a stuck project, has subtasks but no next task
-	       next-headline))))
+         "Only show subtrees that are stuck projects"
+         ;; (bh/list-sublevels-for-projects-indented)
+         (save-restriction
+           (widen)
+           (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+             (if (bh/is-project-p)
+                 (let* ((subtree-end (save-excursion (org-end-of-subtree t)))
+                        (has-next ))
+                   (save-excursion
+                     (forward-line 1)
+                     (while (and (not has-next)
+                                 (< (point) subtree-end)
+                                 (re-search-forward "^\\*+ \\(NEXT\\|STUFF\\) " subtree-end t))
+                       (unless (member "WAITING" (org-get-tags-at))
+                         (setq has-next t))))
+                   (if has-next
+                       next-headline
+                     nil)) ; a stuck project, has subtasks but no next task
+               next-headline))))
 
        (defun bh/skip-non-projects ()
-	 "Skip trees that are not projects"
-	 ;; (bh/list-sublevels-for-projects-indented)
-	 (if (save-excursion (bh/skip-non-stuck-projects))
-	     (save-restriction
-	       (widen)
-	       (let ((subtree-end (save-excursion (org-end-of-subtree t))))
-		 (cond
-		  ((bh/is-project-p)
-		   nil)
-		  ((and (bh/is-project-subtree-p) (not (bh/is-task-p)))
-		   nil)
-		  (t
-		   subtree-end))))
-	   (save-excursion (org-end-of-subtree t))))
+         "Skip trees that are not projects"
+         ;; (bh/list-sublevels-for-projects-indented)
+         (if (save-excursion (bh/skip-non-stuck-projects))
+             (save-restriction
+               (widen)
+               (let ((subtree-end (save-excursion (org-end-of-subtree t))))
+                 (cond
+                  ((bh/is-project-p)
+                   nil)
+                  ((and (bh/is-project-subtree-p) (not (bh/is-task-p)))
+                   nil)
+                  (t
+                   subtree-end))))
+           (save-excursion (org-end-of-subtree t))))
 
        (defun bh/skip-non-tasks ()
-	 "Show non-project tasks.
-	  Skip project and sub-project tasks, habits, and project related tasks."
-	 (save-restriction
-	   (widen)
-	   (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
-	     (cond
-	      ((bh/is-task-p)
-	       nil)
-	      (t
-	       next-headline)))))
+         "Show non-project tasks.
+        Skip project and sub-project tasks, habits, and project related tasks."
+         (save-restriction
+           (widen)
+           (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+             (cond
+              ((bh/is-task-p)
+               nil)
+              (t
+               next-headline)))))
 
        (defun bh/skip-project-trees-and-habits ()
-	 "Skip trees that are projects"
-	 (save-restriction
-	   (widen)
-	   (let ((subtree-end (save-excursion (org-end-of-subtree t))))
-	     (cond
-	      ((bh/is-project-p)
-	       subtree-end)
-	      ((org-is-habit-p)
-	       subtree-end)
-	      (t
-	       nil)))))
+         "Skip trees that are projects"
+         (save-restriction
+           (widen)
+           (let ((subtree-end (save-excursion (org-end-of-subtree t))))
+             (cond
+              ((bh/is-project-p)
+               subtree-end)
+              ((org-is-habit-p)
+               subtree-end)
+              (t
+               nil)))))
 
        (defun bh/skip-projects-and-habits-and-single-tasks ()
-	 "Skip trees that are projects, tasks that are habits, single non-project tasks"
-	 (save-restriction
-	   (widen)
-	   (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
-	     (cond
-	      ((org-is-habit-p)
-	       next-headline)
-	      ((and bh/hide-scheduled-and-waiting-next-tasks
-		    (member "WAITING" (org-get-tags-at)))
-	       next-headline)
-	      ((bh/is-project-p)
-	       next-headline)
-	      ((and (bh/is-task-p) (not (bh/is-project-subtree-p)))
-	       next-headline)
-	      (t
-	       nil)))))
+         "Skip trees that are projects, tasks that are habits, single non-project tasks"
+         (save-restriction
+           (widen)
+           (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+             (cond
+              ((org-is-habit-p)
+               next-headline)
+              ((and bh/hide-scheduled-and-waiting-next-tasks
+                    (member "WAITING" (org-get-tags-at)))
+               next-headline)
+              ((bh/is-project-p)
+               next-headline)
+              ((and (bh/is-task-p) (not (bh/is-project-subtree-p)))
+               next-headline)
+              (t
+               nil)))))
 
        (defun my/only-next-projects-and-tasks ()
-	 (save-restriction
-	   (widen)
-	   (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
-	     (cond
-	      ((org-is-habit-p)
-	       next-headline)
-	      ((and bh/hide-scheduled-and-waiting-next-tasks
-		    (member "WAITING" (org-get-tags-at)))
-	       next-headline)
-	      ((bh/is-project-p)
-	       next-headline)
-	      (t (unless (or (and (bh/is-task-p)
-				  (not (bh/is-project-subtree-p)))
-			     (string= "NEXT"
-				      (org-get-todo-state)))
-		  next-headline))))))
+         (save-restriction
+           (widen)
+           (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+             (cond
+              ((org-is-habit-p)
+               next-headline)
+              ((and bh/hide-scheduled-and-waiting-next-tasks
+                    (member "WAITING" (org-get-tags-at)))
+               next-headline)
+              ((bh/is-project-p)
+               next-headline)
+              (t (unless (or (and (bh/is-task-p)
+                                  (not (bh/is-project-subtree-p))
+                                  (not (string= "STUFF" (org-get-todo-state))))
+                             (string= "NEXT"
+                                      (org-get-todo-state)))
+                   next-headline))))))
 
        (defun bh/skip-project-tasks-maybe ()
-	 "Show tasks related to the current restriction.
-	  When restricted to a project, skip project and sub project tasks, habits, NEXT tasks, and loose tasks.
-	  When not restricted, skip project and sub-project tasks, habits, and project related tasks."
-	 (save-restriction
-	   (widen)
-	   (let* ((subtree-end (save-excursion (org-end-of-subtree t)))
-		  (next-headline (save-excursion (or (outline-next-heading) (point-max))))
-		  (limit-to-project (marker-buffer org-agenda-restrict-begin)))
-	     (cond
-	      ((bh/is-project-p)
-	       next-headline)
-	      ((org-is-habit-p)
-	       subtree-end)
-	      ((and (not limit-to-project)
-		    (bh/is-project-subtree-p))
-	       subtree-end)
-	      ((and limit-to-project
-		    (bh/is-project-subtree-p)
-		    (member (org-get-todo-state) (list "NEXT")))
-	       subtree-end)
-	      (t
-	       nil)))))
+         "Show tasks related to the current restriction.
+        When restricted to a project, skip project and sub project tasks, habits, NEXT tasks, and loose tasks.
+        When not restricted, skip project and sub-project tasks, habits, and project related tasks."
+         (save-restriction
+           (widen)
+           (let* ((subtree-end (save-excursion (org-end-of-subtree t)))
+                  (next-headline (save-excursion (or (outline-next-heading) (point-max))))
+                  (limit-to-project (marker-buffer org-agenda-restrict-begin)))
+             (cond
+              ((bh/is-project-p)
+               next-headline)
+              ((org-is-habit-p)
+               subtree-end)
+              ((and (not limit-to-project)
+                    (bh/is-project-subtree-p))
+               subtree-end)
+              ((and limit-to-project
+                    (bh/is-project-subtree-p)
+                    (member (org-get-todo-state) (list "NEXT")))
+               subtree-end)
+              (t
+               nil)))))
 
        (defun bh/skip-project-tasks ()
-	 "Show non-project tasks.
-	  Skip project and sub-project tasks, habits, and project related tasks."
-	 (save-restriction
-	   (widen)
-	   (let* ((subtree-end (save-excursion (org-end-of-subtree t))))
-	     (cond
-	      ((bh/is-project-p)
-	       subtree-end)
-	      ((org-is-habit-p)
-	       subtree-end)
-	      ((bh/is-project-subtree-p)
-	       subtree-end)
-	      (t
-	       nil)))))
+         "Show non-project tasks.
+        Skip project and sub-project tasks, habits, and project related tasks."
+         (save-restriction
+           (widen)
+           (let* ((subtree-end (save-excursion (org-end-of-subtree t))))
+             (cond
+              ((bh/is-project-p)
+               subtree-end)
+              ((org-is-habit-p)
+               subtree-end)
+              ((bh/is-project-subtree-p)
+               subtree-end)
+              (t
+               nil)))))
 
        (defun bh/skip-non-project-tasks ()
-	 "Show project tasks.
-	  Skip project and sub-project tasks, habits, and loose non-project tasks."
-	 (save-restriction
-	   (widen)
-	   (let* ((subtree-end (save-excursion (org-end-of-subtree t)))
-		  (next-headline (save-excursion (or (outline-next-heading) (point-max)))))
-	     (cond
-	      ((bh/is-project-p)
-	       next-headline)
-	      ((org-is-habit-p)
-	       subtree-end)
-	      ((and (bh/is-project-subtree-p)
-		    (member (org-get-todo-state) (list "NEXT")))
-	       subtree-end)
-	      ((not (bh/is-project-subtree-p))
-	       subtree-end)
-	      (t
-	       nil)))))
+         "Show project tasks.
+        Skip project and sub-project tasks, habits, and loose non-project tasks."
+         (save-restriction
+           (widen)
+           (let* ((subtree-end (save-excursion (org-end-of-subtree t)))
+                  (next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+             (cond
+              ((bh/is-project-p)
+               next-headline)
+              ((org-is-habit-p)
+               subtree-end)
+              ((and (bh/is-project-subtree-p)
+                    (member (org-get-todo-state) (list "NEXT")))
+               subtree-end)
+              ((not (bh/is-project-subtree-p))
+               subtree-end)
+              (t
+               nil)))))
 
        (defun bh/skip-projects-and-habits ()
-	 "Skip trees that are projects and tasks that are habits"
-	 (save-restriction
-	   (widen)
-	   (let ((subtree-end (save-excursion (org-end-of-subtree t))))
-	     (cond
-	      ((bh/is-project-p)
-	       subtree-end)
-	      ((org-is-habit-p)
-	       subtree-end)
-	      (t
-	       nil)))))
+         "Skip trees that are projects and tasks that are habits"
+         (save-restriction
+           (widen)
+           (let ((subtree-end (save-excursion (org-end-of-subtree t))))
+             (cond
+              ((bh/is-project-p)
+               subtree-end)
+              ((org-is-habit-p)
+               subtree-end)
+              (t
+               nil)))))
 
        (defun bh/skip-non-subprojects ()
-	 "Skip trees that are not projects"
-	 (let ((next-headline (save-excursion (outline-next-heading))))
-	   (if (bh/is-subproject-p)
-	       nil
-	     next-headline)))
+         "Skip trees that are not projects"
+         (let ((next-headline (save-excursion (outline-next-heading))))
+           (if (bh/is-subproject-p)
+               nil
+             next-headline)))
 
 
        (defun bh/widen ()
-	 (interactive)
-	 (if (equal major-mode 'org-agenda-mode)
-	     (progn
-	       (org-agenda-remove-restriction-lock)
-	       (when org-agenda-sticky
-		 (org-agenda-redo)))
-	   (widen)))
+         (interactive)
+         (if (equal major-mode 'org-agenda-mode)
+             (progn
+               (org-agenda-remove-restriction-lock)
+               (when org-agenda-sticky
+                 (org-agenda-redo)))
+           (widen)))
      #+END_SRC
 **** Norang sorting
      #+BEGIN_SRC emacs-lisp#
@@ -1394,202 +1401,239 @@
              ((< tb ta) +1))))
      #+END_SRC
 **** Views
-#+BEGIN_SRC emacs-lisp
-  (defun test (throwaway)
-    (org-agenda-prepare "This is a test")
-    (insert throwaway)
-    (org-agenda-finalize)
-    (setq buffer-read-only t))
+     #+BEGIN_SRC emacs-lisp
+       (defun test (throwaway)
+         (org-agenda-prepare "This is a test")
+         (insert throwaway)
+         (org-agenda-finalize)
+         (setq buffer-read-only t))
 
-  (setq org-agenda-tags-todo-honor-ignore-options t)
+       (setq org-agenda-tags-todo-honor-ignore-options t)
 
-  (defun bh/org-auto-exclude-function (tag)
-    "Automatic task exclusion in the agenda with / RET"
-    (and (cond
-          ((string= tag "hold")
-           t))
-         (concat "-" tag)))
+       (defun bh/org-auto-exclude-function (tag)
+         "Automatic task exclusion in the agenda with / RET"
+         (and (cond
+               ((string= tag "hold")
+                t))
+              (concat "-" tag)))
 
-  (add-hook 'org-agenda-mode-hook
-            '(lambda ()
-               (org-defkey org-agenda-mode-map
-                           "W"
-                           (lambda ()
-                             (interactive)
-                             (setq bh/hide-scheduled-and-waiting-next-tasks
-                                   (not bh/hide-scheduled-and-waiting-next-tasks))
-                             (bh/widen))))
-            'append)
+       (add-hook 'org-agenda-mode-hook
+                 '(lambda ()
+                    (org-defkey org-agenda-mode-map
+                                "W"
+                                (lambda ()
+                                  (interactive)
+                                  (setq bh/hide-scheduled-and-waiting-next-tasks
+                                        (not bh/hide-scheduled-and-waiting-next-tasks))
+                                  (bh/widen))))
+                 'append)
 
-  (setq org-agenda-auto-exclude-function 'bh/org-auto-exclude-function)
-  (setq org-agenda-skip-deadline-prewarning-if-scheduled t)
+       (setq org-agenda-auto-exclude-function 'bh/org-auto-exclude-function)
+       (setq org-agenda-skip-deadline-prewarning-if-scheduled t)
 
-  (defun cap/ignore-schedule-deadline (tag)
-    `((org-agenda-overriding-header (concat ,tag
-                                            (if bh/hide-scheduled-and-waiting-next-tasks
-                                                ""
-                                              " (including WAITING and SCHEDULED tasks)")))
-      (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
-      (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)
-      (org-agenda-todo-ignore-with-date bh/hide-scheduled-and-waiting-next-tasks)))
+       (defun cap/ignore-schedule-deadline (tag)
+         `((org-agenda-overriding-header (concat ,tag
+                                                 (if bh/hide-scheduled-and-waiting-next-tasks
+                                                     ""
+                                                   " (including WAITING and SCHEDULED tasks)")))
+           (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
+           (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)
+           (org-agenda-todo-ignore-with-date bh/hide-scheduled-and-waiting-next-tasks)))
 
-  (defun my-org-agenda-entry-get-agenda-timestamp (pom)
-    "Retrieve timestamp information for sorting agenda views.
-  Given a point or marker POM, returns a cons cell of the timestamp
-  and the timestamp type relevant for the sorting strategy in
-  `org-agenda-sorting-strategy-selected'."
-    (let (ts ts-date-type)
-      (save-match-data
-        (cond ((org-em 'scheduled-up 'scheduled-down
-               org-agenda-sorting-strategy-selected)
-           (setq ts (org-entry-get pom "SCHEDULED")
-             ts-date-type " scheduled"))
-          ((org-em 'deadline-up 'deadline-down
-               org-agenda-sorting-strategy-selected)
-           (setq ts (org-entry-get pom "DEADLINE")
-             ts-date-type " deadline"))
-          ((org-em 'ts-up 'ts-down
-               org-agenda-sorting-strategy-selected)
-           (setq ts (org-entry-get pom "TIMESTAMP")
-             ts-date-type " timestamp"))
-          ((org-em 'tsia-up 'tsia-down
-               org-agenda-sorting-strategy-selected)
-           (setq ts (org-entry-get pom "TIMESTAMP_IA")
-             ts-date-type " timestamp_ia"))
-          ((org-em 'timestamp-up 'timestamp-down
-               org-agenda-sorting-strategy-selected)
-           (setq ts (or (org-entry-get pom "SCHEDULED")
-                (org-entry-get pom "DEADLINE")
-                (org-entry-get pom "TIMESTAMP")
-                (org-entry-get pom "TIMESTAMP_IA"))
-             ts-date-type ""))
-          (t (setq ts-date-type "")))
-        (cons (when ts (ignore-errors 
-                         (org-time-string-to-seconds (if (string-match-p ":" ts)
-                                                         ts
-                                                       (let ((s (substring ts 0 (1- (length ts)))))
-                                                         (concat s
-                                                                 " 23:59>"))))))
-          ts-date-type))))
+             (defun org-agenda-delete-empty-blocks ()
+         "Remove empty agenda blocks.
+       A block is identified as empty if there are fewer than 2
+       non-empty lines in the block (excluding the line with
+       `org-agenda-block-separator' characters)."
+         (when org-agenda-compact-blocks
+           (user-error "Cannot delete empty compact blocks"))
+         (setq buffer-read-only nil)
+         (save-excursion
+           (goto-char (point-min))
+           (let* ((blank-line-re "^\\s-*$")
+                  (content-line-count (if (looking-at-p blank-line-re) 0 1))
+                  (start-pos (point))
+                  (block-re (format "%c\\{10,\\}" org-agenda-block-separator)))
+             (while (and (not (eobp)) (forward-line))
+               (cond
+                ((looking-at-p block-re)
+                 (when (< content-line-count 2)
+                   (delete-region start-pos (1+ (point-at-bol))))
+                 (setq start-pos (point))
+                 (forward-line)
+                 (setq content-line-count (if (looking-at-p blank-line-re) 0 1)))
+                ((not (looking-at-p blank-line-re))
+                 (setq content-line-count (1+ content-line-count)))))
+             (when (< content-line-count 2)
+               (delete-region start-pos (point-max)))
+             (goto-char (point-min))
+             ;; The above strategy can leave a separator line at the beginning
+             ;; of the buffer.
+             (when (looking-at-p block-re)
+               (delete-region (point) (1+ (point-at-eol))))))
+         (setq buffer-read-only t))
 
-  (advice-add 'org-agenda-entry-get-agenda-timestamp
-              :override
-              #'my-org-agenda-entry-get-agenda-timestamp)
+       (add-hook 'org-agenda-finalize-hook #'org-agenda-delete-empty-blocks)
 
-  (defvar view/general-view 
-    '(("g" "General View"
-       ((agenda "" ((org-agenda-log-mode 1)))
-        (tags-todo "+TODO=\"STAGED\""
-                   ((org-agenda-overriding-header "------------------------------------\nStaged Tasks")))
-        (tags-todo "+REFILE"
-                   ((org-agenda-overriding-header "Refile tasks")))
-        (tags-todo "WORK|SCHOOL-APT-TODO=\"STAGED\""
-                   ((org-agenda-overriding-header "Important Tasks")))
-        (tags-todo "+APT"
-                   ((org-agenda-overriding-header "Appointments")))
-        (tags-todo "+TODO=\"WAIT\""
-                   ((org-agenda-overriding-header "Tasks on hold")))
-        (tags-todo "-WORK-SCHOOL+TODO=\"TODO\""
-                   ((org-agenda-overriding-header "All tasks")))))))
+       (defun my-org-agenda-entry-get-agenda-timestamp (pom)
+         "Retrieve timestamp information for sorting agenda views.
+       Given a point or marker POM, returns a cons cell of the timestamp
+       and the timestamp type relevant for the sorting strategy in
+       `org-agenda-sorting-strategy-selected'."
+         (let (ts ts-date-type)
+           (save-match-data
+             (cond ((org-em 'scheduled-up 'scheduled-down
+                    org-agenda-sorting-strategy-selected)
+                (setq ts (org-entry-get pom "SCHEDULED")
+                  ts-date-type " scheduled"))
+               ((org-em 'deadline-up 'deadline-down
+                    org-agenda-sorting-strategy-selected)
+                (setq ts (org-entry-get pom "DEADLINE")
+                  ts-date-type " deadline"))
+               ((org-em 'ts-up 'ts-down
+                    org-agenda-sorting-strategy-selected)
+                (setq ts (org-entry-get pom "TIMESTAMP")
+                  ts-date-type " timestamp"))
+               ((org-em 'tsia-up 'tsia-down
+                    org-agenda-sorting-strategy-selected)
+                (setq ts (org-entry-get pom "TIMESTAMP_IA")
+                  ts-date-type " timestamp_ia"))
+               ((org-em 'timestamp-up 'timestamp-down
+                    org-agenda-sorting-strategy-selected)
+                (setq ts (or (org-entry-get pom "SCHEDULED")
+                     (org-entry-get pom "DEADLINE")
+                     (org-entry-get pom "TIMESTAMP")
+                     (org-entry-get pom "TIMESTAMP_IA"))
+                  ts-date-type ""))
+               (t (setq ts-date-type "")))
+             (cons (when ts (ignore-errors 
+                              (org-time-string-to-seconds (if (string-match-p ":" ts)
+                                                              ts
+                                                            (let ((s (substring ts 0 (1- (length ts)))))
+                                                              (concat s
+                                                                      " 23:59>"))))))
+               ts-date-type))))
 
-  ;; Investigate
-  (setq org-sort-agenda-notime-is-late t)
+       (advice-add 'org-agenda-entry-get-agenda-timestamp
+                   :override
+                   #'my-org-agenda-entry-get-agenda-timestamp)
 
-  (setq org-agenda-custom-commands
-        `(,@view/general-view
-          ("n" . "Norang overhaul")
-          ("nv" "Norang View"
-           ((agenda "" (;; (org-agenda-log-mode 1)
-                        (org-agenda-skip-scheduled-if-done t)
-                        (org-agenda-skip-deadline-if-done t)
-                        (org-agenda-span 1)
-                        ))
-            (tags-todo "+REFILE"
-                       ((org-agenda-overriding-header "-------------------------------------\nRefile tasks")))
-            (tags-todo "SCHEDULED<\"<today>\""
-                       ((org-agenda-files (cons "~/MEGA/org/agenda/tickler.org" org-agenda-files))
-                        (org-agenda-overriding-header "Tickler")))
-            (tags-todo "-REFILE-HOLD/!NEXT"
-                       (,@(cap/ignore-schedule-deadline "Project Next Tasks")
-                        (org-agenda-skip-function 'bh/skip-projects-and-habits-and-single-tasks)
-                        (org-tags-match-list-sublevels t)))
-            (tags-todo "-REFILE-HOLD/!"
-                       (,@(cap/ignore-schedule-deadline "Standalone Tasks")
-                        (org-agenda-skip-function 'bh/skip-project-tasks)))
-            (tags-todo "+HOLD"
-                       (,@(cap/ignore-schedule-deadline "On Hold Tasks")
-                        (org-agenda-skip-function 'bh/skip-project-tasks)))))
-          ("nn" "Next tasks" 
-           ((tags-todo "+PLAN"
-                       ((org-agenda-files '("~/MEGA/org/entries/journal.gpg"))
-                       (org-agenda-overriding-header "Today's plan")))
-            (tags-todo "+REFILE"
-                       ((org-agenda-overriding-header "Refile tasks")))
-            (tags-todo "+TICKLER+SCHEDULED<\"<today>\""
-                       ((org-agenda-files (cons "~/MEGA/org/agenda/tickler.org" org-agenda-files))
-                        (org-agenda-overriding-header "Tickler")))
-            (tags-todo "-REFILE-SCHEDULED>\"<today>\"/!"
-                       ((org-agenda-overriding-header "Stuck Projects")
-                        (org-tags-match-list-sublevels 'indented)
-                        (org-agenda-skip-function 'bh/skip-non-stuck-projects)
-                        (org-agenda-sorting-strategy
-                         '(category-keep))))
-            (tags-todo "-REFILE-HOLD-WAIT+SCHEDULED<\"<tomorrow>\"/!"
-                       ((org-agenda-skip-function 'my/only-next-projects-and-tasks)
-                        (org-agenda-overriding-header "Scheduled Tasks")
-                        (org-tags-match-list-sublevels t)
-                        (org-agenda-sorting-strategy '(scheduled-up))))
-            (tags-todo "-REFILE-HOLD-WAIT+DEADLINE<\"<tomorrow>\"/!"
-                       ((org-agenda-skip-function 'my/only-next-projects-and-tasks)
-                        (org-agenda-overriding-header "Done by today")
-                        (org-tags-match-list-sublevels t)
-                        (org-agenda-sorting-strategy '(deadline-up))))
-            (tags-todo "-REFILE-HOLD-WAIT+DEADLINE>=\"<tomorrow>\"/!"
-                       ((org-agenda-skip-function 'my/only-next-projects-and-tasks)
-                        (org-agenda-overriding-header "Tasks with Deadlines")
-                        (org-tags-match-list-sublevels t)
-                        (org-agenda-sorting-strategy '(deadline-up))))
-            (tags-todo "-REFILE-HOLD+TODO=\"WAIT\""
-                       (;(org-agenda-skip-function 'my/only-next-projects-and-tasks)
-                        (org-agenda-overriding-header "Tasks in other courts")
-                        (org-tags-match-list-sublevels t)))
-            (tags-todo "-REFILE-HOLD-DEADLINE={.}-SCHEDULED={.}/!"
-                       ((org-agenda-skip-function 'my/only-next-projects-and-tasks)
-                        (org-agenda-overriding-header "Inactive Tasks")
-                        (org-tags-match-list-sublevels t)))
-            (tags-todo "-REFILE-HOLD/!"
-                       ((org-agenda-overriding-header "Active Projects")
-                        (org-agenda-skip-function 'bh/skip-non-projects)
-                        (org-tags-match-list-sublevels 'indented)))))
-          ("nh" "Projects on hold" todo "HOLD" ((org-tags-match-list-sublevels 'indented)))
-          ("nt" "Tickler" agenda ""
-           ((org-agenda-files (cons "/home/benson/MEGA/org/agenda/tickler.org" org-agenda-files))
-            (org-agenda-tag-filter-preset '("+TICKLER"))))
-          ("nd" "DOESNOTAPPLY" tags "DOESNOTAPPLY")
-          ("nc" "Completed today" tags "+CLOSED={.}-CLOSED<\"<today>\"" ((org-agenda-skip-archived-trees nil)))
-          ("nu" "Test order" tags-todo  "-REFILE-HOLD-DOESNOTAPPLY+test/!"
-           ((org-agenda-skip-function 'my/only-next-projects-and-tasks)
-            (org-agenda-overriding-header "Next Tasks")
-            (org-agenda-sorting-strategy '(deadline-up))
-            (org-agenda-files '("~/MEGA/org/agenda/personal.org"))))
-          ("u" "Test"
-           ((tags-todo "+PLAN"
-                       ((org-agenda-overriding-header "Today's plan")))
-            (test "Hello"
-                  ((org-agenda-overriding-header "Hello")))
-            ))
-          ("c" . "Custom Commands")
-          ("ca" "Appointments" tags-todo "+APT")
-          ("cs" "School"
-           ((tags-todo "SCHOOL")))
-          ("cr" "Archive" tags "TODO=\"DONE\"-PLAN")
-          ("cf" "Refile" tags-todo "+REFILE")
-          ("cp" "Post-panic" tags-todo "+PANIC")))
-#+END_SRC
+       (add-to-list 'org-agenda-entry-types :deadlines*)
+
+       (defvar view/general-view 
+         '(("g" "General View"
+            ((agenda "" ((org-agenda-log-mode 1)))
+             (tags-todo "+TODO=\"STAGED\""
+                        ((org-agenda-overriding-header "------------------------------------\nStaged Tasks")))
+             (tags-todo "+REFILE"
+                        ((org-agenda-overriding-header "Refile tasks")))
+             (tags-todo "WORK|SCHOOL-APT-TODO=\"STAGED\""
+                        ((org-agenda-overriding-header "Important Tasks")))
+             (tags-todo "+APT"
+                        ((org-agenda-overriding-header "Appointments")))
+             (tags-todo "+TODO=\"WAIT\""
+                        ((org-agenda-overriding-header "Tasks on hold")))
+             (tags-todo "-WORK-SCHOOL+TODO=\"TODO\""
+                        ((org-agenda-overriding-header "All tasks")))))))
+
+       ;; Investigate
+       (setq org-sort-agenda-notime-is-late t)
+
+       (setq org-agenda-custom-commands
+             `(,@view/general-view
+               ("n" . "Norang overhaul")
+               ("nv" "Norang View"
+                ((agenda "" (;; (org-agenda-log-mode 1)
+                             (org-agenda-skip-scheduled-if-done t)
+                             (org-agenda-skip-deadline-if-done t)
+                             (org-agenda-span 1)
+                             ))
+                 (tags-todo "+REFILE"
+                            ((org-agenda-overriding-header "-------------------------------------\nRefile tasks")))
+                 (tags-todo "SCHEDULED<\"<today>\""
+                            ((org-agenda-files (cons "~/MEGA/org/agenda/tickler.org" org-agenda-files))
+                             (org-agenda-overriding-header "Tickler")))
+                 (tags-todo "-REFILE-HOLD/!NEXT"
+                            (,@(cap/ignore-schedule-deadline "Project Next Tasks")
+                             (org-agenda-skip-function 'bh/skip-projects-and-habits-and-single-tasks)
+                             (org-tags-match-list-sublevels t)))
+                 (tags-todo "-REFILE-HOLD/!"
+                            (,@(cap/ignore-schedule-deadline "Standalone Tasks")
+                             (org-agenda-skip-function 'bh/skip-project-tasks)))
+                 (tags-todo "+HOLD"
+                            (,@(cap/ignore-schedule-deadline "On Hold Tasks")
+                             (org-agenda-skip-function 'bh/skip-project-tasks)))))
+               ("nn" "Next tasks" 
+                ((tags-todo "+PLAN"
+                            ((org-agenda-files '("~/MEGA/org/entries/journal.gpg"))
+                            (org-agenda-overriding-header "Today's plan")))
+                 (tags-todo "+REFILE|TODO=\"STUFF\""
+                            ((org-agenda-overriding-header "Refile tasks")))
+                 (tags-todo "+TICKLER+SCHEDULED<\"<today>\""
+                            ((org-agenda-files (cons "~/MEGA/org/agenda/tickler.org" org-agenda-files))
+                             (org-agenda-overriding-header "Tickler")))
+                 (tags-todo "-REFILE-SCHEDULED>\"<today>\"/!"
+                            ((org-agenda-overriding-header "Stuck Projects")
+                             (org-tags-match-list-sublevels 'indented)
+                             (org-agenda-skip-function 'bh/skip-non-stuck-projects)
+                             (org-agenda-sorting-strategy
+                              '(category-keep))))
+                 (tags-todo "-REFILE-HOLD-WAIT-SCHEDULED>\"<now>\"+DEADLINE<\"<tomorrow>\"/!"
+                            ((org-agenda-skip-function 'my/only-next-projects-and-tasks)
+                             (org-agenda-overriding-header "Done by today")
+                             (org-tags-match-list-sublevels t)
+                             (org-agenda-sorting-strategy '(deadline-up))))
+                 (tags-todo "-REFILE-HOLD-WAIT+SCHEDULED<=\"<now>\"/!"
+                            ((org-agenda-skip-function 'my/only-next-projects-and-tasks)
+                             (org-agenda-overriding-header "Scheduled Tasks")
+                             (org-tags-match-list-sublevels t)
+                             (org-agenda-sorting-strategy '(scheduled-up))))
+                 (tags-todo "-REFILE-HOLD-WAIT+DEADLINE>=\"<tomorrow>\"/!"
+                            ((org-agenda-skip-function 'my/only-next-projects-and-tasks)
+                             (org-agenda-overriding-header "Tasks with Deadlines")
+                             (org-tags-match-list-sublevels t)
+                             (org-agenda-sorting-strategy '(deadline-up))))
+                 (tags-todo "-REFILE-HOLD+TODO=\"WAIT\""
+                            (;(org-agenda-skip-function 'my/only-next-projects-and-tasks)
+                             (org-agenda-overriding-header "Tasks in other courts")
+                             (org-tags-match-list-sublevels t)))
+                 (tags-todo "-REFILE-HOLD-DEADLINE={.}-SCHEDULED={.}/!"
+                            ((org-agenda-skip-function 'my/only-next-projects-and-tasks)
+                             (org-agenda-overriding-header "Inactive Tasks")
+                             (org-tags-match-list-sublevels t)))
+                 (tags-todo "-REFILE-HOLD/!"
+                            ((org-agenda-overriding-header "Active Projects")
+                             (org-agenda-skip-function 'bh/skip-non-projects)
+                             (org-tags-match-list-sublevels 'indented)))))
+               ("nh" "Projects on hold" todo "HOLD" ((org-tags-match-list-sublevels 'indented)))
+               ("nt" "Tickler" agenda ""
+                ((org-agenda-files (cons "/home/benson/MEGA/org/agenda/tickler.org" org-agenda-files))
+                 (org-agenda-tag-filter-preset '("+TICKLER"))))
+               ("nd" "DOESNOTAPPLY" tags "DOESNOTAPPLY")
+               ("nc" "Completed today" tags "+CLOSED={.}-CLOSED<\"<today>\"" ((org-agenda-skip-archived-trees nil)))
+               ("nu" "Test order" tags-todo  "-REFILE-HOLD-DOESNOTAPPLY+test/!"
+                ((org-agenda-skip-function 'my/only-next-projects-and-tasks)
+                 (org-agenda-overriding-header "Next Tasks")
+                 (org-agenda-sorting-strategy '(deadline-up))
+                 (org-agenda-files '("~/MEGA/org/agenda/personal.org"))))
+               ("u" "Test"
+                ((tags-todo "+PLAN"
+                            ((org-agenda-overriding-header "Today's plan")))
+                 (test "Hello"
+                       ((org-agenda-overriding-header "Hello")))
+                 ))
+               ("c" . "Custom Commands")
+               ("ca" "Appointments" tags-todo "+APT")
+               ("cs" "School"
+                ((tags-todo "SCHOOL")))
+               ("cr" "Archive" tags "TODO=\"DONE\"-PLAN")
+               ("cf" "Refile" tags-todo "+REFILE")
+               ("cp" "Post-panic" tags-todo "+PANIC")))
+     #+END_SRC
 **** Face
      #+BEGIN_SRC emacs-lisp
        (custom-set-faces
-	'(org-agenda-date-today ((t (:inherit org-agenda-date :foreground "cyan" :slant italic :weight bold :height 1.1)))))
+    '(org-agenda-date-today ((t (:inherit org-agenda-date :foreground "cyan" :slant italic :weight bold :height 1.1)))))
      #+END_SRC
 *** Plugins
 **** org-bullets
@@ -1670,10 +1714,10 @@
    (dired "~/MEGA/org/"))
  #+END_SRC
 *** Reveal.js
-#+BEGIN_SRC emacs-lisp
-(use-package ox-reveal)
-(setq org-reveal-root "file:///home/benson/reveal.js")
-#+END_SRC
+    #+BEGIN_SRC emacs-lisp
+      (use-package ox-reveal)
+      (setq org-reveal-root "file:///home/benson/reveal.js")
+    #+END_SRC
 *** Require org-protocol
     #+BEGIN_SRC emacs-lisp
     (require 'org-protocol)
@@ -1723,14 +1767,14 @@
     (interactive)
     (let ((entries (elfeed-search-selected)))
       (dolist (entry entries)
-	(if (null (youtube-dl (elfeed-entry-link entry)
-			      :title (elfeed-entry-title entry)
-			      :slow slow))
-	    (message "Entry is not a YouTube link!")
-	  (message "Downloading %s" (elfeed-entry-title entry)))
-	(elfeed-untag entry 'unread)
-	(elfeed-search-update-entry entry)
-	(unless (use-region-p) (forward-line)))))
+    (if (null (youtube-dl (elfeed-entry-link entry)
+                  :title (elfeed-entry-title entry)
+                  :slow slow))
+        (message "Entry is not a YouTube link!")
+      (message "Downloading %s" (elfeed-entry-title entry)))
+    (elfeed-untag entry 'unread)
+    (elfeed-search-update-entry entry)
+    (unless (use-region-p) (forward-line)))))
 
   (define-key elfeed-search-mode-map "d" 'elfeed-search-youtube-dl)
   (setq youtube-dl-directory "~/big_files/Videos/youtube-dl")
@@ -1930,26 +1974,55 @@
  ;(defun my-mu4e-set-account ()
  ;  "Set the account for composing a message."
  ;  (let* ((account
- ;	  (if mu4e-compose-parent-message
- ;	      (let ((maildir (mu4e-message-field mu4e-compose-parent-message :maildir)))
- ;		(string-match "/\\(.*?\\)/" maildir)
- ;		(match-string 1 maildir))
- ;	    (completing-read (format "Compose with account: (%s) "
- ;				     (mapconcat #'(lambda (var) (car var))
- ;						my-mu4e-account-alist "/"))
- ;			     (mapcar #'(lambda (var) (car var)) my-mu4e-account-alist)
- ;			     nil t nil nil (caar my-mu4e-account-alist))))
- ;	 (account-vars (cdr (assoc account my-mu4e-account-alist))))
+ ;    (if mu4e-compose-parent-message
+ ;        (let ((maildir (mu4e-message-field mu4e-compose-parent-message :maildir)))
+ ;      (string-match "/\\(.*?\\)/" maildir)
+ ;      (match-string 1 maildir))
+ ;      (completing-read (format "Compose with account: (%s) "
+ ;                   (mapconcat #'(lambda (var) (car var))
+ ;                      my-mu4e-account-alist "/"))
+ ;               (mapcar #'(lambda (var) (car var)) my-mu4e-account-alist)
+ ;               nil t nil nil (caar my-mu4e-account-alist))))
+ ;   (account-vars (cdr (assoc account my-mu4e-account-alist))))
  ;    (if account-vars
  ;        (mapc #'(lambda (var)
- ;		  (set (car var) (cadr var)))
- ;	      account-vars)
+ ;        (set (car var) (cadr var)))
+ ;        account-vars)
  ;      (error "No email account found"))))
 
- ;	(add-hook 'mu4e~headers-jump-to-maildir 'my-mu4e-set-account)
+ ;  (add-hook 'mu4e~headers-jump-to-maildir 'my-mu4e-set-account)
 
 
     #+END_SRC
+** Wunderlist
+   #+BEGIN_SRC emacs-lisp#
+     (use-package org-wunderlist)
+
+     (save-excursion
+       (let ((filename "~/.emacs.d/wunderlist.el"))
+         (if (not (file-exists-p filename))
+             (message "Wunderlist secret file missing")
+           (set-buffer (find-file-noselect filename))
+           (let ((var (eval (read (buffer-string)))))
+             (setq org-wunderlist-client-id (car var)
+                   org-wunderlist-token (cadr var)))
+           (kill-buffer))))
+
+     (setq org-wunderlist-file  "~/MEGA/org/agenda/Wunderlist.org"
+           org-wunderlist-dir "~/MEGA/org/agenda/org-wunderlist/")
+   #+END_SRC
+** Dired+
+   #+BEGIN_SRC emacs-lisp#
+     (use-package dired+
+       :quelpa (dired+ :fetcher url :url "https://www.emacswiki.org/emacs/download/dired+.el")
+       :defer 1
+       :init
+       (setq diredp-hide-details-initially-flag nil)
+       (setq diredp-hide-details-propagate-flag nil)
+
+       :config
+       (diredp-toggle-find-file-reuse-dir 1))
+   #+END_SRC
 * Disabled 
 ** nnreddit
  #+BEGIN_SRC emacs-lisp#
@@ -1998,9 +2071,9 @@
  ;  (lambda (line) 
  ;    (propertize (format (let ((w (length (number-to-string (count-lines (point-min) (point-max))))))
  ;                          (concat "%" (number-to-string w) "d ")) 
- ;		        line) 
- ;		'face 
- ;		'linum)))
+ ;              line) 
+ ;      'face 
+ ;      'linum)))
 
  ;(setq linum-relative-format "%3s\u2502 ")
  #+END_SRC

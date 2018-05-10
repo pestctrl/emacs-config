@@ -7,3 +7,6 @@
 [submodule "custom/dired-plus"]
 	path = custom/dired-plus
 	url = https://github.com/emacsmirror/dired-plus
+[submodule "custom/bookmark-plus"]
+	path = custom/bookmark-plus
+	url = https://github.com/emacsmirror/bookmark-plus

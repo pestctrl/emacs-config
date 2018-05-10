@@ -278,7 +278,6 @@
           (define-key term-raw-map (kbd "C-c C-y") 'term-paste)
           (define-key term-raw-map (kbd "M-x") 'helm-M-x)))
    #+END_SRC
-  
 * My variables alist
 #+BEGIN_SRC emacs-lisp
   (defvar my/variable-alist-file "~/.emacs.d/codertilldeath_variables.el")
@@ -869,7 +868,7 @@
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-cc" 'org-capture)
 (global-set-key "\C-cb" 'org-iswitchb)
-(global-set-key (kbd "<f12>") 'org-agenda)
+(global-set-key (kbd "<f5>") 'org-agenda)
 (global-set-key (kbd "<f11>") (lambda () (interactive) (org-agenda "" "g")))
 (global-set-key (kbd "<f9>") 'org-capture)
 (global-set-key (kbd "C-x C-o") 'org-switchb)
@@ -1951,6 +1950,12 @@
      (define-key pdf-view-mode-map (kbd "d") (lambda () (interactive) (pdf-view-next-line-or-next-page 8)))
      (define-key pdf-view-mode-map (kbd "u") (lambda () (interactive) (pdf-view-previous-line-or-previous-page 8)))
    #+END_SRC
+** Dired+
+   #+BEGIN_SRC emacs-lisp
+     (add-to-list 'load-path
+                  "~/.emacs.d/custom/dired-plus")
+     (require 'dired+)
+   #+END_SRC
 * Broken
 ** mu4e
 *** General config
@@ -2033,18 +2038,6 @@
 
      (setq org-wunderlist-file  "~/MEGA/org/agenda/Wunderlist.org"
            org-wunderlist-dir "~/MEGA/org/agenda/org-wunderlist/")
-   #+END_SRC
-** Dired+
-   #+BEGIN_SRC emacs-lisp#
-     (use-package dired+
-       :quelpa (dired+ :fetcher url :url "https://www.emacswiki.org/emacs/download/dired+.el")
-       :defer 1
-       :init
-       (setq diredp-hide-details-initially-flag nil)
-       (setq diredp-hide-details-propagate-flag nil)
-
-       :config
-       (diredp-toggle-find-file-reuse-dir 1))
    #+END_SRC
 * Disabled 
 ** nnreddit

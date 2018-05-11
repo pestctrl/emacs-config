@@ -87,19 +87,38 @@
 ** Global keys
    #+BEGIN_SRC emacs-lisp
      (setq exwm-input-global-keys
-      `(([?\s-r] . exwm-reset)
-        ([?\s-w] . exwm-workspace-switch)
-        ([?\s-l] . lock-screen)
-        ,@(mapcar (lambda (i)
-                    `(,(kbd (format "s-%d" (mod (1+ i) 10))) .
-                      (lambda ()
-                        (interactive)
-                        (exwm-workspace-switch-create ,i))))
-                  (number-sequence 0 9))))
+           `(([?\s-r] . exwm-reset)
+             ([?\s-w] . exwm-workspace-switch)
+             ([?\s-l] . lock-screen)
+             ,@(mapcar (lambda (i)
+                         `(,(kbd (format "s-%d" (mod (1+ i) 10))) .
+                           (lambda ()
+                             (interactive)
+                             (exwm-workspace-switch-create ,i))))
+                       (number-sequence 0 9))))
      (global-set-key (kbd "M-T") 'flop-frame)
      (global-set-key (kbd "C-x p") 'launch-program)
      (global-set-key (kbd "M-…") 'multi-term)
      (global-set-key (kbd "C-ü") 'undo-tree-undo)
+
+     (defun prompt-workspace (&optional prompt)
+       "Prompt for a workspace, returning the workspace frame."
+       (exwm-workspace--update-switch-history)
+       (let* ((current-idx (exwm-workspace--position exwm-workspace--current))
+              (history-add-new-input nil)  ;prevent modifying history
+              (history-idx (read-from-minibuffer
+                            (or prompt "Workspace: ")
+                            (elt exwm-workspace--switch-history current-idx)
+                            exwm-workspace--switch-map nil
+                            `(exwm-workspace--switch-history . ,(1+ current-idx))))
+              (workspace-idx (mod (1- (cl-position history-idx exwm-workspace--switch-history
+                                          :test #'equal)) 10)))
+         (elt exwm-workspace--list workspace-idx)))
+
+     (advice-add 'exwm-workspace--prompt-for-workspace
+                 :override
+                 #'prompt-workspace)
+
    #+END_SRC
 ** Custom
    #+BEGIN_SRC emacs-lisp
@@ -1955,6 +1974,14 @@
      (add-to-list 'load-path
                   "~/.emacs.d/custom/dired-plus")
      (require 'dired+)
+     (setq dired-listing-switches "-al  --group-directories-first --sort=extension")
+     (require 'dired-x)
+     (setq-default dired-omit-files-p t)
+     (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
+     (use-package dired-narrow
+       :ensure t
+       :bind (:map dired-mode-map
+                   ("/" . dired-narrow)))
    #+END_SRC
 * Broken
 ** mu4e

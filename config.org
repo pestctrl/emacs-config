@@ -1080,6 +1080,9 @@
         (lambda () 
           (not (member "ARCHIVE" (org-get-tags-at (point) nil)))))
 
+  ; Use full outline paths for refile targets - we file directly with IDO
+  (setq org-refile-use-outline-path 'file)
+
   ; Targets complete directly with IDO
   (setq org-outline-path-complete-in-steps nil)
 

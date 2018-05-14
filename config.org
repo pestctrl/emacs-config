@@ -161,7 +161,9 @@
      (defvar live-wallpaper-path "/home/benson/MEGA/pictures/wallpapers/videos/bg.mp4")
      (defvar exwm-startup-programs
        '("megasync"
-         ("compton -f -i .7 -b" "compton")))
+         ("compton -f -i .7 -b" "compton")
+         ("/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1")
+         ("nm-applet")))
      (defvar hard-drive-space "")
 
      (defun lock-screen ()
@@ -1650,7 +1652,7 @@
                ("ca" "Appointments" tags-todo "+APT")
                ("cs" "School"
                 ((tags-todo "SCHOOL")))
-               ("cr" "Archive" tags "TODO=\"DONE\"-PLAN")
+               ("cr" "Archive" todo "DONE|CANCELLED")
                ("cf" "Refile" tags-todo "+REFILE")
                ("cp" "Post-panic" tags-todo "+PANIC")))
      #+END_SRC
@@ -1978,6 +1980,9 @@
                   "~/.emacs.d/custom/dired-plus")
      (require 'dired+)
      (setq dired-listing-switches "-al  --group-directories-first --sort=extension")
+     
+     (setq diredp-hide-details-initially-flag nil)
+     (setq diredp-hide-details-propagate-flag nil)
      (require 'dired-x)
      (setq-default dired-omit-files-p t)
      (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))

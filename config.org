@@ -1957,6 +1957,7 @@
 ** Swiper or counsel-grep
    #+BEGIN_SRC emacs-lisp
      (global-set-key (kbd "C-s") 'counsel-grep-or-swiper)
+     (setq counsel-grep-base-command "grep -nE --ignore-case \"%s\" %s")
    #+END_SRC
 ** Youtube-dl
    #+BEGIN_SRC emacs-lisp

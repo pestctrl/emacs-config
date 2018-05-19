@@ -253,6 +253,11 @@
 (require 'exwm-randr)
 ;No dash when using intel driver
 (setq exwm-randr-workspace-output-plist '(2 "HDMI1" 3 "HDMI1"))
+
+(defun exwm-presentation-mode ()
+  (interactive)
+  (setq exwm-randr-workspace-output-plist nil))
+
 (exwm-randr-enable)
 #+END_SRC
 ** Startup
@@ -1047,14 +1052,16 @@
   (setq org-todo-keywords
          '((sequence "STUFF(s)" "|")
            (sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
-           (sequence  "WAIT(w@/!)" "HOLD(h)" "|" "CANCELLED(c@/!)")))
+           (sequence "PROJECT(p)" "|" "COMPLETE(c)")
+           (sequence  "WAIT(w@/!)" "HOLD(h)" "|" "ABANDON(a@/!)")))
 
   (setq org-todo-keyword-faces 
         '(("STUFF" :foreground "goldenrod" :weight bold)
           ("NEXT" :foreground "cyan" :weight bold)
           ("WAIT" :foreground "yellow" :weight bold)
           ("HOLD" :foreground "red" :weight bold)
-          ("CANCELLED" :foreground "dark gray" :weight bold)))
+          ("PROJECT" :foreground "white" :weight bold)
+          ("ABANDON" :foreground "dark gray" :weight bold)))
 
   (setq org-todo-state-tags-triggers
         (quote (("HOLD" ("HOLD" . t))
@@ -1116,19 +1123,20 @@
 
        (defun bh/is-project-p ()
          "Any task with a todo keyword subtask"
-         (save-restriction
-           (widen)
-           (let ((has-subtask)
-                 (subtree-end (save-excursion (org-end-of-subtree t)))
-                 (is-a-task (member (nth 2 (org-heading-components)) org-todo-keywords-1)))
-             (save-excursion
-               (forward-line 1)
-               (while (and (not has-subtask)
-                           (< (point) subtree-end)
-                           (re-search-forward "^\*+ " subtree-end t))
-                 (when (member (org-get-todo-state) org-todo-keywords-1)
-                   (setq has-subtask t))))
-             (and is-a-task has-subtask))))
+         (or (equal (org-get-todo-state) "PROJECT")
+             (save-restriction
+               (widen)
+               (let ((has-subtask)
+                     (subtree-end (save-excursion (org-end-of-subtree t)))
+                     (is-a-task (member (nth 2 (org-heading-components)) org-todo-keywords-1)))
+                 (save-excursion
+                   (forward-line 1)
+                   (while (and (not has-subtask)
+                               (< (point) subtree-end)
+                               (re-search-forward "^\*+ " subtree-end t))
+                     (when (member (org-get-todo-state) (delete "DONE" org-todo-keywords-1))
+                       (setq has-subtask t))))
+                 (and is-a-task has-subtask)))))
 
        (defun bh/is-project-subtree-p ()
          "Any task with a todo keyword that is in a project subtree.
@@ -1225,7 +1233,7 @@
                                  (< (point) subtree-end)
                                  (re-search-forward "^\\*+ \\(NEXT\\|STUFF\\) " subtree-end t))
                        (unless (member "WAITING" (org-get-tags-at))
-                         (setq has-next t))))
+                             (setq has-next t))))
                    (if has-next
                        next-headline
                      nil)) ; a stuck project, has subtasks but no next task
@@ -1642,6 +1650,7 @@
                  (org-agenda-overriding-header "Next Tasks")
                  (org-agenda-sorting-strategy '(deadline-up))
                  (org-agenda-files '("~/MEGA/org/agenda/personal.org"))))
+               ("nb" "Bus tasks" tags "BUS")  
                ("u" "Test"
                 ((tags-todo "+PLAN"
                             ((org-agenda-overriding-header "Today's plan")))
@@ -1990,6 +1999,16 @@
        :ensure t
        :bind (:map dired-mode-map
                    ("/" . dired-narrow)))
+   #+END_SRC
+** Time to game!
+   #+BEGIN_SRC emacs-lisp
+     (defvar my/games '("mednaffe" "dolphin-emu" "m64py" "citra-qt" "steam " "th12"))
+
+     (defun time-to-game ()
+       (interactive)
+       (let ((selection (completing-read "What would you like to play? "
+                                         my/games)))
+         (launch-program selection)))
    #+END_SRC
 * Broken
 ** mu4e

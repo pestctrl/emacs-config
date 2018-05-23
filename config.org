@@ -95,7 +95,15 @@
                            (lambda ()
                              (interactive)
                              (exwm-workspace-switch-create ,i))))
-                       (number-sequence 0 9))))
+                       (number-sequence 0 9))
+             (,(kbd "s-b") . ivy-switch-buffer)
+             (,(kbd "s-a") . org-agenda)
+             (,(kbd "s-c") . org-capture)
+             (,(kbd "s-h") . split-window-right)
+             (,(kbd "s-t") . split-window-below)
+             (,(kbd "s-n") . switch-window)
+             (,(kbd "s-k") . ido-kill-buffer)
+             (,(kbd "s-s") . resize-window)))
      (global-set-key (kbd "M-T") 'flop-frame)
      (global-set-key (kbd "C-x p") 'launch-program)
      (global-set-key (kbd "M-…") 'multi-term)
@@ -159,12 +167,19 @@
    #+BEGIN_SRC emacs-lisp
      (defvar wallpaper-path "/home/benson/.emacs.d/res/digital_space_universe_4k_8k-wide.jpg")
      (defvar live-wallpaper-path "/home/benson/MEGA/pictures/wallpapers/videos/bg.mp4")
+     (setq i3-string "Xephyr -br -ac -noreset -resizeable -screen 1920x1080 :1 & sleep 1s; DISPLAY=:1 i3")
      (defvar exwm-startup-programs
        '("megasync"
          ("compton -f -i .7 -b" "compton")
          ("/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1")
-         ("nm-applet")))
+         ("nm-applet")
+         ;(i3-string)
+         ))
      (defvar hard-drive-space "")
+
+     (defun launch-i3 ()
+       (interactive)
+       (launch-program i3-string))
 
      (defun lock-screen ()
        (interactive)
@@ -303,6 +318,14 @@
        '(progn 
           (define-key term-raw-map (kbd "C-c C-y") 'term-paste)
           (define-key term-raw-map (kbd "M-x") 'helm-M-x)))
+   #+END_SRC
+** Xephyr launches in tiling-mode
+   #+BEGIN_SRC emacs-lisp
+     (setq exwm-manage-configurations `(((equal exwm-class-name "Xephyr")
+                                         floating nil 
+                                         char-mode t
+                                         fullscreen t)))
+
    #+END_SRC
 * My variables alist
 #+BEGIN_SRC emacs-lisp
@@ -1617,7 +1640,7 @@
                              (org-agenda-overriding-header "Done by today")
                              (org-tags-match-list-sublevels t)
                              (org-agenda-sorting-strategy '(deadline-up))))
-                 (tags-todo "-REFILE-HOLD-WAIT+SCHEDULED<=\"<now>\"/!"
+                 (tags-todo "-REFILE-HOLD-WAIT+SCHEDULED<=\"<now>\"-DEADLINE<\"<tomorrow>\"/!"
                             ((org-agenda-skip-function 'my/only-next-projects-and-tasks)
                              (org-agenda-overriding-header "Scheduled Tasks")
                              (org-tags-match-list-sublevels t)
@@ -1644,13 +1667,16 @@
                 ((org-agenda-files (cons "/home/benson/MEGA/org/agenda/tickler.org" org-agenda-files))
                  (org-agenda-tag-filter-preset '("+TICKLER"))))
                ("nd" "DOESNOTAPPLY" tags "DOESNOTAPPLY")
-               ("nc" "Completed today" tags "+CLOSED={.}-CLOSED<\"<today>\"" ((org-agenda-skip-archived-trees nil)))
+               ("nc" "Completed today" tags "+CLOSED={.}-CLOSED<\"<today>\""
+                ((org-agenda-skip-archived-trees nil)))
                ("nu" "Test order" tags-todo  "-REFILE-HOLD-DOESNOTAPPLY+test/!"
                 ((org-agenda-skip-function 'my/only-next-projects-and-tasks)
                  (org-agenda-overriding-header "Next Tasks")
                  (org-agenda-sorting-strategy '(deadline-up))
                  (org-agenda-files '("~/MEGA/org/agenda/personal.org"))))
-               ("nb" "Bus tasks" tags "BUS")  
+               ("nb" "Bus tasks" tags-todo "BUS")
+               ("nr" "Articles to read" tags-todo "READ"
+                ((org-agenda-files (cons "~/MEGA/org/agenda/someday.org" org-agenda-files))))
                ("u" "Test"
                 ((tags-todo "+PLAN"
                             ((org-agenda-overriding-header "Today's plan")))
@@ -1957,7 +1983,7 @@
 ** Swiper or counsel-grep
    #+BEGIN_SRC emacs-lisp
      (global-set-key (kbd "C-s") 'counsel-grep-or-swiper)
-     (setq counsel-grep-base-command "grep -nE --ignore-case \"%s\" %s")
+     (setq counsel-grep-base-command "grep --ignore-case -E -n -e %s %s")
    #+END_SRC
 ** Youtube-dl
    #+BEGIN_SRC emacs-lisp
@@ -2003,13 +2029,18 @@
    #+END_SRC
 ** Time to game!
    #+BEGIN_SRC emacs-lisp
-     (defvar my/games '("mednaffe" "dolphin-emu" "m64py" "citra-qt" "steam " "th12"))
+     (defvar my/games '("desmume" "mednaffe" "dolphin-emu" "m64py" "citra-qt" "steam " "th12"))
 
      (defun time-to-game ()
        (interactive)
        (let ((selection (completing-read "What would you like to play? "
                                          my/games)))
          (launch-program selection)))
+   #+END_SRC
+** Winner Mode
+   #+BEGIN_SRC emacs-lisp
+   (require 'winner)
+   (winner-mode)
    #+END_SRC
 * Broken
 ** mu4e

@@ -374,6 +374,10 @@
 (use-package color-theme-modern)
 (load-theme 'calm-forest t)
 #+END_SRC
+*** Wallpaper
+    #+BEGIN_SRC emacs-lisp
+    (setq wallpaper-path "/home/benson/.emacs.d/res/digital_space_universe_4k_8k-wide.jpg")
+    #+END_SRC
 *** powerline
 **** Test new mode-line
 #+BEGIN_SRC emacs-lisp
@@ -1102,7 +1106,8 @@
           ("~/MEGA/org/agenda/tickler.org" :maxlevel . 9)
           ("~/MEGA/org/agenda/reference.org" :maxlevel . 9)
           ("~/MEGA/org/agenda/reads.org" :maxlevel . 9)
-          ("~/MEGA/org/entries/important.gpg" :maxlevel . 9)))
+          ("~/MEGA/org/entries/important.gpg" :maxlevel . 9)
+          ("~/MEGA/org/agenda/habits.org" :maxlevel . 9)))
   ; Targets include this file and any file contributing to the agenda - up to 9 levels deep
   (setq org-refile-targets `((nil :maxlevel . 9)
                              (org-agenda-files :maxlevel . 9)
@@ -1111,6 +1116,8 @@
   (setq org-refile-target-verify-function
         (lambda () 
           (not (member "ARCHIVE" (org-get-tags-at (point) nil)))))
+
+  (setq org-agenda-show-future-repeats nil)
 
   ; Use full outline paths for refile targets - we file directly with IDO
   (setq org-refile-use-outline-path 'file)
@@ -1497,7 +1504,7 @@
            (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)
            (org-agenda-todo-ignore-with-date bh/hide-scheduled-and-waiting-next-tasks)))
 
-             (defun org-agenda-delete-empty-blocks ()
+       (defun org-agenda-delete-empty-blocks ()
          "Remove empty agenda blocks.
        A block is identified as empty if there are fewer than 2
        non-empty lines in the block (excluding the line with
@@ -1530,7 +1537,29 @@
                (delete-region (point) (1+ (point-at-eol))))))
          (setq buffer-read-only t))
 
-       (add-hook 'org-agenda-finalize-hook #'org-agenda-delete-empty-blocks)
+       (defun get-beginning-of-match-and-line-number (regexp)
+         (re-search-forward regexp)
+         (list (match-beginning 0)
+               (line-number-at-pos)))
+
+       (defun org-agenda-delete-empty-compact-blocks ()
+         (interactive)
+         (unless org-agenda-compact-blocks
+           (user-error "Compact blocks must be on"))
+         (setq buffer-read-only nil)
+         (save-excursion
+           (goto-char (point-min))
+           (let* ((header-regexp "^[^:\n]*$")
+                  (previous (get-beginning-of-match-and-line-number header-regexp))
+                  current)
+             (while (and (setq current (get-beginning-of-match-and-line-number header-regexp))
+                         (not (eobp)))
+               (if (= (1+ (cadr previous))
+                      (cadr current))
+                   (delete-region (car previous) (car current))
+                 (setq previous current))))))
+
+       (add-hook 'org-agenda-finalize-hook #'org-agenda-delete-empty-compact-blocks)
 
        (defun my-org-agenda-entry-get-agenda-timestamp (pom)
          "Retrieve timestamp information for sorting agenda views.
@@ -1635,6 +1664,9 @@
                              (org-agenda-skip-function 'bh/skip-non-stuck-projects)
                              (org-agenda-sorting-strategy
                               '(category-keep))))
+                 (tags-todo "+DEADLINE<\"<tomorrow>\"/!"
+                            ((org-agenda-overriding-header "Incomplete Habits")
+                             (org-agenda-files '("~/MEGA/org/agenda/habits.org"))))
                  (tags-todo "-REFILE-HOLD-WAIT-SCHEDULED>\"<now>\"+DEADLINE<\"<tomorrow>\"/!"
                             ((org-agenda-skip-function 'my/only-next-projects-and-tasks)
                              (org-agenda-overriding-header "Done by today")
@@ -1694,7 +1726,8 @@
 **** Face
      #+BEGIN_SRC emacs-lisp
        (custom-set-faces
-    '(org-agenda-date-today ((t (:inherit org-agenda-date :foreground "cyan" :slant italic :weight bold :height 1.1)))))
+        '(org-agenda-date-today ((t (:inherit org-agenda-date :foreground "cyan" :slant italic :weight bold :height 1.1))))
+        '(org-agenda-structure ((t (:foreground "LightSkyBlue" :box (:line-width 1 :color "grey75" :style released-button))))))
      #+END_SRC
 *** Plugins
 **** org-bullets

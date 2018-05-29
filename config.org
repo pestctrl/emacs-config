@@ -35,7 +35,7 @@
  #+END_SRC
 ** M-1 = windresize
  #+BEGIN_SRC emacs-lisp
- (global-set-key (kbd "M-1") 'windresize)
+ (global-set-key (kbd "M-1") 'resize-window)
  #+END_SRC
 ** Emacs which key
 #+BEGIN_SRC emacs-lisp
@@ -2074,6 +2074,15 @@
    #+BEGIN_SRC emacs-lisp
    (require 'winner)
    (winner-mode)
+   #+END_SRC
+** Skewer Mode (web development)
+   #+BEGIN_SRC emacs-lisp
+   (use-package js2-mode)
+   (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+   (use-package skewer-mode)
+   (add-hook 'js2-mode-hook 'skewer-mode)
+   (add-hook 'css-mode-hook 'skewer-css-mode)
+   (add-hook 'html-mode-hook 'skewer-html-mode)
    #+END_SRC
 * Broken
 ** mu4e

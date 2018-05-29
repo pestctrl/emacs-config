@@ -105,7 +105,7 @@
              (,(kbd "s-k") . ido-kill-buffer)
              (,(kbd "s-s") . resize-window)))
      (global-set-key (kbd "M-T") 'flop-frame)
-     (global-set-key (kbd "C-x p") 'dmenu)
+     (global-set-key (kbd "C-x p") 'launch-program)
      (global-set-key (kbd "M-…") 'multi-term)
      (global-set-key (kbd "C-ü") 'undo-tree-undo)
 
@@ -192,6 +192,8 @@
        (ivy-read "Shell Command: "
                  shell-command-history
                  :caller 'counsel-shell-command))
+
+     (use-package dmenu)            
 
      (defun read-program ()
        (funcall #'completing-read dmenu-prompt-string

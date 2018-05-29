@@ -1508,60 +1508,29 @@
            (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)
            (org-agenda-todo-ignore-with-date bh/hide-scheduled-and-waiting-next-tasks)))
 
-       (defun org-agenda-delete-empty-blocks ()
-         "Remove empty agenda blocks.
-       A block is identified as empty if there are fewer than 2
-       non-empty lines in the block (excluding the line with
-       `org-agenda-block-separator' characters)."
-         (when org-agenda-compact-blocks
-           (user-error "Cannot delete empty compact blocks"))
-         (setq buffer-read-only nil)
-         (save-excursion
-           (goto-char (point-min))
-           (let* ((blank-line-re "^\\s-*$")
-                  (content-line-count (if (looking-at-p blank-line-re) 0 1))
-                  (start-pos (point))
-                  (block-re (format "%c\\{10,\\}" org-agenda-block-separator)))
-             (while (and (not (eobp)) (forward-line))
-               (cond
-                ((looking-at-p block-re)
-                 (when (< content-line-count 2)
-                   (delete-region start-pos (1+ (point-at-bol))))
-                 (setq start-pos (point))
-                 (forward-line)
-                 (setq content-line-count (if (looking-at-p blank-line-re) 0 1)))
-                ((not (looking-at-p blank-line-re))
-                 (setq content-line-count (1+ content-line-count)))))
-             (when (< content-line-count 2)
-               (delete-region start-pos (point-max)))
-             (goto-char (point-min))
-             ;; The above strategy can leave a separator line at the beginning
-             ;; of the buffer.
-             (when (looking-at-p block-re)
-               (delete-region (point) (1+ (point-at-eol))))))
-         (setq buffer-read-only t))
-
-       (defun get-beginning-of-match-and-line-number (regexp)
-         (re-search-forward regexp)
-         (list (match-beginning 0)
-               (line-number-at-pos)))
-
        (defun org-agenda-delete-empty-compact-blocks ()
-         (interactive)
+         "Function removes empty compact blocks. 
+       If two lines next to each other have the 
+       org-agenda-structure face, then delete the 
+       previous block."
          (unless org-agenda-compact-blocks
            (user-error "Compact blocks must be on"))
          (setq buffer-read-only nil)
          (save-excursion
            (goto-char (point-min))
-           (let* ((header-regexp "^[^:\n]*$")
-                  (previous (get-beginning-of-match-and-line-number header-regexp))
-                  current)
-             (while (and (setq current (get-beginning-of-match-and-line-number header-regexp))
+           (let ((start-pos (point))
+                 (previous t))
+             (while (and (forward-line)
                          (not (eobp)))
-               (if (= (1+ (cadr previous))
-                      (cadr current))
-                   (delete-region (car previous) (car current))
-                 (setq previous current))))))
+               (cond
+                ((eq (get-char-property (point) 'face)
+                     'org-agenda-structure)
+                 (if previous
+                     (delete-region start-pos
+                                    (point))
+                   (setq start-pos (point)))
+                 (setq previous t))
+                (t (setq previous nil)))))))
 
        (add-hook 'org-agenda-finalize-hook #'org-agenda-delete-empty-compact-blocks)
 

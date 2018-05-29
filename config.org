@@ -105,7 +105,7 @@
              (,(kbd "s-k") . ido-kill-buffer)
              (,(kbd "s-s") . resize-window)))
      (global-set-key (kbd "M-T") 'flop-frame)
-     (global-set-key (kbd "C-x p") 'launch-program)
+     (global-set-key (kbd "C-x p") 'dmenu)
      (global-set-key (kbd "M-…") 'multi-term)
      (global-set-key (kbd "C-ü") 'undo-tree-undo)
 
@@ -193,8 +193,19 @@
                  shell-command-history
                  :caller 'counsel-shell-command))
 
+     (defun read-program ()
+       (funcall #'completing-read dmenu-prompt-string
+                                        (append dmenu--history-list
+                                                (cl-remove-if (lambda (x)
+                                                                (member x dmenu--history-list))
+                                                              dmenu--cache-executable-files))
+                                        nil
+                                        'confirm
+                                        nil
+                                        'dmenu--history-list))
+
      (defun launch-program (command &optional process-name)
-       (interactive (list (read-shell-command "$ ")))
+       (interactive (list (read-program)))
        (let ((name (or process-name command)))
          (start-process-shell-command name nil command)))
 
@@ -2059,18 +2070,18 @@
    #+END_SRC
 ** Gnus
    #+BEGIN_SRC emacs-lisp
-   (setq user-mail-address "bensonchu457@gmail.com"
-      user-full-name "Benson Chu")
+     (setq user-mail-address "bensonchu457@gmail.com"
+           user-full-name "Benson Chu")
 
-(setq gnus-select-method
-      '(nnimap "gmail"
-	       (nnimap-address "imap.gmail.com")
-	       (nnimap-server-port "imaps")
-	       (nnimap-stream ssl)))
+     (setq gnus-select-method
+           '(nnimap "gmail"
+                    (nnimap-address "imap.gmail.com")
+                    (nnimap-server-port "imaps")
+                    (nnimap-stream ssl)))
 
-(setq smtpmail-smtp-server "smtp.gmail.com"
-      smtpmail-smtp-service 587
-      gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
+     (setq smtpmail-smtp-server "smtp.gmail.com"
+           smtpmail-smtp-service 587
+           gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
 
    #+END_SRC
 * Broken

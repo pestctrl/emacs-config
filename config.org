@@ -829,7 +829,8 @@
 #+BEGIN_SRC emacs-lisp
   (use-package evil)
   (global-set-key (kbd "C-z") 'evil-local-mode)
-  (setq evil-insert-state-modes nil)
+  (setq evil-insert-state-modes nil)  
+  (setq evil-motion-state-modes nil)
   (setq evil-default-state 'emacs)
   (evil-set-initial-state 'term-mode 'emacs)
   (evil-set-initial-state 'help-mode 'emacs)

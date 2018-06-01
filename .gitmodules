@@ -10,3 +10,6 @@
 [submodule "custom/bookmark-plus"]
 	path = custom/bookmark-plus
 	url = https://github.com/emacsmirror/bookmark-plus
+[submodule "custom/emacs-memoize"]
+	path = custom/emacs-memoize
+	url = https://github.com/skeeto/emacs-memoize

@@ -811,11 +811,14 @@
   (use-package ivy)
   (use-package smex)
   (ivy-mode 1)
+
+  ;(advice-add 'ivy-completion-in-region :before (lambda (start end collection &optional predicate) (insert " ")))
+
   (add-to-list 'ivy-initial-inputs-alist '(org-refile . ""))
   (add-to-list 'ivy-initial-inputs-alist '(org-agenda-refile . ""))
   (add-to-list 'ivy-initial-inputs-alist '(org-capture-refile . ""))
   (add-to-list 'ivy-initial-inputs-alist '(counsel-M-x . ""))
-  
+
   (define-key ivy-minibuffer-map (kbd "<return>") 'ivy-alt-done)
   (define-key ivy-minibuffer-map (kbd "C-<return>") 'ivy-done)
   (global-set-key (kbd "C-h M-x") 'helm-M-x)

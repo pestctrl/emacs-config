@@ -943,12 +943,13 @@
 #+BEGIN_SRC emacs-lisp
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-ca" 'org-agenda)
+(global-set-key (kbd "M-∀") 'org-agenda)
 (global-set-key "\C-cc" 'org-capture)
 (global-set-key "\C-cb" 'org-iswitchb)
 (global-set-key (kbd "<f5>") 'org-agenda)
 (global-set-key (kbd "<f11>") (lambda () (interactive) (org-agenda "" "g")))
 (global-set-key (kbd "<f9>") 'org-capture)
-(global-set-key (kbd "C-x C-o") 'org-switchb)
+(global-set-key (kbd "C-x C-o") 'org-agenda)
 (define-key org-mode-map (kbd "C-c SPC") nil)
 (define-key org-agenda-mode-map (kbd "a") 'org-agenda)
 #+END_SRC

@@ -1220,6 +1220,10 @@
                    (setq has-subtask t))))
              (and is-a-task (not has-subtask)))))
 
+       (defun my/is-standalone-task-p ()
+         (and (bh/is-task-p)
+              (not (bh/is-subproject-p))))
+
        (defun bh/is-next-task-p ()
          (and (bh/is-task-p)
               (or (equal (org-get-todo-state)
@@ -1239,20 +1243,36 @@
                  (setq is-subproject t))))
            (and is-a-task is-subproject)))
 
+       (defvar memoized-stuck-function nil
+         "DO NOT SETQ. Use in agenda views")
+
+       (defun my/make-memoized-stuck-projects ()
+         (memoize (lambda (point)
+                    (message "Hello, world!")
+                    (my/is-stuck-project-p))))
+
        (defun my/is-stuck-project-p ()
          (let ((subtree-end (save-excursion (org-end-of-subtree t)))
-               has-next)
+               has-next
+               has-stuck-project)
            (save-restriction
              (save-excursion 
-               (while (and (not has-next)
+               (while (and (or (not has-next)
+                               (not has-stuck-project))
                            (outline-next-heading)
                            (< (point) subtree-end))
-                 (when (bh/is-next-task-p)
-                   (setq has-next t)))))
+                 (cond ((and (bh/is-project-p)
+                             (my/is-stuck-project-p))
+                        (setq has-stuck-project t))
+                       ((bh/is-next-task-p)
+                        (setq has-next t))))))
            (and (bh/is-project-p)
-                (not has-next))))
+                (or (not has-next)
+                    has-stuck-project))))
 
-
+       (defun my/is-active-project-p ()
+         ;; Need to finish
+         )
 
        (defun bh/list-sublevels-for-projects-indented ()
          "Set org-tags-match-list-sublevels so when restricted to a subtree we list all subtasks.
@@ -1359,7 +1379,8 @@
                next-headline)
               ((bh/is-project-p)
                next-headline)
-              (t (unless (bh/is-next-task-p)
+              (t (unless (or (bh/is-next-task-p)
+                             (my/is-standalone-task-p))
                    next-headline))))))
 
        (defun bh/skip-project-tasks-maybe ()

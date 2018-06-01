@@ -1218,6 +1218,15 @@
                    (setq has-subtask t))))
              (and is-a-task (not has-subtask)))))
 
+       (defun bh/is-next-task-p ()
+         (and (bh/is-task-p)
+              (or (equal (org-get-todo-state)
+                         "NEXT")
+                  (and (equal (org-get-todo-state)
+                              "TODO")
+                       (or (org-get-scheduled-time (point))
+                           (org-get-deadline-time (point)))))))
+
        (defun bh/is-subproject-p ()
          "Any task which is a subtask of another project"
          (let ((is-subproject)
@@ -1227,6 +1236,21 @@
                (when (member (nth 2 (org-heading-components)) org-todo-keywords-1)
                  (setq is-subproject t))))
            (and is-a-task is-subproject)))
+
+       (defun my/is-stuck-project-p ()
+         (let ((subtree-end (save-excursion (org-end-of-subtree t)))
+               has-next)
+           (save-restriction
+             (save-excursion 
+               (while (and (not has-next)
+                           (outline-next-heading)
+                           (< (point) subtree-end))
+                 (when (bh/is-next-task-p)
+                   (setq has-next t)))))
+           (and (bh/is-project-p)
+                (not has-next))))
+
+
 
        (defun bh/list-sublevels-for-projects-indented ()
          "Set org-tags-match-list-sublevels so when restricted to a subtree we list all subtasks.
@@ -1258,55 +1282,25 @@
          (save-restriction
            (widen)
            (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
-             (if (bh/is-project-p)
-                 (let* ((subtree-end (save-excursion (org-end-of-subtree t)))
-                        (has-next ))
-                   (save-excursion
-                     (forward-line 1)
-                     (while (and (not has-next) (< (point) subtree-end) (re-search-forward "^\\*+ NEXT " subtree-end t))
-                       (unless (member "WAITING" (org-get-tags-at))
-                         (setq has-next t))))
-                   (if has-next
-                       nil
-                     next-headline)) ; a stuck project, has subtasks but no next task
-               nil))))
+             (when (my/is-stuck-project-p)
+               next-headline))))
 
-       (defun bh/skip-non-stuck-projects ()
+       (defun my/show-stuck-projects ()
          "Only show subtrees that are stuck projects"
          ;; (bh/list-sublevels-for-projects-indented)
          (save-restriction
            (widen)
            (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
-             (if (bh/is-project-p)
-                 (let* ((subtree-end (save-excursion (org-end-of-subtree t)))
-                        (has-next ))
-                   (save-excursion
-                     (forward-line 1)
-                     (while (and (not has-next)
-                                 (< (point) subtree-end)
-                                 (re-search-forward "^\\*+ \\(NEXT\\|STUFF\\) " subtree-end t))
-                       (unless (member "WAITING" (org-get-tags-at))
-                             (setq has-next t))))
-                   (if has-next
-                       next-headline
-                     nil)) ; a stuck project, has subtasks but no next task
+             (unless (my/is-stuck-project-p)
                next-headline))))
 
-       (defun bh/skip-non-projects ()
+       (defun bh/show-active-projects ()
          "Skip trees that are not projects"
          ;; (bh/list-sublevels-for-projects-indented)
-         (if (save-excursion (bh/skip-non-stuck-projects))
-             (save-restriction
-               (widen)
-               (let ((subtree-end (save-excursion (org-end-of-subtree t))))
-                 (cond
-                  ((bh/is-project-p)
-                   nil)
-                  ((and (bh/is-project-subtree-p) (not (bh/is-task-p)))
-                   nil)
-                  (t
-                   subtree-end))))
-           (save-excursion (org-end-of-subtree t))))
+         (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+           (unless (and (bh/is-project-p)
+                        (not (my/is-stuck-project-p)))
+               next-headline)))
 
        (defun bh/skip-non-tasks ()
          "Show non-project tasks.
@@ -1363,11 +1357,7 @@
                next-headline)
               ((bh/is-project-p)
                next-headline)
-              (t (unless (or (and (bh/is-task-p)
-                                  (not (bh/is-project-subtree-p))
-                                  (not (string= "STUFF" (org-get-todo-state))))
-                             (string= "NEXT"
-                                      (org-get-todo-state)))
+              (t (unless (bh/is-next-task-p)
                    next-headline))))))
 
        (defun bh/skip-project-tasks-maybe ()
@@ -1394,7 +1384,7 @@
               (t
                nil)))))
 
-       (defun bh/skip-project-tasks ()
+       (defun bh/show-non-project-tasks ()
          "Show non-project tasks.
         Skip project and sub-project tasks, habits, and project related tasks."
          (save-restriction
@@ -1637,10 +1627,10 @@
                              (org-tags-match-list-sublevels t)))
                  (tags-todo "-REFILE-HOLD/!"
                             (,@(cap/ignore-schedule-deadline "Standalone Tasks")
-                             (org-agenda-skip-function 'bh/skip-project-tasks)))
+                             (org-agenda-skip-function 'bh/show-non-project-tasks)))
                  (tags-todo "+HOLD"
                             (,@(cap/ignore-schedule-deadline "On Hold Tasks")
-                             (org-agenda-skip-function 'bh/skip-project-tasks)))))
+                             (org-agenda-skip-function 'bh/show-non-project-tasks)))))
                ("nn" "Next tasks" 
                 ((tags-todo "+PLAN"
                             ((org-agenda-files '("~/MEGA/org/entries/journal.gpg"))
@@ -1653,7 +1643,7 @@
                  (tags-todo "-REFILE-SCHEDULED>\"<today>\"/!"
                             ((org-agenda-overriding-header "Stuck Projects")
                              (org-tags-match-list-sublevels 'indented)
-                             (org-agenda-skip-function 'bh/skip-non-stuck-projects)
+                             (org-agenda-skip-function 'my/show-stuck-projects)
                              (org-agenda-sorting-strategy
                               '(category-keep))))
                  (tags-todo "+DEADLINE<\"<tomorrow>\"/!"
@@ -1684,7 +1674,7 @@
                              (org-tags-match-list-sublevels t)))
                  (tags-todo "-REFILE-HOLD/!"
                             ((org-agenda-overriding-header "Active Projects")
-                             (org-agenda-skip-function 'bh/skip-non-projects)
+                             (org-agenda-skip-function 'bh/show-active-projects)
                              (org-tags-match-list-sublevels 'indented)))))
                ("nh" "Projects on hold" todo "HOLD" ((org-tags-match-list-sublevels 'indented)))
                ("nt" "Tickler" agenda ""

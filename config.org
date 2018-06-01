@@ -802,7 +802,7 @@
     (setq fancy-splash-image "~/.emacs.d/res/icon.png")
     #+END_SRC
 ** Navigation
-*** Helm & counsel
+*** Helm & counsel/ivy
 #+BEGIN_SRC emacs-lisp
   (require 'helm-config)
   (use-package company)

@@ -195,19 +195,22 @@
 
      (use-package dmenu)            
 
+     (make-thread 
+       #'dmenu--cache-executable-files)
+
+    
      (defun read-program ()
-       (funcall #'completing-read dmenu-prompt-string
+       (funcall #'ido-completing-read "$ "
                                         (append dmenu--history-list
                                                 (cl-remove-if (lambda (x)
                                                                 (member x dmenu--history-list))
-                                                              dmenu--cache-executable-files))
-                                        nil
-                                        'confirm
-                                        nil
-                                        'dmenu--history-list))
+                                                              dmenu--cache-executable-files))))
 
      (defun launch-program (command &optional process-name)
        (interactive (list (read-program)))
+       (setq dmenu--history-list (cons command (remove command dmenu--history-list)))
+       (when (> (length dmenu--history-list) dmenu-history-size)
+       (setcdr (nthcdr (- dmenu-history-size 1) dmenu--history-list) nil))
        (let ((name (or process-name command)))
          (start-process-shell-command name nil command)))
 
@@ -2091,6 +2094,7 @@
 *** General config
  #+BEGIN_SRC emacs-lisp
  (require 'mu4e)
+
  (add-to-list 'mu4e-view-actions
    '("ViewInBrowser" . mu4e-action-view-in-browser) t)
    (global-set-key (kbd "<f8>") 'mu4e)

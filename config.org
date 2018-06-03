@@ -1120,7 +1120,7 @@
   (setq org-todo-state-tags-triggers
         (quote (("HOLD" ("HOLD" . t))
                 ("WAIT" ("WAITING" . t))
-                ("TODO" ("HOLD") ("WAITING")))))
+                (todo ("HOLD") ("WAITING")))))
 
 
   (setq org-use-fast-todo-selection t)

@@ -340,7 +340,9 @@
      (setq exwm-manage-configurations `(((equal exwm-class-name "Xephyr")
                                          floating nil 
                                          char-mode t
-                                         fullscreen t)))
+                                         fullscreen t)
+                                        ((equal exwm-class-name "plasmashell")
+                                         floating t)))
 
    #+END_SRC
 * My variables alist

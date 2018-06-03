@@ -1314,9 +1314,13 @@
          ;; (bh/list-sublevels-for-projects-indented)
          (save-restriction
            (widen)
-           (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
-             (unless (my/is-stuck-project-p)
-               next-headline))))
+           (let ((next-headline (save-excursion (or (outline-next-heading) (point-max))))
+                 (subtree-end (save-excursion (org-end-of-subtree t))))
+             (cond ((member (org-get-todo-state)
+                            '("WAIT" "HOLD"))
+                     subtree-end)
+                    ((not (my/is-stuck-project-p))
+                     next-headline)))))
 
        (defun bh/show-active-projects ()
          "Skip trees that are not projects"

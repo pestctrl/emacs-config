@@ -1,4 +1,4 @@
-(setq package-list '(org use-package))
+(setq package-list '(org-plus-contrib use-package))
 ; list the repositories containing them
 (setq package-archives '(("melpa" . "http://melpa.org/packages/")
                          ("org" . "https://orgmode.org/elpa/")
@@ -20,7 +20,7 @@
   (unless (package-installed-p package)
     (package-install package)))
 
-(require 'org)
+(require 'org-plus-contrib)
 (require 'use-package)
 
 (setq use-package-always-ensure t)

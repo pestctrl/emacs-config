@@ -1123,15 +1123,14 @@
                 ("WAIT" ("WAITING" . t))
                 (todo ("HOLD") ("WAITING")))))
 
-
   (setq org-use-fast-todo-selection t)
 
   ;(setq org-agenda-files (quote ("~/MEGA/org/agenda")))
   (org-agenda-load-file-list)
 
   (setq my/non-agenda-refiles
-        '(("~/MEGA/org/agenda/someday.org" :maxlevel . 9)
-          ("~/MEGA/org/agenda/tickler.org" :maxlevel . 9)
+        
+          '(("~/MEGA/org/agenda/tickler.org" :maxlevel . 9)
           ("~/MEGA/org/agenda/reference.org" :maxlevel . 9)
           ("~/MEGA/org/agenda/reads.org" :maxlevel . 9)
           ("~/MEGA/org/entries/important.gpg" :maxlevel . 9)

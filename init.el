@@ -20,7 +20,7 @@
   (unless (package-installed-p package)
     (package-install package)))
 
-(require 'org-plus-contrib)
+(require 'org)
 (require 'use-package)
 
 (setq use-package-always-ensure t)

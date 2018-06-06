@@ -1103,14 +1103,18 @@
   (setq org-log-done 'time)
   (setq org-agenda-window-setup 'other-window)
   (setq org-agenda-restore-windows-after-quit t)
+
+  (setq org-agenda-sticky t)
+
   (setq org-todo-keywords
-         '((sequence "STUFF(s)" "|")
-           (sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
+         '((sequence "STUFF(s)" "SOMEDAY(P)" "|")
+           (sequence "TODO(t)" "ONE(o)" "NEXT(n)" "READ(r)" "|" "DONE(d!)")
            (sequence "PROJECT(p)" "|" "COMPLETE(c)")
-           (sequence  "WAIT(w@/!)" "HOLD(h)" "|" "ABANDON(a@/!)")))
+           (sequence  "WAIT(w@/!)" "HOLD(h)" "TICKLER())" "|" "ABANDON(a@/!)")))
 
   (setq org-todo-keyword-faces 
-        '(("STUFF" :foreground "goldenrod" :weight bold)
+        '(("ONE" :foreground "royal blue" :weight bold)
+          ("STUFF" :foreground "goldenrod" :weight bold)
           ("NEXT" :foreground "cyan" :weight bold)
           ("WAIT" :foreground "yellow" :weight bold)
           ("HOLD" :foreground "red" :weight bold)

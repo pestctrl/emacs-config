@@ -953,6 +953,7 @@
 (global-set-key (kbd "C-x C-o") 'org-agenda)
 (define-key org-mode-map (kbd "C-c SPC") nil)
 (define-key org-agenda-mode-map (kbd "a") 'org-agenda)
+(setq org-src-window-setup 'current-window)
 #+END_SRC
 *** Should always use visual-line-mode
 #+BEGIN_SRC emacs-lisp
@@ -2323,6 +2324,11 @@
            smtpmail-smtp-service 587
            gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
 
+   #+END_SRC
+** Elpy
+   #+BEGIN_SRC emacs-lisp
+   (use-package elpy)
+   (elpy-enable)
    #+END_SRC
 * Broken
 ** mu4e

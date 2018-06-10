@@ -1479,32 +1479,170 @@
                  (org-agenda-redo)))
            (widen)))
      #+END_SRC
-**** Norang sorting
-     #+BEGIN_SRC emacs-lisp#
-       (setq org-agenda-cmp-user-defined 'bh/agenda-sort)
+**** My Project code
+     #+BEGIN_SRC emacs-lisp
+       (defun my/is-part-of-subtree ()
+         (save-excursion
+           (and (not (= 1 (org-current-level)))
+                (let (has-parent-project)
+                  (while (not has-parent-project)
+                    (org-up-heading-safe)
+                    (when (org-get-todo-state)
+                      (setq has-parent-project t)))
+                  has-parent-project))))
 
-       (defun bh/agenda-sort (a b)
-         (let ((deadline-up     (org-cmp-ts a b "deadline"))
-               (deadline-down   (if deadline-up (- deadline-up) nil)))
-           (if (eq deadline-up -1)
-               t
-             nil)))
+       (defun my/is-standalone-task ()
+         (and (org-get-todo-state)
+              (not (my/is-part-of-subtree))
+              (not (my/is-a-project))))
 
-       (defsubst org-cmp-ts (a b type)
-         "Compare the timestamps values of entries A and B.
-       When TYPE is \"scheduled\", \"deadline\", \"timestamp\" or
-       \"timestamp_ia\", compare within each of these type.  When TYPE
-       is the empty string, compare all timestamps without respect of
-       their type."
-         (let* ((def (if org-sort-agenda-notime-is-late most-positive-fixnum -1))
-            (ta (or (and (string-match type (or (get-text-property 1 'type a) ""))
-                     (get-text-property 1 'ts-date a))
-                def))
-            (tb (or (and (string-match type (or (get-text-property 1 'type b) ""))
-                     (get-text-property 1 'ts-date b))
-                def)))
-           (cond ((< ta tb) -1)
-             ((< tb ta) +1))))
+       (defun my/is-a-task ()
+         (save-excursion
+           (and (org-get-todo-state)
+                (let ((curr-indent (org-current-level)))
+                  (while (and (outline-next-heading)
+                              (not (member "ARCHIVE" (org-get-tags)))
+                              (not (org-get-todo-state))))
+                  (>= curr-indent
+                      (org-current-level))))))
+
+       (defun my/has-subtask ()
+         (save-excursion
+           (let ((subtree-end (save-excursion (org-end-of-subtree t)))
+                 has-subtask)
+             (while (and (not has-subtask)
+                         (outline-next-heading)
+                         (< (point) subtree-end))
+               (when (org-get-todo-state)
+                 (setq has-subtask t)))
+             has-subtask)))
+
+       (defun my/has-next-task ()
+         (save-excursion
+           (let ((subtree-end (save-excursion (org-end-of-subtree t)))
+                 has-next-task)
+             (while (and (not has-next-task)
+                         (outline-next-heading)
+                         (< (point) subtree-end))
+               (when (my/is-next-task)
+                 (setq has-next-task t)))
+             has-next-task)))
+
+       (defun my/is-next-task ()
+         (let ((todo (org-get-todo-state)))
+           (or (equal todo "NEXT")
+               (and (member todo '("TODO" "ONE"))
+                    (or (org-get-scheduled-time (point))
+                        (org-get-deadline-time (point)))))))
+
+       (defun my/is-a-project ()
+         (save-excursion
+           (let ((todo (org-get-todo-state)))
+             (when todo
+               (or (equal todo "PROJECT")
+                   (and (equal todo "ONE")
+                        (my/has-next-task))
+                   (and (member todo '("TODO" "WAIT" "SOMEDAY" "HOLD"))
+                        (my/has-subtask)))))))
+
+       (defvar my/ambiguous-projects-default-to-stuck t)
+
+       (defun my/greedy-active-project (file point)
+         (save-excursion
+           (let ((subtree-end (save-excursion (org-end-of-subtree t)))
+                 has-next-task has-active-project)
+             (while (and (not (and has-next-task
+                                   has-active-project))
+                         (outline-next-heading)
+                         (< (point) subtree-end))
+               (cond ((and (my/is-a-task)
+                           (my/is-next-task))
+                      (setq has-next-task t))
+                     ((and (my/is-a-project)
+                           (eq (my/get-project-type file (point) nil)
+                               'active))
+                      (setq has-stuck-project t))))
+             (or has-next-task
+                 has-active-project))))
+
+       (defun my/generous-active-project (file point)
+         (save-excursion
+           (let ((subtree-end (save-excursion (org-end-of-subtree t)))
+                 has-task has-next-task has-stuck-project)
+             (while (and (not (and has-next-task
+                                   has-stuck-project))
+                         (outline-next-heading)
+                         (< (point) subtree-end))
+               (cond ((my/is-a-task)
+                      (setq has-task t)
+                      (when (my/is-next-task)
+                        (setq has-next-task t)))
+                     ((and (my/is-a-project)
+                           (eq (my/get-project-type file (point) t)
+                               'stuck))
+                      (setq has-stuck-project t))))
+             (and (or (not has-task) has-next-task)
+                  (not has-stuck-project)))))
+
+       (defun my/get-project-type (file point &optional ambiguous-to-stuck)
+         (save-excursion
+           (when (my/is-a-project)
+             (let ((subtree-end (save-excursion (org-end-of-subtree t)))
+                   (todo (org-get-todo-state)))
+               (cond ((equal todo "SOMEDAY") 'someday)
+                     ((equal todo "HOLD") 'hold)
+                     ((equal todo "WAIT") 'wait)
+                     ((org-time> (org-entry-get (point) "SCHEDULED") "<now>") 'delayed)
+                     (ambiguous-to-stuck
+                      (if (my/generous-active-project file point)
+                          'active
+                        'stuck))
+                     ((not ambiguous-to-stuck)
+                      (if (my/greedy-active-project file point)
+                          'active
+                        'stuck)))))))
+
+       (defun my/show-stuck-projects ()
+         "Only show subtrees that are stuck projects"
+         (save-restriction
+           (widen)
+           (let ((subtree-end (save-excursion (org-end-of-subtree t))))
+             (unless (eq (my/get-project-type buffer-file-name (point) t)
+                         'stuck)
+               subtree-end))))
+
+       (defun my/show-active-projects ()
+         "Only show subtrees that are stuck projects"
+         (save-restriction
+           (widen)
+           (let ((subtree-end (save-excursion (org-end-of-subtree t))))
+             (unless (eq (my/get-project-type buffer-file-name (point) nil)
+                         'active)
+               subtree-end))))
+
+       (defun my/show-hold-projects ()
+         "Only show subtrees that are stuck projects"
+         (save-restriction
+           (widen)
+           (let ((subtree-end (save-excursion (org-end-of-subtree t))))
+             (unless (eq (my/get-project-type buffer-file-name (point))
+                         'hold)
+               subtree-end))))
+
+       (defun my/show-delayed-projects ()
+         (save-restriction
+           (widen)
+           (let ((subtree-end (save-excursion (org-end-of-subtree t))))
+             (unless (eq (my/get-project-type buffer-file-name (point))
+                         'delayed)
+               subtree-end))))
+
+       (defun my/show-next-tasks-and-standalone-tasks ()
+         (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+           (unless (or (and (my/is-a-task)
+                            (my/is-next-task))
+                       (my/is-standalone-task))
+             next-headline)))
      #+END_SRC
 **** Views
      #+BEGIN_SRC emacs-lisp

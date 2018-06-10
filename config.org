@@ -1707,31 +1707,11 @@
               (concat "-" tag)))
 
        (org-defkey org-agenda-mode-map
-                   "ℝ"
+                   "A"
                    'org-agenda)
-
-       (add-hook 'org-agenda-mode-hook
-                 '(lambda ()
-                    (org-defkey org-agenda-mode-map
-                                "W"
-                                (lambda ()
-                                  (interactive)
-                                  (setq bh/hide-scheduled-and-waiting-next-tasks
-                                        (not bh/hide-scheduled-and-waiting-next-tasks))
-                                  (bh/widen))))
-                 'append)
 
        (setq org-agenda-auto-exclude-function 'bh/org-auto-exclude-function)
        (setq org-agenda-skip-deadline-prewarning-if-scheduled t)
-
-       (defun cap/ignore-schedule-deadline (tag)
-         `((org-agenda-overriding-header (concat ,tag
-                                                 (if bh/hide-scheduled-and-waiting-next-tasks
-                                                     ""
-                                                   " (including WAITING and SCHEDULED tasks)")))
-           (org-agenda-todo-ignore-scheduled bh/hide-scheduled-and-waiting-next-tasks)
-           (org-agenda-todo-ignore-deadlines bh/hide-scheduled-and-waiting-next-tasks)
-           (org-agenda-todo-ignore-with-date bh/hide-scheduled-and-waiting-next-tasks)))
 
        (defun org-agenda-delete-empty-compact-blocks ()
          "Function removes empty compact blocks. 
@@ -1823,30 +1803,7 @@
        ;; Investigate
        (setq org-sort-agenda-notime-is-late t)
 
-       (setq org-agenda-custom-commands
-             `(;,@view/general-view
-               ("v" "Norang View"
-                ((agenda "" (;; (org-agenda-log-mode 1)
-                             (org-agenda-skip-scheduled-if-done t)
-                             (org-agenda-skip-deadline-if-done t)
-                             (org-agenda-span 1)
-                             ))
-                 (tags-todo "+REFILE"
-                            ((org-agenda-overriding-header "Refile tasks")))
-                 (tags-todo "SCHEDULED<\"<today>\""
-                            ((org-agenda-files (cons "~/MEGA/org/agenda/tickler.org" org-agenda-files))
-                             (org-agenda-overriding-header "Tickler")))
-                 (tags-todo "-REFILE-HOLD/!NEXT"
-                            (,@(cap/ignore-schedule-deadline "Project Next Tasks")
-                             (org-agenda-skip-function 'bh/skip-projects-and-habits-and-single-tasks)
-                             (org-tags-match-list-sublevels t)))
-                 (tags-todo "-REFILE-HOLD/!"
-                            (,@(cap/ignore-schedule-deadline "Standalone Tasks")
-                             (org-agenda-skip-function 'bh/show-non-project-tasks)))
-                 (tags-todo "+HOLD"
-                            (,@(cap/ignore-schedule-deadline "On Hold Tasks")
-                             (org-agenda-skip-function 'bh/show-non-project-tasks)))))
-               ("n" "Next tasks" 
+       (setq overview '("o" "Overview" 
                 ((tags-todo "+PLAN"
                             ((org-agenda-files '("~/MEGA/org/entries/journal.gpg"))
                             (org-agenda-overriding-header "Today's plan")))
@@ -1855,12 +1812,99 @@
                  (tags-todo "+TICKLER+SCHEDULED<\"<today>\""
                             ((org-agenda-files (cons "~/MEGA/org/agenda/tickler.org" org-agenda-files))
                              (org-agenda-overriding-header "Tickler")))
-                 (tags-todo "-REFILE-SCHEDULED>\"<today>\"/!"
+                 (tags-todo "-REFILE/!"
                             ((org-agenda-overriding-header "Stuck Projects")
                              (org-tags-match-list-sublevels 'indented)
                              (org-agenda-skip-function 'my/show-stuck-projects)
                              (org-agenda-sorting-strategy
                               '(category-keep))))
+                 (tags-todo "-REFILE-HOLD+TODO=\"WAIT\""
+                            ((org-agenda-overriding-header "Tasks in other courts")
+                             (org-tags-match-list-sublevels t)))
+                 (tags-todo "+DEADLINE<\"<tomorrow>\"/!"
+                            ((org-agenda-overriding-header "Incomplete Habits")
+                             (org-agenda-files '("~/MEGA/org/agenda/habits.org"))))
+                 (tags-todo "-REFILE-HOLD-WAIT-SCHEDULED>\"<now>\"+DEADLINE<\"<tomorrow>\"/!"
+                            ((org-agenda-skip-function 'my/show-next-tasks-and-standalone-tasks)
+                             (org-agenda-overriding-header "Done by today")
+                             (org-tags-match-list-sublevels t)
+                             (org-agenda-sorting-strategy '(deadline-up))))
+                 (tags-todo "-REFILE-HOLD-WAIT+SCHEDULED<=\"<now>\"-DEADLINE<\"<tomorrow>\"/!"
+                            ((org-agenda-skip-function 'my/show-next-tasks-and-standalone-tasks)
+                             (org-agenda-overriding-header "Scheduled Tasks")
+                             (org-tags-match-list-sublevels t)
+                             (org-agenda-sorting-strategy '(scheduled-up))))
+                 (tags-todo "-REFILE-HOLD-WAIT+DEADLINE>=\"<tomorrow>\"/!"
+                            ((org-agenda-skip-function 'my/show-next-tasks-and-standalone-tasks)
+                             (org-agenda-overriding-header "Tasks with Deadlines")
+                             (org-tags-match-list-sublevels t)
+                             (org-agenda-sorting-strategy '(deadline-up))))
+                 (tags-todo "-REFILE-HOLD-SOMEDAY-DEADLINE={.}-SCHEDULED={.}/!"
+                            ((org-agenda-skip-function 'my/show-next-tasks-and-standalone-tasks)
+                             (org-agenda-overriding-header "Inactive Tasks")
+                             (org-tags-match-list-sublevels t)))
+                 (todo "HOLD"
+                       ((org-agenda-overriding-header "Projects on hold")))
+                 (tags-todo "-REFILE/!"
+                            ((org-agenda-overriding-header "Delayed projects")
+                             (org-agenda-skip-function 'my/show-delayed-projects)))
+                 (tags-todo "-REFILE-HOLD/!"
+                            ((org-agenda-overriding-header "Active Projects")
+                             (org-agenda-skip-function 'my/show-active-projects)
+                             (org-tags-match-list-sublevels 'indented)
+                             (org-agenda-sorting-strategy nil))))))
+
+       (setq org-agenda-custom-commands
+             `(;,@view/general-view
+               ;; ("v" "Norang View"
+               ;;  ((agenda "" (;; (org-agenda-log-mode 1)
+               ;;               (org-agenda-skip-scheduled-if-done t)
+               ;;               (org-agenda-skip-deadline-if-done t)
+               ;;               (org-agenda-span 1)
+               ;;               ))
+               ;;   (tags-todo "+REFILE"
+               ;;              ((org-agenda-overriding-header "Refile tasks")))
+               ;;   (tags-todo "SCHEDULED<\"<today>\""
+               ;;              ((org-agenda-files (cons "~/MEGA/org/agenda/tickler.org" org-agenda-files))
+               ;;               (org-agenda-overriding-header "Tickler")))
+               ;;   (tags-todo "-REFILE-HOLD/!NEXT"
+               ;;              (,@(cap/ignore-schedule-deadline "Project Next Tasks")
+               ;;               (org-agenda-skip-function 'bh/skip-projects-and-habits-and-single-tasks)
+               ;;               (org-tags-match-list-sublevels t)))
+               ;;   (tags-todo "-REFILE-HOLD/!"
+               ;;              (,@(cap/ignore-schedule-deadline "Standalone Tasks")
+               ;;               (org-agenda-skip-function 'bh/show-non-project-tasks)))
+               ;;   (tags-todo "+HOLD"
+               ;;              (,@(cap/ignore-schedule-deadline "On Hold Tasks")
+               ;;               (org-agenda-skip-function 'bh/show-non-project-tasks)))))
+               ("p" "Project View"
+                ((tags-todo "-REFILE/!"
+                            ((org-agenda-overriding-header "Stuck Projects")
+                             (org-tags-match-list-sublevels 'indented)
+                             (org-agenda-skip-function 'my/show-stuck-projects)
+                             (org-agenda-sorting-strategy
+                              '(category-keep))))
+                 (tags-todo "-REFILE/!"
+                            ((org-agenda-overriding-header "Delayed projects")
+                             (org-agenda-skip-function 'my/show-delayed-projects)))
+                 (todo "HOLD"
+                       ((org-agenda-overriding-header "Projects on hold")))
+                 (tags-todo "+PROJECTS+SOMEDAY"
+                            ((org-agenda-overriding-header "Someday projects")))
+                 (tags-todo "-REFILE-HOLD/!"
+                            ((org-agenda-overriding-header "Active Projects")
+                             (org-agenda-skip-function 'my/show-active-projects)
+                             (org-tags-match-list-sublevels 'indented)))))
+               ,overview
+               ("n" "Next Tasks" 
+                ((tags-todo "+PLAN"
+                            ((org-agenda-files '("~/MEGA/org/entries/journal.gpg"))
+                            (org-agenda-overriding-header "Today's plan")))
+                 (tags-todo "+REFILE|TODO=\"STUFF\""
+                            ((org-agenda-overriding-header "Refile tasks")))
+                 (tags-todo "+TICKLER+SCHEDULED<\"<today>\""
+                            ((org-agenda-files (cons "~/MEGA/org/agenda/tickler.org" org-agenda-files))
+                             (org-agenda-overriding-header "Tickler")))
                  (tags-todo "-REFILE-HOLD+TODO=\"WAIT\""
                             (;(org-agenda-skip-function 'my/only-next-projects-and-tasks)
                              (org-agenda-overriding-header "Tasks in other courts")
@@ -1869,38 +1913,31 @@
                             ((org-agenda-overriding-header "Incomplete Habits")
                              (org-agenda-files '("~/MEGA/org/agenda/habits.org"))))
                  (tags-todo "-REFILE-HOLD-WAIT-SCHEDULED>\"<now>\"+DEADLINE<\"<tomorrow>\"/!"
-                            ((org-agenda-skip-function 'my/only-next-projects-and-tasks)
+                            ((org-agenda-skip-function 'my/show-next-tasks-and-standalone-tasks)
                              (org-agenda-overriding-header "Done by today")
                              (org-tags-match-list-sublevels t)
                              (org-agenda-sorting-strategy '(deadline-up))))
                  (tags-todo "-REFILE-HOLD-WAIT+SCHEDULED<=\"<now>\"-DEADLINE<\"<tomorrow>\"/!"
-                            ((org-agenda-skip-function 'my/only-next-projects-and-tasks)
+                            ((org-agenda-skip-function 'my/show-next-tasks-and-standalone-tasks)
                              (org-agenda-overriding-header "Scheduled Tasks")
                              (org-tags-match-list-sublevels t)
                              (org-agenda-sorting-strategy '(scheduled-up))))
                  (tags-todo "-REFILE-HOLD-WAIT+DEADLINE>=\"<tomorrow>\"/!"
-                            ((org-agenda-skip-function 'my/only-next-projects-and-tasks)
+                            ((org-agenda-skip-function 'my/show-next-tasks-and-standalone-tasks)
                              (org-agenda-overriding-header "Tasks with Deadlines")
                              (org-tags-match-list-sublevels t)
                              (org-agenda-sorting-strategy '(deadline-up))))
-                 (tags-todo "-REFILE-HOLD-DEADLINE={.}-SCHEDULED={.}/!"
-                            ((org-agenda-skip-function 'my/only-next-projects-and-tasks)
+                 (tags-todo "-REFILE-HOLD-SOMEDAY-DEADLINE={.}-SCHEDULED={.}/!"
+                            ((org-agenda-skip-function 'my/show-next-tasks-and-standalone-tasks)
                              (org-agenda-overriding-header "Inactive Tasks")
-                             (org-tags-match-list-sublevels t)))
-                 (todo "HOLD"
-                       ((org-agenda-overriding-header "Projects on hold")))
-                 (tags-todo "-REFILE-HOLD/!"
-                            ((org-agenda-overriding-header "Active Projects")
-                             (org-agenda-skip-function 'bh/show-active-projects)
-                             (org-tags-match-list-sublevels 'indented)))))
+                             (org-tags-match-list-sublevels t)))))
                ("h" "Projects on hold" todo "HOLD" ((org-tags-match-list-sublevels 'indented)))
                ("t" "Tickler" agenda ""
                 ((org-agenda-files (cons "/home/benson/MEGA/org/agenda/tickler.org" org-agenda-files))
                  (org-agenda-tag-filter-preset '("+TICKLER"))))
                ("c" . "Categories")  
                ("cb" "Bus tasks" tags-todo "BUS")
-               ("cr" "Articles to read" tags-todo "READ"
-                ((org-agenda-files (cons "~/MEGA/org/agenda/someday.org" org-agenda-files))))
+               ("cr" "Articles to read" tags-todo "READ")
                ("u" "Test stuff"
                 ((tags-todo "+PLAN"
                             ((org-agenda-overriding-header "Today's plan")))

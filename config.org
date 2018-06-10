@@ -1164,7 +1164,7 @@
   (setq org-agenda-compact-blocks t)
 #+END_SRC
 **** Norang Projects code
-     #+BEGIN_SRC emacs-lisp
+     #+BEGIN_SRC emacs-lisp#
        (require 'org-habit)
 
        (defun bh/find-project-task ()
@@ -1183,17 +1183,22 @@
          (or (equal (org-get-todo-state) "PROJECT")
              (save-restriction
                (widen)
-               (let ((has-subtask)
-                     (subtree-end (save-excursion (org-end-of-subtree t)))
-                     (is-a-task (member (nth 2 (org-heading-components)) org-todo-keywords-1)))
+               (let ((subtree-end (save-excursion (org-end-of-subtree t)))
+                     (is-a-task (member (nth 2 (org-heading-components)) org-todo-keywords-1))
+                     has-subtask has-task)
                  (save-excursion
                    (forward-line 1)
                    (while (and (not has-subtask)
                                (< (point) subtree-end)
                                (re-search-forward "^\*+ " subtree-end t))
-                     (when (member (org-get-todo-state) (delete "DONE" org-todo-keywords-1))
-                       (setq has-subtask t))))
-                 (and is-a-task has-subtask)))))
+                     (when (member (org-get-todo-state) org-todo-keywords-1)
+                       (setq has-subtask t)
+                       (when (not (equal (org-get-todo-state) "DONE"))
+                         (setq has-task t)))))
+                 (and is-a-task (or has-task
+                                    (and has-subtask
+                                         (equal "TODO"
+                                                (org-get-todo-state)))))))))
 
        (defun bh/is-project-subtree-p ()
          "Any task with a todo keyword that is in a project subtree.
@@ -1220,7 +1225,9 @@
                            (re-search-forward "^\*+ " subtree-end t))
                  (when (member (org-get-todo-state) org-todo-keywords-1)
                    (setq has-subtask t))))
-             (and is-a-task (not has-subtask)))))
+             (and is-a-task (or (equal (org-get-todo-state)
+                                       "ONE")
+                                (not has-subtask))))))
 
        (defun my/is-standalone-task-p ()
          (and (bh/is-task-p)
@@ -1266,11 +1273,30 @@
                  (cond ((and (bh/is-project-p)
                              (my/is-stuck-project-p))
                         (setq has-stuck-project t))
-                       ((bh/is-next-task-p)
+                       ((or (bh/is-next-task-p)
+                            (equal (org-get-todo-state) "WAIT"))
                         (setq has-next t))))))
            (and (bh/is-project-p)
                 (or (not has-next)
                     has-stuck-project))))
+
+
+       (defun my/is-inactive-project-p ()
+         (let (has-next
+               has-stuck-project)
+           (and (bh/is-project-p)
+                (or (not (member (org-get-todo-state)
+                                 '("TASK" "PROJECT" "TODO")))
+                    (org-time> (org-entry-get (point) "SCHEDULED") "<now>")))))
+
+       (defun my/is-delayed-project-p ()
+          (and (bh/is-project-p)
+               (org-entry-get (point) "SCHEDULED")
+               (org-time> (org-entry-get (point) "SCHEDULED") "<now>")))
+
+       (defun my/is-ignored-project ()
+         ;; Need to finish
+         )
 
        (defun my/is-active-project-p ()
          ;; Need to finish
@@ -1316,11 +1342,30 @@
            (widen)
            (let ((next-headline (save-excursion (or (outline-next-heading) (point-max))))
                  (subtree-end (save-excursion (org-end-of-subtree t))))
-             (cond ((member (org-get-todo-state)
-                            '("WAIT" "HOLD"))
+             (cond ((my/is-inactive-project-p)
                      subtree-end)
                     ((not (my/is-stuck-project-p))
                      next-headline)))))
+
+       (defun my/show-inactive-projects ()
+         "Only show subtrees that are stuck projects"
+         ;; (bh/list-sublevels-for-projects-indented)
+         (save-restriction
+           (widen)
+           (let ((next-headline (save-excursion (or (outline-next-heading) (point-max))))
+                 (subtree-end (save-excursion (org-end-of-subtree t))))
+             (unless (my/is-inactive-project-p)
+                     subtree-end))))
+
+       (defun my/show-delayed-projects ()
+         "Only show subtrees that are stuck projects"
+         ;; (bh/list-sublevels-for-projects-indented)
+         (save-restriction
+           (widen)
+           (let ((next-headline (save-excursion (or (outline-next-heading) (point-max))))
+                 (subtree-end (save-excursion (org-end-of-subtree t))))
+             (unless (my/is-delayed-project-p)
+                     subtree-end))))
 
        (defun bh/show-active-projects ()
          "Skip trees that are not projects"

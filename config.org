@@ -2378,6 +2378,11 @@
    (use-package elpy)
    (elpy-enable)
    #+END_SRC
+** Ledger mode
+   #+BEGIN_SRC emacs-lisp
+   (use-package ledger-mode
+     :mode "\\.dat\\'")
+   #+END_SRC
 * Broken
 ** mu4e
 *** General config

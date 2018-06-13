@@ -1673,9 +1673,9 @@
                         (setq has-next-task t)))
                      ((my/is-a-project)
                       (setq has-project t) 
-                      (eq (my/get-project-type file (point) t)
-                          'stuck)
-                      (setq has-stuck-project t))))
+                      (when (eq (my/get-project-type file (point) t)
+                                'stuck)
+                        (setq has-stuck-project t)))))
              (or (and has-next-task 
                       (not has-stuck-project))
                  (and (not has-task) 
@@ -1998,7 +1998,7 @@
                        ((org-agenda-overriding-header "Hello")))
                  ))
                ("r" . "Review")
-               ("ra" "Archive" todo "DONE|CANCELLED")))
+               ("ra" "Archive" todo "DONE|CANCELLED|COMPLETE")))
      #+END_SRC
 **** Face
      #+BEGIN_SRC emacs-lisp

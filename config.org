@@ -1147,7 +1147,7 @@
 **** General config
 #+BEGIN_SRC emacs-lisp
   (setq org-log-done 'time)
-  (setq org-agenda-window-setup 'other-window)
+  (setq org-agenda-window-setup 'current-window)
   (setq org-agenda-restore-windows-after-quit t)
 
   (setq org-agenda-sticky t)
@@ -1662,7 +1662,7 @@
        (defun my/generous-active-project (file point)
          (save-excursion
            (let ((subtree-end (save-excursion (org-end-of-subtree t)))
-                 has-task has-next-task has-stuck-project)
+                 has-task has-next-task has-project has-stuck-project)
              (while (and (not (and has-next-task
                                    has-stuck-project))
                          (outline-next-heading)
@@ -1671,12 +1671,16 @@
                       (setq has-task t)
                       (when (my/is-next-task)
                         (setq has-next-task t)))
-                     ((and (my/is-a-project)
-                           (eq (my/get-project-type file (point) t)
-                               'stuck))
+                     ((my/is-a-project)
+                      (setq has-project t) 
+                      (eq (my/get-project-type file (point) t)
+                          'stuck)
                       (setq has-stuck-project t))))
-             (and (or (not has-task) has-next-task)
-                  (not has-stuck-project)))))
+             (or (and has-next-task 
+                      (not has-stuck-project))
+                 (and (not has-task) 
+                      has-project
+                      (not has-stuck-project))))))
 
        (defun my/get-project-type (file point &optional ambiguous-to-stuck)
          (save-excursion

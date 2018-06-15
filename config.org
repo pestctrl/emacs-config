@@ -1983,7 +1983,7 @@
                  (tags-todo "+REFILE|TODO=\"STUFF\""
                             ((org-agenda-overriding-header "Refile tasks")))
                  (tags-todo "+TICKLER+SCHEDULED<\"<today>\""
-                            ((org-agenda-files (cons "~/MEGA/org/agenda/tickler.org" org-agenda-files))
+                            ((org-agenda-files '("~/MEGA/org/agenda/tickler.org"))
                              (org-agenda-overriding-header "Tickler")))
                  (tags-todo "-REFILE-HOLD+TODO=\"WAIT\""
                             (;(org-agenda-skip-function 'my/only-next-projects-and-tasks)

@@ -1587,8 +1587,9 @@
                       (setq has-parent-project t)))
                   has-parent-project))))
 
+
        (defun my/is-standalone-task ()
-         (and (org-get-todo-state)
+         (and (not (equal (org-get-todo-state) "WAIT"))
               (not (my/is-part-of-subtree))
               (not (my/is-a-project))))
 

@@ -1191,7 +1191,9 @@
 
   (setq org-refile-target-verify-function
         (lambda () 
-          (not (member "ARCHIVE" (org-get-tags-at (point) nil)))))
+          (let ((tags (org-get-tags)))
+            (and (not (member "ARCHIVE" tags))
+                 (not (equal "DONE" (org-get-todo-state)))))))
 
   (setq org-agenda-show-future-repeats nil)
 

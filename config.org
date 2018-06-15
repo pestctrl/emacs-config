@@ -1739,6 +1739,29 @@
                subtree-end))))
 
        (defun my/show-next-tasks-and-standalone-tasks ()
+         (let ((next-headline (save-excursion (or (outline-next-heading) (point-max))))
+               (current (point))
+               display)
+           (save-restriction
+             (widen)
+             (save-excursion
+               (while (and (not (eobp))
+                           (not display))
+                 (if (or (and (my/is-a-task)
+                              (my/is-next-task))
+                         (my/is-standalone-task))
+                     (setq display (point))
+                   (let ((project-type (my/get-project-type buffer-file-name (point) nil)))
+                     (if (and project-type
+                              (not (eq project-type 'active)))
+                         (goto-char (save-excursion (org-end-of-subtree t)))
+                       (outline-next-heading)))))
+               (cond ((eobp)
+                      (point-max))
+                     ((not (= display current))
+                      display))))))
+
+       (defun my/show-next-tasks-and-standalone-tasks ()
          (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
            (unless (or (and (my/is-a-task)
                             (my/is-next-task))

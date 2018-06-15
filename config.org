@@ -1922,16 +1922,17 @@
                             ((org-agenda-skip-function 'my/show-next-tasks-and-standalone-tasks)
                              (org-agenda-overriding-header "Inactive Tasks")
                              (org-tags-match-list-sublevels t)))
-                 (todo "HOLD"
-                       ((org-agenda-overriding-header "Projects on hold")))
-                 (tags-todo "-REFILE/!"
-                            ((org-agenda-overriding-header "Delayed projects")
-                             (org-agenda-skip-function 'my/show-delayed-projects)))
-                 (tags-todo "-REFILE-HOLD/!"
-                            ((org-agenda-overriding-header "Active Projects")
-                             (org-agenda-skip-function 'my/show-active-projects)
-                             (org-tags-match-list-sublevels 'indented)
-                             (org-agenda-sorting-strategy nil))))))
+                 ;; (todo "HOLD"
+                 ;;       ((org-agenda-overriding-header "Projects on hold")))
+                 ;; (tags-todo "-REFILE/!"
+                 ;;            ((org-agenda-overriding-header "Delayed projects")
+                 ;;             (org-agenda-skip-function 'my/show-delayed-projects)))
+                 ;; (tags-todo "-REFILE-HOLD/!"
+                 ;;            ((org-agenda-overriding-header "Active Projects")
+                 ;;             (org-agenda-skip-function 'my/show-active-projects)
+                 ;;             (org-tags-match-list-sublevels 'indented)
+                 ;;             (org-agenda-sorting-strategy nil)))
+                 )))
 
        (setq org-agenda-custom-commands
              `(;,@view/general-view

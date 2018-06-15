@@ -2029,6 +2029,10 @@
                  ))
                ("r" . "Review")
                ("ra" "Archive" todo "DONE|CANCELLED|COMPLETE")))
+
+;               (remove-hook 'org-agenda-mode-hook
+;                         'org-store-agenda-views)
+
      #+END_SRC
 **** Face
      #+BEGIN_SRC emacs-lisp

@@ -2414,8 +2414,25 @@
    #+END_SRC
 ** Ledger mode
    #+BEGIN_SRC emacs-lisp
-   (use-package ledger-mode
-     :mode "\\.dat\\'")
+     (use-package ledger-mode
+       :mode "\\.dat\\'")
+     (setq ledger-reports
+           '(("expmonth" "%(binary) -f %(ledger-file) -M reg Expenses")
+             ("owedmom" "%(binary) -f %(ledger-file) reg Liabilities")
+             ("progress" "%(binary) -f %(ledger-file) reg Assets Equity Liabilities")
+             ("cleared" "%(binary) -f %(ledger-file) cleared")
+             (#("bal" 0 1
+                (idx 1))
+              "%(binary) -f %(ledger-file) bal")
+             (#("reg" 0 1
+                (idx 4))
+              "%(binary) -f %(ledger-file) reg")
+             (#("payee" 0 1
+                (idx 3))
+              "%(binary) -f %(ledger-file) reg @%(payee)")
+             (#("account" 0 1
+                (idx 0))
+              "%(binary) -f %(ledger-file) reg %(account)")))
    #+END_SRC
 * Broken
 ** mu4e

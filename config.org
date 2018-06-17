@@ -1794,9 +1794,9 @@
 
        (defun org-agenda-delete-empty-compact-blocks ()
          "Function removes empty compact blocks. 
-       If two lines next to each other have the 
-       org-agenda-structure face, then delete the 
-       previous block."
+              If two lines next to each other have the 
+              org-agenda-structure face, then delete the 
+              previous block."
          (unless org-agenda-compact-blocks
            (user-error "Compact blocks must be on"))
          (setq buffer-read-only nil)
@@ -1820,42 +1820,42 @@
 
        (defun my-org-agenda-entry-get-agenda-timestamp (pom)
          "Retrieve timestamp information for sorting agenda views.
-       Given a point or marker POM, returns a cons cell of the timestamp
-       and the timestamp type relevant for the sorting strategy in
-       `org-agenda-sorting-strategy-selected'."
+              Given a point or marker POM, returns a cons cell of the timestamp
+              and the timestamp type relevant for the sorting strategy in
+              `org-agenda-sorting-strategy-selected'."
          (let (ts ts-date-type)
            (save-match-data
              (cond ((org-em 'scheduled-up 'scheduled-down
-                    org-agenda-sorting-strategy-selected)
-                (setq ts (org-entry-get pom "SCHEDULED")
-                  ts-date-type " scheduled"))
-               ((org-em 'deadline-up 'deadline-down
-                    org-agenda-sorting-strategy-selected)
-                (setq ts (org-entry-get pom "DEADLINE")
-                  ts-date-type " deadline"))
-               ((org-em 'ts-up 'ts-down
-                    org-agenda-sorting-strategy-selected)
-                (setq ts (org-entry-get pom "TIMESTAMP")
-                  ts-date-type " timestamp"))
-               ((org-em 'tsia-up 'tsia-down
-                    org-agenda-sorting-strategy-selected)
-                (setq ts (org-entry-get pom "TIMESTAMP_IA")
-                  ts-date-type " timestamp_ia"))
-               ((org-em 'timestamp-up 'timestamp-down
-                    org-agenda-sorting-strategy-selected)
-                (setq ts (or (org-entry-get pom "SCHEDULED")
-                     (org-entry-get pom "DEADLINE")
-                     (org-entry-get pom "TIMESTAMP")
-                     (org-entry-get pom "TIMESTAMP_IA"))
-                  ts-date-type ""))
-               (t (setq ts-date-type "")))
+                            org-agenda-sorting-strategy-selected)
+                    (setq ts (org-entry-get pom "SCHEDULED")
+                          ts-date-type " scheduled"))
+                   ((org-em 'deadline-up 'deadline-down
+                            org-agenda-sorting-strategy-selected)
+                    (setq ts (org-entry-get pom "DEADLINE")
+                          ts-date-type " deadline"))
+                   ((org-em 'ts-up 'ts-down
+                            org-agenda-sorting-strategy-selected)
+                    (setq ts (org-entry-get pom "TIMESTAMP")
+                          ts-date-type " timestamp"))
+                   ((org-em 'tsia-up 'tsia-down
+                            org-agenda-sorting-strategy-selected)
+                    (setq ts (org-entry-get pom "TIMESTAMP_IA")
+                          ts-date-type " timestamp_ia"))
+                   ((org-em 'timestamp-up 'timestamp-down
+                            org-agenda-sorting-strategy-selected)
+                    (setq ts (or (org-entry-get pom "SCHEDULED")
+                                 (org-entry-get pom "DEADLINE")
+                                 (org-entry-get pom "TIMESTAMP")
+                                 (org-entry-get pom "TIMESTAMP_IA"))
+                          ts-date-type ""))
+                   (t (setq ts-date-type "")))
              (cons (when ts (ignore-errors 
                               (org-time-string-to-seconds (if (string-match-p ":" ts)
                                                               ts
                                                             (let ((s (substring ts 0 (1- (length ts)))))
                                                               (concat s
                                                                       " 23:59>"))))))
-               ts-date-type))))
+                   ts-date-type))))
 
        (advice-add 'org-agenda-entry-get-agenda-timestamp
                    :override

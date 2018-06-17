@@ -1888,12 +1888,18 @@
                ("n" "Next Tasks" 
                 ((tags-todo "+PLAN"
                             ((org-agenda-files '("~/MEGA/org/entries/journal.gpg"))
-                            (org-agenda-overriding-header "Today's plan")))
+                             (org-agenda-overriding-header "Today's plan")))
                  (tags-todo "+REFILE|TODO=\"STUFF\""
                             ((org-agenda-overriding-header "Refile tasks")))
                  (tags-todo "+TICKLER+SCHEDULED<\"<today>\""
                             ((org-agenda-files '("~/MEGA/org/agenda/tickler.org"))
                              (org-agenda-overriding-header "Tickler")))
+                 (tags-todo "-REFILE/!"
+                            ((org-agenda-overriding-header "Stuck Projects")
+                             (org-tags-match-list-sublevels 'indented)
+                             (org-agenda-skip-function 'my/show-stuck-projects)
+                             (org-agenda-sorting-strategy
+                              '(category-keep))))
                  (tags-todo "-REFILE-HOLD+TODO=\"WAIT\""
                             (;(org-agenda-skip-function 'my/only-next-projects-and-tasks)
                              (org-agenda-overriding-header "Tasks in other courts")
@@ -1921,8 +1927,12 @@
                              (org-agenda-overriding-header "Inactive Tasks")
                              (org-tags-match-list-sublevels t)))
                  )
-                 nil
+                nil
                 ("~/MEGA/org/agenda/tasks.html"))
+               ("w" "Next week" agenda ""
+                ((org-agenda-skip-function 'my/show-next-tasks-and-standalone-tasks)
+                 (org-agenda-start-on-weekday nil)
+                 (org-agenda-start-day "-Fri")))
                ("h" "Projects on hold" todo "HOLD" ((org-tags-match-list-sublevels 'indented)))
                ("t" "Tickler" agenda ""
                 ((org-agenda-files (cons "/home/benson/MEGA/org/agenda/tickler.org" org-agenda-files))

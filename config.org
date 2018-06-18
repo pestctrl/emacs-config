@@ -1589,7 +1589,7 @@
 
 
        (defun my/is-standalone-task ()
-         (and (not (equal (org-get-todo-state) "WAIT"))
+         (and (not (member (org-get-todo-state) '("WAIT" "PROJECT" "SOMEDAY")))
               (not (my/is-part-of-subtree))
               (not (my/is-a-project))))
 
@@ -1672,7 +1672,7 @@
                          (< (point) subtree-end))
                (cond ((my/is-a-task)
                       (setq has-task t)
-                      (when (my/is-next-task)
+                      (when (or (my/is-next-task) (equal (org-get-todo-state) "WAIT"))
                         (setq has-next-task t)))
                      ((my/is-a-project)
                       (setq has-project t) 

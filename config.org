@@ -1581,8 +1581,8 @@
          (save-excursion
            (and (not (= 1 (org-current-level)))
                 (let (has-parent-project)
-                  (while (not has-parent-project)
-                    (org-up-heading-safe)
+                  (while (and (not has-parent-project)
+                              (org-up-heading-safe))
                     (when (org-get-todo-state)
                       (setq has-parent-project t)))
                   has-parent-project))))

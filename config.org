@@ -2414,10 +2414,6 @@
      (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
      (setq web-mode-auto-close-style 2)
    #+END_SRC
-** Tagedit
-   #+BEGIN_SRC emacs-lisp
-     (use-package tagedit)
-   #+END_SRC
 ** overtone
    #+BEGIN_SRC emacs-lisp
    (use-package overtone)

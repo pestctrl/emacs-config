@@ -2400,6 +2400,28 @@
                 (idx 0))
               "%(binary) -f %(ledger-file) reg %(account)")))
    #+END_SRC
+** Web-mode
+   #+BEGIN_SRC emacs-lisp
+     (use-package web-mode)
+     (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+     (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+     (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+     (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+     (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+     (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+     (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+
+     (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+     (setq web-mode-auto-close-style 2)
+   #+END_SRC
+** Tagedit
+   #+BEGIN_SRC emacs-lisp
+     (use-package tagedit)
+   #+END_SRC
+** overtone
+   #+BEGIN_SRC emacs-lisp
+   (use-package overtone)
+   #+END_SRC
 * Broken
 ** mu4e
 *** General config

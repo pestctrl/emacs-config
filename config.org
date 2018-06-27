@@ -2386,6 +2386,7 @@
              ("owedmom" "%(binary) -f %(ledger-file) reg Liabilities")
              ("progress" "%(binary) -f %(ledger-file) reg Assets Equity Liabilities")
              ("cleared" "%(binary) -f %(ledger-file) cleared")
+             ("food" "%(binary) -f %(ledger-file) --add-budget reg Assets")
              (#("bal" 0 1
                 (idx 1))
               "%(binary) -f %(ledger-file) bal")

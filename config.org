@@ -1,6 +1,15 @@
 #+TITLE: Emacs Configuration
 #+AUTHOR: Benson Chu
 
+* Neo keyboard issues
+  #+BEGIN_SRC emacs-lisp
+    (global-set-key (kbd "M-Ä") 'eval-expression)
+    (global-set-key (kbd "M-–") 'beginning-of-buffer)
+    (global-set-key (kbd "M-•") 'end-of-buffer)
+    (defun reset-keyboard ()
+      (interactive)
+      (shell-command "setxkbmap de neo_dvorak"))
+  #+END_SRC
 * Set customizations file
   #+BEGIN_SRC emacs-lisp
   (setq custom-file "~/.emacs.d/custom.el")
@@ -69,12 +78,6 @@
    #+BEGIN_SRC emacs-lisp
    (global-set-key (kbd "C-c v") 'volume)
    #+END_SRC
-* Neo keyboard issues
-  #+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "M-Ä") 'eval-expression)
-  (global-set-key (kbd "M-–") 'beginning-of-buffer)
-  (global-set-key (kbd "M-•") 'end-of-buffer)
-  #+END_SRC
 * EXWM
 ** Config
 #+BEGIN_SRC emacs-lisp

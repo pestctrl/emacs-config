@@ -2266,12 +2266,6 @@
     #+BEGIN_SRC emacs-lisp
     (use-package paredit)
     #+END_SRC
-*** Cider
-    #+BEGIN_SRC emacs-lisp
-    (use-package 'clj-refactor)
-    (use-package 'cider)
-    (use-package clojure-mode)
-    #+END_SRC
 ** Freekeys
    #+BEGIN_SRC emacs-lisp
    (use-package free-keys)
@@ -2414,9 +2408,11 @@
      (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
      (setq web-mode-auto-close-style 2)
    #+END_SRC
-** overtone
+** Cider
    #+BEGIN_SRC emacs-lisp
-   (use-package overtone)
+   (use-package 'clj-refactor)
+   (use-package 'cider)
+   (use-package clojure-mode)
    #+END_SRC
 * Broken
 ** mu4e

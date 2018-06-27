@@ -76,6 +76,7 @@
    #+END_SRC
 ** Volume
    #+BEGIN_SRC emacs-lisp
+   (use-package volume)
    (global-set-key (kbd "C-c v") 'volume)
    #+END_SRC
 * EXWM

@@ -13,16 +13,16 @@
    (quote
     (("cleared" "ledger -f /home/benson/MEGA/org/ledger.ledger cleared")
      (#("bal" 0 1
-        (idx 1))
+	(idx 1))
       "%(binary) -f %(ledger-file) bal")
      (#("reg" 0 1
-        (idx 4))
+	(idx 4))
       "%(binary) -f %(ledger-file) reg")
      (#("payee" 0 1
-        (idx 3))
+	(idx 3))
       "%(binary) -f %(ledger-file) reg @%(payee)")
      (#("account" 0 1
-        (idx 0))
+	(idx 0))
       "%(binary) -f %(ledger-file) reg %(account)"))))
  '(line-number-mode nil)
  '(org-agenda-files
@@ -33,15 +33,15 @@
  '(org-trello-current-prefix-keybinding "C-c o")
  '(package-selected-packages
    (quote
-    (langtool ledger-mode elpy org-plus-contrib dmenu ocodo-svg-modelines skewer-mode inf-ruby solarized-theme org-super-agenda restclient shell-pop org-toodledo dired-narrow dired+ quelpa-use-package geiser treemacs-projectile treemacs org-wunderlist youtube-dl irony dired-aux elfeed-org elfeed calfw-ical mu4e org-protocol ox-reveal ob-clojure ob-core org-caldav calfw-org org-habit epa-file switch-window ibuf-ext evil helm-config exwm-randr exwm-config exwm-systemtray use-package glsl-mode oauth2 ng2-mode transpose-frame clojure-snippets common-lisp-snippets go-snippets haskell-snippets java-snippets ensime yasnippet-bundle yasnippet helm-exwm smex matlab-mode beacon company-flx dired-du diredful free-keys elfeed-goodies exwm-surf el-autoyas flycheck-clojure flycheck-haskell flycheck-irony flycheck-pycheckers company-erlang company-ghc company-ghci company-go company-lua company-arduino company-c-headers company-cmake company-distel company-irony ac-c-headers ac-html ac-html-angular ac-slime ac-cider ace-window exwm angular-mode neotree smart-mode-line-powerline-theme smart-mode-line helm-projectile projectile ace-jump-mode ace-jump-buffer ace-jump-helm-line resize-window volume babel babel-repl lua-mode pocket-reader el-pocket magit-svn magit dirtree mu4e-alert habitica scala-mode auto-complete w3m calfw calfw-gcal org-gcal nlinum nlinum-relative color-theme-modern linum-relative helm i3wm org-bullets windresize slime powerline-evil persistent-soft pdf-tools multi-term ergoemacs-mode epresent engine-mode)))
+    (clj-refactor cider ac-cider overtone org-tree-slide tagedit web-mode langtool ledger-mode dmenu ocodo-svg-modelines skewer-mode inf-ruby restclient shell-pop org-toodledo dired-narrow dired+ org-wunderlist youtube-dl dired-aux elfeed-org calfw-ical mu4e org-protocol ox-reveal ob-clojure ob-core calfw-org org-habit epa-file ibuf-ext helm-config exwm-randr exwm-config exwm-systemtray glsl-mode oauth2 transpose-frame clojure-snippets common-lisp-snippets go-snippets haskell-snippets java-snippets yasnippet-bundle smex matlab-mode beacon company-flx dired-du diredful free-keys elfeed-goodies exwm-surf el-autoyas flycheck-clojure company-erlang company-ghc company-ghci company-go company-lua company-arduino company-c-headers company-cmake company-distel company-irony ac-c-headers ac-html ac-html-angular ac-slime ace-window exwm angular-mode smart-mode-line-powerline-theme ace-jump-mode ace-jump-buffer ace-jump-helm-line resize-window volume babel babel-repl lua-mode pocket-reader el-pocket magit-svn dirtree mu4e-alert habitica scala-mode auto-complete calfw calfw-gcal org-gcal nlinum nlinum-relative color-theme-modern linum-relative i3wm org-bullets windresize powerline-evil persistent-soft multi-term ergoemacs-mode epresent engine-mode)))
  '(safe-local-variable-values (quote ((org-log-done))))
  '(send-mail-function (quote mailclient-send-it))
  '(show-paren-mode t)
  '(sml/mode-width
    (if
        (eq
-        (powerline-current-separator)
-        (quote arrow))
+	(powerline-current-separator)
+	(quote arrow))
        (quote right)
      (quote full)))
  '(sml/pos-id-separator
@@ -50,14 +50,14 @@
      (:propertize " " face powerline-active1)
      (:eval
       (propertize " "
-                  (quote display)
-                  (funcall
-                   (intern
-                    (format "powerline-%s-%s"
-                            (powerline-current-separator)
-                            (car powerline-default-separator-dir)))
-                   (quote powerline-active1)
-                   (quote powerline-active2))))
+		  (quote display)
+		  (funcall
+		   (intern
+		    (format "powerline-%s-%s"
+			    (powerline-current-separator)
+			    (car powerline-default-separator-dir)))
+		   (quote powerline-active1)
+		   (quote powerline-active2))))
      (:propertize " " face powerline-active2))))
  '(sml/pos-minor-modes-separator
    (quote
@@ -65,14 +65,14 @@
      (:propertize " " face powerline-active1)
      (:eval
       (propertize " "
-                  (quote display)
-                  (funcall
-                   (intern
-                    (format "powerline-%s-%s"
-                            (powerline-current-separator)
-                            (cdr powerline-default-separator-dir)))
-                   (quote powerline-active1)
-                   (quote sml/global))))
+		  (quote display)
+		  (funcall
+		   (intern
+		    (format "powerline-%s-%s"
+			    (powerline-current-separator)
+			    (cdr powerline-default-separator-dir)))
+		   (quote powerline-active1)
+		   (quote sml/global))))
      (:propertize " " face sml/global))))
  '(sml/pre-id-separator
    (quote
@@ -80,14 +80,14 @@
      (:propertize " " face sml/global)
      (:eval
       (propertize " "
-                  (quote display)
-                  (funcall
-                   (intern
-                    (format "powerline-%s-%s"
-                            (powerline-current-separator)
-                            (car powerline-default-separator-dir)))
-                   (quote sml/global)
-                   (quote powerline-active1))))
+		  (quote display)
+		  (funcall
+		   (intern
+		    (format "powerline-%s-%s"
+			    (powerline-current-separator)
+			    (car powerline-default-separator-dir)))
+		   (quote sml/global)
+		   (quote powerline-active1))))
      (:propertize " " face powerline-active1))))
  '(sml/pre-minor-modes-separator
    (quote
@@ -95,14 +95,14 @@
      (:propertize " " face powerline-active2)
      (:eval
       (propertize " "
-                  (quote display)
-                  (funcall
-                   (intern
-                    (format "powerline-%s-%s"
-                            (powerline-current-separator)
-                            (cdr powerline-default-separator-dir)))
-                   (quote powerline-active2)
-                   (quote powerline-active1))))
+		  (quote display)
+		  (funcall
+		   (intern
+		    (format "powerline-%s-%s"
+			    (powerline-current-separator)
+			    (cdr powerline-default-separator-dir)))
+		   (quote powerline-active2)
+		   (quote powerline-active1))))
      (:propertize " " face powerline-active1))))
  '(sml/pre-modes-separator (propertize " " (quote face) (quote sml/modes)))
  '(yas-global-mode t))

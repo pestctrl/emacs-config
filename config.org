@@ -2266,6 +2266,12 @@
     #+BEGIN_SRC emacs-lisp
     (use-package paredit)
     #+END_SRC
+*** Cider
+    #+BEGIN_SRC emacs-lisp
+    (use-package 'clj-refactor)
+    (use-package 'cider)
+    (use-package clojure-mode)
+    #+END_SRC
 ** Freekeys
    #+BEGIN_SRC emacs-lisp
    (use-package free-keys)

@@ -340,6 +340,10 @@
   (interactive)
   (setq exwm-randr-workspace-output-plist nil))
 
+(defun exwm-regular-mode ()
+  (interactive)
+  (setq exwm-randr-workspace-output-plist '(2 "HDMI1" 3 "HDMI1")))
+
 (exwm-randr-enable)
 #+END_SRC
 ** Startup

@@ -2399,6 +2399,15 @@
              (#("account" 0 1
                 (idx 0))
               "%(binary) -f %(ledger-file) reg %(account)")))
+
+     (setq dynamic-reports
+           '(("budgetcal" "%(binary) -f ~/MEGA/org/entries/food.ledger --daily --add-budget reg Expenses")))
+
+     (defun ledger-dynamic-report ()
+       (interactive)
+       (let* ((ledger-reports dynamic-reports)
+              (report-name (ledger-report-read-name)))
+         (ledger-report report-name nil)))
    #+END_SRC
 ** Web-mode
    #+BEGIN_SRC emacs-lisp

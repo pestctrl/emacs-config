@@ -2322,6 +2322,8 @@
    #+END_SRC
 ** Gnus
    #+BEGIN_SRC emacs-lisp
+     (add-hook 'gnus-group-mode-hook 'gnus-topic-mode)
+
      (setq user-mail-address "bensonchu457@gmail.com"
            user-full-name "Benson Chu")
 
@@ -2329,11 +2331,38 @@
            '(nnimap "gmail"
                     (nnimap-address "imap.gmail.com")
                     (nnimap-server-port "imaps")
-                    (nnimap-stream ssl)))
+                    (nnimap-stream ssl)
+                    (nnimap-authinfo-file "~/.authinfo.gpg")))
+
+     (setq gnus-secondary-select-methods
+           '((nnimap "work"
+                   (nnimap-address "outlook.office365.com")
+                   (nnimap-server-port "imaps")
+                   (nnimap-stream ssl)
+                   (nnimap-authinfo-file "~/.authinfo.gpg"))))
 
      (setq smtpmail-smtp-server "smtp.gmail.com"
-           smtpmail-smtp-service 587
-           gnus-ignored-newsgroups "^to\\.\\|^[0-9. ]+\\( \\|$\\)\\|^[\"]\"[#'()]")
+           smtpmail-smtp-service 587)
+
+     (setq gnus-mark-article-hook nil)
+
+     (gnus-add-configuration
+      '(article
+        (horizontal 1.0
+                    (vertical 25
+                              (group 1.0))
+                    (vertical 1.0
+                              (summary 0.25 point)
+                              (article 1.0)))))
+
+     (gnus-add-configuration
+      '(summary
+        (horizontal 1.0
+                    (vertical 25
+                              (group 1.0))
+                    (vertical 1.0
+                              (summary 1.0 point)))))
+
 
    #+END_SRC
 ** Elpy

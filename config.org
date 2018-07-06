@@ -82,102 +82,59 @@
 * EXWM
 ** Config
 #+BEGIN_SRC emacs-lisp
-  (use-package exwm)  
+  ;(use-package exwm)  
+  (add-to-list 'load-path "~/.emacs.d/custom/exwm")
+  (add-to-list 'load-path "~/.emacs.d/custom/xelb")
+  (require 'exwm)
   (require 'exwm-systemtray)
   (require 'exwm-config)
   (exwm-config-default)
   ;(setq exwm-input-line-mode-passthrough t)
 #+END_SRC
-** Set focus fix
-  #+BEGIN_SRC emacs-lisp
-  (defun exwm-input--set-focus (id)
- "Set input focus to window ID in a proper way."
- (when (exwm--id->buffer id)
-   (with-current-buffer (exwm--id->buffer id)
-     (cond
-      ((and (not exwm--hints-input)
-            (memq xcb:Atom:WM_TAKE_FOCUS exwm--protocols))
-       (when (= (frame-parameter nil 'exwm-id)
-                (slot-value (xcb:+request-unchecked+reply exwm--connection
-                                (make-instance 'xcb:GetInputFocus))
-                            'focus))
-         (exwm--log "Focus on #x%x with WM_TAKE_FOCUS" id)
-         (exwm-input--update-timestamp
-          (lambda (timestamp id)
-            (let ((event (make-instance 'xcb:icccm:WM_TAKE_FOCUS
-                                        :window id
-                                        :time timestamp)))
-              (setq event (xcb:marshal event exwm--connection))
-              (xcb:+request exwm--connection
-                  (make-instance 'xcb:icccm:SendEvent
-                                 :destination id
-                                 :event event))
-              (exwm-input--set-active-window id)
-              (xcb:flush exwm--connection)))
-          id)))
-      (t
-       (exwm--log "Focus on #x%x with SetInputFocus" id)
-       (exwm-input--update-timestamp
-        (lambda (timestamp id)
-          (let ((event (make-instance 'xcb:icccm:WM_TAKE_FOCUS
-                                      :window id
-                                      :time timestamp)))
-            (setq event (xcb:marshal event exwm--connection))
-            (xcb:+request exwm--connection
-                (make-instance 'xcb:icccm:SendEvent
-                               :destination id
-                               :event event)))
-          (xcb:+request exwm--connection
-              (make-instance 'xcb:SetInputFocus
-                             :revert-to xcb:InputFocus:Parent
-                             :focus id
-                             :time timestamp))
-          (exwm-input--set-active-window id)
-          (xcb:flush exwm--connection))
-        id))))))
-  #+END_SRC
 ** Global keys
    #+BEGIN_SRC emacs-lisp
-     (setq exwm-input-global-keys
-           `(([?\s-r] . exwm-reset)
-             ([?\s-w] . exwm-workspace-switch)
-             ([?\s-l] . lock-screen)
-             ,@(mapcar (lambda (i)
-                         `(,(kbd (format "s-%d" (mod (1+ i) 10))) .
-                           (lambda ()
-                             (interactive)
-                             (exwm-workspace-switch-create ,i))))
-                       (number-sequence 0 9))
-             (,(kbd "s-b") . ivy-switch-buffer)
-             (,(kbd "s-a") . org-agenda)
-             (,(kbd "s-c") . org-capture)
-             (,(kbd "s-h") . split-window-right)
-             (,(kbd "s-t") . split-window-below)
-             (,(kbd "s-n") . switch-window)
-             (,(kbd "s-k") . ido-kill-buffer)
-             (,(kbd "s-s") . resize-window)))
-     (global-set-key (kbd "M-T") 'flop-frame)
-     (global-set-key (kbd "C-x p") 'launch-program)
-     (global-set-key (kbd "M-…") 'multi-term)
-     (global-set-key (kbd "C-ü") 'undo-tree-undo)
+          (use-package transpose-frame)
+          (setq exwm-input-global-keys
+                `(([?\s-r] . exwm-reset)
+                  ([?\s-w] . exwm-workspace-switch)
+                  ([?\s-l] . lock-screen)
+                  ,@(mapcar (lambda (i)
+                              `(,(kbd (format "s-%d" (mod (1+ i) 10))) .
+                                (lambda ()
+                                  (interactive)
+                                  (exwm-workspace-switch-create ,i))))
+                            (number-sequence 0 9))
+                  (,(kbd "s-b") . ivy-switch-buffer)
+                  (,(kbd "s-a") . org-agenda)
+                  (,(kbd "s-c") . org-capture)
+                  (,(kbd "s-h") . split-window-right)
+                  (,(kbd "s-t") . split-window-below)
+                  (,(kbd "s-n") . switch-window)
+                  (,(kbd "s-k") . ido-kill-buffer)
+                  (,(kbd "s-s") . resize-window)))
+          (global-set-key (kbd "M-T") 'flop-frame)
+          (global-set-key (kbd "C-x p") 'launch-program)
+          (global-set-key (kbd "M-…") 'multi-term)
+          (global-set-key (kbd "C-ü") 'undo-tree-undo)
 
-     (defun prompt-workspace (&optional prompt)
-       "Prompt for a workspace, returning the workspace frame."
-       (exwm-workspace--update-switch-history)
-       (let* ((current-idx (exwm-workspace--position exwm-workspace--current))
-              (history-add-new-input nil)  ;prevent modifying history
-              (history-idx (read-from-minibuffer
-                            (or prompt "Workspace: ")
-                            (elt exwm-workspace--switch-history current-idx)
-                            exwm-workspace--switch-map nil
-                            `(exwm-workspace--switch-history . ,(1+ current-idx))))
-              (workspace-idx (mod (1- (cl-position history-idx exwm-workspace--switch-history
-                                          :test #'equal)) 10)))
-         (elt exwm-workspace--list workspace-idx)))
+          (defun prompt-workspace (&optional prompt)
+            "Prompt for a workspace, returning the workspace frame."
+            (exwm-workspace--update-switch-history)
+            (let* ((current-idx (exwm-workspace--position exwm-workspace--current))
+                   (history-add-new-input nil)  ;prevent modifying history
+                   (history-idx (read-from-minibuffer
+                                 (or prompt "Workspace: ")
+                                 (elt exwm-workspace--switch-history current-idx)
+                                 exwm-workspace--switch-map nil
+                                 `(exwm-workspace--switch-history . ,(1+ current-idx))))
+                   (workspace-idx (mod (1- (cl-position history-idx exwm-workspace--switch-history
+                                               :test #'equal)) 
+                                       10)))
+              (elt exwm-workspace--list workspace-idx)))
 
-     (advice-add 'exwm-workspace--prompt-for-workspace
-                 :override
-                 #'prompt-workspace)
+          (advice-add 'exwm-workspace--prompt-for-workspace
+                      :override
+                      #'prompt-workspace)
 
    #+END_SRC
 ** Custom

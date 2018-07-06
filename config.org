@@ -1900,10 +1900,17 @@
                  )
                 nil
                 ("~/MEGA/org/agenda/tasks.html"))
-               ("w" "Next week" agenda ""
-                ((org-agenda-skip-function 'my/show-next-tasks-and-standalone-tasks)
-                 (org-agenda-start-on-weekday nil)
-                 (org-agenda-start-day "-Fri")))
+               ("w" "Next week"
+                ((tags-todo "-REFILE/!"
+                            ((org-agenda-overriding-header "Stuck Projects")
+                             (org-tags-match-list-sublevels 'indented)
+                             (org-agenda-skip-function 'my/show-stuck-projects)
+                             (org-agenda-sorting-strategy
+                              '(category-keep))))
+                 (agenda ""
+                         ((org-agenda-skip-function 'my/show-next-tasks-and-standalone-tasks)
+                          (org-agenda-start-on-weekday nil)
+                          (org-agenda-start-day "-Fri")))))
                ("h" "Projects on hold" todo "HOLD" ((org-tags-match-list-sublevels 'indented)))
                ("t" "Tickler" agenda ""
                 ((org-agenda-files (cons "/home/benson/MEGA/org/agenda/tickler.org" org-agenda-files))

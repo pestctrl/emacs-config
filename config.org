@@ -44,6 +44,7 @@
  #+END_SRC
 ** M-1 = windresize
  #+BEGIN_SRC emacs-lisp
+ (use-package resize-window)
  (global-set-key (kbd "M-1") 'resize-window)
  #+END_SRC
 ** Emacs which key

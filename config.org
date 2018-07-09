@@ -1111,7 +1111,7 @@
           ("ee" "Exercise" table-line (file "~/MEGA/org/entries/exercise.org")
            "| %u | %^{Push-ups} | %^{Leg-lifts} | %^{Squats}")
           ("em" "Expenditures" plain (file "~/MEGA/org/entries/finances/ledger.ledger")
-           (file "~/MEGA/org/templates/basic.ledger") :unnarrowed t)
+           (file "~/MEGA/org/templates/basic.ledger") :unnarrowed t :empty-lines 1)
           ("ej" "Journal")
           ("eje" "Journal Entry" entry (file+olp+datetree "~/MEGA/org/entries/journal.gpg")
            "* %<%R> %?\n%U\n\n")
@@ -1727,8 +1727,9 @@
          (save-restriction
            (widen)
            (let ((subtree-end (save-excursion (org-end-of-subtree t))))
-             (unless (eq (my/get-project-type buffer-file-name (point) t)
-                         'stuck)
+             (unless (or ;(my/is-standalone-task)
+                         (eq (my/get-project-type buffer-file-name (point) t)
+                             'stuck))
                subtree-end))))
 
        (defun my/show-active-projects ()

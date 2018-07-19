@@ -2117,82 +2117,91 @@
     #+END_SRC
 ** Elfeed
 #+BEGIN_SRC emacs-lisp
-  ;; Load elfeed-org
-  (use-package elfeed)
-  (use-package elfeed-org)
+    ;; Load elfeed-org
+    (use-package elfeed)
+    (use-package elfeed-org)
 
-  ;; Initialize elfeed-org
-  ;; This hooks up elfeed-org to read the configuration when elfeed
-  ;; is started with =M-x elfeed=
+    ;; Initialize elfeed-org
+    ;; This hooks up elfeed-org to read the configuration when elfeed
+    ;; is started with =M-x elfeed=
 
-  ;; Optionally specify a number of files containing elfeed
-  ;; configuration. If not set then the location below is used.
-  ;; Note: The customize interface is also supported.
-  (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org"))
-  (elfeed-org)
-  (setq-default elfeed-search-filter "@6-months-ago +unread -youtube")
-  (define-key elfeed-search-mode-map "U" 'elfeed-search-fetch-visible)
-  (define-key elfeed-search-mode-map "Y" (lambda ()
-                       (interactive)
-                       (elfeed-search-set-filter "+youtube +unread")))
-  (define-key elfeed-search-mode-map "h" (lambda ()
-                       (interactive)
-                       (elfeed-search-set-filter nil)))
+    ;; Optionally specify a number of files containing elfeed
+    ;; configuration. If not set then the location below is used.
+    ;; Note: The customize interface is also supported.
+    (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org"))
+    (elfeed-org)
+    (setq-default elfeed-search-filter "@6-months-ago +unread -youtube")
+    (define-key elfeed-search-mode-map "U" 'elfeed-search-fetch-visible)
+    (define-key elfeed-search-mode-map "Y" (lambda ()
+                         (interactive)
+                         (elfeed-search-set-filter "+youtube +unread")))
+    (define-key elfeed-search-mode-map "h" (lambda ()
+                         (interactive)
+                         (elfeed-search-set-filter nil)))
 
-  (defun elfeed-show-youtube-dl ()
-    "Download the current entry with youtube-dl."
-    (interactive)
-    (pop-to-buffer (youtube-dl (elfeed-entry-link elfeed-show-entry))))
+    (defun elfeed-show-youtube-dl ()
+      "Download the current entry with youtube-dl."
+      (interactive)
+      (pop-to-buffer (youtube-dl (elfeed-entry-link elfeed-show-entry))))
 
-  (cl-defun elfeed-search-youtube-dl (&key slow)
-    "Download the current entry with youtube-dl."
-    (interactive)
-    (let ((entries (elfeed-search-selected)))
-      (dolist (entry entries)
-    (if (null (youtube-dl (elfeed-entry-link entry)
-                  :title (elfeed-entry-title entry)
-                  :slow slow))
-        (message "Entry is not a YouTube link!")
-      (message "Downloading %s" (elfeed-entry-title entry)))
-    (elfeed-untag entry 'unread)
-    (elfeed-search-update-entry entry)
-    (unless (use-region-p) (forward-line)))))
+    (cl-defun elfeed-search-youtube-dl (&key slow)
+      "Download the current entry with youtube-dl."
+      (interactive)
+      (let ((entries (elfeed-search-selected)))
+        (dolist (entry entries)
+      (if (null (youtube-dl (elfeed-entry-link entry)
+                    :title (elfeed-entry-title entry)
+                    :slow slow))
+          (message "Entry is not a YouTube link!")
+        (message "Downloading %s" (elfeed-entry-title entry)))
+      (elfeed-untag entry 'unread)
+      (elfeed-search-update-entry entry)
+      (unless (use-region-p) (forward-line)))))
 
-  (define-key elfeed-search-mode-map "d" 'elfeed-search-youtube-dl)
-  (setq youtube-dl-directory "~/big_files/Videos/youtube-dl")
+    (define-key elfeed-search-mode-map "d" 'elfeed-search-youtube-dl)
+    (setq youtube-dl-directory "~/big_files/Videos/youtube-dl")
 
-(require 'dired-aux)
+  (require 'dired-aux)
 
-(defvar dired-filelist-cmd
-  '(("vlc" "-L")))
+  (defvar dired-filelist-cmd
+    '(("vlc" "-L")))
 
-(defun dired-start-process (cmd &optional file-list)
-  (interactive
-   (let ((files (dired-get-marked-files
-                 t current-prefix-arg)))
-     (list
-      (dired-read-shell-command "& on %s: "
-                                current-prefix-arg files)
-      files)))
-  (let (list-switch)
-    (start-process
-     cmd nil shell-file-name
-     shell-command-switch
-     (format
-      "nohup 1>/dev/null 2>/dev/null %s \"%s\""
-      (if (and (> (length file-list) 1)
-               (setq list-switch
-                     (cadr (assoc cmd dired-filelist-cmd))))
-          (format "%s %s" cmd list-switch)
-        cmd)
-      (mapconcat #'expand-file-name file-list "\" \"")))))
-      
-      (define-key dired-mode-map "r" 'dired-start-process)
+  (defun dired-start-process (cmd &optional file-list)
+    (interactive
+     (let ((files (dired-get-marked-files
+                   t current-prefix-arg)))
+       (list
+        (dired-read-shell-command "& on %s: "
+                                  current-prefix-arg files)
+        files)))
+    (let (list-switch)
+      (start-process
+       cmd nil shell-file-name
+       shell-command-switch
+       (format
+        "nohup 1>/dev/null 2>/dev/null %s \"%s\""
+        (if (and (> (length file-list) 1)
+                 (setq list-switch
+                       (cadr (assoc cmd dired-filelist-cmd))))
+            (format "%s %s" cmd list-switch)
+          cmd)
+        (mapconcat #'expand-file-name file-list "\" \"")))))
+
+  (define-key dired-mode-map "r" 'dired-start-process)
 
   (defun watch-youtube ()
     (interactive)
     (dired "~/big_files/Videos/youtube-dl")
     (local-set-key (kbd "RET") 'dired-start-process))
+    
+  (defun dired-async-save-excursion (orig-fun &rest args)
+    (save-window-excursion
+      (apply orig-fun args)))
+
+  (advice-add 'dired-do-async-shell-command :around #'dired-async-save-excursion)
+
+
+  (use-package dired-du)
 #+END_SRC
 ** Programming
 *** Autocompletion

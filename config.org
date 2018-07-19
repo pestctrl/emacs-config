@@ -2481,6 +2481,10 @@
      (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
      (setq web-mode-auto-close-style 2)
    #+END_SRC
+** ediff
+   #+BEGIN_SRC emacs-lisp
+   (setq ediff-window-setup-function 'ediff-setup-windows-plain)
+   #+END_SRC
 * Broken
 ** mu4e
 *** General config

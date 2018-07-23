@@ -19,3 +19,6 @@
 [submodule "custom/xelb"]
 	path = custom/xelb
 	url = https://github.com/ch11ng/xelb
+[submodule "custom/org-fstree"]
+	path = custom/org-fstree
+	url = http://repo.or.cz/org-fstree.git

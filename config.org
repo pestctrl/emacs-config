@@ -4,225 +4,77 @@
 * Neo keyboard issues
   #+BEGIN_SRC emacs-lisp
     (global-set-key (kbd "M-Ä") 'eval-expression)
-    (global-set-key (kbd "M-–") 'beginning-of-buffer)
-    (global-set-key (kbd "M-•") 'end-of-buffer)
     (defun reset-keyboard ()
       (interactive)
       (shell-command "setxkbmap de neo_dvorak"))
   #+END_SRC
-* Set customizations file
+* Custom file
   #+BEGIN_SRC emacs-lisp
   (setq custom-file "~/.emacs.d/custom.el")
   (load custom-file 'noerror)
   (setq backup-directory-alist `(("." . ,(concat user-emacs-directory "backups"))))
   #+END_SRC
-* Accessibility
-** Reloading config
- #+BEGIN_SRC emacs-lisp
- (defun reload-config () (interactive) (load-file "~/.emacs.d/init.el"))
- #+END_SRC
-
-** Half Scroll
- #+BEGIN_SRC emacs-lisp
-    (defun window-half-height ()
-      (max 1 (/ (1- (window-height (selected-window))) 2)))
-   
-    (defun scroll-up-half ()
-      (interactive)
-      (scroll-up (window-half-height)))
-   
-    (defun scroll-down-half ()         
-      (interactive)                    
-      (scroll-down (window-half-height)))
-   
-    (global-set-key (kbd "M-n") 'scroll-up-half)
-    (global-set-key (kbd "M-p") 'scroll-down-half)
- #+END_SRC
-** Add to load-path ~/bin
- #+BEGIN_SRC emacs-lisp
- (add-to-list 'exec-path "~/bin")
- #+END_SRC
-** M-1 = windresize
- #+BEGIN_SRC emacs-lisp
- (use-package resize-window)
- (global-set-key (kbd "M-1") 'resize-window)
- #+END_SRC
-** Emacs which key
-#+BEGIN_SRC emacs-lisp
-(use-package which-key)
-(which-key-mode)
-#+END_SRC
-** help window select
-   #+BEGIN_SRC emacs-lisp
-   (setq help-window-select t)
-   #+END_SRC
-** Multi-term
-   #+BEGIN_SRC emacs-lisp
-     (use-package multi-term)
-     (add-hook 'term-mode-hook
-               (lambda ()
-                 (add-to-list 'term-bind-key-alist '("M-[" . multi-term-prev))
-                 (add-to-list 'term-bind-key-alist '("M-]" . multi-term-next))))
-   #+END_SRC
-** beacon
-   #+BEGIN_SRC emacs-lisp
-     (use-package beacon)
-     (beacon-mode 1)
-     (setq beacon-color "#006400")
-   #+END_SRC
-** Dashboard
-   #+BEGIN_SRC emacs-lisp
-   (use-package dashboard)
-   (dashboard-setup-startup-hook)
-   #+END_SRC
-** Volume
-   #+BEGIN_SRC emacs-lisp
-   (use-package volume)
-   (global-set-key (kbd "C-c v") 'volume)
-   #+END_SRC
 * EXWM
-** Config
+** Meta
 #+BEGIN_SRC emacs-lisp
-  (use-package exwm)  
-  ;(add-to-list 'load-path "~/.emacs.d/custom/exwm")
-  ;(add-to-list 'load-path "~/.emacs.d/custom/xelb")
-  ;(require 'exwm)
-  (require 'exwm-systemtray)
-  (require 'exwm-config)
-  (exwm-config-default)
-  ;(setq exwm-input-line-mode-passthrough t)
+(use-package exwm)
+(require 'exwm-config)
+(exwm-config-default)
 #+END_SRC
-** Keyboard fix
-   #+BEGIN_SRC emacs-lisp
-     (defun exwm-input--set-focus (id)
-       "Set input focus to window ID in a proper way."
-       (when (exwm--id->buffer id)
-         (with-current-buffer (exwm--id->buffer id)
-           (cond
-            ((and (not exwm--hints-input)
-                  (memq xcb:Atom:WM_TAKE_FOCUS exwm--protocols))
-             (when (= (frame-parameter nil 'exwm-id)
-                      (slot-value (xcb:+request-unchecked+reply exwm--connection
-                                      (make-instance 'xcb:GetInputFocus))
-                                  'focus))
-               (exwm--log "Focus on #x%x with WM_TAKE_FOCUS" id)
-               (exwm-input--update-timestamp
-                (lambda (timestamp id)
-                  (let ((event (make-instance 'xcb:icccm:WM_TAKE_FOCUS
-                                              :window id
-                                              :time timestamp)))
-                    (setq event (xcb:marshal event exwm--connection))
-                    (xcb:+request exwm--connection
-                        (make-instance 'xcb:icccm:SendEvent
-                                       :destination id
-                                       :event event))
-                    (exwm-input--set-active-window id)
-                    (xcb:flush exwm--connection)))
-                id)))
-            (t
-             (exwm--log "Focus on #x%x with SetInputFocus" id)
-             (exwm-input--update-timestamp
-              (lambda (timestamp id)
-                (let ((event (make-instance 'xcb:icccm:WM_TAKE_FOCUS
-                                            :window id
-                                            :time timestamp)))
-                  (setq event (xcb:marshal event exwm--connection))
-                  (xcb:+request exwm--connection
-                      (make-instance 'xcb:icccm:SendEvent
-                                     :destination id
-                                     :event event)))
-                (xcb:+request exwm--connection
-                    (make-instance 'xcb:SetInputFocus
-                                   :revert-to xcb:InputFocus:Parent
-                                   :focus id
-                                   :time timestamp))
-                (exwm-input--set-active-window id)
-                (xcb:flush exwm--connection))
-              id))))))
-   #+END_SRC
-** Global keys
-   #+BEGIN_SRC emacs-lisp
-     (use-package transpose-frame)
-     (setq exwm-input-global-keys
-           `(([?\s-r] . exwm-reset)
-             ([?\s-w] . exwm-workspace-switch)
-             ([?\s-l] . lock-screen)
-             ,@(mapcar (lambda (i)
-                         `(,(kbd (format "s-%d" (mod (1+ i) 10))) .
-                           (lambda ()
-                             (interactive)
-                             (exwm-workspace-switch-create ,i))))
-                       (number-sequence 0 9))
-             (,(kbd "s-b") . ivy-switch-buffer)
-             (,(kbd "s-a") . org-agenda)
-             (,(kbd "s-c") . org-capture)
-             (,(kbd "s-h") . split-window-right)
-             (,(kbd "s-t") . split-window-below)
-             (,(kbd "s-n") . switch-window)
-             (,(kbd "s-k") . ido-kill-buffer)
-             (,(kbd "s-s") . resize-window)))
-     (global-set-key (kbd "M-T") 'flop-frame)
-     (global-set-key (kbd "C-x p") 'launch-program)
-     (global-set-key (kbd "M-…") 'multi-term)
-     (global-set-key (kbd "C-ü") 'undo-tree-undo)
+** Multimonitor support
+#+BEGIN_SRC emacs-lisp
+(require 'exwm-randr)
+(setq exwm-randr-workspace-output-plist '(2 "HDMI1" 3 "HDMI1"))
+(exwm-randr-enable)
+#+END_SRC
+** Keybindings
+#+BEGIN_SRC emacs-lisp
+  (use-package transpose-frame)
+  (setq exwm-input-global-keys
+	`(([?\s-r] . exwm-reset)
+	  ([?\s-w] . exwm-workspace-switch)
+	  ([?\s-l] . lock-screen)
+	  ,@(mapcar (lambda (i)
+		      `(,(kbd (format "s-%d" (mod (1+ i) 10))) .
+			(lambda ()
+			  (interactive)
+			  (exwm-workspace-switch-create ,i))))
+		    (number-sequence 0 9))
+	  (,(kbd "s-b") . ivy-switch-buffer)
+	  (,(kbd "s-a") . org-agenda)
+	  (,(kbd "s-c") . org-capture)
+	  (,(kbd "s-h") . split-window-right)
+	  (,(kbd "s-t") . split-window-below)
+	  (,(kbd "s-n") . switch-window)
+	  (,(kbd "s-k") . ido-kill-buffer)
+	  (,(kbd "s-s") . resize-window)))
+  (global-set-key (kbd "M-T") 'flop-frame)
+  (global-set-key (kbd "C-x p") 'launch-program)
+  (global-set-key (kbd "M-…") 'multi-term)
+  (global-set-key (kbd "C-ü") 'undo-tree-undo)
 
-     (defun prompt-workspace (&optional prompt)
-       "Prompt for a workspace, returning the workspace frame."
-       (exwm-workspace--update-switch-history)
-       (let* ((current-idx (exwm-workspace--position exwm-workspace--current))
-              (history-add-new-input nil)  ;prevent modifying history
-              (history-idx (read-from-minibuffer
-                            (or prompt "Workspace: ")
-                            (elt exwm-workspace--switch-history current-idx)
-                            exwm-workspace--switch-map nil
-                            `(exwm-workspace--switch-history . ,(1+ current-idx))))
-              (workspace-idx (mod (1- (cl-position history-idx exwm-workspace--switch-history
-                                          :test #'equal)) 
-                                  10)))
-         (elt exwm-workspace--list workspace-idx)))
+  (defun prompt-workspace (&optional prompt)
+    "Prompt for a workspace, returning the workspace frame."
+    (exwm-workspace--update-switch-history)
+    (let* ((current-idx (exwm-workspace--position exwm-workspace--current))
+	   (history-add-new-input nil)  ;prevent modifying history
+	   (history-idx (read-from-minibuffer
+			 (or prompt "Workspace: ")
+			 (elt exwm-workspace--switch-history current-idx)
+			 exwm-workspace--switch-map nil
+			 `(exwm-workspace--switch-history . ,(1+ current-idx))))
+	   (workspace-idx (mod (1- (cl-position history-idx exwm-workspace--switch-history
+				       :test #'equal)) 
+			       10)))
+      (elt exwm-workspace--list workspace-idx)))
 
-     (advice-add 'exwm-workspace--prompt-for-workspace
-                 :override
-                 #'prompt-workspace)
-
-   #+END_SRC
-** Custom
-   #+BEGIN_SRC emacs-lisp
-     (defvar workspace-list '(("s" 0 "school")
-                              ("y" 1 "youtube")
-                              ("w" 2 "work")
-                              ("r" 3 "research")
-                              ("c" 4 "code"))
-       "My custom workspace list")
-
-     (defun workspace-switch-prompt ()
-       (exwm-workspace--update-switch-history)
-       (let* ((current-workspace (exwm-workspace--position exwm-workspace--current))
-              (workspace-string (elt exwm-workspace--switch-history current-workspace)))
-         (mapcar (lambda (x)
-                   (setq workspace-string
-                         (replace-regexp-in-string (number-to-string (cadr x))
-                                                   (caddr x)
-                                                   workspace-string)))
-                 workspace-list)
-         workspace-string))
-
-     (defun my-workspace-switch ()
-       (interactive)
-       (let* ((letter (read-char (workspace-switch-prompt)))
-             (ws-info (assoc (char-to-string letter)
-                             workspace-list)))
-         (if ws-info
-           (exwm-workspace-switch (cadr ws-info))
-           (exwm-workspace-switch (string-to-number
-                                   (char-to-string
-                                    letter))))))
-
-     (global-set-key (kbd "s-w") 'my-workspace-switch)
-     (global-set-key (kbd "s-l") '(lambda () (interactive) (launch-program "i3lock-fancy")))
-   #+END_SRC
+  (advice-add 'exwm-workspace--prompt-for-workspace
+	      :override
+	      #'prompt-workspace)
+#+END_SRC
 ** Helper functions
-   #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
+
      (defvar wallpaper-path "/home/benson/.emacs.d/res/digital_space_universe_4k_8k-wide.jpg")
      (defvar live-wallpaper-path "/home/benson/MEGA/pictures/wallpapers/videos/bg.mp4")
      (setq i3-string "Xephyr -br -ac -noreset -resizeable -screen 1920x1080 :1 & sleep 1s; DISPLAY=:1 i3")
@@ -307,6 +159,41 @@
            (add-to-list 'global-mode-string
                         'hard-drive-space
                         t)))
+#+END_SRC
+** Workspace WIP
+   #+BEGIN_SRC emacs-lisp
+     (defvar workspace-list '(("s" 0 "school")
+                              ("y" 1 "youtube")
+                              ("w" 2 "work")
+                              ("r" 3 "research")
+                              ("c" 4 "code"))
+       "My custom workspace list")
+
+     (defun workspace-switch-prompt ()
+       (exwm-workspace--update-switch-history)
+       (let* ((current-workspace (exwm-workspace--position exwm-workspace--current))
+              (workspace-string (elt exwm-workspace--switch-history current-workspace)))
+         (mapcar (lambda (x)
+                   (setq workspace-string
+                         (replace-regexp-in-string (number-to-string (cadr x))
+                                                   (caddr x)
+                                                   workspace-string)))
+                 workspace-list)
+         workspace-string))
+
+     (defun my-workspace-switch ()
+       (interactive)
+       (let* ((letter (read-char (workspace-switch-prompt)))
+             (ws-info (assoc (char-to-string letter)
+                             workspace-list)))
+         (if ws-info
+           (exwm-workspace-switch (cadr ws-info))
+           (exwm-workspace-switch (string-to-number
+                                   (char-to-string
+                                    letter))))))
+
+     (global-set-key (kbd "s-w") 'my-workspace-switch)
+     (global-set-key (kbd "s-l") '(lambda () (interactive) (launch-program "i3lock-fancy")))
    #+END_SRC
 ** Simulation keys
 #+BEGIN_SRC emacs-lisp
@@ -337,57 +224,49 @@
     ([?\M-s] . ?\C-s)
 ))
 #+END_SRC
-** xrandr
-#+BEGIN_SRC emacs-lisp
-(require 'exwm-randr)
-;No dash when using intel driver
-(setq exwm-randr-workspace-output-plist '(2 "HDMI1" 3 "HDMI1"))
 
-(defun exwm-presentation-mode ()
-  (interactive)
-  (setq exwm-randr-workspace-output-plist nil))
-
-(defun exwm-regular-mode ()
-  (interactive)
-  (setq exwm-randr-workspace-output-plist '(2 "HDMI1" 3 "HDMI1")))
-
-(exwm-randr-enable)
-#+END_SRC
 ** Startup
-#+BEGIN_SRC emacs-lisp   
-  (add-hook 'exwm-init-hook 'server-start)
 
-  ; Reminder: Hooks execute in order. Make sure megasync launches after systemtray is enabled
-  (add-hook 'exwm-init-hook 'call-startup-programs)
-  (add-hook 'exwm-init-hook 'setup-wallpaper)
+*** Emacs server, startup programs, wallpaper
+#+BEGIN_SRC emacs-lisp
+   (add-hook 'exwm-init-hook 'server-start)
 
-  (exwm-systemtray-enable)
-  (setq display-time-day-and-date t)
-
-  (defvar my/exclude-buffer-modes '(helm-major-mode messages-buffer-mode special-mode))
-
-  (defun my-buffer-predicate (buf)
-    (with-current-buffer buf
-      (if (memq major-mode my/exclude-buffer-modes)
-          nil
-        (exwm-layout--other-buffer-predicate buf))))
-
-  (add-hook 'exwm-init-hook
-            (lambda ()
-              (interactive) 
-              (modify-all-frames-parameters
-               '((buffer-predicate . my-buffer-predicate)))))
-
-  ;(add-to-list 'default-frame-alist '(alpha . (85 . 50)))
-  (setq window-system-default-frame-alist '((x . ((alpha . (85 . 50)) ))))
-  ;Display hard drive space
-
-  (add-hook 'display-time-hook 'update-hard-drive-space-string)
-
-  (display-time-mode)
-  (display-battery-mode)
-  (display-hard-drive-space-mode)
+   ; Reminder: Hooks execute in order. Make sure megasync launches after systemtray is enabled
+   (add-hook 'exwm-init-hook 'call-startup-programs)
+   (add-hook 'exwm-init-hook 'setup-wallpaper)
 #+END_SRC
+
+*** System tray, display time, display battery, display hard-drive-space
+ #+BEGIN_SRC emacs-lisp   
+   (require 'exwm-systemtray)
+   (exwm-systemtray-enable)
+   (setq display-time-day-and-date t)
+
+   (defvar my/exclude-buffer-modes '(helm-major-mode messages-buffer-mode special-mode))
+
+   (defun my-buffer-predicate (buf)
+     (with-current-buffer buf
+       (if (memq major-mode my/exclude-buffer-modes)
+           nil
+         (exwm-layout--other-buffer-predicate buf))))
+
+   (add-hook 'exwm-init-hook
+             (lambda ()
+               (interactive) 
+               (modify-all-frames-parameters
+		'((buffer-predicate . my-buffer-predicate)))))
+
+   ;(add-to-list 'default-frame-alist '(alpha . (85 . 50)))
+   (setq window-system-default-frame-alist '((x . ((alpha . (85 . 50)) ))))
+   ;Display hard drive space
+
+   (add-hook 'display-time-hook 'update-hard-drive-space-string)
+
+   (display-time-mode)
+   (display-battery-mode)
+   (display-hard-drive-space-mode)
+ #+END_SRC
+
 ** Shutdown
    #+BEGIN_SRC emacs-lisp
      (add-hook 'exwm-exit-hook 'org-save-all-org-buffers)
@@ -407,440 +286,447 @@
                                          floating t)))
 
    #+END_SRC
-* My variables alist
-#+BEGIN_SRC emacs-lisp
-  (defvar my/variable-alist-file "~/.emacs.d/codertilldeath_variables.el")
-  (defvar my/variable-alist '())
-
-  (save-excursion
-     (set-buffer (find-file-noselect my/variable-alist-file))
-     (setq my/variable-alist (eval (read (buffer-string))))
-     (kill-buffer))
-
-  (defun my/set-variable (key value)
-    (let ((res (assq key my-variable-alist)))
-      (setcdr res value))
-    (my/save-variables))
-
-  (defun my/add-variable (key value)
-    (add-to-list 'my/variable-alist
-                 '(key value))
-    (my/save-variables))
-
-  (defun my/get-variable (key)
-    (assoc key my/variable-alist))
-
-  (defun my/save-variables ()
-    (interactive)
-    (save-excursion
-      (let ((buf (find-file-noselect my/variable-alist-file)))
-        (set-buffer buf)
-        (erase-buffer)
-        (print (list 'quote my/variable-alist) buf)
-        (save-buffer)
-        (kill-buffer)
-        (message "variable-alist file list saved to: %s" my/variable-alist-file))))
-
-#+END_SRC
-* UI
-** Turn off menu bar and toolbar
+* Emacs
+** Reload Config
  #+BEGIN_SRC emacs-lisp
-(menu-bar-mode -1)
-(tool-bar-mode -1)
-#+END_SRC
-** Theming
-*** Calm forest theme
-#+BEGIN_SRC emacs-lisp
-(use-package color-theme-modern)
-(load-theme 'calm-forest t)
-#+END_SRC
-*** Wallpaper
-    #+BEGIN_SRC emacs-lisp
-    (setq wallpaper-path "/home/benson/.emacs.d/res/digital_space_universe_4k_8k-wide.jpg")
-    #+END_SRC
-*** mode-line
-**** Powerline
-***** Test new mode-line
- #+BEGIN_SRC emacs-lisp
-   (defun my-airline-theme ()
-     "Set the airline mode-line-format"
-     (interactive)
-     (setq-default mode-line-format
-           '("%e"
-             (:eval
-              (let* ((active (powerline-selected-window-active))
-                 (separator-left (intern (format "powerline-%s-%s"
-                                 (powerline-current-separator)
-                                 (car powerline-default-separator-dir))))
-                 (separator-right (intern (format "powerline-%s-%s"
-                                  (powerline-current-separator)
-                                  (cdr powerline-default-separator-dir))))
-                 (mode-line-face (if active 'mode-line 'mode-line-inactive))
-                 (visual-block (if (featurep 'evil)
-                           (and (evil-visual-state-p)
-                            (eq evil-visual-selection 'block))
-                         nil))
-                 (visual-line (if (featurep 'evil)
-                          (and (evil-visual-state-p)
-                           (eq evil-visual-selection 'line))
-                        nil))
-                 (current-evil-state-string (if (featurep 'evil)
-                                (upcase (concat (symbol-name evil-state)
-                                        (cond (visual-block "-BLOCK")
-                                          (visual-line "-LINE"))))
-                              nil))
-
-                 (outer-face
-                  (if (powerline-selected-window-active)
-                  (if (featurep 'evil)
-                      (cond ((eq evil-state (intern "normal"))  'airline-normal-outer)
-                        ((eq evil-state (intern "insert"))  'airline-insert-outer)
-                        ((eq evil-state (intern "visual"))  'airline-visual-outer)
-                        ((eq evil-state (intern "replace")) 'airline-replace-outer)
-                        ((eq evil-state (intern "emacs"))   'airline-emacs-outer)
-                        (t                                  'airline-normal-outer))
-                    'airline-normal-outer)
-                    'powerline-inactive1))
-
-                 (inner-face
-                  (if (powerline-selected-window-active)
-                  (if (featurep 'evil)
-                      (cond ((eq evil-state (intern "normal")) 'airline-normal-inner)
-                        ((eq evil-state (intern "insert")) 'airline-insert-inner)
-                        ((eq evil-state (intern "visual")) 'airline-visual-inner)
-                        ((eq evil-state (intern "replace")) 'airline-replace-inner)
-                        ((eq evil-state (intern "emacs"))   'airline-emacs-inner)
-                        (t                                 'airline-normal-inner))
-                    'airline-normal-inner)
-                    'powerline-inactive2))
-
-                 (center-face
-                  (if (powerline-selected-window-active)
-                  (if (featurep 'evil)
-                      (cond ((eq evil-state (intern "normal")) 'airline-normal-center)
-                        ((eq evil-state (intern "insert")) 'airline-insert-center)
-                        ((eq evil-state (intern "visual")) 'airline-visual-center)
-                        ((eq evil-state (intern "replace")) 'airline-replace-center)
-                        ((eq evil-state (intern "emacs"))   'airline-emacs-center)
-                        (t                                 'airline-normal-center))
-                    'airline-normal-center)
-                    'airline-inactive3))
-
-                 ;; Left Hand Side
-                 (lhs-mode (if (featurep 'evil)
-                       (list
-                        ;; Evil Mode Name
-                        (powerline-raw (concat " " current-evil-state-string " ") outer-face)
-                        (funcall separator-left outer-face inner-face)
-                        ;; Modified string
-                        (powerline-raw "%*" inner-face 'l)
-                        )
-                       (list
-                        ;; Modified string
-                        (powerline-raw "%*" outer-face 'l)
-                        ;; Separator >
-                        (powerline-raw " " outer-face)
-                        (funcall separator-left outer-face inner-face))))
-
-                 (lhs-rest (list
-                        ;; ;; Separator >
-                        ;; (powerline-raw (char-to-string #x2b81) inner-face 'l)
-
-                        ;; Eyebrowse current tab/window config
-                        (if (featurep 'eyebrowse)
-                        (powerline-raw (concat " " (eyebrowse-mode-line-indicator)) inner-face))
-
-                        ;; Git Branch
-                        (powerline-raw (airline-get-vc) inner-face)
-
-                        ;; Separator >
-                        (powerline-raw " " inner-face)
-                        (funcall separator-left inner-face center-face)
-
-                        ;; Directory
-                        ;(when (eq airline-display-directory 'airline-directory-shortened)
-                        ;  (powerline-raw (airline-shorten-directory default-directory airline-shortened-directory-length) center-face 'l))
-                        ;(when (eq airline-display-directory 'airline-directory-full)
-                        ;  (powerline-raw default-directory center-face 'l))
-                        ;(when (eq airline-display-directory nil)
-                        ;  (powerline-raw " " center-face))
-
-                        ;; Buffer ID
-                        ;; (powerline-buffer-id center-face)
-                        ;; (powerline-raw "%b" center-face)
-                        (powerline-buffer-id center-face)
-
-                        (powerline-major-mode center-face 'l)
-                        (powerline-process center-face)
-                        ;(powerline-minor-modes center-face 'l)
-
-                        ;; Current Function (which-function-mode)
-                        (when (and (boundp 'which-func-mode) which-func-mode)
-                      ;; (powerline-raw which-func-format 'l nil))
-                      (powerline-raw which-func-format center-face 'l))
-
-                        ;; ;; Separator >
-                        ;; (powerline-raw " " center-face)
-                        ;; (funcall separator-left mode-line face1)
-
-                        (when (boundp 'erc-modified-channels-object)
-                      (powerline-raw erc-modified-channels-object center-face 'l))
-
-                        ;; ;; Separator <
-                        ;; (powerline-raw " " face1)
-                        ;; (funcall separator-right face1 face2)
-                      ))
-
-                 (lhs (append lhs-mode lhs-rest))
-
-                 ;; Right Hand Side
-                 (rhs (list (powerline-raw global-mode-string center-face 'r)
-
-                        ;; ;; Separator <
-                        ;; (powerline-raw (char-to-string #x2b83) center-face 'l)
-
-                        ;; Minor Modes
-                        ;(powerline-minor-modes center-face 'l)
-                        ;; (powerline-narrow center-face 'l)
-
-                        ;; Subseparator <
-                        (powerline-raw (char-to-string airline-utf-glyph-subseparator-right) center-face 'l)
-
-                        ;; Major Mode
-                        ;(powerline-major-mode center-face 'l)
-                        ;(powerline-process center-face)
-
-                        ;; Separator <
-                        (powerline-raw " " center-face)
-                        (funcall separator-right center-face inner-face)
-
-                        ;; Buffer Size
-                        (when powerline-display-buffer-size
-                      (powerline-buffer-size inner-face 'l))
-
-                        ;; Mule Info
-                        (when powerline-display-mule-info
-                      (powerline-raw mode-line-mule-info inner-face 'l))
-
-                        (powerline-raw " " inner-face)
-
-                        ;; Separator <
-                        (funcall separator-right inner-face outer-face)
-
-                        ;; LN charachter
-                        (powerline-raw (char-to-string airline-utf-glyph-linenumber) outer-face 'l)
-
-                        ;; Current Line
-                        (powerline-raw "%4l" outer-face 'l)
-                        (powerline-raw ":" outer-face 'l)
-                        ;; Current Column
-                        (powerline-raw "%3c" outer-face 'r)
-
-                        ;; % location in file
-                        (powerline-raw "%6p" outer-face 'r)
-
-                        ;; position in file image
-                        (when powerline-display-hud
-                      (powerline-hud inner-face outer-face)))
-                  ))
-
-                ;; Combine Left and Right Hand Sides
-                (concat (powerline-render lhs)
-                    (powerline-fill center-face (powerline-width rhs))
-                    (powerline-render rhs))))))
-     (powerline-reset)
-     (kill-local-variable 'mode-line-format))
-
-     (defun my-show-minor-modes ()
-     "Set the airline mode-line-format"
-     (interactive)
-     (setq-default mode-line-format
-           '("%e"
-             (:eval
-              (let* ((active (powerline-selected-window-active))
-                 (separator-left (intern (format "powerline-%s-%s"
-                                 (powerline-current-separator)
-                                 (car powerline-default-separator-dir))))
-                 (separator-right (intern (format "powerline-%s-%s"
-                                  (powerline-current-separator)
-                                  (cdr powerline-default-separator-dir))))
-                 (mode-line-face (if active 'mode-line 'mode-line-inactive))
-                 (visual-block (if (featurep 'evil)
-                           (and (evil-visual-state-p)
-                            (eq evil-visual-selection 'block))
-                         nil))
-                 (visual-line (if (featurep 'evil)
-                          (and (evil-visual-state-p)
-                           (eq evil-visual-selection 'line))
-                        nil))
-                 (current-evil-state-string (if (featurep 'evil)
-                                (upcase (concat (symbol-name evil-state)
-                                        (cond (visual-block "-BLOCK")
-                                          (visual-line "-LINE"))))
-                              nil))
-
-                 (outer-face
-                  (if (powerline-selected-window-active)
-                  (if (featurep 'evil)
-                      (cond ((eq evil-state (intern "normal"))  'airline-normal-outer)
-                        ((eq evil-state (intern "insert"))  'airline-insert-outer)
-                        ((eq evil-state (intern "visual"))  'airline-visual-outer)
-                        ((eq evil-state (intern "replace")) 'airline-replace-outer)
-                        ((eq evil-state (intern "emacs"))   'airline-emacs-outer)
-                        (t                                  'airline-normal-outer))
-                    'airline-normal-outer)
-                    'powerline-inactive1))
-
-                 (inner-face
-                  (if (powerline-selected-window-active)
-                  (if (featurep 'evil)
-                      (cond ((eq evil-state (intern "normal")) 'airline-normal-inner)
-                        ((eq evil-state (intern "insert")) 'airline-insert-inner)
-                        ((eq evil-state (intern "visual")) 'airline-visual-inner)
-                        ((eq evil-state (intern "replace")) 'airline-replace-inner)
-                        ((eq evil-state (intern "emacs"))   'airline-emacs-inner)
-                        (t                                 'airline-normal-inner))
-                    'airline-normal-inner)
-                    'powerline-inactive2))
-
-                 (center-face
-                  (if (powerline-selected-window-active)
-                  (if (featurep 'evil)
-                      (cond ((eq evil-state (intern "normal")) 'airline-normal-center)
-                        ((eq evil-state (intern "insert")) 'airline-insert-center)
-                        ((eq evil-state (intern "visual")) 'airline-visual-center)
-                        ((eq evil-state (intern "replace")) 'airline-replace-center)
-                        ((eq evil-state (intern "emacs"))   'airline-emacs-center)
-                        (t                                 'airline-normal-center))
-                    'airline-normal-center)
-                    'airline-inactive3))
-
-                 ;; Left Hand Side
-                 (lhs-mode (if (featurep 'evil)
-                       (list
-                        ;; Evil Mode Name
-                        (powerline-raw (concat " " current-evil-state-string " ") outer-face)
-                        (funcall separator-left outer-face inner-face)
-                        ;; Modified string
-                        (powerline-raw "%*" inner-face 'l)
-                        )
-                       (list
-                        ;; Modified string
-                        (powerline-raw "%*" outer-face 'l)
-                        ;; Separator >
-                        (powerline-raw " " outer-face)
-                        (funcall separator-left outer-face inner-face))))
-
-                 (lhs-rest (list
-                        ;; ;; Separator >
-                        ;; (powerline-raw (char-to-string #x2b81) inner-face 'l)
-
-                        ;; Eyebrowse current tab/window config
-                        (if (featurep 'eyebrowse)
-                        (powerline-raw (concat " " (eyebrowse-mode-line-indicator)) inner-face))
-
-                        ;; Git Branch
-                        (powerline-raw (airline-get-vc) inner-face)
-
-                        ;; Separator >
-                        (powerline-raw " " inner-face)
-                        (funcall separator-left inner-face center-face)
-
-                        ;; Directory
-                        ;(when (eq airline-display-directory 'airline-directory-shortened)
-                        ;  (powerline-raw (airline-shorten-directory default-directory airline-shortened-directory-length) center-face 'l))
-                        ;(when (eq airline-display-directory 'airline-directory-full)
-                        ;  (powerline-raw default-directory center-face 'l))
-                        ;(when (eq airline-display-directory nil)
-                        ;  (powerline-raw " " center-face))
-
-                        ;; Buffer ID
-                        ;; (powerline-buffer-id center-face)
-                        ;; (powerline-raw "%b" center-face)
-                        (powerline-buffer-id center-face)
-
-                        (powerline-major-mode center-face 'l)
-                        (powerline-process center-face)
-                        (powerline-minor-modes center-face 'l)
-
-                        ;; Current Function (which-function-mode)
-                        (when (and (boundp 'which-func-mode) which-func-mode)
-                      ;; (powerline-raw which-func-format 'l nil))
-                      (powerline-raw which-func-format center-face 'l))
-
-                        ;; ;; Separator >
-                        ;; (powerline-raw " " center-face)
-                        ;; (funcall separator-left mode-line face1)
-
-                        (when (boundp 'erc-modified-channels-object)
-                      (powerline-raw erc-modified-channels-object center-face 'l))
-
-                        ;; ;; Separator <
-                        ;; (powerline-raw " " face1)
-                        ;; (funcall separator-right face1 face2)
-                      ))
-
-                 (lhs (append lhs-mode lhs-rest))
-
-                 ;; Right Hand Side
-                 (rhs (list (powerline-raw global-mode-string center-face 'r)
-
-                        ;; ;; Separator <
-                        ;; (powerline-raw (char-to-string #x2b83) center-face 'l)
-
-                        ;; Minor Modes
-                        ;(powerline-minor-modes center-face 'l)
-                        ;; (powerline-narrow center-face 'l)
-
-                        ;; Subseparator <
-                        (powerline-raw (char-to-string airline-utf-glyph-subseparator-right) center-face 'l)
-
-                        ;; Major Mode
-                        ;(powerline-major-mode center-face 'l)
-                        ;(powerline-process center-face)
-
-                        ;; Separator <
-                        (powerline-raw " " center-face)
-                        (funcall separator-right center-face inner-face)
-
-                        ;; Buffer Size
-                        (when powerline-display-buffer-size
-                      (powerline-buffer-size inner-face 'l))
-
-                        ;; Mule Info
-                        (when powerline-display-mule-info
-                      (powerline-raw mode-line-mule-info inner-face 'l))
-
-                        (powerline-raw " " inner-face)
-
-                        ;; Separator <
-                        (funcall separator-right inner-face outer-face)
-
-                        ;; LN charachter
-                        (powerline-raw (char-to-string airline-utf-glyph-linenumber) outer-face 'l)
-
-                        ;; Current Line
-                        (powerline-raw "%4l" outer-face 'l)
-                        (powerline-raw ":" outer-face 'l)
-                        ;; Current Column
-                        (powerline-raw "%3c" outer-face 'r)
-
-                        ;; % location in file
-                        (powerline-raw "%6p" outer-face 'r)
-
-                        ;; position in file image
-                        (when powerline-display-hud
-                      (powerline-hud inner-face outer-face)))
-                  ))
-
-                ;; Combine Left and Right Hand Sides
-                (concat (powerline-render lhs)
-                    (powerline-fill center-face (powerline-width rhs))
-                    (powerline-render rhs))))))
-     (powerline-reset)
-     (kill-local-variable 'mode-line-format))
+ (defun reload-config () (interactive) (load-file "~/.emacs.d/init.el"))
  #+END_SRC
-***** Config
+** Select Help Window
+ #+BEGIN_SRC emacs-lisp
+ (setq help-window-select t)
+ #+END_SRC
+** Multi-term
+ #+BEGIN_SRC emacs-lisp
+   (use-package multi-term)
+   (add-hook 'term-mode-hook
+	     (lambda ()
+	       (add-to-list 'term-bind-key-alist '("M-[" . multi-term-prev))
+	       (add-to-list 'term-bind-key-alist '("M-]" . multi-term-next))))
+ #+END_SRC
+** resize-window
+#+BEGIN_SRC emacs-lisp
+(use-package resize-window)
+(global-set-key (kbd "M-1") 'resize-window)
+#+END_SRC
+** which-key
+#+BEGIN_SRC emacs-lisp
+(use-package which-key)
+(which-key-mode)
+#+END_SRC
+** beacon
+   #+BEGIN_SRC emacs-lisp
+     (use-package beacon)
+     (beacon-mode 1)
+     (setq beacon-color "#006400")
+   #+END_SRC
+** Volume
+   #+BEGIN_SRC emacs-lisp
+   (use-package volume)
+   (global-set-key (kbd "C-c v") 'volume)
+   #+END_SRC
+** Dashboard
+   #+BEGIN_SRC emacs-lisp
+   (use-package dashboard)
+   (dashboard-setup-startup-hook)
+   #+END_SRC
+** undo-tree
+#+BEGIN_SRC emacs-lisp
+(use-package undo-tree)
+#+END_SRC
+* Look and feel
+** Theme
+ #+BEGIN_SRC emacs-lisp
+ (use-package color-theme-modern)
+ (load-theme 'calm-forest t)
+ #+END_SRC
+
+** Wallpaper
+   #+BEGIN_SRC emacs-lisp
+   (setq wallpaper-path "/home/benson/.emacs.d/res/digital_space_universe_4k_8k-wide.jpg")
+   #+END_SRC
+** mode-line
+*** Powerline
+**** Test new mode-line
+#+BEGIN_SRC emacs-lisp
+  (defun my-airline-theme ()
+    "Set the airline mode-line-format"
+    (interactive)
+    (setq-default mode-line-format
+          '("%e"
+            (:eval
+             (let* ((active (powerline-selected-window-active))
+                (separator-left (intern (format "powerline-%s-%s"
+                                (powerline-current-separator)
+                                (car powerline-default-separator-dir))))
+                (separator-right (intern (format "powerline-%s-%s"
+                                 (powerline-current-separator)
+                                 (cdr powerline-default-separator-dir))))
+                (mode-line-face (if active 'mode-line 'mode-line-inactive))
+                (visual-block (if (featurep 'evil)
+                          (and (evil-visual-state-p)
+                           (eq evil-visual-selection 'block))
+                        nil))
+                (visual-line (if (featurep 'evil)
+                         (and (evil-visual-state-p)
+                          (eq evil-visual-selection 'line))
+                       nil))
+                (current-evil-state-string (if (featurep 'evil)
+                               (upcase (concat (symbol-name evil-state)
+                                       (cond (visual-block "-BLOCK")
+                                         (visual-line "-LINE"))))
+                             nil))
+
+                (outer-face
+                 (if (powerline-selected-window-active)
+                 (if (featurep 'evil)
+                     (cond ((eq evil-state (intern "normal"))  'airline-normal-outer)
+                       ((eq evil-state (intern "insert"))  'airline-insert-outer)
+                       ((eq evil-state (intern "visual"))  'airline-visual-outer)
+                       ((eq evil-state (intern "replace")) 'airline-replace-outer)
+                       ((eq evil-state (intern "emacs"))   'airline-emacs-outer)
+                       (t                                  'airline-normal-outer))
+                   'airline-normal-outer)
+                   'powerline-inactive1))
+
+                (inner-face
+                 (if (powerline-selected-window-active)
+                 (if (featurep 'evil)
+                     (cond ((eq evil-state (intern "normal")) 'airline-normal-inner)
+                       ((eq evil-state (intern "insert")) 'airline-insert-inner)
+                       ((eq evil-state (intern "visual")) 'airline-visual-inner)
+                       ((eq evil-state (intern "replace")) 'airline-replace-inner)
+                       ((eq evil-state (intern "emacs"))   'airline-emacs-inner)
+                       (t                                 'airline-normal-inner))
+                   'airline-normal-inner)
+                   'powerline-inactive2))
+
+                (center-face
+                 (if (powerline-selected-window-active)
+                 (if (featurep 'evil)
+                     (cond ((eq evil-state (intern "normal")) 'airline-normal-center)
+                       ((eq evil-state (intern "insert")) 'airline-insert-center)
+                       ((eq evil-state (intern "visual")) 'airline-visual-center)
+                       ((eq evil-state (intern "replace")) 'airline-replace-center)
+                       ((eq evil-state (intern "emacs"))   'airline-emacs-center)
+                       (t                                 'airline-normal-center))
+                   'airline-normal-center)
+                   'airline-inactive3))
+
+                ;; Left Hand Side
+                (lhs-mode (if (featurep 'evil)
+                      (list
+                       ;; Evil Mode Name
+                       (powerline-raw (concat " " current-evil-state-string " ") outer-face)
+                       (funcall separator-left outer-face inner-face)
+                       ;; Modified string
+                       (powerline-raw "%*" inner-face 'l)
+                       )
+                      (list
+                       ;; Modified string
+                       (powerline-raw "%*" outer-face 'l)
+                       ;; Separator >
+                       (powerline-raw " " outer-face)
+                       (funcall separator-left outer-face inner-face))))
+
+                (lhs-rest (list
+                       ;; ;; Separator >
+                       ;; (powerline-raw (char-to-string #x2b81) inner-face 'l)
+
+                       ;; Eyebrowse current tab/window config
+                       (if (featurep 'eyebrowse)
+                       (powerline-raw (concat " " (eyebrowse-mode-line-indicator)) inner-face))
+
+                       ;; Git Branch
+                       (powerline-raw (airline-get-vc) inner-face)
+
+                       ;; Separator >
+                       (powerline-raw " " inner-face)
+                       (funcall separator-left inner-face center-face)
+
+                       ;; Directory
+                       ;(when (eq airline-display-directory 'airline-directory-shortened)
+                       ;  (powerline-raw (airline-shorten-directory default-directory airline-shortened-directory-length) center-face 'l))
+                       ;(when (eq airline-display-directory 'airline-directory-full)
+                       ;  (powerline-raw default-directory center-face 'l))
+                       ;(when (eq airline-display-directory nil)
+                       ;  (powerline-raw " " center-face))
+
+                       ;; Buffer ID
+                       ;; (powerline-buffer-id center-face)
+                       ;; (powerline-raw "%b" center-face)
+                       (powerline-buffer-id center-face)
+
+                       (powerline-major-mode center-face 'l)
+                       (powerline-process center-face)
+                       ;(powerline-minor-modes center-face 'l)
+
+                       ;; Current Function (which-function-mode)
+                       (when (and (boundp 'which-func-mode) which-func-mode)
+                     ;; (powerline-raw which-func-format 'l nil))
+                     (powerline-raw which-func-format center-face 'l))
+
+                       ;; ;; Separator >
+                       ;; (powerline-raw " " center-face)
+                       ;; (funcall separator-left mode-line face1)
+
+                       (when (boundp 'erc-modified-channels-object)
+                     (powerline-raw erc-modified-channels-object center-face 'l))
+
+                       ;; ;; Separator <
+                       ;; (powerline-raw " " face1)
+                       ;; (funcall separator-right face1 face2)
+                     ))
+
+                (lhs (append lhs-mode lhs-rest))
+
+                ;; Right Hand Side
+                (rhs (list (powerline-raw global-mode-string center-face 'r)
+
+                       ;; ;; Separator <
+                       ;; (powerline-raw (char-to-string #x2b83) center-face 'l)
+
+                       ;; Minor Modes
+                       ;(powerline-minor-modes center-face 'l)
+                       ;; (powerline-narrow center-face 'l)
+
+                       ;; Subseparator <
+                       (powerline-raw (char-to-string airline-utf-glyph-subseparator-right) center-face 'l)
+
+                       ;; Major Mode
+                       ;(powerline-major-mode center-face 'l)
+                       ;(powerline-process center-face)
+
+                       ;; Separator <
+                       (powerline-raw " " center-face)
+                       (funcall separator-right center-face inner-face)
+
+                       ;; Buffer Size
+                       (when powerline-display-buffer-size
+                     (powerline-buffer-size inner-face 'l))
+
+                       ;; Mule Info
+                       (when powerline-display-mule-info
+                     (powerline-raw mode-line-mule-info inner-face 'l))
+
+                       (powerline-raw " " inner-face)
+
+                       ;; Separator <
+                       (funcall separator-right inner-face outer-face)
+
+                       ;; LN charachter
+                       (powerline-raw (char-to-string airline-utf-glyph-linenumber) outer-face 'l)
+
+                       ;; Current Line
+                       (powerline-raw "%4l" outer-face 'l)
+                       (powerline-raw ":" outer-face 'l)
+                       ;; Current Column
+                       (powerline-raw "%3c" outer-face 'r)
+
+                       ;; % location in file
+                       (powerline-raw "%6p" outer-face 'r)
+
+                       ;; position in file image
+                       (when powerline-display-hud
+                     (powerline-hud inner-face outer-face)))
+                 ))
+
+               ;; Combine Left and Right Hand Sides
+               (concat (powerline-render lhs)
+                   (powerline-fill center-face (powerline-width rhs))
+                   (powerline-render rhs))))))
+    (powerline-reset)
+    (kill-local-variable 'mode-line-format))
+
+    (defun my-show-minor-modes ()
+    "Set the airline mode-line-format"
+    (interactive)
+    (setq-default mode-line-format
+          '("%e"
+            (:eval
+             (let* ((active (powerline-selected-window-active))
+                (separator-left (intern (format "powerline-%s-%s"
+                                (powerline-current-separator)
+                                (car powerline-default-separator-dir))))
+                (separator-right (intern (format "powerline-%s-%s"
+                                 (powerline-current-separator)
+                                 (cdr powerline-default-separator-dir))))
+                (mode-line-face (if active 'mode-line 'mode-line-inactive))
+                (visual-block (if (featurep 'evil)
+                          (and (evil-visual-state-p)
+                           (eq evil-visual-selection 'block))
+                        nil))
+                (visual-line (if (featurep 'evil)
+                         (and (evil-visual-state-p)
+                          (eq evil-visual-selection 'line))
+                       nil))
+                (current-evil-state-string (if (featurep 'evil)
+                               (upcase (concat (symbol-name evil-state)
+                                       (cond (visual-block "-BLOCK")
+                                         (visual-line "-LINE"))))
+                             nil))
+
+                (outer-face
+                 (if (powerline-selected-window-active)
+                 (if (featurep 'evil)
+                     (cond ((eq evil-state (intern "normal"))  'airline-normal-outer)
+                       ((eq evil-state (intern "insert"))  'airline-insert-outer)
+                       ((eq evil-state (intern "visual"))  'airline-visual-outer)
+                       ((eq evil-state (intern "replace")) 'airline-replace-outer)
+                       ((eq evil-state (intern "emacs"))   'airline-emacs-outer)
+                       (t                                  'airline-normal-outer))
+                   'airline-normal-outer)
+                   'powerline-inactive1))
+
+                (inner-face
+                 (if (powerline-selected-window-active)
+                 (if (featurep 'evil)
+                     (cond ((eq evil-state (intern "normal")) 'airline-normal-inner)
+                       ((eq evil-state (intern "insert")) 'airline-insert-inner)
+                       ((eq evil-state (intern "visual")) 'airline-visual-inner)
+                       ((eq evil-state (intern "replace")) 'airline-replace-inner)
+                       ((eq evil-state (intern "emacs"))   'airline-emacs-inner)
+                       (t                                 'airline-normal-inner))
+                   'airline-normal-inner)
+                   'powerline-inactive2))
+
+                (center-face
+                 (if (powerline-selected-window-active)
+                 (if (featurep 'evil)
+                     (cond ((eq evil-state (intern "normal")) 'airline-normal-center)
+                       ((eq evil-state (intern "insert")) 'airline-insert-center)
+                       ((eq evil-state (intern "visual")) 'airline-visual-center)
+                       ((eq evil-state (intern "replace")) 'airline-replace-center)
+                       ((eq evil-state (intern "emacs"))   'airline-emacs-center)
+                       (t                                 'airline-normal-center))
+                   'airline-normal-center)
+                   'airline-inactive3))
+
+                ;; Left Hand Side
+                (lhs-mode (if (featurep 'evil)
+                      (list
+                       ;; Evil Mode Name
+                       (powerline-raw (concat " " current-evil-state-string " ") outer-face)
+                       (funcall separator-left outer-face inner-face)
+                       ;; Modified string
+                       (powerline-raw "%*" inner-face 'l)
+                       )
+                      (list
+                       ;; Modified string
+                       (powerline-raw "%*" outer-face 'l)
+                       ;; Separator >
+                       (powerline-raw " " outer-face)
+                       (funcall separator-left outer-face inner-face))))
+
+                (lhs-rest (list
+                       ;; ;; Separator >
+                       ;; (powerline-raw (char-to-string #x2b81) inner-face 'l)
+
+                       ;; Eyebrowse current tab/window config
+                       (if (featurep 'eyebrowse)
+                       (powerline-raw (concat " " (eyebrowse-mode-line-indicator)) inner-face))
+
+                       ;; Git Branch
+                       (powerline-raw (airline-get-vc) inner-face)
+
+                       ;; Separator >
+                       (powerline-raw " " inner-face)
+                       (funcall separator-left inner-face center-face)
+
+                       ;; Directory
+                       ;(when (eq airline-display-directory 'airline-directory-shortened)
+                       ;  (powerline-raw (airline-shorten-directory default-directory airline-shortened-directory-length) center-face 'l))
+                       ;(when (eq airline-display-directory 'airline-directory-full)
+                       ;  (powerline-raw default-directory center-face 'l))
+                       ;(when (eq airline-display-directory nil)
+                       ;  (powerline-raw " " center-face))
+
+                       ;; Buffer ID
+                       ;; (powerline-buffer-id center-face)
+                       ;; (powerline-raw "%b" center-face)
+                       (powerline-buffer-id center-face)
+
+                       (powerline-major-mode center-face 'l)
+                       (powerline-process center-face)
+                       (powerline-minor-modes center-face 'l)
+
+                       ;; Current Function (which-function-mode)
+                       (when (and (boundp 'which-func-mode) which-func-mode)
+                     ;; (powerline-raw which-func-format 'l nil))
+                     (powerline-raw which-func-format center-face 'l))
+
+                       ;; ;; Separator >
+                       ;; (powerline-raw " " center-face)
+                       ;; (funcall separator-left mode-line face1)
+
+                       (when (boundp 'erc-modified-channels-object)
+                     (powerline-raw erc-modified-channels-object center-face 'l))
+
+                       ;; ;; Separator <
+                       ;; (powerline-raw " " face1)
+                       ;; (funcall separator-right face1 face2)
+                     ))
+
+                (lhs (append lhs-mode lhs-rest))
+
+                ;; Right Hand Side
+                (rhs (list (powerline-raw global-mode-string center-face 'r)
+
+                       ;; ;; Separator <
+                       ;; (powerline-raw (char-to-string #x2b83) center-face 'l)
+
+                       ;; Minor Modes
+                       ;(powerline-minor-modes center-face 'l)
+                       ;; (powerline-narrow center-face 'l)
+
+                       ;; Subseparator <
+                       (powerline-raw (char-to-string airline-utf-glyph-subseparator-right) center-face 'l)
+
+                       ;; Major Mode
+                       ;(powerline-major-mode center-face 'l)
+                       ;(powerline-process center-face)
+
+                       ;; Separator <
+                       (powerline-raw " " center-face)
+                       (funcall separator-right center-face inner-face)
+
+                       ;; Buffer Size
+                       (when powerline-display-buffer-size
+                     (powerline-buffer-size inner-face 'l))
+
+                       ;; Mule Info
+                       (when powerline-display-mule-info
+                     (powerline-raw mode-line-mule-info inner-face 'l))
+
+                       (powerline-raw " " inner-face)
+
+                       ;; Separator <
+                       (funcall separator-right inner-face outer-face)
+
+                       ;; LN charachter
+                       (powerline-raw (char-to-string airline-utf-glyph-linenumber) outer-face 'l)
+
+                       ;; Current Line
+                       (powerline-raw "%4l" outer-face 'l)
+                       (powerline-raw ":" outer-face 'l)
+                       ;; Current Column
+                       (powerline-raw "%3c" outer-face 'r)
+
+                       ;; % location in file
+                       (powerline-raw "%6p" outer-face 'r)
+
+                       ;; position in file image
+                       (when powerline-display-hud
+                     (powerline-hud inner-face outer-face)))
+                 ))
+
+               ;; Combine Left and Right Hand Sides
+               (concat (powerline-render lhs)
+                   (powerline-fill center-face (powerline-width rhs))
+                   (powerline-render rhs))))))
+    (powerline-reset)
+    (kill-local-variable 'mode-line-format))
+#+END_SRC
+**** Config
  #+BEGIN_SRC emacs-lisp
  (use-package powerline)
  (use-package airline-themes)
@@ -850,46 +736,74 @@
  (my-airline-theme)
  (setq battery-mode-line-format "[%b%p%%%%]")
  #+END_SRC
-**** Smart Mode Line
-     #+BEGIN_SRC emacs-lisp#
-      (use-package smart-mode-line)
-      (setq sml/theme 'powerline)
-      (sml/setup)
-
-     #+END_SRC
-**** Ocodo
-     #+BEGIN_SRC emacs-lisp#
-     (use-package ocodo-svg-modelines)
-     #+END_SRC
-*** Splash image
-    #+BEGIN_SRC emacs-lisp
-    (setq fancy-splash-image "~/.emacs.d/res/icon.png")
+*** Smart Mode Line
+    #+BEGIN_SRC emacs-lisp#
+     (use-package smart-mode-line-powerline-theme)
+     (use-package smart-mode-line)
+     (setq sml/theme 'powerline)
+     (setq rm-blacklist  )
+     (sml/setup)
     #+END_SRC
-** Navigation
-*** Helm & counsel/ivy
+*** Ocodo
+    #+BEGIN_SRC emacs-lisp#
+    (use-package ocodo-svg-modelines)
+    #+END_SRC
+** Splash image
+   #+BEGIN_SRC emacs-lisp
+   (setq fancy-splash-image "~/.emacs.d/res/icon.png")
+   #+END_SRC
+** Font
+ #+BEGIN_SRC emacs-lisp
+   ;(set-face-attribute 'default t :font "Dotsies Training Wheels-20")
+   ;(add-to-list 'default-frame-alist '(font . "Dotsies Training Wheels-20"))
+   (let ((font (format "%s"
+                       "RobotoMono-11"
+                       ;; "Tamzen"
+                       ;; "SourceCodePro"
+                       ;; "Gohu Gohufont"
+                       )))
+     (add-to-list 'default-frame-alist `(font . ,font)))
+   ;;(set-frame-font "RobotoMono-11")
+ #+END_SRC
+* Navigation
+** IDO
+ #+BEGIN_SRC emacs-lisp
+ (use-package ido)
+ (ido-mode t)
+ #+END_SRC
+** Helm & counsel/ivy
+ #+BEGIN_SRC emacs-lisp
+   (use-package helm)
+   (require 'helm-config)
+   ;(helm-mode 1)
+   ;(setq ivy-initial-inputs-alist nil)
+   (use-package ivy)
+   (use-package smex)
+   (use-package counsel)
+   (ivy-mode 1)
+
+   ;(advice-add 'ivy-completion-in-region :before (lambda (start end collection &optional predicate) (insert " ")))
+
+   (add-to-list 'ivy-initial-inputs-alist '(org-refile . ""))
+   (add-to-list 'ivy-initial-inputs-alist '(org-agenda-refile . ""))
+   (add-to-list 'ivy-initial-inputs-alist '(org-capture-refile . ""))
+   (add-to-list 'ivy-initial-inputs-alist '(counsel-M-x . ""))
+
+   (define-key ivy-minibuffer-map (kbd "<return>") 'ivy-alt-done)
+   (define-key ivy-minibuffer-map (kbd "C-<return>") 'ivy-done)
+   (global-set-key (kbd "C-h M-x") 'helm-M-x)
+   (global-set-key (kbd "M-x") 'counsel-M-x)
+ #+END_SRC
+** Swiper or counsel-grep
+   #+BEGIN_SRC emacs-lisp
+     (global-set-key (kbd "C-s") 'counsel-grep-or-swiper)
+     (setq counsel-grep-base-command "grep --ignore-case -E -n -e %s %s")
+   #+END_SRC
+** transpose-frame
 #+BEGIN_SRC emacs-lisp
-  (use-package helm)
-  (require 'helm-config)
-  (use-package company)
-  ;(helm-mode 1)
-  ;(setq ivy-initial-inputs-alist nil)
-  (use-package ivy)
-  (use-package smex)
-  (ivy-mode 1)
 
-  ;(advice-add 'ivy-completion-in-region :before (lambda (start end collection &optional predicate) (insert " ")))
-
-  (add-to-list 'ivy-initial-inputs-alist '(org-refile . ""))
-  (add-to-list 'ivy-initial-inputs-alist '(org-agenda-refile . ""))
-  (add-to-list 'ivy-initial-inputs-alist '(org-capture-refile . ""))
-  (add-to-list 'ivy-initial-inputs-alist '(counsel-M-x . ""))
-
-  (define-key ivy-minibuffer-map (kbd "<return>") 'ivy-alt-done)
-  (define-key ivy-minibuffer-map (kbd "C-<return>") 'ivy-done)
-  (global-set-key (kbd "C-h M-x") 'helm-M-x)
-  (global-set-key (kbd "M-x") 'counsel-M-x)
 #+END_SRC
-*** Evil mode
+** Evil mode
 #+BEGIN_SRC emacs-lisp
   (use-package evil)
   (global-set-key (kbd "C-z") 'evil-local-mode)
@@ -900,18 +814,20 @@
   (evil-set-initial-state 'help-mode 'emacs)
   (evil-mode 1)
 #+END_SRC
-*** Buffer handling
-**** Ido mode
+** Ace window
 #+BEGIN_SRC emacs-lisp
-(use-package ido)
-(ido-mode t)
+(use-package switch-window)
+(global-set-key (kbd "C-x o") 'switch-window)
+(setq switch-window-shortcut-style 'qwerty)
+(setq switch-window-qwerty-shortcuts
+      '("a" "o" "e" "u" "i" "d" "h" "t" "n" "s"))
 #+END_SRC
-**** ibuffer
-***** Keybindings
+** ibuffer
+*** Keybindings
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 #+END_SRC
-***** Config
+*** Config
 #+BEGIN_SRC emacs-lisp
   (require 'ibuf-ext)
   (autoload 'ibuffer "ibuffer" "List buffers." t)
@@ -959,7 +875,7 @@
                (ibuffer-switch-to-saved-filter-groups "General")
                (ibuffer-do-sort-by-alphabetic)))
 #+END_SRC
-***** Custom Filters
+*** Custom Filters
 #+BEGIN_SRC emacs-lisp
   (eval-after-load "ibuf-ext"
     '(define-ibuffer-filter directory-name
@@ -971,33 +887,12 @@
 
   ;(add-hook 'exwm-workspace-switch-hook 'ibuffer)
 #+END_SRC
-**** Ace window
-#+BEGIN_SRC emacs-lisp
-(use-package switch-window)
-(global-set-key (kbd "C-x o") 'switch-window)
-(setq switch-window-shortcut-style 'qwerty)
-(setq switch-window-qwerty-shortcuts
-      '("a" "o" "e" "u" "i" "d" "h" "t" "n" "s"))
-#+END_SRC
 *** Ace jump
 #+BEGIN_SRC emacs-lisp
 (use-package ace-jump-mode)
 (global-set-key (kbd "C-c SPC") 'ace-jump-mode)
 (global-set-key (kbd "C-c j") 'ace-jump-line-mode)
 #+END_SRC
-** Font
- #+BEGIN_SRC emacs-lisp
-   ;(set-face-attribute 'default t :font "Dotsies Training Wheels-20")
-   ;(add-to-list 'default-frame-alist '(font . "Dotsies Training Wheels-20"))
-   (let ((font (format "%s"
-                       "RobotoMono-11"
-                       ;; "Tamzen"
-                       ;; "SourceCodePro"
-                       ;; "Gohu Gohufont"
-                       )))
-     (add-to-list 'default-frame-alist `(font . ,font)))
-   ;;(set-frame-font "RobotoMono-11")
- #+END_SRC
 * Tools
 ** Encryption
 #+BEGIN_SRC emacs-lisp
@@ -1009,14 +904,17 @@
 ** Org Mode
 *** Keybindings
 #+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "M-–") (lambda () (interactive) (org-agenda "" "p")))
+(global-set-key (kbd "M-•") (lambda () (interactive) (org-agenda "" "n")))
 (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key (kbd "M-∀") 'org-agenda)
 (global-set-key "\C-cc" 'org-capture)
 (global-set-key "\C-cb" 'org-iswitchb)
 (global-set-key (kbd "<f5>") 'org-agenda)
-(global-set-key (kbd "<f11>") (lambda () (interactive) (org-agenda "" "g")))
+(global-set-key (kbd "<f11>") (lambda () (interactive) (org-agenda "" "p")))
 (global-set-key (kbd "<f9>") 'org-capture)
+(global-set-key (kbd "<f12>") (lambda () (interactive) (org-agenda "" "n")))
 (global-set-key (kbd "C-x C-o") 'org-agenda)
 (define-key org-mode-map (kbd "C-c SPC") nil)
 (define-key org-agenda-mode-map (kbd "a") 'org-agenda)
@@ -1118,7 +1016,7 @@
           ("ejp" "Plan your day" entry (file+olp+datetree "~/MEGA/org/entries/journal.gpg")
            (file "~/MEGA/org/templates/daily-plan.org"))
           ("l" "Later")
-          ("lr" "Read Later" entry (file+headline "~/MEGA/org/agenda/someday.org" "Things to read")
+          ("lr" "Read Later" entry (file+headline "~/MEGA/org/agenda/lists.org" "Things to read")
            "* TODO %?\n%U\n")
           ("ll" "Links for life" entry (file "~/MEGA/org/entries/links.org")
            "* %?")
@@ -1126,11 +1024,15 @@
           ("cc" "Conference Via Bus" entry (file "~/MEGA/org/agenda/refile.org")
            (file "~/MEGA/org/checklists/conference.org")
            :conference/airplane nil)
+          ("cm" "Morning routine" entry (file "~/MEGA/org/entries/routines.org")
+           (file "~/MEGA/org/checklists/mornings.org"))
+          ("cn" "Nightly routine" entry (file "~/MEGA/org/entries/routines.org")
+           (file "~/MEGA/org/checklists/nights.org"))
           ;("w" "Weekly Thoughts" entry (function org-capture-function)
           ;  "** %<%R> %?")
-          ("p" "Protocol" entry (file+headline "~/MEGA/org/entries/org-protocol.org" "Inbox")
+          ("p" "Protocol" entry (file+headline "~/MEGA/org/agenda/org-protocol.org" "Inbox")
            "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
-          ("L" "Protocol Link" entry (file+headline "~/MEGA/org/entries/org-protocol.org" "Inbox")
+          ("L" "Protocol Link" entry (file+headline "~/MEGA/org/agenda/org-protocol.org" "Inbox")
            "* %? [[%:link][%:description]] \nCaptured On: %U")))
 #+END_SRC
 *** org-agenda
@@ -1173,9 +1075,9 @@
 
   (setq org-todo-keywords
          '((sequence "STUFF(s)" "SOMEDAY(P)" "|")
-           (sequence "TODO(t)" "ONE(o)" "NEXT(n)" "READ(r)" "|" "DONE(d!)")
-           (sequence "PROJECT(p)" "|" "COMPLETE(c)")
-           (sequence  "WAIT(w@/!)" "HOLD(h)" "TICKLER())" "|" "ABANDON(a@/!)")))
+           (sequence "TODO(t)" "ONE(o)" "NEXT(n)" "READ(r)" "HABIT(H)" "|" "DONE(d!)")
+           (sequence "PROJECT(p)" "ETERNAL(e)" "|" "COMPLETE(c)")
+           (sequence  "WAIT(w@/!)" "HOLD(h)" "TICKLER())" "FORGOTTEN(f)" "|" "ABANDON(a@/!)")))
 
   (setq org-todo-keyword-faces 
         '(("ONE" :foreground "royal blue" :weight bold)
@@ -1184,7 +1086,8 @@
           ("WAIT" :foreground "yellow" :weight bold)
           ("HOLD" :foreground "red" :weight bold)
           ("PROJECT" :foreground "white" :weight bold)
-          ("ABANDON" :foreground "dark gray" :weight bold)))
+          ("ABANDON" :foreground "dark gray" :weight bold)
+          ("FORGOTTEN" :foreground "dark gray" :weight bold)))
 
   (setq org-todo-state-tags-triggers
         (quote (("HOLD" ("HOLD" . t))
@@ -1196,21 +1099,13 @@
   ;(setq org-agenda-files (quote ("~/MEGA/org/agenda")))
   (org-agenda-load-file-list)
 
-  (setq my/non-agenda-refiles
-        
-          '(("~/MEGA/org/agenda/tickler.org" :maxlevel . 9)
-          ("~/MEGA/org/agenda/reference.org" :maxlevel . 9)
-          ("~/MEGA/org/agenda/reads.org" :maxlevel . 9)
-          ("~/MEGA/org/entries/important.gpg" :maxlevel . 9)
-          ("~/MEGA/org/agenda/habits.org" :maxlevel . 9)))
   ; Targets include this file and any file contributing to the agenda - up to 9 levels deep
   (setq org-refile-targets `((nil :maxlevel . 9)
-                             (org-agenda-files :maxlevel . 9)
-                             ,@my/non-agenda-refiles))
+                             (org-agenda-files :maxlevel . 9)))
 
   (setq org-refile-target-verify-function
         (lambda () 
-          (let ((tags (org-get-tags)))
+          (let ((tags (org-get-tags-at)))
             (and (not (member "ARCHIVE" tags))
                  (not (equal "DONE" (org-get-todo-state)))))))
 
@@ -1300,7 +1195,7 @@
                                 (not has-subtask))))))
 
        (defun my/is-standalone-task-p ()
-         (and (bh/is-task-p)
+         (and (my/is-a-task)
               (not (bh/is-subproject-p))))
 
        (defun bh/is-next-task-p ()
@@ -1608,16 +1503,18 @@
 
 
        (defun my/is-standalone-task ()
-         (and (not (member (org-get-todo-state) '("WAIT" "PROJECT" "SOMEDAY")))
+         (and (not (member (org-get-todo-state) '("WAIT" "PROJECT" "SOMEDAY" "TICKLER")))
+              (not (member "ARCHIVE" (org-get-tags-at)))
               (not (my/is-part-of-subtree))
               (not (my/is-a-project))))
 
        (defun my/is-a-task ()
          (save-excursion
            (and (org-get-todo-state)
+                (not (member "NOT_TASKS" (org-get-tags-at)))
                 (let ((curr-indent (org-current-level)))
                   (while (and (outline-next-heading)
-                              (not (member "ARCHIVE" (org-get-tags)))
+                              (not (member "ARCHIVE" (org-get-tags-at)))
                               (not (org-get-todo-state))))
                   (>= curr-indent
                       (org-current-level))))))
@@ -1655,10 +1552,10 @@
          (save-excursion
            (let ((todo (org-get-todo-state)))
              (when todo
-               (or (equal todo "PROJECT")
+               (or (member todo '("PROJECT" "ETERNAL" "HOLD"))
                    (and (equal todo "ONE")
                         (my/has-next-task))
-                   (and (member todo '("TODO" "WAIT" "SOMEDAY" "HOLD"))
+                   (and (member todo '("TODO" "WAIT" "SOMEDAY"))
                         (my/has-subtask)))))))
 
        (defvar my/ambiguous-projects-default-to-stuck t)
@@ -1709,7 +1606,8 @@
            (when (my/is-a-project)
              (let ((subtree-end (save-excursion (org-end-of-subtree t)))
                    (todo (org-get-todo-state)))
-               (cond ((equal todo "SOMEDAY") 'someday)
+               (cond ((equal todo "ETERNAL") 'eternal)
+                     ((equal todo "SOMEDAY") 'someday)
                      ((equal todo "HOLD") 'hold)
                      ((equal todo "WAIT") 'wait)
                      ((org-time> (org-entry-get (point) "SCHEDULED") "<now>") 'delayed)
@@ -1727,7 +1625,10 @@
          (save-restriction
            (widen)
            (let ((subtree-end (save-excursion (org-end-of-subtree t))))
-             (unless (or ;(my/is-standalone-task)
+             (unless (or (and (my/is-a-task)
+                              (my/is-standalone-task)
+                              (not (org-get-scheduled-time (point)))
+                              (not (org-get-deadline-time (point))))
                          (eq (my/get-project-type buffer-file-name (point) t)
                              'stuck))
                subtree-end))))
@@ -1783,9 +1684,10 @@
 
        (defun my/show-next-tasks-and-standalone-tasks ()
          (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
-           (unless (or (and (my/is-a-task)
-                            (my/is-next-task))
-                       (my/is-standalone-task))
+           (unless (and (my/is-a-task)
+                        (or 
+                         (my/is-next-task)
+                         (my/is-standalone-task)))
              next-headline)))
      #+END_SRC
 **** Views
@@ -1886,6 +1788,8 @@
        ;; Investigate
        (setq org-sort-agenda-notime-is-late t)
 
+       (setq org-agenda-hide-tags-regexp "NOT_TASKS\\|PROJECT")
+
        (setq org-agenda-custom-commands
              `(("p" "Project View"
                 ((tags-todo "-REFILE/!"
@@ -1897,10 +1801,14 @@
                  (tags-todo "-REFILE/!"
                             ((org-agenda-overriding-header "Delayed projects")
                              (org-agenda-skip-function 'my/show-delayed-projects)))
-                 (todo "HOLD"
-                       ((org-agenda-overriding-header "Projects on hold")))
-                 (tags-todo "+PROJECTS+SOMEDAY"
+                 (tags-todo "-PEOPLE/!HOLD"
+                            ((org-agenda-overriding-header "Projects on hold")))
+                 (tags-todo "+PEOPLE/!HOLD"
+                            ((org-agenda-overriding-header "People on hold")))
+                 (tags-todo "+PROJECTS/!TODO"
                             ((org-agenda-overriding-header "Someday projects")))
+                 (todo "ETERNAL"
+                       ((org-agenda-overriding-header "Eternal Projects")))
                  (tags-todo "-REFILE-HOLD/!"
                             ((org-agenda-overriding-header "Active Projects")
                              (org-agenda-skip-function 'my/show-active-projects)
@@ -1911,9 +1819,8 @@
                              (org-agenda-overriding-header "Today's plan")))
                  (tags-todo "+REFILE|TODO=\"STUFF\""
                             ((org-agenda-overriding-header "Refile tasks")))
-                 (tags-todo "+TICKLER+SCHEDULED<\"<today>\""
-                            ((org-agenda-files '("~/MEGA/org/agenda/tickler.org"))
-                             (org-agenda-overriding-header "Tickler")))
+                 (tags-todo "+SCHEDULED<\"<today>\"/!TICKLER"
+                            ((org-agenda-overriding-header "Tickler")))
                  (tags-todo "-REFILE/!"
                             ((org-agenda-overriding-header "Stuck Projects")
                              (org-tags-match-list-sublevels 'indented)
@@ -1924,9 +1831,8 @@
                             (;(org-agenda-skip-function 'my/only-next-projects-and-tasks)
                              (org-agenda-overriding-header "Tasks in other courts")
                              (org-tags-match-list-sublevels t)))
-                 (tags-todo "+DEADLINE<\"<tomorrow>\"/!"
-                            ((org-agenda-overriding-header "Incomplete Habits")
-                             (org-agenda-files '("~/MEGA/org/agenda/habits.org"))))
+                 (tags-todo "+DEADLINE<\"<tomorrow>\"-SCHEDULED>\"<now>\"/!HABIT"
+                            ((org-agenda-overriding-header "Incomplete Habits")))
                  (tags-todo "-REFILE-HOLD-WAIT-SCHEDULED>\"<now>\"+DEADLINE<\"<tomorrow>\"/!"
                             ((org-agenda-skip-function 'my/show-next-tasks-and-standalone-tasks)
                              (org-agenda-overriding-header "Done by today")
@@ -1942,13 +1848,12 @@
                              (org-agenda-overriding-header "Tasks with Deadlines")
                              (org-tags-match-list-sublevels t)
                              (org-agenda-sorting-strategy '(deadline-up))))
-                 (tags-todo "-REFILE-HOLD-SOMEDAY-DEADLINE={.}-SCHEDULED={.}/!"
-                            ((org-agenda-skip-function 'my/show-next-tasks-and-standalone-tasks)
-                             (org-agenda-overriding-header "Inactive Tasks")
-                             (org-tags-match-list-sublevels t)))
                  )
                 nil
                 ("~/MEGA/org/agenda/tasks.html"))
+               ("l" . "Leisure")
+               ("la" "Articles" tags-todo "READ/!TODO")
+               ("lv" "Videos" tags-todo "VIDEO/!TODO")
                ("w" "Next week"
                 ((tags-todo "-REFILE/!"
                             ((org-agenda-overriding-header "Stuck Projects")
@@ -1958,8 +1863,7 @@
                               '(category-keep))))
                  (agenda ""
                          ((org-agenda-skip-function 'my/show-next-tasks-and-standalone-tasks)
-                          (org-agenda-start-on-weekday nil)
-                          (org-agenda-start-day "-Fri")))))
+                          (org-agenda-start-on-weekday 5)))))
                ("h" "Projects on hold" todo "HOLD" ((org-tags-match-list-sublevels 'indented)))
                ("t" "Tickler" agenda ""
                 ((org-agenda-files (cons "/home/benson/MEGA/org/agenda/tickler.org" org-agenda-files))
@@ -2025,6 +1929,12 @@
      '((clojure . t)))
    #+END_SRC
 *** Plugins
+**** fstree
+     #+BEGIN_SRC emacs-lisp
+       (add-to-list 'load-path
+                    "~/.emacs.d/custom/org-fstree")
+       (require 'org-fstree)
+     #+END_SRC
 **** org-bullets
 #+BEGIN_SRC emacs-lisp
 (use-package org-bullets)
@@ -2301,8 +2211,12 @@
     (use-package cider)
     (use-package clojure-mode)
     #+END_SRC
+*** YAML
+    #+BEGIN_SRC emacs-lisp
+    (use-package yaml-mode)
+    #+END_SRC
 ** Freekeys
-   #+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lisp#
    (use-package free-keys)
    (bind-key "C-h C-k" 'free-keys)
    #+END_SRC 
@@ -2314,11 +2228,6 @@
                (w3m-goto-url "https://google.com")))
    #+END_SRC
 * New
-** Swiper or counsel-grep
-   #+BEGIN_SRC emacs-lisp
-     (global-set-key (kbd "C-s") 'counsel-grep-or-swiper)
-     (setq counsel-grep-base-command "grep --ignore-case -E -n -e %s %s")
-   #+END_SRC
 ** Youtube-dl
    #+BEGIN_SRC emacs-lisp
      (add-to-list 'load-path "~/.emacs.d/custom/youtube-dl-emacs/")
@@ -2484,6 +2393,16 @@
 ** ediff
    #+BEGIN_SRC emacs-lisp
    (setq ediff-window-setup-function 'ediff-setup-windows-plain)
+   #+END_SRC
+** Scroll interval
+   #+BEGIN_SRC emacs-lisp
+     (setq scroll-margin 1
+           hscroll-margin 2
+           hscroll-step 1
+           scroll-conservatively 101
+           scroll-preserve-screen-position t
+           mouse-wheel-scroll-amount '(1)
+           mouse-wheel-progressive-speed nil)
    #+END_SRC
 * Broken
 ** mu4e

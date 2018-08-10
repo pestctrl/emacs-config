@@ -24,30 +24,30 @@
 ** Multimonitor support
 #+BEGIN_SRC emacs-lisp
 (require 'exwm-randr)
-(setq exwm-randr-workspace-output-plist '(2 "HDMI1" 3 "HDMI1"))
+(setq exwm-randr-workspace-output-plist '(2 "DP1" 3 "DP1"))
 (exwm-randr-enable)
 #+END_SRC
 ** Keybindings
 #+BEGIN_SRC emacs-lisp
   (use-package transpose-frame)
   (setq exwm-input-global-keys
-	`(([?\s-r] . exwm-reset)
-	  ([?\s-w] . exwm-workspace-switch)
-	  ([?\s-l] . lock-screen)
-	  ,@(mapcar (lambda (i)
-		      `(,(kbd (format "s-%d" (mod (1+ i) 10))) .
-			(lambda ()
-			  (interactive)
-			  (exwm-workspace-switch-create ,i))))
-		    (number-sequence 0 9))
-	  (,(kbd "s-b") . ivy-switch-buffer)
-	  (,(kbd "s-a") . org-agenda)
-	  (,(kbd "s-c") . org-capture)
-	  (,(kbd "s-h") . split-window-right)
-	  (,(kbd "s-t") . split-window-below)
-	  (,(kbd "s-n") . switch-window)
-	  (,(kbd "s-k") . ido-kill-buffer)
-	  (,(kbd "s-s") . resize-window)))
+        `(([?\s-r] . exwm-reset)
+          ([?\s-w] . exwm-workspace-switch)
+          ([?\s-l] . lock-screen)
+          ,@(mapcar (lambda (i)
+                      `(,(kbd (format "s-%d" (mod (1+ i) 10))) .
+                        (lambda ()
+                          (interactive)
+                          (exwm-workspace-switch-create ,i))))
+                    (number-sequence 0 9))
+          (,(kbd "s-b") . ivy-switch-buffer)
+          (,(kbd "s-a") . org-agenda)
+          (,(kbd "s-c") . org-capture)
+          (,(kbd "s-h") . split-window-right)
+          (,(kbd "s-t") . split-window-below)
+          (,(kbd "s-n") . switch-window)
+          (,(kbd "s-k") . ido-kill-buffer)
+          (,(kbd "s-s") . resize-window)))
   (global-set-key (kbd "M-T") 'flop-frame)
   (global-set-key (kbd "C-x p") 'launch-program)
   (global-set-key (kbd "M-…") 'multi-term)
@@ -57,20 +57,20 @@
     "Prompt for a workspace, returning the workspace frame."
     (exwm-workspace--update-switch-history)
     (let* ((current-idx (exwm-workspace--position exwm-workspace--current))
-	   (history-add-new-input nil)  ;prevent modifying history
-	   (history-idx (read-from-minibuffer
-			 (or prompt "Workspace: ")
-			 (elt exwm-workspace--switch-history current-idx)
-			 exwm-workspace--switch-map nil
-			 `(exwm-workspace--switch-history . ,(1+ current-idx))))
-	   (workspace-idx (mod (1- (cl-position history-idx exwm-workspace--switch-history
-				       :test #'equal)) 
-			       10)))
+           (history-add-new-input nil)  ;prevent modifying history
+           (history-idx (read-from-minibuffer
+                         (or prompt "Workspace: ")
+                         (elt exwm-workspace--switch-history current-idx)
+                         exwm-workspace--switch-map nil
+                         `(exwm-workspace--switch-history . ,current-idx)))
+           (workspace-idx (mod (1- (cl-position history-idx exwm-workspace--switch-history
+                                       :test #'equal)) 
+                               10)))
       (elt exwm-workspace--list workspace-idx)))
 
   (advice-add 'exwm-workspace--prompt-for-workspace
-	      :override
-	      #'prompt-workspace)
+              :override
+              #'prompt-workspace)
 #+END_SRC
 ** Helper functions
 #+BEGIN_SRC emacs-lisp
@@ -80,7 +80,7 @@
      (setq i3-string "Xephyr -br -ac -noreset -resizeable -screen 1920x1080 :1 & sleep 1s; DISPLAY=:1 i3")
      (defvar exwm-startup-programs
        '("megasync"
-         ("compton -f -i .7 -b" "compton")
+         ("compton -f -i .7 -b")
          ("/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1")
          ("nm-applet")
          ;(i3-string)
@@ -994,6 +994,8 @@
   (setq org-capture-templates
         '(("t" "Todo" entry (file "~/MEGA/org/agenda/refile.org")
            "* STUFF %?\n  :PROPERTIES:\n  :CREATED: %U\n  :VIEWING: %a\n  :END:")
+          ("w" "Web" entry (file "~/MEGA/org/agenda/refile.org")
+           "* TODO [[%^{URL}][%^{Title}]]\n  :PROPERTIES:\n  :CREATED: %U\n  :END:")
           ("f" "Reference" entry (file "~/MEGA/org/agenda/reference.org")
           "* %?\n%i%U")
           ("r" "Reviews")
@@ -2215,6 +2217,10 @@
     #+BEGIN_SRC emacs-lisp
     (use-package yaml-mode)
     #+END_SRC
+*** show parens
+    #+BEGIN_SRC emacs-lisp
+      (show-paren-mode t)
+    #+END_SRC
 ** Freekeys
    #+BEGIN_SRC emacs-lisp#
    (use-package free-keys)
@@ -2495,12 +2501,12 @@
    (define-key xwidget-webkit-mode-map [mouse-5] 'xwidget-webkit-scroll-up)
    #+END_SRC 
 ** Slime mode
- #+BEGIN_SRC emacs-lisp#
+ #+BEGIN_SRC emacs-lisp
  (use-package slime)
  (add-hook 'lisp-mode-hook (lambda () (slime-mode t)))
  (add-hook 'inferior-lisp-mode-hook (lambda () (inferior-slime-mode t)))
  (setq inferior-lisp-program "/usr/bin/sbcl")
- (load (expand-file-name "~/quicklisp/slime-helper.el"))
+ (slime-setup '(slime-fancy slime-asdf))
  #+END_SRC
 ** i3wm interaction
   #+BEGIN_SRC emacs-lisp#

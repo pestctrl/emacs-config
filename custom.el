@@ -6,9 +6,12 @@
  '(custom-safe-themes
    (quote
     ("003a9aa9e4acb50001a006cfde61a6c3012d373c4763b48ceb9d523ceba66829" default)))
+ '(org-agenda-files
+   (quote
+    ("~/MEGA/org/agenda/reference.org" "~/MEGA/org/agenda/agenda.org" "~/MEGA/org/agenda/refile.org")))
  '(package-selected-packages
    (quote
-    (undo-tree multi-term counsel swiper color-theme-modern org org-plus-contrib use-package exwm))))
+    (counsel-projectile helm-projectile projectile slime pulseaudio-control evil undo-tree multi-term swiper color-theme-modern org org-plus-contrib use-package exwm))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

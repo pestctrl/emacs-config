@@ -52,6 +52,8 @@
     
 **** [[https://www.youtube.com/feeds/videos.xml?channel_id=UC768XN2ZjMYtNsPT6hcvbCA][Dana ASMR]]
 **** [[https://www.youtube.com/feeds/videos.xml?channel_id=UC-r8XyqbggZobMiNsqgWkDg][Springbok ASMR]]
+** News
+*** [[https://www.sciencedaily.com/rss/computers_math.xml][Science Daily Computers and Math]]
 * Test                                                               :ignore:
 ** Remaining
 *** [[https://www.youtube.com/feeds/videos.xml?channel_id=UCxNcCtPqqGIMEDwDACPVoHg][Gaijin Goombah Media]]
@@ -209,3 +211,4 @@
 *** [[https://www.youtube.com/feeds/videos.xml?channel_id=UCYh0dZLbJoQ-I-So_GureAQ][praisegugleourmaster]]
 *** [[https://www.youtube.com/feeds/videos.xml?channel_id=UCCAgrIbwcJ67zIow1pNF30A][nottinghamscience]]
 *** [[https://www.youtube.com/feeds/videos.xml?channel_id=UC1MwJy1R0nGQkXxRD9p-zTQ][Barnacules Nerdgasm]]
+    

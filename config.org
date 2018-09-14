@@ -842,6 +842,11 @@
            ("Terminals"       (mode . term-mode))
            ("emacs-config"    (or (filename . ".emacs.d")
                                   (filename . "emacs-config")))
+           ("code-aux"        (or (mode . slime-repl-mode)
+                                  (mode . magit-status-mode)
+                                  (mode . ein:notebooklist-mode)
+                                  (mode . cider-repl-mode)
+                                  (mode . comint-mode)))
            ("code"            (or (mode . clojure-mode)
                                   (mode . c++-mode)
                                   (mode . c-mode)
@@ -850,7 +855,9 @@
                                   (mode . java-mode)
                                   (mode . js-mode)
                                   (mode . python-mode)
-                                  (mode . ng2-ts-mode)))
+                                  (mode . ng2-ts-mode)
+                                  (mode . lisp-mode)
+                                  (mode . ein:notebook-multilang-mode)))
            ("web"             (or (mode . web-mode)
                                   (mode . mhtml-mode)
                                   (mode . js2-mode)
@@ -927,73 +934,97 @@
 *** Custom Journal
 **** Attempt 3
 #+BEGIN_SRC emacs-lisp
-  (defvar yearly-theme "Surpass")
+    (defvar yearly-theme "Surpass")
 
-  (defun completed-tags-search (start-date end-date)
-    (let ((org-agenda-overriding-header "* Log")
-          (tag-search (concat (format "TODO=\"DONE\"&CLOSED>=\"<%s>\"&CLOSED<=\"<%s>\""
-                      start-date
-                      end-date))))
-      (org-tags-view nil tag-search)))
+    (defun completed-tags-search (start-date end-date)
+      (let ((org-agenda-overriding-header "* Log")
+            (tag-search (concat (format "TODO=\"DONE\"&CLOSED>=\"<%s>\"&CLOSED<=\"<%s>\""
+                                        start-date
+                                        end-date))))
+        (org-tags-view nil tag-search)))
 
-  (defun get-tasks-from (start-date end-date)
-    (let (string)
+    (defun get-tasks-from (start-date end-date)
+      (let (string)
+        (save-window-excursion
+          (completed-tags-search start-date end-date)
+          (setq string (mapconcat 'identity
+                                  (mapcar (lambda (a)
+                                            (concat "***" a))
+                                          (butlast (cdr (split-string (buffer-string) "\n")) 1)) 
+                                  "\n"))
+          (kill-buffer))
+        string))
+
+    (defun get-journal-entries-from (start-date end-date)
+      (let ((string "")
+            match)
+        (save-window-excursion
+          (switch-to-buffer (find-file "~/MEGA/org/entries/journal.gpg"))
+          (goto-char (point-min))
+          (while (setq match 
+                       (re-search-forward
+                        "^\\*\\*\\* \\(2[0-9]\\{3\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\) \\w+$" nil t))
+            (let ((date (match-string 1)))
+              (when (and (org-time< start-date date)
+                         (or (not end-date) (org-time< date end-date)))
+                (org-narrow-to-subtree)
+                (setq string (concat string "\n" (buffer-string)))
+                (widen))))
+          (not-modified)
+          (kill-buffer))
+        string))
+
+    (defun weekly-review-file ()
+      (set-buffer
+       (org-capture-target-buffer (format "~/MEGA/org/entries/review/%s/Year of %s, Week %s.org"
+                                          (format-time-string "%Y")
+                                          yearly-theme
+                                          (format-time-string "%V")))))
+
+    (defun make-up-review-file ()
+      (let* ((date (org-read-date))
+             (week (number-to-string
+                    (org-days-to-iso-week
+                     (org-time-string-to-absolute date)))))
+        (org-capture-put :start-date date)
+        (org-capture-put :start-week week)
+        (set-buffer 
+         (org-capture-target-buffer
+          (format "~/MEGA/org/entries/review/%s/Year of %s, Week %s-%s.org"
+                  (format-time-string "%Y")
+                  yearly-theme
+                  week
+                  (format-time-string "%V"))))))
+
+    (defun output-date ()
       (save-window-excursion
-        (completed-tags-search start-date end-date)
-        (setq string (mapconcat 'identity
-                                (mapcar (lambda (a)
-                                          (concat "***" a))
-                                        (butlast (cdr (split-string (buffer-string) "\n")) 1)) 
-                                "\n"))
-        (kill-buffer))
-      string))
+        (switch-to-buffer (find-file "~/.emacs.d/last-review.el"))
+        (erase-buffer)
+        (insert (org-read-date nil nil ""))
+        (save-buffer)
+        (kill-buffer)
+        ""))
 
-  (defun get-journal-entries-from (start-date end-date)
-    (let ((string "")
-      match)
+    (defun get-last-review-date ()
       (save-window-excursion
-    (switch-to-buffer (find-file "~/MEGA/org/entries/journal.gpg"))
-    (goto-char (point-min))
-    (while (setq match (re-search-forward "^\\*\\*\\* \\(2[0-9]\\{3\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\) \\w+$" nil t))
-    (let ((date (match-string 1)))
-      (when (and (org-time< start-date date)
-             (or (not end-date) (org-time< date end-date)))
-        (org-narrow-to-subtree)
-        (setq string (concat string "\n" (buffer-string)))
-        (widen))))
-    (not-modified)
-    (kill-buffer))
-      string))
+        (set-buffer (find-file "~/.emacs.d/last-review.el"))
+        (buffer-string)))
 
-  (defun weekly-review-file ()
-    (set-buffer
-     (org-capture-target-buffer (format "~/MEGA/org/entries/review/%s/Year of %s, Week %s.org"
-                                        (format-time-string "%Y")
-                                        yearly-theme
-                                        (format-time-string "%V")))))
+    (defun setup-make-up-review ()
+      (let* ((date (org-read-date))
+             (week (number-to-string
+                    (org-days-to-iso-week
+                     (org-time-string-to-absolute date)))))
+        (org-capture-put :start-date date)
+        (org-capture-put :start-week week)))
 
-  (defun make-up-review-file ()
-    (let* ((date (org-read-date))
-           (week (number-to-string
-                  (org-days-to-iso-week
-                   (org-time-string-to-absolute date)))))
-      (org-capture-put :start-date date)
-      (org-capture-put :start-week week)
-      (set-buffer 
-       (org-capture-target-buffer
-        (format "~/MEGA/org/entries/review/%s/Year of %s, Week %s-%s.org"
-                (format-time-string "%Y")
-                yearly-theme
-                week
-                (format-time-string "%V"))))))
-
-  (defun setup-make-up-review ()
-    (let* ((date (org-read-date))
-           (week (number-to-string
-                  (org-days-to-iso-week
-                   (org-time-string-to-absolute date)))))
-      (org-capture-put :start-date date)
-      (org-capture-put :start-week week)))
+    (defun setup-automatic-review ()
+      (let* ((date (org-read-date nil nil (get-last-review-date)))
+             (week (number-to-string
+                    (org-days-to-iso-week
+                     (org-time-string-to-absolute date)))))
+        (org-capture-put :start-date date)
+        (org-capture-put :start-week week)))
 #+END_SRC
 *** Capture templates
 #+BEGIN_SRC emacs-lisp
@@ -1006,6 +1037,8 @@
           ("f" "Reference" entry (file "~/MEGA/org/agenda/reference.org")
           "* %?\n%i%U")
           ("r" "Reviews")
+          ("ra" "Automatic Review" entry (file+function "~/MEGA/org/entries/reviews.gpg" setup-automatic-review)
+           (file "~/MEGA/org/templates/review-interactive-entry.org"))
           ("rw" "Weekly Review" entry (file "~/MEGA/org/entries/reviews.gpg")
            (file "~/MEGA/org/templates/weekly-review-entry-template.org"))
           ("rm" "Make-up Weekly Review" entry (file+function "~/MEGA/org/entries/reviews.gpg" setup-make-up-review)
@@ -1029,10 +1062,10 @@
            (file "~/MEGA/org/checklists/mornings.org"))
           ("cn" "Nightly routine" entry (file "~/MEGA/org/entries/routines.org")
            (file "~/MEGA/org/checklists/nights.org"))
-          ("p" "Protocol" entry (file+headline "~/MEGA/org/agenda/org-protocol.org" "Inbox")
-           "* %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
-          ("L" "Protocol Link" entry (file+headline "~/MEGA/org/agenda/org-protocol.org" "Inbox")
-           "* %? [[%:link][%:description]] \nCaptured On: %U")))
+          ("p" "Protocol" entry (file "~/MEGA/org/agenda/refile.org")
+           "* STUFF %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
+          ("L" "Protocol Link" entry (file "~/MEGA/org/agenda/refile.org")
+           "* STUFF %? [[%:link][%:description]] \nCaptured On: %U")))
 #+END_SRC
 **** disabled 
 #+BEGIN_SRC emacs-lisp#
@@ -1168,14 +1201,15 @@
 
        (defun my/is-a-task ()
          (save-excursion
-           (and (org-get-todo-state)
-                (not (member "NOT_TASKS" (org-get-tags-at)))
-                (let ((curr-indent (org-current-level)))
-                  (while (and (outline-next-heading)
-                              (not (member "ARCHIVE" (org-get-tags-at)))
-                              (not (org-get-todo-state))))
-                  (>= curr-indent
-                      (org-current-level))))))
+           (or (equal "ONE" (org-get-todo-state))
+               (and (org-get-todo-state)
+                    (not (member "NOT_TASKS" (org-get-tags-at)))
+                    (let ((curr-indent (org-current-level)))
+                      (while (and (outline-next-heading)
+                                  (not (member "ARCHIVE" (org-get-tags-at)))
+                                  (not (org-get-todo-state))))
+                      (>= curr-indent
+                          (org-current-level)))))))
 
        (defun my/has-subtask ()
          (save-excursion
@@ -1376,17 +1410,17 @@
 
        (defun bh/org-auto-exclude-function (tag)
          "Automatic task exclusion in the agenda with / RET"
-         (and (cond
-               ((string= tag "hold")
-                t))
-              (concat "-" tag)))
+         (when (string= tag "online")
+           (concat "-" tag)))
 
        (org-defkey org-agenda-mode-map
                    "A"
                    'org-agenda)
 
        (setq org-agenda-auto-exclude-function 'bh/org-auto-exclude-function)
-       (setq org-agenda-skip-deadline-prewarning-if-scheduled t)
+       (setq org-agenda-skip-deadline-prewarning-if-scheduled 'pre-scheduled)
+       (setq org-agenda-skip-scheduled-if-deadline-is-shown nil)
+       (setq org-agenda-log-mode-items '(clock closed))
 
        (defun org-agenda-delete-empty-compact-blocks ()
          "Function removes empty compact blocks. 
@@ -1488,44 +1522,6 @@
                             ((org-agenda-overriding-header "Active Projects")
                              (org-agenda-skip-function 'my/show-active-projects)
                              (org-tags-match-list-sublevels 'indented)))))
-               ;; ("g" "Legacy View" 
-               ;;  ((tags-todo "+PLAN"
-               ;;              ((org-agenda-files '("~/MEGA/org/entries/journal.gpg"))
-               ;;               (org-agenda-overriding-header "Today's plan")))
-               ;;   (tags-todo "+REFILE|TODO=\"STUFF\""
-               ;;              ((org-agenda-overriding-header "Refile tasks")))
-               ;;   (tags-todo "+SCHEDULED<\"<today>\"/!TICKLER"
-               ;;              ((org-agenda-overriding-header "Tickler")))
-               ;;   (tags-todo "-REFILE/!"
-               ;;              ((org-agenda-overriding-header "Stuck Projects")
-               ;;               (org-tags-match-list-sublevels 'indented)
-               ;;               (org-agenda-skip-function 'my/show-stuck-projects)
-               ;;               (org-agenda-sorting-strategy
-               ;;                '(category-keep))))
-               ;;   (tags-todo "-REFILE-HOLD+TODO=\"WAIT\""
-               ;;              (;(org-agenda-skip-function 'my/only-next-projects-and-tasks)
-               ;;               (org-agenda-overriding-header "Tasks in other courts")
-               ;;               (org-tags-match-list-sublevels t)))
-               ;;   (tags-todo "+DEADLINE<\"<tomorrow>\"-SCHEDULED>\"<now>\"/!HABIT"
-               ;;              ((org-agenda-overriding-header "Incomplete Habits")))
-               ;;   (tags-todo "-REFILE-HOLD-WAIT-SCHEDULED>\"<now>\"+DEADLINE<\"<tomorrow>\"/!"
-               ;;              ((org-agenda-skip-function 'my/show-next-tasks-and-standalone-tasks)
-               ;;               (org-agenda-overriding-header "Done by today")
-               ;;               (org-tags-match-list-sublevels t)
-               ;;               (org-agenda-sorting-strategy '(deadline-up))))
-               ;;   (tags-todo "-REFILE-HOLD-WAIT+SCHEDULED<=\"<now>\"-DEADLINE<\"<tomorrow>\"/!"
-               ;;              ((org-agenda-skip-function 'my/show-next-tasks-and-standalone-tasks)
-               ;;               (org-agenda-overriding-header "Scheduled Tasks")
-               ;;               (org-tags-match-list-sublevels t)
-               ;;               (org-agenda-sorting-strategy '(scheduled-up))))
-               ;;   (tags-todo "-REFILE-HOLD-WAIT+DEADLINE>=\"<tomorrow>\"/!"
-               ;;              ((org-agenda-skip-function 'my/show-next-tasks-and-standalone-tasks)
-               ;;               (org-agenda-overriding-header "Tasks with Deadlines")
-               ;;               (org-tags-match-list-sublevels t)
-               ;;               (org-agenda-sorting-strategy '(deadline-up))))
-               ;;   )
-               ;;  nil
-               ;;  ("~/MEGA/org/agenda/tasks.html"))
                ("c" "Complete View"
                 ((tags-todo "+PLAN"
                             ((org-agenda-files '("~/MEGA/org/entries/journal.gpg"))
@@ -2061,6 +2057,12 @@
    (use-package elpy)
    (elpy-enable)
    #+END_SRC
+** EIN
+#+BEGIN_SRC emacs-lisp
+  (use-package ein)
+  (add-to-list 'exec-path
+               "/home/benson/anaconda3/bin/")
+#+END_SRC
 ** Ledger mode
    #+BEGIN_SRC emacs-lisp
      (use-package ledger-mode
@@ -2130,7 +2132,7 @@
 * Broken
 ** mu4e
 *** General config
- #+BEGIN_SRC emacs-lisp
+ #+BEGIN_SRC emacs-lisp#
  (require 'mu4e)
 
  (add-to-list 'mu4e-view-actions

@@ -1,1 +1,11 @@
-*
+projectile-bookmarks.eld
+recentf
+request
+elpa
+*.el
+ido.last
+smex-items
+tramp
+backups
+auto-save-list
+ac-comphist.dat

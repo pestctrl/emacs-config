@@ -344,6 +344,20 @@
    #+BEGIN_SRC emacs-lisp
    (setq wallpaper-path "/home/benson/.emacs.d/res/digital_space_universe_4k_8k-wide.jpg")
    #+END_SRC
+** Font
+ #+BEGIN_SRC emacs-lisp
+   ;(set-face-attribute 'default t :font "Dotsies Training Wheels-20")
+   ;(add-to-list 'default-frame-alist '(font . "Dotsies Training Wheels-20"))
+   (set-default-font "Monospace 11")
+   (let ((font (format "%s"
+                       "RobotoMono-11"
+                       ;; "Tamzen"
+                       ;; "SourceCodePro"
+                       ;; "Gohu Gohufont"
+                       )))
+     (add-to-list 'default-frame-alist `(font . ,font)))
+   ;; (set-frame-font "RobotoMono-11")
+ #+END_SRC
 ** mode-line
 *** Powerline
 **** Test new mode-line
@@ -752,19 +766,6 @@
    #+BEGIN_SRC emacs-lisp
    (setq fancy-splash-image "~/.emacs.d/res/icon.png")
    #+END_SRC
-** Font
- #+BEGIN_SRC emacs-lisp
-   ;(set-face-attribute 'default t :font "Dotsies Training Wheels-20")
-   ;(add-to-list 'default-frame-alist '(font . "Dotsies Training Wheels-20"))
-   (let ((font (format "%s"
-                       "RobotoMono-11"
-                       ;; "Tamzen"
-                       ;; "SourceCodePro"
-                       ;; "Gohu Gohufont"
-                       )))
-     (add-to-list 'default-frame-alist `(font . ,font)))
-   ;;(set-frame-font "RobotoMono-11")
- #+END_SRC
 * Navigation
 ** IDO
  #+BEGIN_SRC emacs-lisp

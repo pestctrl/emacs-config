@@ -53,7 +53,10 @@
 **** [[https://www.youtube.com/feeds/videos.xml?channel_id=UC768XN2ZjMYtNsPT6hcvbCA][Dana ASMR]]
 **** [[https://www.youtube.com/feeds/videos.xml?channel_id=UC-r8XyqbggZobMiNsqgWkDg][Springbok ASMR]]
 ** News
-*** [[https://www.sciencedaily.com/rss/computers_math.xml][Science Daily Computers and Math]]
+*** [[https://www.sciencedaily.com/rss/computers_math.xml][Science Daily]]
+** Blogs                                                              :BLOGS:
+*** [[https://blog.cleancoder.com/atom.xml][Clean Coder]]
+*** [[http://www.secretgeek.net/Rss][SecretGeek]]
 * Test                                                               :ignore:
 ** Remaining
 *** [[https://www.youtube.com/feeds/videos.xml?channel_id=UCxNcCtPqqGIMEDwDACPVoHg][Gaijin Goombah Media]]

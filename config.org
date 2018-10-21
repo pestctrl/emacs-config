@@ -1449,8 +1449,9 @@
              (while (and (forward-line)
                          (not (eobp)))
                (cond
-                ((eq (get-char-property (point) 'face)
-                     'org-agenda-structure)
+                ((let ((face (get-char-property (point) 'face)))
+                   (or (eq face 'org-agenda-structure)
+                       (eq face 'org-agenda-date-today)))
                  (if previous
                      (delete-region start-pos
                                     (point))

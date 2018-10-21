@@ -2192,6 +2192,27 @@
 
 (setq processing-location "/usr/bin/processing-java")
 #+END_SRC
+** AUR PKGBUILD
+   #+BEGIN_SRC emacs-lisp
+   (use-package pkgbuild-mode)
+   #+END_SRC
+** Golang
+   #+BEGIN_SRC emacs-lisp
+   (use-package go-mode)
+   (add-hook 'go-mode-hook
+          (lambda ()
+            (add-hook 'before-save-hook 'gofmt-before-save)
+            (setq tab-width 4)
+            (setq indent-tabs-mode 1)))
+   #+END_SRC
+** React js
+   #+BEGIN_SRC emacs-lisp
+   (use-package rjsx-mode)
+   #+END_SRC
+** Treemacs
+   #+BEGIN_SRC emacs-lisp
+   (use-package treemacs)
+   #+END_SRC
 * Broken
 ** mu4e
 *** General config

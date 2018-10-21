@@ -1537,13 +1537,11 @@
                              (org-agenda-skip-function 'my/show-active-projects)
                              (org-tags-match-list-sublevels 'indented)))))
                ("c" "Complete View"
-                ((tags-todo "+PLAN"
-                            ((org-agenda-files '("~/MEGA/org/entries/journal.gpg"))
-                             (org-agenda-overriding-header "Today's plan")))
+                (;; (tags-todo "+PLAN"
+                 ;;            ((org-agenda-files '("~/MEGA/org/entries/journal.gpg"))
+                 ;;             (org-agenda-overriding-header "Today's plan")))
                  (tags-todo "+REFILE|TODO=\"STUFF\""
                             ((org-agenda-overriding-header "Refile tasks")))
-                 (tags-todo "+SCHEDULED<\"<today>\"/!TICKLER"
-                            ((org-agenda-overriding-header "Tickler")))
                  (tags-todo "-REFILE/!"
                             ((org-agenda-overriding-header "Stuck Projects")
                              (org-tags-match-list-sublevels 'indented)
@@ -1578,6 +1576,8 @@
                ("l" . "Leisure")
                ("la" "Articles" tags-todo "READ/!TODO")
                ("lv" "Videos" tags-todo "VIDEO/!TODO")
+               ("f" "Calfw" 
+                cfw:open-org-calendar-no-projects)
                ("w" "Next week"
                 ((tags-todo "-REFILE/!"
                             ((org-agenda-overriding-header "Stuck Projects")
@@ -1602,6 +1602,40 @@
                        ((org-agenda-overriding-header "Hello")))
                  ))
                ("d" "Done tasks" todo "DONE|CANCELLED|COMPLETE")))
+
+
+       (defun cfw:open-org-calendar-no-projects (&args)
+         "Open an org schedule calendar in the new buffer."
+         (interactive)
+         (save-excursion
+           (let ((buf (get-buffer "*cfw-calendar*")))
+             (if buf
+                 (switch-to-buffer buf)
+               (let* ((org-agenda-skip-function 'my/agenda-custom-skip)
+                      (source1 (cfw:org-create-source))
+                      (curr-keymap (if cfw:org-overwrite-default-keybinding cfw:org-custom-map cfw:org-schedule-map))
+                      (cp (cfw:create-calendar-component-buffer
+                           :view 'two-weeks
+                           :contents-sources (list source1)
+                           :custom-map curr-keymap
+                           :sorter 'cfw:org-schedule-sorter)))
+                 (switch-to-buffer (cfw:cp-get-buffer cp))
+                 (set (make-variable-buffer-local 'org-agenda-skip-function)
+                      'my/agenda-custom-skip)
+                 (when (not org-todo-keywords-for-agenda)
+                   (message "Warn : open org-agenda buffer first.")))
+               ))))
+
+       ;; (defun cfw:open-org-calendar-no-projects (&args)
+       ;;   (interactive)
+       ;;   (let ((buf (get-buffer "*cfw-calendar*")))
+       ;;     (if buf
+       ;;         (switch-to-buffer buf)
+       ;;       (progn 
+       ;;         (let ((org-agenda-skip-function 'my/agenda-custom-skip))
+       ;;           (cfw:open-org-calendar))
+       ;;         (set (make-variable-buffer-local 'org-agenda-skip-function)
+       ;;              'my/agenda-custom-skip)))))
 
        ;; (remove-hook 'org-agenda-mode-hook
        ;;              'org-store-agenda-views)
@@ -1717,6 +1751,12 @@
 **** org-protocol
      #+BEGIN_SRC emacs-lisp
      (require 'org-protocol)
+     #+END_SRC
+**** org-timeline
+     #+BEGIN_SRC emacs-lisp
+     (use-package org-timeline)
+     (add-hook 'org-agenda-finalize-hook 'org-timeline-insert-timeline :append)
+     
      #+END_SRC
 *** View org files
  #+BEGIN_SRC emacs-lisp

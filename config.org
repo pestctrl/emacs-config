@@ -1678,12 +1678,21 @@
     #+END_SRC
 *** Code-blocks
    #+BEGIN_SRC emacs-lisp
-   (require 'ob-core)
-   (require 'ob-clojure)
-   (setq org-babel-clojure-backend 'cider)
-   (org-babel-do-load-languages
-     'org-babel-load-languages
-     '((clojure . t)))
+     (require 'ob-core)
+     (require 'ob-clojure)
+     (require 'ob-plantuml)
+     (use-package plantuml-mode)
+
+     (setq org-babel-clojure-backend 'cider)
+     (org-babel-do-load-languages
+      'org-babel-load-languages
+      '((clojure . t)
+        (plantuml . t)))
+
+     (defun my-org-confirm-babel-evaluate (lang body)
+       (not (member lang '("plantuml"))))
+
+     (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
    #+END_SRC
 *** Plugins
 **** fstree

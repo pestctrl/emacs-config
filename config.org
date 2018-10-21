@@ -1528,8 +1528,8 @@
                  (tags-todo "+PEOPLE/!HOLD"
                             ((org-agenda-overriding-header "People on hold")))
                  (todo "SOMEDAY"
-                            ((org-agenda-overriding-header "Someday projects")
-                             (org-agenda-sorting-strategy '(tag-up))))
+                       ((org-agenda-overriding-header "Someday projects")
+                        (org-agenda-sorting-strategy '(tag-up))))
                  (todo "ETERNAL"
                        ((org-agenda-overriding-header "Eternal Projects")))
                  (tags-todo "-REFILE-HOLD/!"

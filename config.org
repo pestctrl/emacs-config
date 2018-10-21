@@ -1388,6 +1388,17 @@
            (when (org-get-scheduled-time)
              next-headline)))
 
+       ;; (defun my/agenda-custom-skip ()
+       ;;   (let ((next-headline (save-excursion (or (outline-next-heading) (point-max))))
+       ;;         (current (point))
+       ;;         display)
+       ;;     (save-restriction
+       ;;       (widen)
+       ;;       (save-excursion
+       ;;         (when (or (my/get-project-type "" "")
+       ;;                   (member (org-get-todo-state) '("SOMEDAY" "WAIT" "HABIT" nil)))
+       ;;           next-headline)))))
+
        (defun my/agenda-custom-skip ()
          (let ((next-headline (save-excursion (or (outline-next-heading) (point-max))))
                (current (point))
@@ -1395,7 +1406,7 @@
            (save-restriction
              (widen)
              (save-excursion
-               (when (or (my/get-project-type "" "")
+               (when (or (my/is-a-project)
                          (member (org-get-todo-state) '("SOMEDAY" "WAIT" "HABIT" nil)))
                  next-headline)))))
      #+END_SRC

@@ -177,3 +177,20 @@
         (org-hide-archived-subtrees (point-min) (point-max)))
       (nreverse rtn)))
 #+END_SRC
+* org-timeline at beginning of agenda buffer
+  #+BEGIN_SRC emacs-lisp
+    (defun org-timeline-insert-timeline ()
+      "Insert graphical timeline into agenda buffer."
+      (unless (buffer-narrowed-p)
+        (goto-char (point-min))
+        (while (and (not (eq (get-text-property (line-beginning-position) 'org-agenda-type) 'agenda))
+                    (not (eobp)))
+          (forward-line))
+        (forward-line)
+        (unless (eobp)
+          (let ((inhibit-read-only t))
+            (insert (org-timeline--generate-timeline))
+            (insert (propertize (concat "\n" (make-string (/ (window-width) 2) ?─)) 'face 'org-time-grid) "\n"))
+          ;; enable `font-lock-mode' in agenda view to display the "chart"
+          (font-lock-mode))))
+  #+END_SRC

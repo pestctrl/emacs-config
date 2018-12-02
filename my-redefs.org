@@ -194,3 +194,16 @@
           ;; enable `font-lock-mode' in agenda view to display the "chart"
           (font-lock-mode))))
   #+END_SRC
+* org-caldav bug
+#+BEGIN_SRC emacs-lisp
+    (defun org-caldav-skip-function (backend)
+      (when (eq backend 'icalendar)
+        (org-map-entries
+         (lambda ()
+           (let ((pt (save-excursion (apply 'org-agenda-skip-entry-if org-caldav-skip-conditions))))
+             (when pt
+               (org-todo 'none)
+               (let ((current-prefix-arg '(4))) 
+                 (call-interactively 'org-schedule)
+                 (call-interactively 'org-deadline))))))))
+#+END_SRC

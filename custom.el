@@ -13,7 +13,7 @@
     ("~/MEGA/org/agenda/agenda.org" "~/MEGA/org/agenda/reference.org" "~/MEGA/org/agenda/refile.org")))
  '(package-selected-packages
    (quote
-    (rjsx-mode go-mode go treemacs org-timeline plantuml-mode pkgbuild-mode airline-themes powerline magit-svn ein emacs-ipython-notebook processing-mode web-mode ledger-mode elpy skewer-mode js2-mode dired-narrow pdf-tools yaml-mode clj-refactor paredit geiser magit ensime yasnippet irony company dired-du elfeed-org elfeed ox-reveal oauth2 org-caldav calfw-org calfw-gcal calfw-ical calfw org-bullets ace-jump-mode switch-window counsel smex ivy helm counsel-projectile helm-projectile projectile slime pulseaudio-control evil undo-tree multi-term swiper color-theme-modern org org-plus-contrib use-package exwm))))
+    (keyfreq org-jira eyebrowse omnisharp omnisharp-emacs typescript-mode csharp-mode restclient rjsx-mode go-mode go treemacs org-timeline plantuml-mode pkgbuild-mode airline-themes powerline magit-svn ein emacs-ipython-notebook processing-mode web-mode ledger-mode elpy skewer-mode js2-mode dired-narrow pdf-tools yaml-mode clj-refactor paredit geiser magit ensime yasnippet irony company dired-du elfeed-org elfeed ox-reveal oauth2 org-caldav calfw-org calfw-gcal calfw-ical calfw org-bullets ace-jump-mode switch-window counsel smex ivy helm counsel-projectile helm-projectile projectile slime pulseaudio-control evil undo-tree multi-term swiper color-theme-modern org org-plus-contrib use-package exwm))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

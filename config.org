@@ -936,7 +936,7 @@
 *** Custom Journal
 **** Attempt 3
 #+BEGIN_SRC emacs-lisp
-    (defvar yearly-theme "Surpass")
+    (defvar yearly-theme "Thought")
 
     (defun completed-tags-search (start-date end-date)
       (let ((org-agenda-overriding-header "* Log")
@@ -1536,7 +1536,7 @@
                             ((org-agenda-overriding-header "Active Projects")
                              (org-agenda-skip-function 'my/show-active-projects)
                              (org-tags-match-list-sublevels 'indented)))))
-               ("c" "Complete View"
+               ("g" "General View"
                 (;; (tags-todo "+PLAN"
                  ;;            ((org-agenda-files '("~/MEGA/org/entries/journal.gpg"))
                  ;;             (org-agenda-overriding-header "Today's plan")))
@@ -1693,6 +1693,7 @@
        (not (member lang '("plantuml"))))
 
      (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
+     (setq org-plantuml-jar-path "/opt/plantuml/plantuml.jar")
    #+END_SRC
 *** Plugins
 **** fstree
@@ -1717,40 +1718,41 @@
    #+END_SRC
 **** sync with google calendar
      #+BEGIN_SRC emacs-lisp
-       (require 'url-http)
-       (use-package org-caldav)
-       (use-package oauth2)
-       (setq epa-pinentry-mode 'loopback)
-       (setq plstore-cache-passphrase-for-symmetric-encryption t)
+              (require 'url-http)
+              (use-package org-caldav)
+              (use-package oauth2)
+              (setq epa-pinentry-mode 'loopback)
+              (setq plstore-cache-passphrase-for-symmetric-encryption t)
 
-       (save-excursion
-         (let ((filename "~/.emacs.d/google-calendar-secret.el"))
-           (when (file-exists-p filename)
-             (set-buffer (find-file-noselect filename))
-             (let ((var (eval (read (buffer-string)))))
-               (setq org-caldav-oauth2-client-id (car var)
-                     org-caldav-oauth2-client-secret (cadr var)))
-             (kill-buffer))))
+              (save-excursion
+                (let ((filename "~/.emacs.d/google-calendar-secret.el"))
+                  (when (file-exists-p filename)
+                    (set-buffer (find-file-noselect filename))
+                    (let ((var (eval (read (buffer-string)))))
+                      (setq org-caldav-oauth2-client-id (car var)
+                            org-caldav-oauth2-client-secret (cadr var)))
+                    (kill-buffer))))
 
-       (setq org-caldav-url 'google
-             org-caldav-calendar-id "jqeua8pamjrclakq3bg8mpnlis@group.calendar.google.com"
-             org-caldav-inbox "~/MEGA/org/agenda/test.org"
-             org-caldav-files '("~/MEGA/org/agenda/school.org" "~/MEGA/org/agenda/people.org") 
-             org-icalendar-include-todo nil
-             org-icalendar-include-sexp t
-             org-icalendar-categories '(all-tags category)
-             org-icalendar-use-deadline '(event-if-todo event-if-not-todo todo-due)
-             org-icalendar-use-scheduled '(event-if-todo event-if-not-todo todo-start)
-             org-icalendar-with-timestamps nil
-             org-caldav-delete-org-entries 'never)
-       (defun always-use-loopback (fun context args)
-         (setf (epg-context-pinentry-mode context) epa-pinentry-mode)
-         (funcall fun context args))
-       (advice-add 'epg--start :around #'always-use-loopback)
-       (setq org-caldav-skip-conditions 
-             '(nottodo ("TODO" "NEXT"))
-             )
-       (setq org-caldav-exclude-tags '("ARCHIVE"))
+              (setq org-caldav-url 'google
+                    org-caldav-calendar-id "jqeua8pamjrclakq3bg8mpnlis@group.calendar.google.com"
+                    org-caldav-inbox "~/MEGA/org/agenda/test.org"
+                    org-caldav-files '("~/MEGA/org/agenda/agenda.org")
+                    org-icalendar-include-todo nil
+                    org-icalendar-include-sexps t
+                    org-icalendar-categories '(all-tags category)
+                    org-icalendar-use-deadline '(event-if-todo event-if-not-todo todo-due)
+                    org-icalendar-use-scheduled '(event-if-todo event-if-not-todo todo-start)
+                    org-icalendar-with-timestamps nil
+                    org-caldav-delete-org-entries 'never)
+
+              (setq org-caldav-skip-conditions '(nottodo ("TODO" "NEXT"))
+                    org-caldav-exclude-tags '("ARCHIVE"))
+
+              (defun always-use-loopback (fun context args)
+                (setf (epg-context-pinentry-mode context) epa-pinentry-mode)
+                (funcall fun context args))
+         
+              (advice-add 'epg--start :around #'always-use-loopback)
      #+END_SRC
 **** Reveal.js
      #+BEGIN_SRC emacs-lisp
@@ -1918,7 +1920,7 @@
                 projectile-project-root-files-functions))
   (setq projectile-indexing-method 'native)
   (setq projectile-completion-system 'ivy)
-  (setq projectile-switch-project-action 'neotree-projectile-action)
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 #+END_SRC
 *** hs-minor-mode
 #+BEGIN_SRC emacs-lisp
@@ -2212,6 +2214,24 @@
 ** Treemacs
    #+BEGIN_SRC emacs-lisp
    (use-package treemacs)
+   #+END_SRC
+** C#
+   #+BEGIN_SRC emacs-lisp
+   (use-package csharp-mode)
+   (use-package omnisharp)
+   (add-hook 'csharp-mode-hook 'omnisharp-mode)
+   #+END_SRC
+** Eyebrowse
+   #+BEGIN_SRC emacs-lisp
+   (use-package eyebrowse)
+   (eyebrowse-mode)
+   (global-set-key (kbd "C->") 'eyebrowse-next-window-config)
+   (global-set-key (kbd "C-<") 'eyebrowse-prev-window-config)
+   #+END_SRC
+** org-jira
+   #+BEGIN_SRC emacs-lisp
+   (use-package org-jira)
+   (setq jiralib-url "https://wenningbai.atlassian.net/")
    #+END_SRC
 * Broken
 ** mu4e

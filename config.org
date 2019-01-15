@@ -1040,6 +1040,10 @@
      (global-set-key (kbd "C-s") 'counsel-grep-or-swiper)
      (setq counsel-grep-base-command "grep --ignore-case -E -n -e %s %s")
    #+END_SRC
+** help should still use regular search
+   #+begin_src emacs-lisp
+     (define-key Info-mode-map (kbd "C-s") 'isearch-forward)
+   #+end_src
 ** transpose-frame
 #+BEGIN_SRC emacs-lisp
 
@@ -1076,6 +1080,8 @@
                '(lambda (buf)
                   (with-current-buffer buf
                     (eq major-mode 'helm-major-mode))))
+
+  (define-key ibuffer-mode-map (kbd "C-t") nil)
 
   (setq ibuffer-saved-filter-groups
         '(("General"

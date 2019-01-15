@@ -559,7 +559,7 @@
 ** Dashboard
    #+BEGIN_SRC emacs-lisp
    (use-package dashboard)
-   (dashboard-setup-startup-hook)
+   ;(dashboard-setup-startup-hook)
    #+END_SRC
 ** undo-tree
 #+BEGIN_SRC emacs-lisp
@@ -578,9 +578,13 @@
    #+END_SRC
 ** Font
  #+BEGIN_SRC emacs-lisp
-   ;(set-face-attribute 'default t :font "Dotsies Training Wheels-20")
-   ;(add-to-list 'default-frame-alist '(font . "Dotsies Training Wheels-20"))
-   (set-default-font "Monospace 11")
+   ;;(set-face-attribute 'default t :font "Dotsies Training Wheels-20")
+   ;;(add-to-list 'default-frame-alist '(font . "Dotsies Training Wheels-20"))
+   (set-default-font "LinuxLibertine")
+   (set-default-font "Hack 10")
+   (set-default-font "UbuntuMono 11")
+   (set-default-font "OfficeCodePro 11")
+   (set-default-font "RobotoMono 11")
    (let ((font (format "%s"
                        "RobotoMono-11"
                        ;; "Tamzen"
@@ -588,7 +592,11 @@
                        ;; "Gohu Gohufont"
                        )))
      (add-to-list 'default-frame-alist `(font . ,font)))
-   ;; (set-frame-font "RobotoMono-11")
+   ;; (set-frame-font "Menlo")
+   (defun reading-buffer ()
+     (interactive)
+      (setq buffer-face-mode-face '(:family "LinuxLibertine" :height 200))
+      (buffer-face-mode))
  #+END_SRC
 ** mode-line
 *** Powerline

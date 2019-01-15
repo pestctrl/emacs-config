@@ -13,13 +13,27 @@
     ("~/MEGA/org/agenda/agenda.org" "~/MEGA/org/agenda/reference.org" "~/MEGA/org/agenda/refile.org")))
  '(package-selected-packages
    (quote
-    (keyfreq org-jira eyebrowse omnisharp omnisharp-emacs typescript-mode csharp-mode restclient rjsx-mode go-mode go treemacs org-timeline plantuml-mode pkgbuild-mode airline-themes powerline magit-svn ein emacs-ipython-notebook processing-mode web-mode ledger-mode elpy skewer-mode js2-mode dired-narrow pdf-tools yaml-mode clj-refactor paredit geiser magit ensime yasnippet irony company dired-du elfeed-org elfeed ox-reveal oauth2 org-caldav calfw-org calfw-gcal calfw-ical calfw org-bullets ace-jump-mode switch-window counsel smex ivy helm counsel-projectile helm-projectile projectile slime pulseaudio-control evil undo-tree multi-term swiper color-theme-modern org org-plus-contrib use-package exwm))))
+    (scrollkeeper elfeed-org elfeed rg ag dumb-jump rainbow-delimiters org-super-agenda htmlize exwm-x keyfreq org-jira eyebrowse omnisharp omnisharp-emacs typescript-mode csharp-mode restclient rjsx-mode go-mode go treemacs org-timeline plantuml-mode pkgbuild-mode airline-themes powerline magit-svn ein emacs-ipython-notebook processing-mode web-mode ledger-mode elpy skewer-mode js2-mode dired-narrow pdf-tools yaml-mode clj-refactor paredit geiser magit ensime yasnippet irony company dired-du ox-reveal oauth2 org-caldav calfw-org calfw-gcal calfw-ical calfw org-bullets ace-jump-mode switch-window counsel smex ivy helm counsel-projectile helm-projectile projectile slime pulseaudio-control evil undo-tree multi-term swiper color-theme-modern org org-plus-contrib use-package exwm))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(default ((t (:background "gray8" :foreground "#70FF00"))))
  '(org-agenda-date-today ((t (:inherit org-agenda-date :foreground "cyan" :slant italic :weight bold :height 1.1))))
  '(org-agenda-structure ((t (:foreground "LightSkyBlue" :box (:line-width 1 :color "grey75" :style released-button)))))
+ '(org-ellipsis ((t (:foreground "turquoise"))))
+ '(rainbow-delimiters-depth-1-face ((t (:foreground "#9E1CB2"))))
+ '(rainbow-delimiters-depth-10-face ((t (:foreground "#1194f6"))))
+ '(rainbow-delimiters-depth-11-face ((t (:foreground "#47B04B"))))
+ '(rainbow-delimiters-depth-12-face ((t (:foreground "#FFED18"))))
+ '(rainbow-delimiters-depth-2-face ((t (:foreground "#47B04B"))))
+ '(rainbow-delimiters-depth-3-face ((t (:foreground "#1194f6"))))
+ '(rainbow-delimiters-depth-4-face ((t (:foreground "#C90067"))))
+ '(rainbow-delimiters-depth-5-face ((t (:foreground "#FFED18"))))
+ '(rainbow-delimiters-depth-6-face ((t (:foreground "#1194f6"))))
+ '(rainbow-delimiters-depth-7-face ((t (:foreground "#C90067"))))
+ '(rainbow-delimiters-depth-8-face ((t (:foreground "#FE7380"))))
+ '(rainbow-delimiters-depth-9-face ((t (:foreground "#9E1CB2"))))
  '(term-bold ((t (:weight bold))))
  '(term-color-blue ((t (:background "dodger blue" :foreground "dodger blue")))))

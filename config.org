@@ -1157,28 +1157,112 @@
   (setq epa-file-cache-passphrase-for-symmetric-encryption t)
 #+END_SRC
 ** Org Mode
-*** Keybindings
+*** Keybindings and customization
 #+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "M-–") (lambda () (interactive) (org-agenda "" "p")))
-(global-set-key (kbd "M-•") (lambda () (interactive) (org-agenda "" "n")))
-(global-set-key "\C-cl" 'org-store-link)
-(global-set-key "\C-ca" 'org-agenda)
-(global-set-key (kbd "M-∀") 'org-agenda)
-(global-set-key "\C-cc" 'org-capture)
-(global-set-key "\C-cb" 'org-iswitchb)
-(global-set-key (kbd "<f5>") 'org-agenda)
-(global-set-key (kbd "<f11>") (lambda () (interactive) (org-agenda "" "p")))
-(global-set-key (kbd "<f9>") 'org-capture)
-(global-set-key (kbd "<f12>") (lambda () (interactive) (org-agenda "" "n")))
-(global-set-key (kbd "C-x C-o") 'org-agenda)
-(define-key org-mode-map (kbd "C-c SPC") nil)
-(define-key org-agenda-mode-map (kbd "a") 'org-agenda)
-(setq org-src-window-setup 'current-window)
+  (global-set-key (kbd "M-–") (lambda () (interactive) (org-agenda "" "p")))
+  (global-set-key (kbd "M-•") (lambda () (interactive) (org-agenda "" "n")))
+  (global-set-key "\C-cl" 'org-store-link)
+  (global-set-key "\C-ca" 'org-agenda)
+  (global-set-key (kbd "M-∀") 'org-agenda)
+  (global-set-key "\C-cc" 'org-capture)
+  (global-set-key "\C-cb" 'org-iswitchb)
+  (global-set-key (kbd "<f5>") 'org-agenda)
+  (global-set-key (kbd "<f11>") (lambda () (interactive) (org-agenda "" "p")))
+  (global-set-key (kbd "<f9>") 'org-capture)
+  (global-set-key (kbd "<f12>") (lambda () (interactive) (org-agenda "" "n")))
+  (global-set-key (kbd "C-x C-o") 'org-agenda)
+  (define-key org-mode-map (kbd "C-c SPC") nil)
+  (define-key org-agenda-mode-map (kbd "a") 'org-agenda)
+  (setq org-src-window-setup 'current-window)
+
+  (add-hook 'org-mode-hook (lambda () (visual-line-mode 1)))
+
+  (setq org-list-allow-alphabetical t)
+
+  ;; This is for safety
+  (define-key org-mode-map (kbd "C-S-<backspace>") 
+    (lambda (arg)
+      (interactive "P")
+      (if (string= "yes" (completing-read "Are you sure you want to use that keybinding? " '("yes" "no")))
+          (kill-whole-line arg)
+        (org-cut-subtree))))
 #+END_SRC
-*** Should always use visual-line-mode
+**** Face
+     #+BEGIN_SRC emacs-lisp
+     (setq org-ellipsis " ")
+     #+END_SRC
+**** My Template                                                     :BROKEN:
+     #+BEGIN_SRC emacs-lisp
+       ;; (add-to-list 'org-structure-template-alist
+       ;;  '("sv" . "#+BEGIN_SRC ? :results value\n\n#+END_SRC"))
+       ;; (add-to-list 'org-structure-template-alist
+       ;;  '("so" . "#+BEGIN_SRC ? :results output\n\n#+END_SRC"))
+     #+END_SRC
+*** Capture templates
 #+BEGIN_SRC emacs-lisp
-(add-hook 'org-mode-hook (lambda () (visual-line-mode 1)))
+  (setq org-default-notes-file "~/MEGA/org-old/notes.org")
+  (setq org-capture-templates
+        '(("t" "Todo" entry (file "~/MEGA/org/agenda/refile.org")
+           "* STUFF %?\n  :PROPERTIES:\n  :CREATED: %U\n  :VIEWING: %a\n  :END:")
+          ("r" "Reviews")
+          ("ra" "Automatic Review" entry (file+function "~/MEGA/org/entries/reviews.gpg" setup-automatic-review)
+           (file "~/MEGA/org/templates/review-interactive-entry.org"))
+          ("rw" "Weekly Review" entry (file "~/MEGA/org/entries/reviews.gpg")
+           (file "~/MEGA/org/templates/weekly-review-entry-template.org"))
+          ("rm" "Make-up Weekly Review" entry (file+function "~/MEGA/org/entries/reviews.gpg" setup-make-up-review)
+           (file "~/MEGA/org/templates/review-interactive-entry.org"))
+          ("rt" "Review Task" entry (file+headline "~/MEGA/org/entries/reviews.gpg" "Tasks")
+           "* TODO %?")
+          ("d" "Dream" entry (file+olp+datetree "~/MEGA/org/entries/dream.org")
+           "* %?")
+          ("m" "Money" plain (file "~/MEGA/org/entries/finances/ledger.ledger")
+           (file "~/MEGA/org/templates/basic.ledger") :unnarrowed t :empty-lines 1)
+          ("c" "Record Comms Message" entry (file+olp+datetree "~/MEGA/org/entries/comms.org")
+           "* TODO %?")
+          ("j" "Journal")
+          ("je" "Journal Entry" entry (file+olp+datetree "~/MEGA/org/entries/journal.gpg")
+           "* %<%R> %?\n%U\n\n")
+          ("jp" "Plan your day" entry (file+olp+datetree "~/MEGA/org/entries/journal.gpg")
+           (file "~/MEGA/org/templates/daily-plan.org"))
+          ("C" "Create checklist")
+          ("Cc" "Conference Via Bus" entry (file "~/MEGA/org/agenda/refile.org")
+           (file "~/MEGA/org/checklists/conference.org")
+           :conference/airplane nil)
+          ("Cm" "Morning routine" entry (file "~/MEGA/org/entries/routines.org")
+           (file "~/MEGA/org/checklists/mornings.org"))
+          ("Cn" "Nightly routine" entry (file "~/MEGA/org/entries/routines.org")
+           (file "~/MEGA/org/checklists/nights.org"))
+          ("y" "Elfeed YouTube" entry (file+olp "~/MEGA/org/agenda/agenda.org" "leisure" "Videos")
+           "* TODO %(identity elfeed-link-org-capture)")
+          ("p" "Protocol" entry (file "~/MEGA/org/agenda/refile.org")
+           "* STUFF %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
+          ("L" "Protocol Link" entry (file "~/MEGA/org/agenda/refile.org")
+           "* STUFF %? [[%:link][%:description]] \nCaptured On: %U")))
 #+END_SRC
+**** disabled 
+ #+BEGIN_SRC emacs-lisp#
+   (setq org-capture-templates
+         '(("w" "Web" entry (file "~/MEGA/org/agenda/refile.org")
+            "* TODO [[%^{URL}][%^{Title}]]\n  :PROPERTIES:\n  :CREATED: %U\n  :END:")
+           ("f" "Reference" entry (file "~/MEGA/org/agenda/reference.org")
+            "* %?\n%i%U")
+           ("rm" "Make-up Weekly Review" plain (function make-up-review-file)
+            (file "~/MEGA/org/templates/review-interactive.org"))
+           ("rw" "Weekly Review" plain (function weekly-review-file)
+            (file "~/MEGA/org/templates/weekly-review-template.org"))
+           ("i" "Important information" entry (file "~/MEGA/org/entries/important.gpg")
+            "* %?")
+           ("e" "Entries")
+           ("ee" "Exercise" table-line (file "~/MEGA/org/entries/exercise.org")
+            "| %u | %^{Push-ups} | %^{Leg-lifts} | %^{Squats}")
+           ("l" "Later")
+           ("lr" "Read Later" entry (file+headline "~/MEGA/org/agenda/lists.org" "Things to read")
+            "* TODO %?\n%U\n")
+           ("ll" "Links for life" entry (file "~/MEGA/org/entries/links.org")
+            "* %?")
+           ("w" "Weekly Thoughts" entry (function org-capture-function)
+            "** %<%R> %?")))
+ #+END_SRC
 *** Custom Journal
 **** Attempt 3
 #+BEGIN_SRC emacs-lisp
@@ -1245,18 +1329,24 @@
                   (format-time-string "%V"))))))
 
     (defun output-date ()
-      (save-window-excursion
-        (switch-to-buffer (find-file "~/.emacs.d/last-review.el"))
-        (erase-buffer)
-        (insert (org-read-date nil nil ""))
-        (save-buffer)
-        (kill-buffer)
-        ""))
+      (when my/review-date-old
+        (save-window-excursion
+          (switch-to-buffer (find-file "~/.emacs.d/last-review.el"))
+          (erase-buffer)
+          (insert (org-read-date nil nil ""))
+          (save-buffer)
+          (kill-buffer)
+          "")
+          )
+      (setq my/review-date-old nil))
+    (add-hook 'org-capture-before-finalize-hook 'output-date)
 
     (defun get-last-review-date ()
       (save-window-excursion
         (set-buffer (find-file "~/.emacs.d/last-review.el"))
-        (buffer-string)))
+        (let ((res (buffer-string)))
+          (kill-buffer)
+          res)))
 
     (defun setup-make-up-review ()
       (let* ((date (org-read-date))
@@ -1266,74 +1356,32 @@
         (org-capture-put :start-date date)
         (org-capture-put :start-week week)))
 
+
+    (defvar my/review-date-old nil)
     (defun setup-automatic-review ()
       (let* ((date (org-read-date nil nil (get-last-review-date)))
-             (week (number-to-string
+             (week (format "%02d" 
                     (org-days-to-iso-week
                      (org-time-string-to-absolute date)))))
+        (setq my/review-date-old date)
+        (setq my/review-visibility-level 6)
         (org-capture-put :start-date date)
-        (org-capture-put :start-week week)))
-#+END_SRC
-*** Capture templates
-#+BEGIN_SRC emacs-lisp
-  (setq org-default-notes-file "~/MEGA/org-old/notes.org")
-  (setq org-capture-templates
-        '(("t" "Todo" entry (file "~/MEGA/org/agenda/refile.org")
-           "* STUFF %?\n  :PROPERTIES:\n  :CREATED: %U\n  :VIEWING: %a\n  :END:")
-          ("w" "Web" entry (file "~/MEGA/org/agenda/refile.org")
-           "* TODO [[%^{URL}][%^{Title}]]\n  :PROPERTIES:\n  :CREATED: %U\n  :END:")
-          ("f" "Reference" entry (file "~/MEGA/org/agenda/reference.org")
-          "* %?\n%i%U")
-          ("r" "Reviews")
-          ("ra" "Automatic Review" entry (file+function "~/MEGA/org/entries/reviews.gpg" setup-automatic-review)
-           (file "~/MEGA/org/templates/review-interactive-entry.org"))
-          ("rw" "Weekly Review" entry (file "~/MEGA/org/entries/reviews.gpg")
-           (file "~/MEGA/org/templates/weekly-review-entry-template.org"))
-          ("rm" "Make-up Weekly Review" entry (file+function "~/MEGA/org/entries/reviews.gpg" setup-make-up-review)
-           (file "~/MEGA/org/templates/review-interactive-entry.org"))
-          ("rt" "Review Task" entry (file+headline "~/MEGA/org/entries/reviews.gpg" "Tasks")
-           "* TODO %?")
-          ("d" "Dream" entry (file+olp+datetree "~/MEGA/org/entries/dream.org")
-           "* %?")
-          ("m" "Money" plain (file "~/MEGA/org/entries/finances/ledger.ledger")
-           (file "~/MEGA/org/templates/basic.ledger") :unnarrowed t :empty-lines 1)
-          ("j" "Journal")
-          ("je" "Journal Entry" entry (file+olp+datetree "~/MEGA/org/entries/journal.gpg")
-           "* %<%R> %?\n%U\n\n")
-          ("jp" "Plan your day" entry (file+olp+datetree "~/MEGA/org/entries/journal.gpg")
-           (file "~/MEGA/org/templates/daily-plan.org"))
-          ("c" "Create checklist")
-          ("cc" "Conference Via Bus" entry (file "~/MEGA/org/agenda/refile.org")
-           (file "~/MEGA/org/checklists/conference.org")
-           :conference/airplane nil)
-          ("cm" "Morning routine" entry (file "~/MEGA/org/entries/routines.org")
-           (file "~/MEGA/org/checklists/mornings.org"))
-          ("cn" "Nightly routine" entry (file "~/MEGA/org/entries/routines.org")
-           (file "~/MEGA/org/checklists/nights.org"))
-          ("p" "Protocol" entry (file "~/MEGA/org/agenda/refile.org")
-           "* STUFF %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
-          ("L" "Protocol Link" entry (file "~/MEGA/org/agenda/refile.org")
-           "* STUFF %? [[%:link][%:description]] \nCaptured On: %U")))
-#+END_SRC
-**** disabled 
-#+BEGIN_SRC emacs-lisp#
-  (setq org-capture-templates
-        '(("rm" "Make-up Weekly Review" plain (function make-up-review-file)
-           (file "~/MEGA/org/templates/review-interactive.org"))
-          ("rw" "Weekly Review" plain (function weekly-review-file)
-           (file "~/MEGA/org/templates/weekly-review-template.org"))
-          ("i" "Important information" entry (file "~/MEGA/org/entries/important.gpg")
-           "* %?")
-          ("e" "Entries")
-          ("ee" "Exercise" table-line (file "~/MEGA/org/entries/exercise.org")
-           "| %u | %^{Push-ups} | %^{Leg-lifts} | %^{Squats}")
-          ("l" "Later")
-          ("lr" "Read Later" entry (file+headline "~/MEGA/org/agenda/lists.org" "Things to read")
-           "* TODO %?\n%U\n")
-          ("ll" "Links for life" entry (file "~/MEGA/org/entries/links.org")
-           "* %?")
-          ("w" "Weekly Thoughts" entry (function org-capture-function)
-           "** %<%R> %?")))
+        (org-capture-put :start-week week)
+        (goto-char (point-min))
+        (re-search-forward "Reviews")))
+
+    (defvar my/review-visibility-level nil)
+
+    (defun my/review-set-visibility ()
+      (when my/review-visibility-level
+        (outline-hide-sublevels my/review-visibility-level)
+        (org-show-entry)
+        (setq my/review-visibility-level nil)))
+
+    (add-hook 'org-capture-mode-hook
+              'my/review-set-visibility)
+
+
 #+END_SRC
 *** org-agenda
 **** Agenda Files
@@ -1377,7 +1425,8 @@
          '((sequence "STUFF(s)" "SOMEDAY(P)" "|")
            (sequence "TODO(t)" "ONE(o)" "NEXT(n)" "READ(r)" "HABIT(H)" "|" "DONE(d!)")
            (sequence "PROJECT(p)" "ETERNAL(e)" "|" "COMPLETE(c)")
-           (sequence  "WAIT(w@/!)" "HOLD(h)" "TICKLER())" "FORGOTTEN(f)" "|" "ABANDON(a@/!)")))
+           (sequence  "WAIT(w@/!)" "HOLD(h)" "TICKLER())" "FORGOTTEN(f)" "|" "ABANDON(a@/!)")
+           (sequence "TOP" "|")))
 
   (setq org-todo-keyword-faces 
         '(("ONE" :foreground "royal blue" :weight bold)
@@ -1387,7 +1436,8 @@
           ("HOLD" :foreground "red" :weight bold)
           ("PROJECT" :foreground "white" :weight bold)
           ("ABANDON" :foreground "dark gray" :weight bold)
-          ("FORGOTTEN" :foreground "dark gray" :weight bold)))
+          ("FORGOTTEN" :foreground "dark gray" :weight bold)
+          ("TOP" :foreground "royal blue" :weight bold)))
 
   (setq org-todo-state-tags-triggers
         (quote (("HOLD" ("HOLD" . t))
@@ -1401,7 +1451,10 @@
 
   ; Targets include this file and any file contributing to the agenda - up to 9 levels deep
   (setq org-refile-targets `((nil :maxlevel . 9)
-                             (org-agenda-files :maxlevel . 9)))
+                             (org-agenda-files :maxlevel . 9)
+                             ("~/MEGA/org/entries/panic.org" :maxlevel . 9)))
+
+  (setq org-refile-use-cache t)
 
   (setq org-refile-target-verify-function
         (lambda () 
@@ -1488,13 +1541,24 @@
                     (or (org-get-scheduled-time (point))
                         (org-get-deadline-time (point)))))))
 
+       (defun my/has-active-task ()
+         (save-excursion
+           (let ((subtree-end (save-excursion (org-end-of-subtree t)))
+                 has-next-task)
+             (while (and (not has-next-task)
+                         (outline-next-heading)
+                         (< (point) subtree-end))
+               (when (not (member (org-get-todo-state) org-done-keywords))
+                 (setq has-next-task t)))
+             has-next-task)))
+
        (defun my/is-a-project ()
          (save-excursion
            (let ((todo (org-get-todo-state)))
              (when todo
                (or (member todo '("PROJECT" "ETERNAL" "HOLD"))
                    (and (equal todo "ONE")
-                        (my/has-next-task))
+                        (my/has-active-task))
                    (and (member todo '("TODO" "WAIT" "SOMEDAY"))
                         (my/has-subtask)))))))
 
@@ -1526,15 +1590,18 @@
                                    has-stuck-project))
                          (outline-next-heading)
                          (< (point) subtree-end))
-               (cond ((my/is-a-task)
-                      (setq has-task t)
-                      (when (or (my/is-next-task) (equal (org-get-todo-state) "WAIT"))
-                        (setq has-next-task t)))
-                     ((my/is-a-project)
-                      (setq has-project t) 
-                      (when (eq (my/get-project-type file (point) t)
-                                'stuck)
-                        (setq has-stuck-project t)))))
+               ;; (unless (member "ARCHIVE" (org-get-tags-at))
+                 (cond ((my/is-a-task)
+                        (setq has-task t)
+                        (when (or (my/is-next-task) (equal (org-get-todo-state) "WAIT"))
+                          (setq has-next-task t)))
+                       ((my/is-a-project)
+                        (setq has-project t) 
+                        (when (eq (my/get-project-type file (point) t)
+                                  'stuck)
+                          (setq has-stuck-project t))
+                        (org-end-of-subtree t t)
+                        )));; )
              (or (and has-next-task 
                       (not has-stuck-project))
                  (and (not has-task) 
@@ -1550,7 +1617,8 @@
                      ((equal todo "SOMEDAY") 'someday)
                      ((equal todo "HOLD") 'hold)
                      ((equal todo "WAIT") 'wait)
-                     ((org-time> (org-entry-get (point) "SCHEDULED") "<now>") 'delayed)
+                     ((org-time> (org-entry-get (point) "SCHEDULED") (org-matcher-time "<now>")) 'delayed)
+                     ;;((my/is-a-task) nil)
                      (ambiguous-to-stuck
                       (if (my/generous-active-project file point)
                           'active
@@ -1572,6 +1640,23 @@
                          (eq (my/get-project-type buffer-file-name (point) t)
                              'stuck))
                subtree-end))))
+
+       (defvar my/done-projects-flag nil)
+
+       (defun my/show-done-projects-and-tasks ()
+         "Show top level leaf of these todos: DONE|CANCELLED|COMPLETE"
+         (save-restriction
+           (widen)
+           (let ((subtree-end (save-excursion (org-end-of-subtree t)))
+                 (next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+             (if my/done-projects-flag
+                 (let ((ov my/done-projects-flag))
+                   (setq my/done-projects-flag nil)
+                   ov)
+               (if (member (org-get-todo-state) org-done-keywords)
+                   (progn (setq my/done-projects-flag subtree-end)
+                          nil)
+                 next-headline)))))
 
        (defun my/show-active-projects ()
          "Only show subtrees that are stuck projects"
@@ -1659,11 +1744,6 @@
      #+END_SRC
 **** Views
      #+BEGIN_SRC emacs-lisp
-       (defun test (throwaway)
-         (org-agenda-prepare "This is a test")
-         (insert throwaway)
-         (org-agenda-finalize)
-         (setq buffer-read-only t))
 
        (setq org-agenda-tags-todo-honor-ignore-options t)
 
@@ -1683,9 +1763,9 @@
 
        (defun org-agenda-delete-empty-compact-blocks ()
          "Function removes empty compact blocks. 
-                     If two lines next to each other have the 
-                     org-agenda-structure face, then delete the 
-                     previous block."
+                            If two lines next to each other have the 
+                            org-agenda-structure face, then delete the 
+                            previous block."
          (unless org-agenda-compact-blocks
            (user-error "Compact blocks must be on"))
          (setq buffer-read-only nil)
@@ -1708,146 +1788,121 @@
 
        (add-hook 'org-agenda-finalize-hook #'org-agenda-delete-empty-compact-blocks)
 
-       (defun my-org-agenda-entry-get-agenda-timestamp (pom)
-         "Retrieve timestamp information for sorting agenda views.
-                     Given a point or marker POM, returns a cons cell of the timestamp
-                     and the timestamp type relevant for the sorting strategy in
-                     `org-agenda-sorting-strategy-selected'."
-         (let (ts ts-date-type)
-           (save-match-data
-             (cond ((org-em 'scheduled-up 'scheduled-down
-                            org-agenda-sorting-strategy-selected)
-                    (setq ts (org-entry-get pom "SCHEDULED")
-                          ts-date-type " scheduled"))
-                   ((org-em 'deadline-up 'deadline-down
-                            org-agenda-sorting-strategy-selected)
-                    (setq ts (org-entry-get pom "DEADLINE")
-                          ts-date-type " deadline"))
-                   ((org-em 'ts-up 'ts-down
-                            org-agenda-sorting-strategy-selected)
-                    (setq ts (org-entry-get pom "TIMESTAMP")
-                          ts-date-type " timestamp"))
-                   ((org-em 'tsia-up 'tsia-down
-                            org-agenda-sorting-strategy-selected)
-                    (setq ts (org-entry-get pom "TIMESTAMP_IA")
-                          ts-date-type " timestamp_ia"))
-                   ((org-em 'timestamp-up 'timestamp-down
-                            org-agenda-sorting-strategy-selected)
-                    (setq ts (or (org-entry-get pom "SCHEDULED")
-                                 (org-entry-get pom "DEADLINE")
-                                 (org-entry-get pom "TIMESTAMP")
-                                 (org-entry-get pom "TIMESTAMP_IA"))
-                          ts-date-type ""))
-                   (t (setq ts-date-type "")))
-             (cons (when ts (ignore-errors 
-                              (org-time-string-to-seconds (if (string-match-p ":" ts)
-                                                              ts
-                                                            (let ((s (substring ts 0 (1- (length ts)))))
-                                                              (concat s
-                                                                      " 23:59>"))))))
-                   ts-date-type))))
-
-       (advice-add 'org-agenda-entry-get-agenda-timestamp
-                   :override
-                   #'my-org-agenda-entry-get-agenda-timestamp)
-
-       (add-to-list 'org-agenda-entry-types :deadlines*)
-
-       ;; Investigate
-       (setq org-sort-agenda-notime-is-late t)
+       ;; I don't think this code is necessary
+       ;; (add-to-list 'org-agenda-entry-types :deadlines*)
 
        (setq org-agenda-hide-tags-regexp "NOT_TASKS\\|PROJECT")
 
-       (setq org-agenda-custom-commands
-             `(("p" "Project View"
-                ((tags-todo "-REFILE/!"
-                            ((org-agenda-overriding-header "Stuck Projects")
-                             (org-tags-match-list-sublevels 'indented)
-                             (org-agenda-skip-function 'my/show-stuck-projects)
-                             (org-agenda-sorting-strategy
-                              '(category-keep))))
-                 (tags-todo "-REFILE/!"
-                            ((org-agenda-overriding-header "Delayed projects")
-                             (org-agenda-skip-function 'my/show-delayed-projects)))
-                 (tags-todo "-PEOPLE/!HOLD"
-                            ((org-agenda-overriding-header "Projects on hold")))
-                 (tags-todo "+PEOPLE/!HOLD"
-                            ((org-agenda-overriding-header "People on hold")))
-                 (todo "SOMEDAY"
-                       ((org-agenda-overriding-header "Someday projects")
-                        (org-agenda-sorting-strategy '(tag-up))))
-                 (todo "ETERNAL"
-                       ((org-agenda-overriding-header "Eternal Projects")))
-                 (tags-todo "-REFILE-HOLD/!"
-                            ((org-agenda-overriding-header "Active Projects")
-                             (org-agenda-skip-function 'my/show-active-projects)
-                             (org-tags-match-list-sublevels 'indented)))))
-               ("g" "General View"
-                (;; (tags-todo "+PLAN"
-                 ;;            ((org-agenda-files '("~/MEGA/org/entries/journal.gpg"))
-                 ;;             (org-agenda-overriding-header "Today's plan")))
-                 (tags-todo "+REFILE|TODO=\"STUFF\""
-                            ((org-agenda-overriding-header "Refile tasks")))
-                 (tags-todo "-REFILE/!"
-                            ((org-agenda-overriding-header "Stuck Projects")
-                             (org-tags-match-list-sublevels 'indented)
-                             (org-agenda-skip-function 'my/show-stuck-projects)
-                             (org-agenda-sorting-strategy
-                              '(category-keep))))
-                 (tags-todo "-REFILE-HOLD+TODO=\"WAIT\""
-                            (;(org-agenda-skip-function 'my/only-next-projects-and-tasks)
-                             (org-agenda-overriding-header "Tasks in other courts")
-                             (org-tags-match-list-sublevels t)))
-                 (tags-todo "+DEADLINE<\"<tomorrow>\"-SCHEDULED>\"<now>\"/!HABIT"
-                            ((org-agenda-overriding-header "Incomplete Habits")))
-                 (agenda ""
-                         ((org-agenda-skip-function 'my/agenda-custom-skip)
-                          (org-agenda-span 'day)
-                          (org-agenda-show-log t)
-                          (org-agenda-skip-deadline-if-done t)
-                          (org-agenda-skip-scheduled-if-done t)))))
-               ("n" "Next Tasks List" tags-todo "-REFILE-HOLD-WAIT"
-                ((org-agenda-skip-function 'my/show-next-tasks-and-standalone-tasks)
-                 (org-agenda-overriding-header "Next Tasks list")
-                 (org-tags-match-list-sublevels t)
-                 (org-agenda-sorting-strategy '(deadline-up))))
-               ("r" "Review Tasks"
-                ((todo "TODO"
-                       ((org-agenda-files '("~/MEGA/org/entries/reviews.gpg"))
-                        (org-agenda-overriding-header "Active")
-                        (org-agenda-skip-function '(org-agenda-skip-entry-if 'notscheduled))))
-                 (todo "TODO"
-                       ((org-agenda-files '("~/MEGA/org/entries/reviews.gpg"))
-                        (org-agenda-overriding-header "Inactive")))))
-               ("l" . "Leisure")
-               ("la" "Articles" tags-todo "READ/!TODO")
-               ("lv" "Videos" tags-todo "VIDEO/!TODO")
-               ("f" "Calfw" 
-                cfw:open-org-calendar-no-projects)
-               ("w" "Next week"
-                ((tags-todo "-REFILE/!"
-                            ((org-agenda-overriding-header "Stuck Projects")
-                             (org-tags-match-list-sublevels 'indented)
-                             (org-agenda-skip-function 'my/show-stuck-projects)
-                             (org-agenda-sorting-strategy
-                              '(category-keep))))
-                 (agenda ""
-                         ((org-agenda-skip-function 'my/show-next-tasks-and-standalone-tasks)
-                          (org-agenda-start-on-weekday 5)))))
-               ("h" "Projects on hold" todo "HOLD" ((org-tags-match-list-sublevels 'indented)))
-               ("t" "Today" agenda ""
-                ((org-agenda-skip-function 'my/agenda-custom-skip)
-                 (org-agenda-span 'day)))
-               ("c" . "Categories")  
-               ("cb" "Bus tasks" tags-todo "BUS")
-               ("cr" "Articles to read" tags-todo "READ")
-               ("u" "Test stuff"
-                ((tags-todo "+PLAN"
-                            ((org-agenda-overriding-header "Today's plan")))
-                 (test "Hello"
-                       ((org-agenda-overriding-header "Hello")))
-                 ))
-               ("d" "Done tasks" todo "DONE|CANCELLED|COMPLETE")))
+       (use-package org-super-agenda)
+       (use-package htmlize)
+       (org-super-agenda-mode)
+       (setq org-super-agenda-header-separator "")
+
+       (let* ((stuck-projects-view '(tags-todo "-REFILE/!"
+                                               ((org-agenda-overriding-header "Stuck Projects")
+                                                (org-tags-match-list-sublevels 'indented)
+                                                (org-agenda-skip-function 'my/show-stuck-projects)
+                                                (org-agenda-sorting-strategy
+                                                 '(category-keep))))))
+         (setq org-agenda-custom-commands
+               `(("p" "Project View"
+                  ((tags-todo "-REFILE-HOLD/!"
+                              ((org-agenda-overriding-header "Active Projects")
+                               (org-agenda-skip-function 'my/show-active-projects)
+                               (org-tags-match-list-sublevels 'indented)))
+                   ,stuck-projects-view
+                   (tags-todo "-REFILE/!"
+                              ((org-agenda-overriding-header "Delayed projects")
+                               (org-agenda-skip-function 'my/show-delayed-projects)))
+                   (tags-todo "-PEOPLE/!HOLD"
+                              ((org-agenda-overriding-header "Projects on hold")))
+                   (tags-todo "+PEOPLE/!HOLD"
+                              ((org-agenda-overriding-header "People on hold")))
+                   (todo "SOMEDAY"
+                         ((org-agenda-overriding-header "Someday projects")
+                          (org-agenda-sorting-strategy '(tag-up))))
+                   (todo "ETERNAL"
+                         ((org-agenda-overriding-header "Eternal Projects")))))
+                 ("g" "General View"
+                  (;; (tags-todo "+PLAN"
+                   ;;            ((org-agenda-files '("~/MEGA/org/entries/journal.gpg"))
+                   ;;             (org-agenda-overriding-header "Today's plan")))
+                   (tags-todo "+REFILE|TODO=\"STUFF\""
+                              ((org-agenda-overriding-header "Refile tasks")))
+                   ,stuck-projects-view
+                   ;; (tags-todo "-REFILE-HOLD+TODO=\"WAIT\""
+                   ;;            (;(org-agenda-skip-function 'my/only-next-projects-and-tasks)
+                   ;;             (org-agenda-overriding-header "Tasks in other courts")
+                   ;;             (org-tags-match-list-sublevels t)))
+                   ;; (tags-todo "+DEADLINE<\"<tomorrow>\"-SCHEDULED>\"<now>\"/!HABIT"
+                   ;;            ((org-agenda-overriding-header "Incomplete Habits")))
+                   ;; This is an inline replacement
+                   (org-ql-agenda-function "")
+                   (agenda ""
+                           ((org-agenda-skip-function 'my/agenda-custom-skip)
+                            (org-agenda-span 'day)
+                            (org-agenda-show-log t)
+                            (org-agenda-skip-deadline-if-done t)
+                            (org-agenda-skip-scheduled-if-done t)
+                            (org-super-agenda-groups '((:name "Overdue" :and (:deadline past :log nil :not (:tag "Work")))
+                                                       (:name "Should do" :and (:scheduled past :log nil :not (:tag "Work")))
+                                                       (:name "Today" :time-grid t 
+                                                              :and (:not (:tag "Work")
+                                                                    :not (:and (:not (:scheduled today)
+                                                                                :not (:deadline today)))))
+                                                       (:name "Work Related" :tag "WORK")
+                                                       ))))))
+                 ("c" "Access Comms" todo "TODO"
+                  ((org-agenda-files '("~/MEGA/org/entries/comms.org"))))
+                 ("P" "Time to panic"
+                  ((tags-todo "+MOTIVATION/!TOP"
+                         ((org-agenda-overriding-header "Remember your motivation")
+                          (org-agenda-files '("~/MEGA/org/entries/motivation.org"))))
+                   (tags-todo "+PANIC"
+                              ((org-agenda-overriding-header "TIME TO PANIC")
+                               (org-use-tag-inheritance nil)))))
+                 ("n" "Next Tasks List" tags-todo "-REFILE-HOLD-WAIT"
+                  ((org-agenda-skip-function 'my/show-next-tasks-and-standalone-tasks)
+                   (org-agenda-overriding-header "Next Tasks list")
+                   (org-tags-match-list-sublevels t)
+                   (org-agenda-sorting-strategy '(deadline-up))))
+                 ("r" "Review Tasks"
+                  ((todo "TODO"
+                         ((org-agenda-files '("~/MEGA/org/entries/reviews.gpg"))
+                          (org-agenda-overriding-header "Active")
+                          (org-agenda-skip-function '(org-agenda-skip-entry-if 'notscheduled))))
+                   (todo "TODO"
+                         ((org-agenda-files '("~/MEGA/org/entries/reviews.gpg"))
+                          (org-agenda-overriding-header "Inactive")))))
+                 ("l" . "Leisure")
+                 ("la" "Articles" tags-todo "READ/!TODO")
+                 ("lv" "Videos" 
+                  ((tags-todo "+VIDEO+LEARN/!TODO" ((org-agenda-overriding-header "Longer")))
+                   (tags-todo "+VIDEO-LEARN/!TODO" ((org-agenda-overriding-header "Shorter")))))
+                 ("f" "Calfw" 
+                  cfw:open-org-calendar-no-projects)
+                 ("w" "Next week"
+                  ((tags-todo "-REFILE/!"
+                              ((org-agenda-overriding-header "Stuck Projects")
+                               (org-tags-match-list-sublevels 'indented)
+                               (org-agenda-skip-function 'my/show-stuck-projects)
+                               (org-agenda-sorting-strategy
+                                '(category-keep))))
+                   (agenda ""
+                           ((org-agenda-skip-function 'my/show-next-tasks-and-standalone-tasks)
+                            (org-agenda-start-on-weekday 5)))))
+                 ("h" "Projects on hold" todo "HOLD" ((org-tags-match-list-sublevels 'indented)))
+                 ("t" "Today" agenda ""
+                  ((org-agenda-skip-function 'my/agenda-custom-skip)
+                   (org-agenda-span 'day)
+                   (org-agenda-show-log t)))
+                 ("C" . "Categories")  
+                 ("Cb" "Bus tasks" tags-todo "BUS")
+                 ("Cr" "Articles to read" tags-todo "READ")
+                 ;; ("D" "Old done tasks" todo "DONE|CANCELLED|COMPLETE")
+                 ("d" "Done Tasks" todo "DONE|CANCELLED|COMPLETE"
+                  ((org-agenda-overriding-header "Done Tasks")
+                   (org-agenda-skip-function 'my/show-done-projects-and-tasks))))))
 
 
        (defun cfw:open-org-calendar-no-projects (&args)
@@ -1893,6 +1948,67 @@
         '(org-agenda-date-today ((t (:inherit org-agenda-date :foreground "cyan" :slant italic :weight bold :height 1.1))))
         '(org-agenda-structure ((t (:foreground "LightSkyBlue" :box (:line-width 1 :color "grey75" :style released-button))))))
      #+END_SRC
+**** My own agenda renderer
+     #+BEGIN_SRC emacs-lisp
+       (add-to-list 'load-path 
+                    "~/.emacs.d/custom/org-ql")
+       (require 'org-ql)
+       (require 'org-ql-agenda)
+       (require 'org-habit)
+
+       ;; (org-ql-agenda '("~/MEGA/org/agenda/agenda.org") (or (and (todo "HABIT") (deadline <= today)) (todo "WAIT")) :super-groups ((:name "Tasks in other courts" :todo "WAIT") (:name "Incomplete Habits" :todo "HABIT")))
+
+       (defun org-ql-agenda-function (ignore)
+         (org-agenda-prepare "org-ql")
+         (insert
+          (save-window-excursion 
+            (org-ql-agenda '("~/MEGA/org/agenda/agenda.org")
+              (or (and (todo "HABIT")
+                       (deadline <= today))
+                  (todo "WAIT")
+                  (and (tags "REWARD")
+                       (priority = "A")))
+              :super-groups ((:name "Tasks in other courts" :todo "WAIT")
+                             (:name "Incomplete Habits" :todo "HABIT")
+                             (:name "Rewards" :tag "REWARD")))
+            (switch-to-buffer "*Org Agenda NG*")
+            (let ((res (buffer-string)))
+              (kill-buffer)
+              res))
+          "\n\n"
+          )
+         (org-agenda-finalize))
+
+       (defvar my/org-agenda-types nil)
+
+       (defun test (throwaway)
+         (if (null my/org-agenda-types)
+             (error "Need to specify my/org-agenda-types")
+           (org-agenda-prepare "This is a test")
+           (org-agenda--insert-overriding-header
+             ;; This string will be inserted if there is no overriding header
+             "This is a test")
+           (insert throwaway "\n")
+           (org-agenda-finalize))
+         ;; (setq buffer-read-only t)
+         )
+
+       (add-to-list 'org-agenda-custom-commands
+                    '("E" "Experimental stuff"
+                      ((tags-todo "-REFILE/!"
+                                  ((org-agenda-overriding-header "Stuck Projects")
+                                   (org-tags-match-list-sublevels 'indented)
+                                   (org-agenda-skip-function 'my/show-stuck-projects)
+                                   (org-agenda-sorting-strategy
+                                    '(category-keep))))
+                       (test "Hello"
+                             ((org-agenda-overriding-header "Hello World")
+                              (my/org-agenda-types t)))
+                       (org-ql-agenda-function ""))))
+
+       ;; Helper function
+       ;; (setq org-agenda-custom-commands (remove-if (lambda (a) (string= (car a) "E")) org-agenda-custom-commands))
+     #+END_SRC
 *** Checkbox
     #+BEGIN_SRC emacs-lisp
       (defun my/org-checkbox-todo ()
@@ -1922,25 +2038,6 @@
 
       (add-hook 'org-checkbox-statistics-hook 'my/org-checkbox-todo)
     #+END_SRC
-*** Code-blocks
-   #+BEGIN_SRC emacs-lisp
-     (require 'ob-core)
-     (require 'ob-clojure)
-     (require 'ob-plantuml)
-     (use-package plantuml-mode)
-
-     (setq org-babel-clojure-backend 'cider)
-     (org-babel-do-load-languages
-      'org-babel-load-languages
-      '((clojure . t)
-        (plantuml . t)))
-
-     (defun my-org-confirm-babel-evaluate (lang body)
-       (not (member lang '("plantuml"))))
-
-     (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
-     (setq org-plantuml-jar-path "/opt/plantuml/plantuml.jar")
-   #+END_SRC
 *** Plugins
 **** fstree
      #+BEGIN_SRC emacs-lisp
@@ -1964,41 +2061,55 @@
    #+END_SRC
 **** sync with google calendar
      #+BEGIN_SRC emacs-lisp
-              (require 'url-http)
-              (use-package org-caldav)
-              (use-package oauth2)
-              (setq epa-pinentry-mode 'loopback)
-              (setq plstore-cache-passphrase-for-symmetric-encryption t)
+       (require 'url-http)
+       (use-package org-caldav)
+       (use-package oauth2)
+       (setq epa-pinentry-mode 'loopback)
+       (setq plstore-cache-passphrase-for-symmetric-encryption t)
 
-              (save-excursion
-                (let ((filename "~/.emacs.d/google-calendar-secret.el"))
-                  (when (file-exists-p filename)
-                    (set-buffer (find-file-noselect filename))
-                    (let ((var (eval (read (buffer-string)))))
-                      (setq org-caldav-oauth2-client-id (car var)
-                            org-caldav-oauth2-client-secret (cadr var)))
-                    (kill-buffer))))
+       (save-excursion
+         (let ((filename "~/.emacs.d/google-calendar-secret.el"))
+           (when (file-exists-p filename)
+             (set-buffer (find-file-noselect filename))
+             (let ((var (eval (read (buffer-string)))))
+               (setq org-caldav-oauth2-client-id (car var)
+                     org-caldav-oauth2-client-secret (cadr var)))
+             (kill-buffer))))
 
-              (setq org-caldav-url 'google
-                    org-caldav-calendar-id "jqeua8pamjrclakq3bg8mpnlis@group.calendar.google.com"
-                    org-caldav-inbox "~/MEGA/org/agenda/test.org"
-                    org-caldav-files '("~/MEGA/org/agenda/agenda.org")
-                    org-icalendar-include-todo nil
-                    org-icalendar-include-sexps t
-                    org-icalendar-categories '(all-tags category)
-                    org-icalendar-use-deadline '(event-if-todo event-if-not-todo todo-due)
-                    org-icalendar-use-scheduled '(event-if-todo event-if-not-todo todo-start)
-                    org-icalendar-with-timestamps nil
-                    org-caldav-delete-org-entries 'never)
+       ;; (setq org-caldav-url 'google
+       ;;       org-caldav-calendar-id "jqeua8pamjrclakq3bg8mpnlis@group.calendar.google.com"
+       ;;       org-caldav-inbox "~/MEGA/org/agenda/test.org"
+       ;;       org-caldav-files '("~/MEGA/org/agenda/agenda.org")
+       ;;       org-icalendar-include-todo nil
+       ;;       org-icalendar-include-sexps t
+       ;;       org-icalendar-categories '(all-tags category)
+       ;;       org-icalendar-use-deadline '(event-if-todo event-if-not-todo todo-due)
+       ;;       org-icalendar-use-scheduled '(event-if-todo event-if-not-todo todo-start)
+       ;;       org-icalendar-with-timestamps nil
+       ;;       org-caldav-delete-org-entries 'never)
 
-              (setq org-caldav-skip-conditions '(nottodo ("TODO" "NEXT"))
-                    org-caldav-exclude-tags '("ARCHIVE"))
+       (setq org-caldav-url "https://99.57.234.31/remote.php/dav/calendars/bchu"
+             org-caldav-calendar-id "orgmode"
+             org-caldav-inbox "~/MEGA/org/agenda/test.org"
+             org-caldav-files '("~/MEGA/org/agenda/agenda.org" "~/MEGA/org/agenda/classes_caldav_workaround.org"))
 
-              (defun always-use-loopback (fun context args)
-                (setf (epg-context-pinentry-mode context) epa-pinentry-mode)
-                (funcall fun context args))
-         
-              (advice-add 'epg--start :around #'always-use-loopback)
+       (setq org-icalendar-alarm-time 30
+             org-icalendar-include-todo nil
+             org-icalendar-include-sexps t
+             org-icalendar-categories '(all-tags category)
+             org-icalendar-use-deadline '(event-if-todo event-if-not-todo todo-due)
+             org-icalendar-use-scheduled '(todo-start event-if-todo)
+             org-icalendar-with-timestamps nil
+             org-caldav-delete-org-entries 'never)
+
+       (setq org-caldav-skip-conditions '(nottodo ("TODO" "NEXT"))
+             org-caldav-exclude-tags '("ARCHIVE" "ONLYEMACS"))
+
+       (defun always-use-loopback (fun context args)
+         (setf (epg-context-pinentry-mode context) epa-pinentry-mode)
+         (funcall fun context args))
+
+       (advice-add 'epg--start :around #'always-use-loopback)
      #+END_SRC
 **** Reveal.js
      #+BEGIN_SRC emacs-lisp
@@ -2012,9 +2123,28 @@
 **** org-timeline
      #+BEGIN_SRC emacs-lisp
      (use-package org-timeline)
-     (add-hook 'org-agenda-finalize-hook 'org-timeline-insert-timeline :append)
+     (remove-hook 'org-agenda-finalize-hook 'org-timeline-insert-timeline)
      
      #+END_SRC
+**** Code-blocks
+    #+BEGIN_SRC emacs-lisp
+      (require 'ob-core)
+      (require 'ob-clojure)
+      (require 'ob-plantuml)
+      (use-package plantuml-mode)
+
+      (setq org-babel-clojure-backend 'cider)
+      (org-babel-do-load-languages
+       'org-babel-load-languages
+       '((clojure . t)
+         (plantuml . t)))
+
+      (defun my-org-confirm-babel-evaluate (lang body)
+        (not (member lang '("plantuml"))))
+
+      (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
+      (setq org-plantuml-jar-path "/opt/plantuml/plantuml.jar")
+    #+END_SRC
 *** View org files
  #+BEGIN_SRC emacs-lisp
  (defun make-org-file (filename)
@@ -2034,17 +2164,10 @@
    (interactive)
    (dired "~/MEGA/org/"))
  #+END_SRC
-*** Allow alphabetic lists
-    #+BEGIN_SRC emacs-lisp
-      (setq org-list-allow-alphabetical t)
-    #+END_SRC
-*** My Template
-    #+BEGIN_SRC emacs-lisp
-    (add-to-list 'org-structure-template-alist
-     '("sv" "#+BEGIN_SRC ? :results value\n\n#+END_SRC"))
-    (add-to-list 'org-structure-template-alist
-     '("so" "#+BEGIN_SRC ? :results output\n\n#+END_SRC"))
-    #+END_SRC
+*** Remove faulty template from org-reveal
+    #+begin_src emacs-lisp
+    (setq org-structure-template-alist (remove-if (lambda (a) (string= (car a) "n")) org-structure-template-alist))
+    #+end_src
 ** Elfeed
 #+BEGIN_SRC emacs-lisp
     ;; Load elfeed-org

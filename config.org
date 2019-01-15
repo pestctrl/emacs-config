@@ -15,6 +15,219 @@
   (setq backup-directory-alist `(("." . ,(concat user-emacs-directory "backups"))))
   #+END_SRC
 * EXWM
+** Naming Windows
+   #+BEGIN_SRC emacs-lisp
+     (defvar my/window-name nil)
+
+     (defun exwmx-name-buffer ()
+       (interactive)
+       (let ((name (completing-read "Name: " (mapcar (lambda (a) (plist-get a :instance)) (exwmx-appconfig--get-all-appconfigs)))))
+         (exwm-workspace-rename-buffer name)
+         (setq-local exwm-instance-name name)))
+
+     (defun exwm-rename-buffer ()
+       (interactive)
+       (when my/window-name
+         (exwm-workspace-rename-buffer my/window-name)
+         (setq-local exwm-instance-name my/window-name)
+         (setq my/window-name nil)))
+
+     ;; Add these hooks in a suitable place (e.g., as done in exwm-config-default)
+     (add-hook 'exwm-manage-finish-hook 'exwm-rename-buffer)
+
+     (defun launch-program-with-name (cmd name)
+       (interactive)
+       (when name (setq my/window-name name))
+       (start-process-shell-command cmd nil cmd))
+   #+END_SRC
+** exwm-x stuff and naming windows
+   #+BEGIN_SRC emacs-lisp
+     (use-package exwm-x)
+     (require 'exwmx-quickrun) 
+
+     (defun exwmx-quickrun (command &optional search-alias ruler)
+       (exwmx--switch-window)
+       (let* ((ruler-plist-p (and ruler (exwmx--plist-p ruler)))
+              (keys
+               ;; Deal with ruler which is like (:class :instance :title)
+               (if (and ruler (listp ruler) (not ruler-plist-p))
+                   (exwmx--clean-keylist ruler)
+                 '(:class :instance)))
+              (appconfigs (exwmx-appconfig--get-all-appconfigs))
+              (cmd (if search-alias
+                       (or (plist-get (exwmx-appconfig--search
+                                       `((:alias ,command)))
+                                      :command)
+                           (when appconfigs
+                             (let ((appconfig (exwmx-appconfig--select-appconfig)))
+                               (plist-put appconfig :alias command)
+                               (exwmx-appconfig--add-appconfig appconfig)
+                               (plist-get appconfig :command))))
+                     command))
+              (buffer (or (if search-alias
+                              (exwmx-quickrun--find-buffer
+                               (if ruler-plist-p
+                                   ruler
+                                 (exwmx-appconfig--get-subset
+                                  (exwmx-appconfig--search
+                                   `((:alias ,command)))
+                                  keys)))
+                            (exwmx-quickrun--find-buffer
+                             (if ruler-plist-p
+                                 ruler
+                               (exwmx-appconfig--get-subset
+                                (exwmx-appconfig--search
+                                 `((:command ,command)))
+                                keys)))))))
+         (if (and search-alias (not cmd))
+             (message "EXWM-X: please run `exwmx-appconfig' to add appconfig.")
+           (message "EXWM-X Quick Run: %s" cmd))
+         ;; If current application window is a floating-window, minumize it.
+         (when (and (eq major-mode 'exwm-mode)
+                    exwm--floating-frame)
+           (exwm-floating-hide))
+         (if buffer
+             (exwm-workspace-switch-to-buffer buffer)
+           (when cmd
+             (launch-program-with-name cmd (plist-get ruler :instance))))))
+
+     (defun exwmx-quickrun--find-buffer (ruler)
+       "Find a exwm buffer which match `ruler', ruler is
+        a plist with three keys: :class, :instance and :title."
+       (let ((current (current-buffer))
+             (buffers (buffer-list))
+             (result '()))
+         (while buffers
+           (let ((buffer (pop buffers))
+                 (class (plist-get ruler :class))
+                 (instance (plist-get ruler :instance))
+                 (title (plist-get ruler :title)))
+             (with-current-buffer buffer
+               (when (and (or class instance title)
+                          (exwmx--string-match-p (or class ".*") exwm-class-name)
+                          (exwmx--string-match-p (or instance ".*") exwm-instance-name)
+                          (exwmx--string-match-p (or title ".*") exwm-title))
+                 (push buffer result)))))
+         (setq result (reverse result))
+         ;; If two more buffers are found, switch between these buffer.
+         (if (and (cadr result)
+                  (eq (car result) current))
+             (cadr result)
+           (car result))))
+
+     (defmacro quickrun-lambda (cmd instance)
+       (if (null instance)
+           `(lambda ()
+              (interactive)
+              (exwmx-quickrun ,cmd))
+         `(lambda ()
+            (interactive)
+            (exwmx-quickrun ,cmd nil '(:class ".*" :instance ,instance)))))
+
+     (use-package dmenu)            
+
+     (make-thread 
+      #'dmenu--cache-executable-files)
+
+
+     (defun read-program ()
+       (funcall #'ido-completing-read "$ "
+                (append dmenu--history-list
+                        (cl-remove-if (lambda (x)
+                                        (member x dmenu--history-list))
+                                      dmenu--cache-executable-files))))
+
+     (defun launch-program (command &optional process-name)
+       (interactive (list (read-program)))
+       (setq dmenu--history-list (cons command (remove command dmenu--history-list)))
+       (when (> (length dmenu--history-list)
+                dmenu-history-size)
+         (setcdr (nthcdr (- dmenu-history-size 1)
+                         dmenu--history-list)
+                 nil))
+       (let ((name (or process-name command)))
+         (start-process-shell-command name nil command)))
+
+     (defun exwmx-launch-program (command &optional process-name)
+       (interactive (list (read-program)))
+       (setq dmenu--history-list (cons command (remove command dmenu--history-list)))
+       (when (> (length dmenu--history-list)
+                dmenu-history-size)
+         (setcdr (nthcdr (- dmenu-history-size 1)
+                         dmenu--history-list)
+                 nil))
+       (exwmx-quickrun command))
+
+     ;; (exwmx-quickrun "firefox" nil '(:class ".*" :instance "School"))
+
+     ;; (exwmx-quickrun--find-buffer '(:class ".*" :instance "Hello"))
+   #+END_SRC
+** Youtube split
+   #+BEGIN_SRC emacs-lisp
+
+     (defun youtube-split ()
+       (interactive)
+       (split-window (selected-window) 526 t t))
+
+       
+     (defun big-youtube-split ()
+       (interactive)
+       (split-window (selected-window) 630 t t))
+   #+END_SRC
+** Disable simulation keys on an emacs window
+   #+BEGIN_SRC emacs-lisp
+     (add-hook 'exwm-manage-finish-hook
+               (lambda ()
+                 (when (and exwm-class-name (string= exwm-class-name "Emacs"))
+                   (exwm-input-set-local-simulation-keys nil))))
+   #+END_SRC
+** Custom keymap
+   #+BEGIN_SRC emacs-lisp
+     (defmacro exec (body)
+       `(lambda ()
+          (interactive)
+          ,body))
+
+     (define-prefix-command '*root-map*)
+     ;(global-set-key (kbd "C-t") '*root-map*)
+     (add-to-list 'exwm-input-prefix-keys ?\C-t)
+     (defun annoying-key-thing ()
+       (interactive)
+       (exwm-input--fake-key ?\C-t))
+     (define-key *root-map* (kbd "C-t") 'annoying-key-thing)
+     (define-key *root-map* (kbd "t") 'transpose-chars)
+     (define-key *root-map* (kbd "c") 'multi-term)
+     (define-key *root-map* (kbd "C-p") 'exwmx-launch-program)
+     (define-key *root-map* (kbd "e") (quickrun-lambda "emacs" "emacs"))
+     (define-key *root-map* (kbd "s") (quickrun-lambda "steam" nil))
+     (define-key *root-map* (kbd "q") (quickrun-lambda "qutebrowser" nil))
+     (define-key *root-map* (kbd "r") 'exwmx-name-buffer)
+     (define-key *root-map* (kbd "C-n") 'switch-window)
+     (define-key *root-map* (kbd ")") (lambda () (interactive) (shell-command "sleep 2s ; xset dpms force off")))
+
+     (define-prefix-command '*window-map*)
+     (define-key *root-map* (kbd "w") '*window-map*)
+     (define-key *window-map* (kbd "y") 'youtube-split)
+     (define-key *window-map* (kbd "Y") 'big-youtube-split)
+
+     (define-prefix-command '*firefox-map*)
+     (define-key *firefox-map* (kbd "f") (quickrun-lambda "firefox" "firefox"))
+     (define-key *firefox-map* (kbd "s") (quickrun-lambda "firefox" "school"))
+     (define-key *firefox-map* (kbd "w") (quickrun-lambda "firefox" "work"))
+     (define-key *firefox-map* (kbd "y") (quickrun-lambda "firefox" "youtube"))
+
+     (define-key *root-map* (kbd "f") '*firefox-map*)
+
+     (define-prefix-command '*music-map*)
+     (define-key *music-map* (kbd "SPC") (exec (shell-command "clementine -t")))
+     (define-key *music-map* (kbd "n") (exec (shell-command "clementine --next")))
+     (define-key *music-map* (kbd "p") (exec (shell-command "clementine --previous")))
+     (define-key *root-map* (kbd "m") '*music-map*)
+   #+END_SRC
+** Switch window
+   #+BEGIN_SRC emacs-lisp
+     (setq switch-window-input-style 'minibuffer)
+   #+END_SRC
 ** Meta
 #+BEGIN_SRC emacs-lisp
 (use-package exwm)
@@ -41,13 +254,36 @@
                           (exwm-workspace-switch-create ,i))))
                     (number-sequence 0 9))
           (,(kbd "s-b") . ivy-switch-buffer)
-          (,(kbd "s-a") . org-agenda)
           (,(kbd "s-c") . org-capture)
           (,(kbd "s-h") . split-window-right)
           (,(kbd "s-t") . split-window-below)
           (,(kbd "s-n") . switch-window)
           (,(kbd "s-k") . ido-kill-buffer)
-          (,(kbd "s-s") . resize-window)))
+          (,(kbd "C-t") . *root-map*)
+          (,(kbd "s-z") . resize-window)
+          (,(kbd "s-s") . youtube-split)
+          (,(kbd "s-n") . switch-to-next-buffer)
+          (,(kbd "s-p") . switch-to-prev-buffer)
+          (,(kbd "s-a") . my/toggle-keyboard)
+          (,(kbd "s-!") . (lambda () (interactive) (exwm-workspace-move-window 0)))
+          (,(kbd "s-@") . (lambda () (interactive) (exwm-workspace-move-window 1)))
+          (,(kbd "s-#") . (lambda () (interactive) (exwm-workspace-move-window 2)))
+          (,(kbd "s-$") . (lambda () (interactive) (exwm-workspace-move-window 3)))))
+
+  (defun dvorak? ()
+    (string= (shell-command-to-string "setxkbmap -v | grep symbols")
+             "symbols:    pc+de(neo_dvorak)+inet(evdev)+terminate(ctrl_alt_bksp)
+  "))
+
+  (defun set-keyboard (layout)
+    (shell-command (format "setxkbmap %s" layout)))
+
+  (defun my/toggle-keyboard ()
+    (interactive)
+    (if (dvorak?)
+        (set-keyboard "us")
+      (set-keyboard "de neo_dvorak")))
+
   (global-set-key (kbd "M-T") 'flop-frame)
   (global-set-key (kbd "C-x p") 'launch-program)
   (global-set-key (kbd "M-…") 'multi-term)
@@ -75,90 +311,71 @@
 ** Helper functions
 #+BEGIN_SRC emacs-lisp
 
-     (defvar wallpaper-path "/home/benson/.emacs.d/res/digital_space_universe_4k_8k-wide.jpg")
-     (defvar live-wallpaper-path "/home/benson/MEGA/pictures/wallpapers/videos/bg.mp4")
-     (setq i3-string "Xephyr -br -ac -noreset -resizeable -screen 1920x1080 :1 & sleep 1s; DISPLAY=:1 i3")
-     (defvar exwm-startup-programs
-       '("megasync"
-         ("compton -f -i .7 -b")
-         ("/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1")
-         ("nm-applet")
-         ;(i3-string)
-         ))
-     (defvar hard-drive-space "")
+  (defvar wallpaper-path "/home/benson/.emacs.d/res/digital_space_universe_4k_8k-wide.jpg")
+  (defvar live-wallpaper-path "/home/benson/MEGA/pictures/wallpapers/videos/bg.mp4")
+  (setq i3-string "Xephyr -br -ac -noreset -resizeable -screen 1920x1080 :1 & sleep 1s; DISPLAY=:1 i3")
+  (defvar exwm-startup-programs
+    '("megasync"
+      ("compton -f -i .7 -b")
+      ("/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1")
+      ("nm-applet")
+      ;(i3-string)
+      ))
+  (defvar hard-drive-space "")
 
-     (defun launch-i3 ()
-       (interactive)
-       (launch-program i3-string))
+  (defun launch-i3 ()
+    (interactive)
+    (launch-program i3-string))
 
-     (defun lock-screen ()
-       (interactive)
-       (shell-command "i3lock-fancy"))
+  (defun lock-screen ()
+    (interactive)
+    (let ((res (shell-command-to-string "pgrep i3lock-fancy")))
+      (when (zerop (length res))
+        (shell-command "i3lock-fancy"))))
 
-     (setq enable-recursive-minibuffers t)
-     (defun counsel-shell-command ()
-       "Forward to `shell-command'."
-       (interactive)
-       (ivy-read "Shell Command: "
-                 shell-command-history
-                 :caller 'counsel-shell-command))
+  (setq enable-recursive-minibuffers t)
+  (defun counsel-shell-command ()
+    "Forward to `shell-command'."
+    (interactive)
+    (ivy-read "Shell Command: "
+              shell-command-history
+              :caller 'counsel-shell-command))
 
-     (use-package dmenu)            
+  (defun dmenu-run ()
+    (interactive)
+    (shell-command "dmenu" nil "dmenu_run -b"))
 
-     (make-thread 
-       #'dmenu--cache-executable-files)
+  (defun call-startup-programs ()
+    (dolist (program exwm-startup-programs)
+      (if (listp program)
+        (launch-program (car program) (cadr program))
+        (launch-program program))))
 
-    
-     (defun read-program ()
-       (funcall #'ido-completing-read "$ "
-                                        (append dmenu--history-list
-                                                (cl-remove-if (lambda (x)
-                                                                (member x dmenu--history-list))
-                                                              dmenu--cache-executable-files))))
+  (defun setup-wallpaper ()
+    (launch-program (concat "feh --bg-fill " wallpaper-path) "feh"))
 
-     (defun launch-program (command &optional process-name)
-       (interactive (list (read-program)))
-       (setq dmenu--history-list (cons command (remove command dmenu--history-list)))
-       (when (> (length dmenu--history-list) dmenu-history-size)
-       (setcdr (nthcdr (- dmenu-history-size 1) dmenu--history-list) nil))
-       (let ((name (or process-name command)))
-         (start-process-shell-command name nil command)))
+  (defun setup-live-wallpaper () 
+    (if (get-process "xwinwrap")
+      (delete-process "xwinwrap"))
+    (launch-program (concat "xwinwrap -ni -ov -g 1920x1080+1280+0 -s -st -sp -nf -- mpv --loop=inf -wid WID " live-wallpaper-path) "xwinwrap"))
 
-     (defun dmenu-run ()
-       (interactive)
-       (shell-command "dmenu" nil "dmenu_run -b"))
+  (defun get-hard-drive-space ()
+    (shell-command-to-string "df -h -P -l ~/ | tail -n 1 | tr -s ' ' | cut -d ' ' -f 4"))
 
-     (defun call-startup-programs ()
-       (dolist (program exwm-startup-programs)
-         (if (listp program)
-           (launch-program (car program) (cadr program))
-           (launch-program program))))
+  (defun update-hard-drive-space-string ()
+    (setq hard-drive-space
+          (let ((space-left (get-hard-drive-space)))
+            (concat " "
+                    (substring space-left
+                               0
+                               (1- (length space-left)))))))
 
-     (defun setup-wallpaper ()
-       (launch-program (concat "feh --bg-fill " wallpaper-path) "feh"))
-
-     (defun setup-live-wallpaper () 
-       (if (get-process "xwinwrap")
-         (delete-process "xwinwrap"))
-       (launch-program (concat "xwinwrap -ni -ov -g 1920x1080+1280+0 -s -st -sp -nf -- mpv --loop=inf -wid WID " live-wallpaper-path) "xwinwrap"))
-
-     (defun get-hard-drive-space ()
-       (shell-command-to-string "df -h -P -l ~/ | tail -n 1 | tr -s ' ' | cut -d ' ' -f 4"))
-
-     (defun update-hard-drive-space-string ()
-       (setq hard-drive-space
-             (let ((space-left (get-hard-drive-space)))
-               (concat " "
-                       (substring space-left
-                                  0
-                                  (1- (length space-left)))))))
-
-     (defun display-hard-drive-space-mode ()
-       (if (not (member 'hard-drive-space
-                        global-mode-string))
-           (add-to-list 'global-mode-string
-                        'hard-drive-space
-                        t)))
+  (defun display-hard-drive-space-mode ()
+    (if (not (member 'hard-drive-space
+                     global-mode-string))
+        (add-to-list 'global-mode-string
+                     'hard-drive-space
+                     t)))
 #+END_SRC
 ** Workspace WIP
    #+BEGIN_SRC emacs-lisp
@@ -229,11 +446,26 @@
 
 *** Emacs server, startup programs, wallpaper
 #+BEGIN_SRC emacs-lisp
-   (add-hook 'exwm-init-hook 'server-start)
+  (add-hook 'exwm-init-hook 'server-start)
 
-   ; Reminder: Hooks execute in order. Make sure megasync launches after systemtray is enabled
-   (add-hook 'exwm-init-hook 'call-startup-programs)
-   (add-hook 'exwm-init-hook 'setup-wallpaper)
+  ; Reminder: Hooks execute in order. Make sure megasync launches after systemtray is enabled
+  (add-hook 'exwm-init-hook 'call-startup-programs)
+  (add-hook 'exwm-init-hook 'setup-wallpaper)
+
+  (defun my/setup-screens ()
+    (interactive)
+    (let ((result (shell-command-to-string "xrandr --query | grep -e connected | grep -v -e disconnected -e eDP1 | cut -d ' ' -f 1 | tr -d \"\\n\"")))
+      (setq exwm-randr-workspace-output-plist `(2 ,result 3 ,result))
+      (when (> (length result) 0)
+        (let* ((response (completing-read (format "Monitor %s detected. Resolution? " result) '("2560x1440" "1920x1080" "3840x2160") nil t "^"))
+               (length (string-to-number (substring response 0 4)))
+               (height (string-to-number (substring response 5 9))))
+          (shell-command (format "xrandr --output %s --mode %s --above eDP1" result response))
+          (let ((pos (completing-read "Position? " (mapcar #'number-to-string (list 0 (/ (- length 1920) 2) 1200)) nil t "^")))
+            (shell-command (format "xrandr --output eDP1 --pos %sx%s" pos height))))))
+    (setup-wallpaper))
+  (add-hook 'exwm-init-hook 'my/setup-screens)
+
 #+END_SRC
 
 *** System tray, display time, display battery, display hard-drive-space

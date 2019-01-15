@@ -318,6 +318,7 @@
     '("megasync"
       ("compton -f -i .7 -b")
       ("/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1")
+      ("/usr/lib/notification-daemon-1.0/notification-daemon")
       ("nm-applet")
       ;(i3-string)
       ))

@@ -2463,24 +2463,35 @@
 *** Yasnippets
     #+BEGIN_SRC emacs-lisp
     (use-package yasnippet)
-    (define-key yas-minor-mode-map (kbd "<backtab>") 'yas-expand)
+    ;(define-key yas-minor-mode-map (kbd "<backtab>") 'yas-expand)
     (yas-global-mode 1)
     #+END_SRC
-*** Projectile
+*** Projectile and dumb-jump
 #+BEGIN_SRC emacs-lisp
   (use-package projectile)
   (use-package helm-projectile)
-  ; (use-package counsel-projectile)
+  (use-package counsel-projectile)
 
   (projectile-global-mode)
   ; Deprecated?
-  ;(counsel-projectile-on)
+  (counsel-projectile-mode)
   (cons 'projectile-root-bottom-up
         (remove 'projectile-root-bottom-up
                 projectile-project-root-files-functions))
   (setq projectile-indexing-method 'native)
   (setq projectile-completion-system 'ivy)
-  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  (define-key projectile-mode-map (kbd "C-c C-p") 'projectile-command-map)
+  (define-key projectile-command-map (kbd "C-a") 'projectile-add-known-project)
+  (define-key projectile-command-map (kbd "C-r") 'projectile-remove-known-project)
+
+  (defun this-is-a-project (dir)
+    (interactive "f")
+    (setq projectile-project-root dir)
+    (set (make-local-variable 'dumb-jump-project) dir))
+
+  (define-key projectile-command-map (kbd "C-t") 'this-is-a-project)
+  (use-package dumb-jump)
+  (dumb-jump-mode)
 #+END_SRC
 *** hs-minor-mode
 #+BEGIN_SRC emacs-lisp
@@ -2783,16 +2794,74 @@
    #+END_SRC
 ** Eyebrowse
    #+BEGIN_SRC emacs-lisp
-   (use-package eyebrowse)
-   (eyebrowse-mode)
-   (global-set-key (kbd "C->") 'eyebrowse-next-window-config)
-   (global-set-key (kbd "C-<") 'eyebrowse-prev-window-config)
+     (use-package eyebrowse
+       :init (setq eyebrowse-keymap-prefix (kbd "C-c w"))
+       :config
+       (eyebrowse-mode)
+       (global-set-key (kbd "C->") 'eyebrowse-next-window-config)
+       (global-set-key (kbd "C-<") 'eyebrowse-prev-window-config))
    #+END_SRC
 ** org-jira
    #+BEGIN_SRC emacs-lisp
    (use-package org-jira)
    (setq jiralib-url "https://wenningbai.atlassian.net/")
    #+END_SRC
+** Writing mode
+   #+BEGIN_SRC emacs-lisp
+     (defun org-writing-mode ()
+       (interactive)
+       (setq org-bullets-bullet-list (quote ("  ")))
+       (buffer-face-set '(:family "ETBookOT")))
+   #+END_SRC
+** re-builder specify read method
+   #+begin_src emacs-lisp
+   (require 're-builder)
+   (setq reb-re-syntax 'string)
+   #+end_src
+** Rainbow delimiters
+   #+begin_src emacs-lisp
+     (use-package rainbow-delimiters)
+     (rainbow-delimiters-mode)
+     (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
+     (add-hook 'org-mode-hook #'rainbow-delimiters-mode)
+
+     (let ((rainbow-purple  "#9E1CB2")
+           (rainbow-blue  "#1194f6")
+           (rainbow-green  "#47B04B")
+           (rainbow-yellow  "#FFED18")
+           (rainbow-orange  "#E7B500")
+           (rainbow-red  "#C90067")
+           (rainbow-7  "#00AA5D")
+           (rainbow-8  "#FE7380"))
+       (custom-set-faces 
+        `(rainbow-delimiters-depth-1-face  ((t (:foreground ,rainbow-purple))))
+        `(rainbow-delimiters-depth-2-face  ((t (:foreground ,rainbow-green))))
+        `(rainbow-delimiters-depth-3-face  ((t (:foreground ,rainbow-blue))))
+        `(rainbow-delimiters-depth-4-face  ((t (:foreground ,rainbow-red))))
+        `(rainbow-delimiters-depth-5-face  ((t (:foreground ,rainbow-yellow))))
+        `(rainbow-delimiters-depth-6-face  ((t (:foreground ,rainbow-blue))))
+        `(rainbow-delimiters-depth-7-face  ((t (:foreground ,rainbow-red))))
+        `(rainbow-delimiters-depth-8-face  ((t (:foreground ,rainbow-8))))
+        `(rainbow-delimiters-depth-9-face  ((t (:foreground ,rainbow-purple))))
+        `(rainbow-delimiters-depth-10-face ((t (:foreground ,rainbow-blue))))
+        `(rainbow-delimiters-depth-11-face ((t (:foreground ,rainbow-green))))
+        `(rainbow-delimiters-depth-12-face ((t (:foreground ,rainbow-yellow))))))
+   #+end_src
+** new-text-color
+   #+begin_src emacs-lisp
+     (custom-set-faces
+      '(default ((t (:background "gray8" :foreground "#70FF00")))))
+   #+end_src
+** dired-du
+   #+begin_src emacs-lisp
+   (use-package dired-du)
+   #+end_src
+** scrollkeeper
+   #+begin_src emacs-lisp
+   (use-package scrollkeeper)
+   (global-set-key (kbd "C-v") 'scrollkeeper-down)
+   (global-set-key (kbd "M-v") 'scrollkeeper-up)
+   #+end_src
 * Broken
 ** mu4e
 *** General config
@@ -2872,7 +2941,7 @@
      (setq org-wunderlist-file  "~/MEGA/org/agenda/Wunderlist.org"
            org-wunderlist-dir "~/MEGA/org/agenda/org-wunderlist/")
    #+END_SRC
-* Disabled 
+* Disabled
 ** nnreddit
  #+BEGIN_SRC emacs-lisp#
  (use-package nnredit "~/.emacs.d/nnreddit/nnreddit.el")
@@ -3496,3 +3565,4 @@
                (org-agenda-redo)))
          (widen)))
    #+END_SRC
+   

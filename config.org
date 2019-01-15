@@ -2169,28 +2169,28 @@
     (setq org-structure-template-alist (remove-if (lambda (a) (string= (car a) "n")) org-structure-template-alist))
     #+end_src
 ** Elfeed
-#+BEGIN_SRC emacs-lisp
-    ;; Load elfeed-org
-    (use-package elfeed)
-    (use-package elfeed-org)
+*** Setup feeds
+ #+BEGIN_SRC emacs-lisp
+     ;; Load elfeed-org
+     (use-package elfeed)
+     (use-package elfeed-org)
 
-    ;; Initialize elfeed-org
-    ;; This hooks up elfeed-org to read the configuration when elfeed
-    ;; is started with =M-x elfeed=
-
-    ;; Optionally specify a number of files containing elfeed
-    ;; configuration. If not set then the location below is used.
-    ;; Note: The customize interface is also supported.
-    (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org"))
-    (elfeed-org)
-    (setq-default elfeed-search-filter "@6-months-ago +unread -youtube")
-    (define-key elfeed-search-mode-map "U" 'elfeed-search-fetch-visible)
-    (define-key elfeed-search-mode-map "Y" (lambda ()
-                         (interactive)
-                         (elfeed-search-set-filter "+youtube +unread")))
-    (define-key elfeed-search-mode-map "h" (lambda ()
-                         (interactive)
-                         (elfeed-search-set-filter nil)))
+     (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org"))
+     (elfeed-org)
+     (setq-default elfeed-search-filter "@6-months-ago +unread -youtube")
+     (define-key elfeed-search-mode-map "U" 'elfeed-search-fetch-visible)
+     (define-key elfeed-search-mode-map "Y" (lambda ()
+                          (interactive)
+                          (elfeed-search-set-filter "+youtube +unread")))
+     (define-key elfeed-search-mode-map "A" (lambda ()
+                          (interactive)
+                          (elfeed-search-set-filter "@6-months-ago +unread -youtube")))
+     (define-key elfeed-search-mode-map "h" (lambda ()
+                          (interactive)
+                          (elfeed-search-set-filter nil)))
+ #+END_SRC
+*** youtube-dl
+  #+begin_src emacs-lisp
 
     (defun elfeed-show-youtube-dl ()
       "Download the current entry with youtube-dl."
@@ -2213,7 +2213,6 @@
 
     (define-key elfeed-search-mode-map "d" 'elfeed-search-youtube-dl)
     (setq youtube-dl-directory "~/big_files/Videos/youtube-dl")
-
   (require 'dired-aux)
 
   (defvar dired-filelist-cmd
@@ -2252,10 +2251,202 @@
       (apply orig-fun args)))
 
   (advice-add 'dired-do-async-shell-command :around #'dired-async-save-excursion)
+  #+end_src
+*** Youtube show thumbnail
+  #+begin_src emacs-lisp
+    (use-package dash)
+    (defun elfeed-entries-from-atom (url xml)
+      "Turn parsed Atom content into a list of elfeed-entry structs."
+      (let* ((feed-id url)
+             (protocol (url-type (url-generic-parse-url url)))
+             (namespace (elfeed-url-to-namespace url))
+             (feed (elfeed-db-get-feed feed-id))
+             (title (elfeed-cleanup (xml-query* (feed title *) xml)))
+             (author (elfeed-cleanup (xml-query* (feed author name *) xml)))
+             (xml-base (or (xml-query* (feed :base) xml) url))
+             (autotags (elfeed-feed-autotags url)))
+        (setf (elfeed-feed-url feed) url
+              (elfeed-feed-title feed) title
+              (elfeed-feed-author feed) author)
+        (cl-loop for entry in (xml-query-all* (feed entry) xml) collect
+                 (let* ((title (or (xml-query* (title *) entry) ""))
+                        (xml-base (elfeed-update-location
+                                   xml-base (xml-query* (:base) (list entry))))
+                        (anylink (xml-query* (link :href) entry))
+                        (altlink (xml-query* (link [rel "alternate"] :href) entry))
+                        (link (elfeed--fixup-protocol
+                               protocol
+                               (elfeed-update-location xml-base
+                                                       (or altlink anylink))))
+                        (date (or (xml-query* (published *) entry)
+                                  (xml-query* (updated *) entry)
+                                  (xml-query* (date *) entry)
+                                  (xml-query* (modified *) entry) ; Atom 0.3
+                                  (xml-query* (issued *) entry))) ; Atom 0.3
+                        (author-name (or (xml-query* (author name *) entry)
+                                         ;; Dublin Core
+                                         (xml-query* (creator *) entry)))
+                        (author-email (xml-query* (author email *) entry))
+                        (author (cond ((and author-name author-email)
+                                       (format "%s <%s>" author-name author-email))
+                                      (author-name)))
+                        (categories (xml-query-all* (category :term) entry))
+                        (content (elfeed--atom-content entry))
+                        (id (or (xml-query* (id *) entry) link
+                                (elfeed-generate-id content)))
+                        (type (or (xml-query* (content :type) entry)
+                                  (xml-query* (summary :type) entry)
+                                  ""))
+                        (tags (elfeed-normalize-tags autotags elfeed-initial-tags))
+                        (content-type (if (string-match-p "html" type) 'html nil))
+                        (etags (xml-query-all* (link [rel "enclosure"]) entry))
+                        (thumb (xml-query* (group thumbnail :url) entry))
+                        (enclosures
+                         (cl-loop for enclosure in etags
+                                  for wrap = (list enclosure)
+                                  for href = (xml-query* (:href) wrap)
+                                  for type = (xml-query* (:type) wrap)
+                                  for length = (xml-query* (:length) wrap)
+                                  collect (list href type length)))
+                        (db-entry (elfeed-entry--create
+                                   :title (elfeed-cleanup title)
+                                   :feed-id feed-id
+                                   :id (cons namespace (elfeed-cleanup id))
+                                   :link (elfeed-cleanup link)
+                                   :tags tags
+                                   :date (or (elfeed-float-time date) (float-time))
+                                   :content content
+                                   :enclosures enclosures
+                                   :content-type content-type
+                                   :meta `(,@(when author
+                                               (list :author author))
+                                           ,@(when categories
+                                               (list :categories categories))
+                                           ,@(when thumb
+                                               (list :thumbnail (elfeed-get-thumbnail thumb)))))))
+                   (setq debug/entry db-entry)
+                   (dolist (hook elfeed-new-entry-parse-hook)
+                     (funcall hook :atom entry db-entry))
+                   db-entry))))
 
+    (defun elfeed-insert-sliced-thumbnail (orig-fun entry)
+      (let ((thumbnail (elfeed-meta entry :thumbnail)))
+        (if (null thumbnail)
+            (funcall orig-fun entry)
+          (insert-sliced-image (create-image thumbnail 'imagemagick nil :height 150) nil nil 4)
+          (delete-backward-char 1)
+          (previous-line)
+          (previous-line)
+          (end-of-line)
+          (let* ((date (elfeed-search-format-date (elfeed-entry-date entry)))
+                 (title (or (elfeed-meta entry :title) (elfeed-entry-title entry) ""))
+                 (title-faces (elfeed-search--faces (elfeed-entry-tags entry)))
+                 (feed (elfeed-entry-feed entry))
+                 (feed-title
+                  (when feed
+                    (or (elfeed-meta feed :title) (elfeed-feed-title feed))))
+                 (tags (mapcar #'symbol-name (elfeed-entry-tags entry)))
+                 (tags-str (mapconcat
+                            (lambda (s) (propertize s 'face 'elfeed-search-tag-face))
+                            tags ","))
+                 (title-width (- (window-width) 10 elfeed-search-trailing-width))
+                 (title-column (elfeed-format-column
+                                title (elfeed-clamp
+                                       elfeed-search-title-min-width
+                                       title-width
+                                       elfeed-search-title-max-width)
+                                :left)))
+            (insert " " (propertize title-column 'face title-faces 'kbd-help title) " ")
+            (next-line)
+            (insert " " (propertize date 'face 'elfeed-search-date-face) " ")
+            (when feed-title
+              (insert (propertize feed-title 'face 'elfeed-search-feed-face) " "))
+            (when tags
+              (insert "(" tags-str ")")))
+          (next-line)
+          (end-of-line))))
 
-  (use-package dired-du)
-#+END_SRC
+    (defun elfeed-insert-sliced-thumbnail (orig-fun entry)
+      (let ((thumbnail (elfeed-meta entry :thumbnail)))
+        (if (null thumbnail)
+            (funcall orig-fun entry)
+          (insert-sliced-image (create-image thumbnail 'imagemagick nil :height 150) nil nil 4)
+          (delete-backward-char 1)
+          (previous-line)
+          (previous-line)
+          (end-of-line)
+          (let* ((date (elfeed-search-format-date (elfeed-entry-date entry)))
+                 (title (or (elfeed-meta entry :title) (elfeed-entry-title entry) ""))
+                 (title-faces (elfeed-search--faces (elfeed-entry-tags entry)))
+                 (feed (elfeed-entry-feed entry))
+                 (feed-title
+                  (when feed
+                    (or (elfeed-meta feed :title) (elfeed-feed-title feed))))
+                 (tags (mapcar #'symbol-name (elfeed-entry-tags entry)))
+                 (tags-str (mapconcat
+                            (lambda (s) (propertize s 'face 'elfeed-search-tag-face))
+                            tags ","))
+                 (title-width (- (window-width) 10 elfeed-search-trailing-width))
+                 (title-column (elfeed-format-column
+                                title (elfeed-clamp
+                                       elfeed-search-title-min-width
+                                       title-width
+                                       elfeed-search-title-max-width)
+                                :left)))
+            (insert " " (propertize title-column 'face title-faces 'kbd-help title) " ")
+            (next-line)
+            (insert " " (propertize date 'face 'elfeed-search-date-face) " ")
+            (when feed-title
+              (insert (propertize feed-title 'face 'elfeed-search-feed-face) " "))
+            (when tags
+              (insert "(" tags-str ")")))
+          (next-line)
+          (end-of-line))))
+
+    (defun elfeed-insert-thumbnail (entry)
+      (let ((thumbnail (elfeed-meta entry :thumbnail)))
+        (if (null thumbnail)
+            (insert "")
+          (insert " ")
+          (insert-image (create-image thumbnail 'imagemagick nil :height 150))
+          (insert " "))))
+
+    (advice-add 'elfeed-search-print-entry--default :before #'elfeed-insert-thumbnail)
+
+    (defvar elfeed-link-org-capture nil)
+    (defun elfeed-show-insert-thumbnail ()
+      (let ((inhibit-read-only t)
+            (thumbnail (elfeed-meta elfeed-show-entry :thumbnail)))
+        (if (null thumbnail)
+            (insert "")
+          (insert-image (create-image thumbnail 'imagemagick nil :height 150))
+          (insert "\n"))
+        (goto-char (point-min))
+        (setq elfeed-link-org-capture
+              (format "[[%s][%s]] :%s:%s:"
+                      (elfeed-entry-link elfeed-show-entry)
+                      (elfeed-entry-title elfeed-show-entry)
+                      (elfeed-meta elfeed-show-entry :author)
+                      (string-join (mapcar #'symbol-name (elfeed-entry-tags elfeed-show-entry)) ":")))))
+
+    (advice-add 'elfeed-show-refresh--mail-style :after #'elfeed-show-insert-thumbnail)
+
+    (defun elfeed-get-thumbnail (url)
+      (let* ((file (--> url
+                        (split-string it "/")
+                        (nth 4 it)
+                        (concat it ".jpg")))
+             (img-url (replace-regexp-in-string "/hqdefault.jpg$" "/mqdefault.jpg" url))
+             (img-folder (--> "images"
+                              (expand-file-name it elfeed-db-directory)
+                              (file-name-as-directory it)))
+             (filepath (concat img-folder file)))
+        (unless (file-directory-p img-folder)
+          (make-directory img-folder))
+        (unless (file-exists-p filepath)
+          (start-process-shell-command "wget" nil (format "wget %s -O %s" img-url filepath)))
+        filepath))
+  #+end_src
 ** Programming
 *** Autocompletion
 #+BEGIN_SRC emacs-lisp

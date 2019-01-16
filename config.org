@@ -15,6 +15,12 @@
   (setq backup-directory-alist `(("." . ,(concat user-emacs-directory "backups"))))
   #+END_SRC
 * EXWM
+** Meta
+#+BEGIN_SRC emacs-lisp
+(use-package exwm)
+(require 'exwm-config)
+(exwm-config-default)
+#+END_SRC
 ** Naming Windows
    #+BEGIN_SRC emacs-lisp
      (defvar my/window-name nil)
@@ -228,12 +234,6 @@
    #+BEGIN_SRC emacs-lisp
      (setq switch-window-input-style 'minibuffer)
    #+END_SRC
-** Meta
-#+BEGIN_SRC emacs-lisp
-(use-package exwm)
-(require 'exwm-config)
-(exwm-config-default)
-#+END_SRC
 ** Multimonitor support
 #+BEGIN_SRC emacs-lisp
 (require 'exwm-randr)

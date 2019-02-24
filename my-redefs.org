@@ -1,3 +1,216 @@
+* Filter by top heading, but only top todo heading
+  #+begin_src emacs-lisp
+    (defun my/org-find-parent (pos)
+      (save-excursion
+        (with-current-buffer (if (markerp pos) (marker-buffer pos) (current-buffer))
+          (when pos (goto-char pos))
+          ;; Skip up to the topmost parent.
+          (while (save-excursion
+                   (org-up-heading-safe)
+                   (org-get-todo-state))
+            (org-up-heading-safe))
+          (ignore-errors (nth 4 (org-heading-components))))))
+
+    (defun org-agenda-filter-by-top-headline (strip)
+      "Keep only those lines that are descendants from the same top headline.
+    The top headline is that of the current line."
+      (interactive "P")
+      (if org-agenda-filtered-by-top-headline
+          (progn
+            (setq org-agenda-filtered-by-top-headline nil
+                  org-agenda-top-headline-filter nil)
+            (org-agenda-filter-show-all-top-filter))
+        (let ((toph (my/org-find-parent (org-get-at-bol 'org-hd-marker))))
+          (if toph (org-agenda-filter-top-headline-apply toph strip)
+            (error "No top-level headline at point")))))
+  #+end_src
+* org-timeline at beginning of agenda buffer
+  #+BEGIN_SRC emacs-lisp
+    (defun org-timeline-insert-timeline ()
+      "Insert graphical timeline into agenda buffer."
+      (unless (buffer-narrowed-p)
+        (goto-char (point-min))
+        (while (and (not (eq (get-text-property (line-beginning-position) 'org-agenda-type) 'agenda))
+                    (not (eobp)))
+          (forward-line))
+        (forward-line)
+        (unless (eobp)
+          (let ((inhibit-read-only t))
+            (insert (org-timeline--generate-timeline))
+            (insert (propertize (concat "\n" (make-string (/ (window-width) 2) ?─)) 'face 'org-time-grid) "\n"))
+          ;; enable `font-lock-mode' in agenda view to display the "chart"
+          (font-lock-mode))))
+  #+END_SRC
+* org-caldav bug
+#+BEGIN_SRC emacs-lisp
+    (defun org-caldav-skip-function (backend)
+      (when (eq backend 'icalendar)
+        (org-map-entries
+         (lambda ()
+           (let ((pt (save-excursion (apply 'org-agenda-skip-entry-if org-caldav-skip-conditions))))
+             (when (or pt
+                       ;;(org-get-repeat)
+                       ) ;; No repeating tasks
+               (org-todo 'none)
+               (let ((current-prefix-arg '(4))) 
+                 (call-interactively 'org-schedule)
+                 (call-interactively 'org-deadline))))))))
+#+END_SRC
+* Another org-caldav bug
+https://github.com/org-trello/org-trello/issues/258
+#+BEGIN_SRC emacs-lisp
+
+  (defun url-http-end-of-document-sentinel (proc why)
+  ;; Sentinel used to handle (i) terminated old HTTP/0.9 connections,
+  ;; and (ii) closed connection due to reusing a HTTP connection which
+  ;; we believed was still alive, but which the server closed on us.
+  ;; We handle case (ii) by calling `url-http' again.
+  (url-http-debug "url-http-end-of-document-sentinel in buffer (%s)"
+		  (process-buffer proc))
+  (url-http-idle-sentinel proc why)
+  (when (buffer-name (process-buffer proc))
+    (with-current-buffer (process-buffer proc)
+      (goto-char (point-min))
+      (cond ((not (looking-at "HTTP/"))
+	     (if url-http-no-retry
+		 ;; HTTP/0.9 just gets passed back no matter what
+		 (url-http-activate-callback)
+	       ;; Call `url-http' again if our connection expired.
+	       (erase-buffer)
+               (let ((url-request-method url-http-method)
+                     (url-request-extra-headers url-http-extra-headers)
+                     (url-request-data url-http-data)
+                     (url-using-proxy (url-find-proxy-for-url
+                                       url-current-object
+                                       (url-host url-current-object))))
+                 (when url-using-proxy
+                   (setq url-using-proxy
+                         (url-generic-parse-url url-using-proxy)))
+                 (if (string= "https" (url-type url-current-object))
+                     (setq url-gateway-method 'tls))
+                 (url-http url-current-object url-callback-function
+                           url-callback-arguments (current-buffer)))))
+	    ((url-http-parse-headers)
+	     (url-http-activate-callback))))))
+
+#+END_SRC
+* I don't like the help window behavior
+  #+BEGIN_SRC emacs-lisp
+    (defun my/goto-variable (var &optional file)
+      (when (eq file 'C-source)
+        (setq file (help-C-file-name var 'var)))
+      (let* ((location (find-variable-noselect var file))
+             (position (cdr location)))
+        (switch-to-buffer (car location))
+        (run-hooks 'find-function-after-hook)
+        (if position
+            (progn
+              ;; Widen the buffer if necessary to go to this position.
+              (when (or (< position (point-min))
+                        (> position (point-max)))
+                (widen))
+              (goto-char position))
+          (message "Unable to find location in file"))))
+
+    (define-button-type 'help-variable-def
+      :supertype 'help-xref
+      'help-function #'my/goto-variable
+      'help-echo (purecopy "mouse-2, RET: find variable's definition"))
+
+    (defun my/goto-function (fun &optional file type)
+      (or file
+          (setq file (find-lisp-object-file-name fun type)))
+      (if (not file)
+          (message "Unable to find defining file")
+        (require 'find-func)
+        (when (eq file 'C-source)
+          (setq file
+                (help-C-file-name (indirect-function fun) 'fun)))
+        ;; Don't use find-function-noselect because it follows
+        ;; aliases (which fails for built-in functions).
+        (let ((location
+               (find-function-search-for-symbol fun type file)))
+          (switch-to-buffer (car location))
+          (run-hooks 'find-function-after-hook)
+          (if (cdr location)
+              (goto-char (cdr location))
+            (message "Unable to find location in file")))))
+
+    (define-button-type 'help-function-def
+      :supertype 'help-xref
+      'help-function #'my/goto-function
+      'help-echo (purecopy "mouse-2, RET: find function's definition"))
+  #+END_SRC
+* Org agenda supposedly has an option to make no timestamp on a date mean the end of the day 
+  However, the behavior reflected is not so. Therefore, I have added some code to manually add the end-of-day timestamp manually
+  #+BEGIN_SRC emacs-lisp
+        (setq org-sort-agenda-notime-is-late t)
+
+        (defun my-org-agenda-entry-get-agenda-timestamp (pom)
+          "Retrieve timestamp information for sorting agenda views.
+                      Given a point or marker POM, returns a cons cell of the timestamp
+                      and the timestamp type relevant for the sorting strategy in
+                      `org-agenda-sorting-strategy-selected'."
+          (let (ts ts-date-type)
+            (save-match-data
+              (cond ((org-em 'scheduled-up 'scheduled-down
+                             org-agenda-sorting-strategy-selected)
+                     (setq ts (org-entry-get pom "SCHEDULED")
+                           ts-date-type " scheduled"))
+                    ((org-em 'deadline-up 'deadline-down
+                             org-agenda-sorting-strategy-selected)
+                     (setq ts (org-entry-get pom "DEADLINE")
+                           ts-date-type " deadline"))
+                    ((org-em 'ts-up 'ts-down
+                             org-agenda-sorting-strategy-selected)
+                     (setq ts (org-entry-get pom "TIMESTAMP")
+                           ts-date-type " timestamp"))
+                    ((org-em 'tsia-up 'tsia-down
+                             org-agenda-sorting-strategy-selected)
+                     (setq ts (org-entry-get pom "TIMESTAMP_IA")
+                           ts-date-type " timestamp_ia"))
+                    ((org-em 'timestamp-up 'timestamp-down
+                             org-agenda-sorting-strategy-selected)
+                     (setq ts (or (org-entry-get pom "SCHEDULED")
+                                  (org-entry-get pom "DEADLINE")
+                                  (org-entry-get pom "TIMESTAMP")
+                                  (org-entry-get pom "TIMESTAMP_IA"))
+                           ts-date-type ""))
+                    (t (setq ts-date-type "")))
+              (cons (when ts 
+                      (ignore-errors 
+                        (org-time-string-to-seconds 
+                         (if (string-match-p ":" ts)
+                             ts
+                           (let ((s (substring ts 0 (1- (length ts))))) ;; Added code here
+                             (concat s
+                                     " 23:59>"))))))
+                    ts-date-type))))
+
+        (advice-add 'org-agenda-entry-get-agenda-timestamp
+                    :override
+                    #'my-org-agenda-entry-get-agenda-timestamp)
+  #+END_SRC
+* org-mru-clock 
+  Include the tags dammit
+  #+begin_src emacs-lisp
+    (defun org-mru-clock-format-entry ()
+      "Return the parent heading string appended to the heading at point."
+      (let* ((this (org-get-heading 'no-tags 'no-todo))
+             (parent
+              (save-excursion
+                (org-up-heading-safe)
+                (concat (org-get-heading 'no-tags 'no-todo)
+                        "   "
+                        (string-join (org-get-tags-at) ","))))
+             (parent-post (if parent
+                              (format " (%s)" parent)
+                            ""))
+             (with-parent (concat this parent-post)))
+        (if org-mru-clock-keep-formatting
+            with-parent
+          (substring-no-properties with-parent))))
+  #+end_src
 * Scan Tags Indent
 #+BEGIN_SRC emacs-lisp
   (defun get-parent-indent-level ()
@@ -177,170 +390,41 @@
         (org-hide-archived-subtrees (point-min) (point-max)))
       (nreverse rtn)))
 #+END_SRC
-* org-timeline at beginning of agenda buffer
-  #+BEGIN_SRC emacs-lisp
-    (defun org-timeline-insert-timeline ()
-      "Insert graphical timeline into agenda buffer."
-      (unless (buffer-narrowed-p)
-        (goto-char (point-min))
-        (while (and (not (eq (get-text-property (line-beginning-position) 'org-agenda-type) 'agenda))
-                    (not (eobp)))
-          (forward-line))
-        (forward-line)
-        (unless (eobp)
-          (let ((inhibit-read-only t))
-            (insert (org-timeline--generate-timeline))
-            (insert (propertize (concat "\n" (make-string (/ (window-width) 2) ?─)) 'face 'org-time-grid) "\n"))
-          ;; enable `font-lock-mode' in agenda view to display the "chart"
-          (font-lock-mode))))
-  #+END_SRC
-* org-caldav bug
-#+BEGIN_SRC emacs-lisp
-    (defun org-caldav-skip-function (backend)
-      (when (eq backend 'icalendar)
-        (org-map-entries
-         (lambda ()
-           (let ((pt (save-excursion (apply 'org-agenda-skip-entry-if org-caldav-skip-conditions))))
-             (when (or pt
-                       ;;(org-get-repeat)
-                       ) ;; No repeating tasks
-               (org-todo 'none)
-               (let ((current-prefix-arg '(4))) 
-                 (call-interactively 'org-schedule)
-                 (call-interactively 'org-deadline))))))))
-#+END_SRC
-* Another org-caldav bug
-https://github.com/org-trello/org-trello/issues/258
-#+BEGIN_SRC emacs-lisp
-
-  (defun url-http-end-of-document-sentinel (proc why)
-  ;; Sentinel used to handle (i) terminated old HTTP/0.9 connections,
-  ;; and (ii) closed connection due to reusing a HTTP connection which
-  ;; we believed was still alive, but which the server closed on us.
-  ;; We handle case (ii) by calling `url-http' again.
-  (url-http-debug "url-http-end-of-document-sentinel in buffer (%s)"
-		  (process-buffer proc))
-  (url-http-idle-sentinel proc why)
-  (when (buffer-name (process-buffer proc))
-    (with-current-buffer (process-buffer proc)
-      (goto-char (point-min))
-      (cond ((not (looking-at "HTTP/"))
-	     (if url-http-no-retry
-		 ;; HTTP/0.9 just gets passed back no matter what
-		 (url-http-activate-callback)
-	       ;; Call `url-http' again if our connection expired.
-	       (erase-buffer)
-               (let ((url-request-method url-http-method)
-                     (url-request-extra-headers url-http-extra-headers)
-                     (url-request-data url-http-data)
-                     (url-using-proxy (url-find-proxy-for-url
-                                       url-current-object
-                                       (url-host url-current-object))))
-                 (when url-using-proxy
-                   (setq url-using-proxy
-                         (url-generic-parse-url url-using-proxy)))
-                 (if (string= "https" (url-type url-current-object))
-                     (setq url-gateway-method 'tls))
-                 (url-http url-current-object url-callback-function
-                           url-callback-arguments (current-buffer)))))
-	    ((url-http-parse-headers)
-	     (url-http-activate-callback))))))
-
-#+END_SRC
-* I don't like the help window behavior
-  #+BEGIN_SRC emacs-lisp
-    (defun my/goto-variable (var &optional file)
-      (when (eq file 'C-source)
-        (setq file (help-C-file-name var 'var)))
-      (let* ((location (find-variable-noselect var file))
-             (position (cdr location)))
-        (switch-to-buffer (car location))
-        (run-hooks 'find-function-after-hook)
-        (if position
-            (progn
-              ;; Widen the buffer if necessary to go to this position.
-              (when (or (< position (point-min))
-                        (> position (point-max)))
-                (widen))
-              (goto-char position))
-          (message "Unable to find location in file"))))
-
-    (define-button-type 'help-variable-def
-      :supertype 'help-xref
-      'help-function #'my/goto-variable
-      'help-echo (purecopy "mouse-2, RET: find variable's definition"))
-
-    (defun my/goto-function (fun &optional file type)
-      (or file
-          (setq file (find-lisp-object-file-name fun type)))
-      (if (not file)
-          (message "Unable to find defining file")
-        (require 'find-func)
-        (when (eq file 'C-source)
-          (setq file
-                (help-C-file-name (indirect-function fun) 'fun)))
-        ;; Don't use find-function-noselect because it follows
-        ;; aliases (which fails for built-in functions).
-        (let ((location
-               (find-function-search-for-symbol fun type file)))
-          (switch-to-buffer (car location))
-          (run-hooks 'find-function-after-hook)
-          (if (cdr location)
-              (goto-char (cdr location))
-            (message "Unable to find location in file")))))
-
-    (define-button-type 'help-function-def
-      :supertype 'help-xref
-      'help-function #'my/goto-function
-      'help-echo (purecopy "mouse-2, RET: find function's definition"))
-  #+END_SRC
-* Org agenda supposedly has an option to make no timestamp on a date mean the end of the day 
-  However, the behavior reflected is not so. Therefore, I have added some code to manually add the end-of-day timestamp manually
-  #+BEGIN_SRC emacs-lisp
-        (setq org-sort-agenda-notime-is-late t)
-
-        (defun my-org-agenda-entry-get-agenda-timestamp (pom)
-          "Retrieve timestamp information for sorting agenda views.
-                      Given a point or marker POM, returns a cons cell of the timestamp
-                      and the timestamp type relevant for the sorting strategy in
-                      `org-agenda-sorting-strategy-selected'."
-          (let (ts ts-date-type)
-            (save-match-data
-              (cond ((org-em 'scheduled-up 'scheduled-down
-                             org-agenda-sorting-strategy-selected)
-                     (setq ts (org-entry-get pom "SCHEDULED")
-                           ts-date-type " scheduled"))
-                    ((org-em 'deadline-up 'deadline-down
-                             org-agenda-sorting-strategy-selected)
-                     (setq ts (org-entry-get pom "DEADLINE")
-                           ts-date-type " deadline"))
-                    ((org-em 'ts-up 'ts-down
-                             org-agenda-sorting-strategy-selected)
-                     (setq ts (org-entry-get pom "TIMESTAMP")
-                           ts-date-type " timestamp"))
-                    ((org-em 'tsia-up 'tsia-down
-                             org-agenda-sorting-strategy-selected)
-                     (setq ts (org-entry-get pom "TIMESTAMP_IA")
-                           ts-date-type " timestamp_ia"))
-                    ((org-em 'timestamp-up 'timestamp-down
-                             org-agenda-sorting-strategy-selected)
-                     (setq ts (or (org-entry-get pom "SCHEDULED")
-                                  (org-entry-get pom "DEADLINE")
-                                  (org-entry-get pom "TIMESTAMP")
-                                  (org-entry-get pom "TIMESTAMP_IA"))
-                           ts-date-type ""))
-                    (t (setq ts-date-type "")))
-              (cons (when ts 
-                      (ignore-errors 
-                        (org-time-string-to-seconds 
-                         (if (string-match-p ":" ts)
-                             ts
-                           (let ((s (substring ts 0 (1- (length ts))))) ;; Added code here
-                             (concat s
-                                     " 23:59>"))))))
-                    ts-date-type))))
-
-        (advice-add 'org-agenda-entry-get-agenda-timestamp
-                    :override
-                    #'my-org-agenda-entry-get-agenda-timestamp)
-  #+END_SRC
+* gdb window layout custom
+  #+begin_src emacs-lisp
+    (defun gdb-setup-windows ()
+      "Layout the window pattern for option `gdb-many-windows'."
+      (gdb-get-buffer-create 'gdb-locals-buffer)
+      (gdb-get-buffer-create 'gdb-stack-buffer)
+      (gdb-get-buffer-create 'gdb-breakpoints-buffer)
+      (set-window-dedicated-p (selected-window) nil)
+      (switch-to-buffer gud-comint-buffer)
+      (delete-other-windows)
+      (let ((win0 (selected-window))
+            (win1 (split-window nil ( / ( * (window-height) 3) 4)))
+            (win2 (split-window nil ( / (window-height) 3)))
+            (win3 (split-window-right)))
+        (gdb-set-window-buffer (gdb-locals-buffer-name) nil win3)
+        (select-window win2)
+        (set-window-buffer
+         win2
+         (if gud-last-last-frame
+             (gud-find-file (car gud-last-last-frame))
+           (if gdb-main-file
+               (gud-find-file gdb-main-file)
+             ;; Put buffer list in window if we
+             ;; can't find a source file.
+             (list-buffers-noselect))))
+        (setq gdb-source-window (selected-window))
+        (let ((win4 (split-window-right)))
+          (gdb-set-window-buffer
+           (gdb-get-buffer-create 'gdb-disassembly-buffer) nil win4))
+        (select-window win1)
+        (gdb-set-window-buffer (gdb-stack-buffer-name))
+        (let ((win5 (split-window-right)))
+          (gdb-set-window-buffer (if gdb-show-threads-by-default
+                                     (gdb-threads-buffer-name)
+                                   (gdb-breakpoints-buffer-name))
+                                 nil win5))
+        (select-window win0)))
+  #+end_src

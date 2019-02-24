@@ -20,6 +20,7 @@
 (use-package exwm)
 (require 'exwm-config)
 (exwm-config-default)
+(fringe-mode '(10 . 0))
 #+END_SRC
 ** Naming Windows
    #+BEGIN_SRC emacs-lisp
@@ -173,12 +174,20 @@
 
      (defun youtube-split ()
        (interactive)
-       (split-window (selected-window) 526 t t))
+       (if-let (buf (get-buffer "youtube"))
+           (switch-to-buffer buf)
+         (launch-program-with-name "firefox" "youtube"))
+       (split-window (selected-window) 472 t t)
+       (switch-window))
 
-       
+
      (defun big-youtube-split ()
        (interactive)
-       (split-window (selected-window) 630 t t))
+       (if-let (buf (get-buffer "youtube"))
+           (switch-to-buffer buf)
+         (launch-program-with-name "firefox" "youtube"))
+       (split-window (selected-window) 630 t t)
+       (switch-window))
    #+END_SRC
 ** Disable simulation keys on an emacs window
    #+BEGIN_SRC emacs-lisp
@@ -201,12 +210,14 @@
        (interactive)
        (exwm-input--fake-key ?\C-t))
      (define-key *root-map* (kbd "C-t") 'annoying-key-thing)
+     (define-key *root-map* (kbd "C-b") 'previous-buffer)
      (define-key *root-map* (kbd "t") 'transpose-chars)
      (define-key *root-map* (kbd "c") 'multi-term)
      (define-key *root-map* (kbd "C-p") 'exwmx-launch-program)
      (define-key *root-map* (kbd "e") (quickrun-lambda "emacs" "emacs"))
      (define-key *root-map* (kbd "s") (quickrun-lambda "steam" nil))
      (define-key *root-map* (kbd "q") (quickrun-lambda "qutebrowser" nil))
+     (define-key *root-map* (kbd "V") (quickrun-lambda "VBoxManage startvm \"Windows 7\"" "VirtualBox Machine"))
      (define-key *root-map* (kbd "r") 'exwmx-name-buffer)
      (define-key *root-map* (kbd "C-n") 'switch-window)
      (define-key *root-map* (kbd ")") (lambda () (interactive) (shell-command "sleep 2s ; xset dpms force off")))
@@ -237,7 +248,6 @@
 ** Multimonitor support
 #+BEGIN_SRC emacs-lisp
 (require 'exwm-randr)
-(setq exwm-randr-workspace-output-plist '(2 "DP1" 3 "DP1"))
 (exwm-randr-enable)
 #+END_SRC
 ** Keybindings
@@ -271,9 +281,8 @@
           (,(kbd "s-$") . (lambda () (interactive) (exwm-workspace-move-window 3)))))
 
   (defun dvorak? ()
-    (string= (shell-command-to-string "setxkbmap -v | grep symbols")
-             "symbols:    pc+de(neo_dvorak)+inet(evdev)+terminate(ctrl_alt_bksp)
-  "))
+    (string-match-p "de(neo_dvorak)" 
+                    (shell-command-to-string "setxkbmap -v | grep symbols")))
 
   (defun set-keyboard (layout)
     (shell-command (format "setxkbmap %s" layout)))
@@ -313,20 +322,29 @@
 
   (defvar wallpaper-path "/home/benson/.emacs.d/res/digital_space_universe_4k_8k-wide.jpg")
   (defvar live-wallpaper-path "/home/benson/MEGA/pictures/wallpapers/videos/bg.mp4")
-  (setq i3-string "Xephyr -br -ac -noreset -resizeable -screen 1920x1080 :1 & sleep 1s; DISPLAY=:1 i3")
+  (setq i3-string "Xephyr -br -ac -noreset -resizeable -screen 1920x1080 :8 & sleep 1s; DISPLAY=:8 i3")
+  (setq xfce4-string "Xephyr -br -ac -noreset -resizeable -screen 1920x1080 :8 & sleep 1s; DISPLAY=:8 xfce4-session")
+  (setq kde-string "Xephyr -br -ac -noreset -resizeable -screen 1920x1080 :8 & sleep 1s; DISPLAY=:8 startkde")
   (defvar exwm-startup-programs
     '("megasync"
       ("compton -f -i .7 -b")
       ("/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1")
       ("/usr/lib/notification-daemon-1.0/notification-daemon")
       ("nm-applet")
-      ;(i3-string)
       ))
   (defvar hard-drive-space "")
 
   (defun launch-i3 ()
     (interactive)
     (launch-program i3-string))
+
+  (defun launch-xfce ()
+    (interactive)
+    (launch-program xfce4-string))
+
+  (defun launch-kde ()
+    (interactive)
+    (launch-program kde-string))
 
   (defun lock-screen ()
     (interactive)
@@ -455,15 +473,17 @@
 
   (defun my/setup-screens ()
     (interactive)
-    (let ((result (shell-command-to-string "xrandr --query | grep -e connected | grep -v -e disconnected -e eDP1 | cut -d ' ' -f 1 | tr -d \"\\n\"")))
-      (setq exwm-randr-workspace-output-plist `(2 ,result 3 ,result))
-      (when (> (length result) 0)
-        (let* ((response (completing-read (format "Monitor %s detected. Resolution? " result) '("2560x1440" "1920x1080" "3840x2160") nil t "^"))
+    (let ((primary (shell-command-to-string "xrandr --query | grep ' connected' | grep eDP | cut -d ' ' -f 1 | tr -d '\n'"))
+          (secondary (shell-command-to-string "xrandr --query | grep ' connected' | grep -v eDP | cut -d ' ' -f 1 | tr -d '\n'")))
+      (setq exwm-randr-workspace-output-plist `(0 ,primary 1 ,primary 2 ,secondary 3 ,secondary))
+      (when (and (> (length secondary) 0)
+                 (string= "yes" (completing-read (format "Monitor %s detected. Setup? " secondary) '("yes" "no"))))
+        (let* ((response (completing-read (format "Resolution for %s? " secondary) '("2560x1440" "1920x1080" "3840x2160") nil t "^"))
                (length (string-to-number (substring response 0 4)))
                (height (string-to-number (substring response 5 9))))
-          (shell-command (format "xrandr --output %s --mode %s --above eDP1" result response))
-          (let ((pos (completing-read "Position? " (mapcar #'number-to-string (list 0 (/ (- length 1920) 2) 1200)) nil t "^")))
-            (shell-command (format "xrandr --output eDP1 --pos %sx%s" pos height))))))
+          (shell-command (format "xrandr --output %s --mode %s --above %s" secondary response primary))
+          (let ((pos (completing-read "Position? " '("right-of" "above") nil t "^")))
+            (shell-command (format "xrandr --output %s --%s %s" primary pos secondary))))))
     (setup-wallpaper))
   (add-hook 'exwm-init-hook 'my/setup-screens)
 
@@ -531,10 +551,14 @@
 ** Multi-term
  #+BEGIN_SRC emacs-lisp
    (use-package multi-term)
+   (define-key term-mode-map (kbd "M-'") 'scroll-down)
+   (unbind-key (kbd "C-t") term-mode-map)
    (add-hook 'term-mode-hook
 	     (lambda ()
 	       (add-to-list 'term-bind-key-alist '("M-[" . multi-term-prev))
-	       (add-to-list 'term-bind-key-alist '("M-]" . multi-term-next))))
+	       (add-to-list 'term-bind-key-alist '("M-]" . multi-term-next))
+	       (add-to-list 'term-bind-key-alist '("M-'" . scroll-down))
+	       (add-to-list 'term-bind-key-alist '("C-t" . *root-map*))))
  #+END_SRC
 ** resize-window
 #+BEGIN_SRC emacs-lisp
@@ -982,7 +1006,7 @@
     (kill-local-variable 'mode-line-format))
 #+END_SRC
 **** Config
- #+BEGIN_SRC emacs-lisp
+ #+BEGIN_SRC emacs-lisp#
  (use-package powerline)
  (use-package airline-themes)
 
@@ -1097,6 +1121,7 @@
                                   (mode . comint-mode)
                                   (mode . makefile-gmake-mode)))
            ("code"            (or (mode . clojure-mode)
+                                  (mode . csharp-mode)
                                   (mode . c++-mode)
                                   (mode . c-mode)
                                   (mode . scala-mode)
@@ -1143,7 +1168,7 @@
 
   ;(add-hook 'exwm-workspace-switch-hook 'ibuffer)
 #+END_SRC
-*** Ace jump
+** Ace jump
 #+BEGIN_SRC emacs-lisp
 (use-package ace-jump-mode)
 (global-set-key (kbd "C-c SPC") 'ace-jump-mode)
@@ -1233,7 +1258,7 @@
            (file "~/MEGA/org/checklists/mornings.org"))
           ("Cn" "Nightly routine" entry (file "~/MEGA/org/entries/routines.org")
            (file "~/MEGA/org/checklists/nights.org"))
-          ("y" "Elfeed YouTube" entry (file+olp "~/MEGA/org/agenda/agenda.org" "leisure" "Videos")
+          ("y" "Elfeed YouTube" entry (file+olp "~/MEGA/org/agenda/agenda.org" "rewards" "Videos")
            "* TODO %(identity elfeed-link-org-capture)")
           ("p" "Protocol" entry (file "~/MEGA/org/agenda/refile.org")
            "* STUFF %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
@@ -1423,9 +1448,9 @@
   (setq org-agenda-sticky t)
 
   (setq org-todo-keywords
-         '((sequence "STUFF(s)" "SOMEDAY(P)" "|")
-           (sequence "TODO(t)" "ONE(o)" "NEXT(n)" "READ(r)" "HABIT(H)" "|" "DONE(d!)")
-           (sequence "PROJECT(p)" "ETERNAL(e)" "|" "COMPLETE(c)")
+         '((sequence "STUFF(s)" "SOMEDAY(P)" "INACT(i)" "|")
+           (sequence "TODO(t)" "ONE(o)" "NEXT(n)" "HABIT(H)" "|" "DONE(d!)")
+           (sequence "PROJECT(p)" "SEQUENTIAL(S)" "ETERNAL(e)" "|" "COMPLETE(c)")
            (sequence  "WAIT(w@/!)" "HOLD(h)" "TICKLER())" "FORGOTTEN(f)" "|" "ABANDON(a@/!)")
            (sequence "TOP" "|")))
 
@@ -1436,9 +1461,11 @@
           ("WAIT" :foreground "yellow" :weight bold)
           ("HOLD" :foreground "red" :weight bold)
           ("PROJECT" :foreground "white" :weight bold)
+          ("SEQUENTIAL" :foreground "white" :weight bold)
           ("ABANDON" :foreground "dark gray" :weight bold)
           ("FORGOTTEN" :foreground "dark gray" :weight bold)
-          ("TOP" :foreground "royal blue" :weight bold)))
+          ("TOP" :foreground "royal blue" :weight bold)
+          ("INACT" :foreground "dark gray" :weight bold)))
 
   (setq org-todo-state-tags-triggers
         (quote (("HOLD" ("HOLD" . t))
@@ -1447,7 +1474,7 @@
 
   (setq org-use-fast-todo-selection t)
 
-  ;(setq org-agenda-files (quote ("~/MEGA/org/agenda")))
+  ;(setq org-agenda-files (quote ("~/MEGA/org/agenda/dallas.org")))
   (org-agenda-load-file-list)
 
   ; Targets include this file and any file contributing to the agenda - up to 9 levels deep
@@ -1484,6 +1511,7 @@
 #+END_SRC
 **** My Project code
      #+BEGIN_SRC emacs-lisp
+
        (defun my/is-part-of-subtree ()
          (save-excursion
            (and (not (= 1 (org-current-level)))
@@ -1496,22 +1524,37 @@
 
 
        (defun my/is-standalone-task ()
-         (and (not (member (org-get-todo-state) '("WAIT" "PROJECT" "SOMEDAY" "TICKLER")))
-              (not (member "ARCHIVE" (org-get-tags-at)))
+         (and (not (member (org-get-todo-state) '("HOLD" "PROJECT" "SOMEDAY" "TICKLER" "SEQUENTIAL")))
+              (not (member "ARCHIVE" (org-get-tags)))
               (not (my/is-part-of-subtree))
               (not (my/is-a-project))))
 
+       (defun my/no-children ()
+         (save-excursion
+           (let ((curr-indent (org-current-level)))
+             (while (and (outline-next-heading)
+                         (< curr-indent (org-current-level))
+                         (if (member "ARCHIVE" (org-get-tags))
+                             (progn
+                               (org-end-of-subtree)
+                               (outline-next-heading))
+                           t)
+                         (not (org-get-todo-state))))
+             (>= curr-indent
+                 (org-current-level)))))
+
+       (defun my/is-unactionable-task ()
+         (or (member "NOT_TASKS" (org-get-tags))
+             (member (org-get-todo-state) (cons "INACT" org-done-keywords))))
+
        (defun my/is-a-task ()
          (save-excursion
-           (or (equal "ONE" (org-get-todo-state))
-               (and (org-get-todo-state)
-                    (not (member "NOT_TASKS" (org-get-tags-at)))
-                    (let ((curr-indent (org-current-level)))
-                      (while (and (outline-next-heading)
-                                  (not (member "ARCHIVE" (org-get-tags-at)))
-                                  (not (org-get-todo-state))))
-                      (>= curr-indent
-                          (org-current-level)))))))
+           (and (not (member "NOT_TASKS" (org-get-tags)))
+                (or (and (equal "ONE" (org-get-todo-state))
+                         (not (my/has-non-done-task)))
+                    (and (org-get-todo-state)
+                         (not (member (org-get-todo-state) '("SOMEDAY" "WAIT")))
+                         (my/no-children))))))
 
        (defun my/has-subtask ()
          (save-excursion
@@ -1519,6 +1562,11 @@
                  has-subtask)
              (while (and (not has-subtask)
                          (outline-next-heading)
+                         (if (member "ARCHIVE" (org-get-tags))
+                             (progn
+                               (org-end-of-subtree)
+                               (outline-next-heading))
+                           t)
                          (< (point) subtree-end))
                (when (org-get-todo-state)
                  (setq has-subtask t)))
@@ -1537,12 +1585,12 @@
 
        (defun my/is-next-task ()
          (let ((todo (org-get-todo-state)))
-           (or (equal todo "NEXT")
-               (and (member todo '("TODO" "ONE"))
+           (or ;;(equal todo "NEXT")
+               (and (member todo '("TODO" "ONE" "NEXT"))
                     (or (org-get-scheduled-time (point))
                         (org-get-deadline-time (point)))))))
 
-       (defun my/has-active-task ()
+       (defun my/has-non-done-task ()
          (save-excursion
            (let ((subtree-end (save-excursion (org-end-of-subtree t)))
                  has-next-task)
@@ -1557,10 +1605,10 @@
          (save-excursion
            (let ((todo (org-get-todo-state)))
              (when todo
-               (or (member todo '("PROJECT" "ETERNAL" "HOLD"))
+               (or (member todo '("PROJECT" "ETERNAL" "HOLD" "SEQUENTIAL"))
                    (and (equal todo "ONE")
-                        (my/has-active-task))
-                   (and (member todo '("TODO" "WAIT" "SOMEDAY"))
+                        (my/has-non-done-task))
+                   (and (member todo '("TODO"))
                         (my/has-subtask)))))))
 
        (defvar my/ambiguous-projects-default-to-stuck t)
@@ -1569,9 +1617,9 @@
          (save-excursion
            (let ((subtree-end (save-excursion (org-end-of-subtree t)))
                  has-next-task has-active-project)
+             (outline-next-heading)
              (while (and (not (and has-next-task
                                    has-active-project))
-                         (outline-next-heading)
                          (< (point) subtree-end))
                (cond ((and (my/is-a-task)
                            (my/is-next-task))
@@ -1579,7 +1627,27 @@
                      ((and (my/is-a-project)
                            (eq (my/get-project-type file (point) nil)
                                'active))
-                      (setq has-stuck-project t))))
+                      (setq has-active-project t)))
+               (org-end-of-subtree t t))
+             (or has-next-task
+                 has-active-project))))
+
+       (defun my/active-sequential-project (file point)
+         (save-excursion
+           (let ((subtree-end (save-excursion (org-end-of-subtree t)))
+                 has-next-task has-active-project)
+             (outline-next-heading)
+             (while (and (not (or has-next-task
+                                  has-active-project))
+                         (< (point) subtree-end))
+               (cond ((and (my/is-a-task)
+                           (my/is-next-task))
+                      (setq has-next-task t))
+                     ((and (my/is-a-project)
+                           (eq (my/get-project-type file (point) nil)
+                               'active))
+                      (setq has-active-project t)))
+               (org-end-of-subtree t t))
              (or has-next-task
                  has-active-project))))
 
@@ -1587,22 +1655,23 @@
          (save-excursion
            (let ((subtree-end (save-excursion (org-end-of-subtree t)))
                  has-task has-next-task has-project has-stuck-project)
+             (outline-next-heading)
              (while (and (not (and has-next-task
                                    has-stuck-project))
-                         (outline-next-heading)
                          (< (point) subtree-end))
-               ;; (unless (member "ARCHIVE" (org-get-tags-at))
+               ;; (unless (member "ARCHIVE" (org-get-tags))
                (cond ((my/is-a-project)
                       (setq has-project t) 
                       (when (eq (my/get-project-type file (point) t)
                                 'stuck)
-                        (setq has-stuck-project t))
-                      (org-end-of-subtree t t))
+                        (setq has-stuck-project t)))
                      ((my/is-a-task)
                       (setq has-task t)
                       (when (or (my/is-next-task) (equal (org-get-todo-state) "WAIT"))
                         (setq has-next-task t)))
-                     ));; )
+                     )
+               (org-end-of-subtree t t)
+               );; )
              (or (and has-next-task 
                       (not has-stuck-project))
                  (and (not has-task) 
@@ -1620,6 +1689,10 @@
                      ((equal todo "WAIT") 'wait)
                      ((org-time> (org-entry-get (point) "SCHEDULED") (org-matcher-time "<now>")) 'delayed)
                      ;;((my/is-a-task) nil)
+                     ((equal "SEQUENTIAL" (org-get-todo-state))
+                      (if (my/active-sequential-project file point)
+                          'active
+                        'stuck))
                      (ambiguous-to-stuck
                       (if (my/generous-active-project file point)
                           'active
@@ -1629,18 +1702,49 @@
                           'active
                         'stuck)))))))
 
+       ;; (defun my/show-stuck-projects ()
+       ;;   "Only show subtrees that are stuck projects"
+       ;;   (save-restriction
+       ;;     (widen)
+       ;;     (let ((subtree-end (save-excursion (org-end-of-subtree t))))
+       ;;       (unless (or (and (my/is-a-task)
+       ;;                        (my/is-standalone-task)
+       ;;                        (not (org-get-scheduled-time (point)))
+       ;;                        (not (org-get-deadline-time (point))))
+       ;;                   (eq (my/get-project-type buffer-file-name (point) t)
+       ;;                       'stuck))
+       ;;         subtree-end))))
+
+       (defvar my/stuck-projects-flag nil)
+
        (defun my/show-stuck-projects ()
          "Only show subtrees that are stuck projects"
          (save-restriction
            (widen)
            (let ((subtree-end (save-excursion (org-end-of-subtree t))))
-             (unless (or (and (my/is-a-task)
-                              (my/is-standalone-task)
-                              (not (org-get-scheduled-time (point)))
-                              (not (org-get-deadline-time (point))))
-                         (eq (my/get-project-type buffer-file-name (point) t)
-                             'stuck))
-               subtree-end))))
+             (if (and my/stuck-projects-flag
+                      (< (point) my/stuck-projects-flag))
+                 (if (or (my/is-next-task)
+                         (my/is-unactionable-task)
+                         (and (not (my/is-a-task))
+                              (not (eq (my/get-project-type buffer-file-name (point) t)
+                                  'stuck))))
+                     subtree-end
+                   nil)
+               (setq my/stuck-projects-flag nil)
+               (cond ((and (my/is-a-task)
+                           (my/is-standalone-task)
+                           (not (org-get-scheduled-time (point)))
+                           (not (org-get-deadline-time (point))))
+                      nil)
+                     ((eq (my/get-project-type buffer-file-name
+                                               (point) t)
+                          'stuck)
+                      (when (or (null my/stuck-projects-flag)
+                                (< stuck-projects-flag subtree-end))
+                        (setq my/stuck-projects-flag subtree-end))
+                      nil)
+                     (t subtree-end))))))
 
        (defvar my/done-projects-flag nil)
 
@@ -1658,6 +1762,15 @@
                    (progn (setq my/done-projects-flag subtree-end)
                           nil)
                  next-headline)))))
+
+       (defun my/org-agenda-reset-vars ()
+         (interactive)
+         (setq my/stuck-projects-flag nil
+               my/done-projects-flag nil
+               my/next-task-flag nil))
+
+       (add-to-list 'org-agenda-finalize-hook
+                    #'my/org-agenda-reset-vars)
 
        (defun my/show-active-projects ()
          "Only show subtrees that are stuck projects"
@@ -1742,6 +1855,26 @@
                (when (or (my/is-a-project)
                          (member (org-get-todo-state) '("SOMEDAY" "WAIT" "HABIT" nil)))
                  next-headline)))))
+
+       (defvar my/next-task-flag nil)
+       ;; (setq my/next-task-flag nil)
+
+       (defun my/has-next-todo ()
+         (save-excursion
+           (let ((end-of-subtree (save-excursion (org-end-of-subtree t)))
+                 flag)
+             (while (and (not flag)
+                         (outline-next-heading)
+                         (< (point) next-headline))
+               (when (string= (org-get-todo-state) "NEXT")
+                 (setq flag (point))))
+             flag)))
+
+       (defun my/show-leaf-tasks ()
+         (let ((next-headline (save-excursion (org-end-of-subtree t))))
+           (unless (or (string= "NEXT" (org-get-todo-state))
+                       (my/has-next-todo))
+             next-headline)))
      #+END_SRC
 **** Views
      #+BEGIN_SRC emacs-lisp
@@ -1788,6 +1921,18 @@
                 (t (setq previous nil)))))))
 
        (add-hook 'org-agenda-finalize-hook #'org-agenda-delete-empty-compact-blocks)
+
+       (defun org-agenda-add-separater-between-project ()
+         (setq buffer-read-only nil)
+         (save-excursion
+           (goto-char (point-min))
+           (let ((start-pos (point))
+                 (previous t))
+             (re-search-forward " +agenda: +[^\\. ]" nil t)
+             (while (re-search-forward " +agenda: +[^\\. ]" nil t)
+               (beginning-of-line)
+               (insert "=============================================\n")
+               (forward-line)))))
 
        ;; I don't think this code is necessary
        ;; (add-to-list 'org-agenda-entry-types :deadlines*)
@@ -1842,7 +1987,7 @@
                    (agenda ""
                            ((org-agenda-skip-function 'my/agenda-custom-skip)
                             (org-agenda-span 'day)
-                            (org-agenda-show-log t)
+                            ;(org-agenda-show-log t)
                             (org-agenda-skip-deadline-if-done t)
                             (org-agenda-skip-scheduled-if-done t)
                             (org-super-agenda-groups '((:name "Overdue" :and (:deadline past :log nil :not (:tag "Work")))
@@ -1853,8 +1998,8 @@
                                                                                 :not (:deadline today)))))
                                                        (:name "Work Related" :tag "WORK")
                                                        ))))))
-                 ("c" "Access Comms" todo "TODO"
-                  ((org-agenda-files '("~/MEGA/org/entries/comms.org"))))
+                 ("c" "Access Comms" tags-todo "+COMMS/!TODO"
+                  ((org-agenda-files '("~/MEGA/org/agenda/agenda.org" "~/MEGA/org/entries/comms.org"))))
                  ("P" "Time to panic"
                   ((tags-todo "+MOTIVATION/!TOP"
                          ((org-agenda-overriding-header "Remember your motivation")
@@ -1867,6 +2012,11 @@
                    (org-agenda-overriding-header "Next Tasks list")
                    (org-tags-match-list-sublevels t)
                    (org-agenda-sorting-strategy '(deadline-up))))
+                 ("L" "Leaf Task List" tags-todo "-REFILE-HOLD-WAIT"
+                  ((org-agenda-skip-function 'my/show-leaf-tasks)
+                   (org-tags-match-list-sublevels 'indented)
+                   (org-agenda-overriding-header "Next Tasks list")
+                   (org-agenda-finalize-hook '(org-agenda-add-separater-between-project))))
                  ("r" "Review Tasks"
                   ((todo "TODO"
                          ((org-agenda-files '("~/MEGA/org/entries/reviews.gpg"))
@@ -1896,7 +2046,8 @@
                  ("t" "Today" agenda ""
                   ((org-agenda-skip-function 'my/agenda-custom-skip)
                    (org-agenda-span 'day)
-                   (org-agenda-show-log t)))
+                   (org-agenda-start-with-log-mode '(closed clock))
+                   (org-agenda-clockreport-mode t)))
                  ("C" . "Categories")  
                  ("Cb" "Bus tasks" tags-todo "BUS")
                  ("Cr" "Articles to read" tags-todo "READ")
@@ -2565,6 +2716,141 @@
     #+BEGIN_SRC emacs-lisp
       (show-paren-mode t)
     #+END_SRC
+*** lsp-mode
+    #+begin_src emacs-lisp
+      (use-package lsp-mode)
+      (use-package lsp-ui)
+
+      (use-package lsp-java)
+      (use-package dap-mode
+        :config
+        (dap-mode t)
+        (dap-ui-mode t))
+      (require 'dap-java)
+
+      ;; (defhydra dap-hydra (:color pink :hint nil :foreign-keys run)
+      ;;   ;;   "
+      ;;   ;; ^Stepping^          ^Switch^                 ^Breakpoints^           ^Eval
+      ;;   ;; ^^^^^^^^-----------------------------------------------------------------------------------------
+      ;;   ;; _n_: Next           _ss_: Session            _bt_: Toggle            _ee_: Eval
+      ;;   ;; _i_: Step in        _st_: Thread             _bd_: Delete            _er_: Eval region
+      ;;   ;; _o_: Step out       _sf_: Stack frame        _ba_: Add               _es_: Eval thing at point
+      ;;   ;; _c_: Continue       _sl_: List locals        _bc_: Set condition     _eii_: Inspect
+      ;;   ;; _r_: Restart frame  _sb_: List breakpoints   _bh_: Set hit count     _eir_: Inspect region
+      ;;   ;; _Q_: Disconnect     _sS_: List sessions      _bl_: Set log message   _eis_: Inspect thing at point
+      ;;   ;; "
+      ;;   ("n" dap-next)
+      ;;   ("i" dap-step-in)
+      ;;   ("o" dap-step-out)
+      ;;   ("c" dap-continue)
+      ;;   ("r" dap-restart-frame)
+      ;;   ("ss" dap-switch-session)
+      ;;   ("st" dap-switch-thread)
+      ;;   ("sf" dap-switch-stack-frame)
+      ;;   ("sl" dap-ui-locals)
+      ;;   ("sb" dap-ui-breakpoints)
+      ;;   ("sS" dap-ui-sessions)
+      ;;   ("bt" dap-breakpoint-toggle)
+      ;;   ("ba" dap-breakpoint-add)
+      ;;   ("bd" dap-breakpoint-delete)
+      ;;   ("bc" dap-breakpoint-condition)
+      ;;   ("bh" dap-breakpoint-hit-condition)
+      ;;   ("bl" dap-breakpoint-log-message)
+      ;;   ("ee" dap-eval)
+      ;;   ("er" dap-eval-region)
+      ;;   ("es" dap-eval-thing-at-point)
+      ;;   ("eii" dap-ui-inspect)
+      ;;   ("eir" dap-ui-inspect-region)
+      ;;   ("eis" dap-ui-inspect-thing-at-point)
+      ;;   ("q" nil "quit" :color blue)
+      ;;   ("Q" dap-disconnect :color red))
+
+      (use-package lsp-rust)
+      (use-package lsp-python)
+    #+end_src
+*** Rainbow delimiters
+    #+begin_src emacs-lisp
+      (use-package rainbow-delimiters)
+      (rainbow-delimiters-mode)
+      (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
+      (add-hook 'org-mode-hook #'rainbow-delimiters-mode)
+
+      (let ((rainbow-purple  "#9E1CB2")
+            (rainbow-blue  "#1194f6")
+            (rainbow-green  "#47B04B")
+            (rainbow-yellow  "#FFED18")
+            (rainbow-orange  "#E7B500")
+            (rainbow-red  "#C90067")
+            (rainbow-7  "#00AA5D")
+            (rainbow-8  "#FE7380"))
+        (custom-set-faces 
+         `(rainbow-delimiters-depth-1-face  ((t (:foreground ,rainbow-purple))))
+         `(rainbow-delimiters-depth-2-face  ((t (:foreground ,rainbow-green))))
+         `(rainbow-delimiters-depth-3-face  ((t (:foreground ,rainbow-blue))))
+         `(rainbow-delimiters-depth-4-face  ((t (:foreground ,rainbow-red))))
+         `(rainbow-delimiters-depth-5-face  ((t (:foreground ,rainbow-yellow))))
+         `(rainbow-delimiters-depth-6-face  ((t (:foreground ,rainbow-blue))))
+         `(rainbow-delimiters-depth-7-face  ((t (:foreground ,rainbow-red))))
+         `(rainbow-delimiters-depth-8-face  ((t (:foreground ,rainbow-8))))
+         `(rainbow-delimiters-depth-9-face  ((t (:foreground ,rainbow-purple))))
+         `(rainbow-delimiters-depth-10-face ((t (:foreground ,rainbow-blue))))
+         `(rainbow-delimiters-depth-11-face ((t (:foreground ,rainbow-green))))
+         `(rainbow-delimiters-depth-12-face ((t (:foreground ,rainbow-yellow))))))
+    #+end_src
+*** C#
+    #+BEGIN_SRC emacs-lisp
+    (use-package csharp-mode)
+    (use-package omnisharp)
+    (add-hook 'csharp-mode-hook 'omnisharp-mode)
+    #+END_SRC
+*** React js
+    #+BEGIN_SRC emacs-lisp
+    (use-package rjsx-mode)
+    #+END_SRC
+*** Golang
+    #+BEGIN_SRC emacs-lisp
+    (use-package go-mode)
+    (add-hook 'go-mode-hook
+           (lambda ()
+             (add-hook 'before-save-hook 'gofmt-before-save)
+             (setq tab-width 4)
+             (setq indent-tabs-mode 1)))
+    #+END_SRC
+*** Elpy
+    #+BEGIN_SRC emacs-lisp
+    (use-package elpy)
+    (elpy-enable)
+    #+END_SRC
+*** EIN
+ #+BEGIN_SRC emacs-lisp
+   (use-package ein)
+   (add-to-list 'exec-path
+                "/home/benson/anaconda3/bin/")
+ #+END_SRC
+*** Web-mode
+    #+BEGIN_SRC emacs-lisp
+      (use-package web-mode)
+      (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+      (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+      (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+      (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+      (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+      (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+      (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+
+      (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+      (setq web-mode-auto-close-style 2)
+    #+END_SRC
+*** Processing
+ #+BEGIN_SRC emacs-lisp
+ (use-package processing-mode)
+
+ (setq processing-location "/usr/bin/processing-java")
+ #+END_SRC
+*** Treemacs
+    #+BEGIN_SRC emacs-lisp
+    (use-package treemacs)
+    #+END_SRC
 ** Freekeys
    #+BEGIN_SRC emacs-lisp#
    (use-package free-keys)
@@ -2689,17 +2975,6 @@
 
 
    #+END_SRC
-** Elpy
-   #+BEGIN_SRC emacs-lisp
-   (use-package elpy)
-   (elpy-enable)
-   #+END_SRC
-** EIN
-#+BEGIN_SRC emacs-lisp
-  (use-package ein)
-  (add-to-list 'exec-path
-               "/home/benson/anaconda3/bin/")
-#+END_SRC
 ** Ledger mode
    #+BEGIN_SRC emacs-lisp
      (use-package ledger-mode
@@ -2732,20 +3007,6 @@
               (report-name (ledger-report-read-name)))
          (ledger-report report-name nil)))
    #+END_SRC
-** Web-mode
-   #+BEGIN_SRC emacs-lisp
-     (use-package web-mode)
-     (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-     (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
-     (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
-     (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-     (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-     (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
-     (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-
-     (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-     (setq web-mode-auto-close-style 2)
-   #+END_SRC
 ** ediff
    #+BEGIN_SRC emacs-lisp
    (setq ediff-window-setup-function 'ediff-setup-windows-plain)
@@ -2760,38 +3021,9 @@
            mouse-wheel-scroll-amount '(1)
            mouse-wheel-progressive-speed nil)
    #+END_SRC
-** Processing
-#+BEGIN_SRC emacs-lisp
-(use-package processing-mode)
-
-(setq processing-location "/usr/bin/processing-java")
-#+END_SRC
 ** AUR PKGBUILD
    #+BEGIN_SRC emacs-lisp
    (use-package pkgbuild-mode)
-   #+END_SRC
-** Golang
-   #+BEGIN_SRC emacs-lisp
-   (use-package go-mode)
-   (add-hook 'go-mode-hook
-          (lambda ()
-            (add-hook 'before-save-hook 'gofmt-before-save)
-            (setq tab-width 4)
-            (setq indent-tabs-mode 1)))
-   #+END_SRC
-** React js
-   #+BEGIN_SRC emacs-lisp
-   (use-package rjsx-mode)
-   #+END_SRC
-** Treemacs
-   #+BEGIN_SRC emacs-lisp
-   (use-package treemacs)
-   #+END_SRC
-** C#
-   #+BEGIN_SRC emacs-lisp
-   (use-package csharp-mode)
-   (use-package omnisharp)
-   (add-hook 'csharp-mode-hook 'omnisharp-mode)
    #+END_SRC
 ** Eyebrowse
    #+BEGIN_SRC emacs-lisp
@@ -2819,35 +3051,6 @@
    (require 're-builder)
    (setq reb-re-syntax 'string)
    #+end_src
-** Rainbow delimiters
-   #+begin_src emacs-lisp
-     (use-package rainbow-delimiters)
-     (rainbow-delimiters-mode)
-     (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
-     (add-hook 'org-mode-hook #'rainbow-delimiters-mode)
-
-     (let ((rainbow-purple  "#9E1CB2")
-           (rainbow-blue  "#1194f6")
-           (rainbow-green  "#47B04B")
-           (rainbow-yellow  "#FFED18")
-           (rainbow-orange  "#E7B500")
-           (rainbow-red  "#C90067")
-           (rainbow-7  "#00AA5D")
-           (rainbow-8  "#FE7380"))
-       (custom-set-faces 
-        `(rainbow-delimiters-depth-1-face  ((t (:foreground ,rainbow-purple))))
-        `(rainbow-delimiters-depth-2-face  ((t (:foreground ,rainbow-green))))
-        `(rainbow-delimiters-depth-3-face  ((t (:foreground ,rainbow-blue))))
-        `(rainbow-delimiters-depth-4-face  ((t (:foreground ,rainbow-red))))
-        `(rainbow-delimiters-depth-5-face  ((t (:foreground ,rainbow-yellow))))
-        `(rainbow-delimiters-depth-6-face  ((t (:foreground ,rainbow-blue))))
-        `(rainbow-delimiters-depth-7-face  ((t (:foreground ,rainbow-red))))
-        `(rainbow-delimiters-depth-8-face  ((t (:foreground ,rainbow-8))))
-        `(rainbow-delimiters-depth-9-face  ((t (:foreground ,rainbow-purple))))
-        `(rainbow-delimiters-depth-10-face ((t (:foreground ,rainbow-blue))))
-        `(rainbow-delimiters-depth-11-face ((t (:foreground ,rainbow-green))))
-        `(rainbow-delimiters-depth-12-face ((t (:foreground ,rainbow-yellow))))))
-   #+end_src
 ** new-text-color
    #+begin_src emacs-lisp
      (custom-set-faces
@@ -2862,6 +3065,165 @@
    (use-package scrollkeeper)
    (global-set-key (kbd "C-v") 'scrollkeeper-down)
    (global-set-key (kbd "M-v") 'scrollkeeper-up)
+   #+end_src
+** set-default-directory
+   #+begin_src emacs-lisp
+     (defun set-default-directory (dir)
+       (interactive "f")
+       (setq default-directory dir))
+   #+end_src
+** hydra
+   #+begin_src emacs-lisp
+   (use-package hydra)
+   #+end_src
+** org-mru-clock
+   #+begin_src emacs-lisp
+   (use-package org-mru-clock)
+   #+end_src
+** org-clock-convenience
+   #+begin_src emacs-lisp
+     (defun my/org-clock-move-to-other ()
+       (interactive)
+       (forward-char 6)
+       (while (condition-case nil
+                  (progn 
+                    (previous-line)
+                    (org-clock-convenience-goto-ts)
+                    nil)
+                (error t))))
+
+     (defun my/org-clock-move-up ()
+       (interactive)
+       (org-clock-convenience-timestamp-up)
+       (my/org-clock-move-to-other)
+       (org-clock-convenience-timestamp-up))
+
+     (use-package org-clock-convenience
+       :ensure t
+       :bind (:map org-agenda-mode-map
+                   ("<S-up>" . org-clock-convenience-timestamp-up)
+                   ("<S-down>" . org-clock-convenience-timestamp-down)
+                   ("<S-M-up>" . org-clock-convenience-timestamp-up)
+                   ("<S-M-down>" . org-clock-convenience-timestamp-down)
+                   ("ö" . org-clock-convenience-fill-gap)
+                   ("é" . org-clock-convenience-fill-gap-both)))
+   #+end_src
+** org-clock-consisitency
+   #+begin_src emacs-lisp
+     (setq org-agenda-clock-consistency-checks
+           '(:max-duration "10:00"
+             :min-duration 0
+             :max-gap 0
+             :gap-ok-around ("4:00")
+             ;; :default-face ((:background "DarkRed")
+             ;;                (:foreground "white"))
+             ;; :overlap-face nil
+             ;; :gap-face ((:background "DarkRed")
+             ;;            (:foreground "white"))
+             ;; :no-end-time-face nil
+             ;; :long-face nil
+             ;; :short-face nil
+             ))
+   #+end_src
+** org-clock stfuf
+   #+begin_src emacs-lisp
+   (org-clock-persistence-insinuate)
+   (setq org-clock-in-resume t)
+   #+end_src
+** org-edna
+   #+begin_src emacs-lisp
+   (use-package org-edna)
+   (org-edna-load)
+   #+end_src
+** org agenda goto headline AND narrow
+   #+begin_src emacs-lisp
+     (defun my/org-agenda-narrow ()
+       (interactive)
+       (org-agenda-switch-to)
+       (org-narrow-to-subtree)
+       (org-cycle)
+       (org-cycle))
+     (define-key org-agenda-mode-map (kbd "S-<return>") 'my/org-agenda-narrow)
+   #+end_src
+** World time include Taiwan
+   #+begin_src emacs-lisp
+     ;; (("America/Los_Angeles" "Seattle")
+     ;;  ("America/New_York" "New York")
+     ;;  ("Europe/London" "London")
+     ;;  ("Europe/Paris" "Paris")
+     ;;  ("Asia/Calcutta" "Bangalore")
+     ;;  ("Asia/Tokyo" "Tokyo"))
+     (setq display-time-world-list
+           '(("Asia/Taipei" "Taiwan")))
+   #+end_src
+** org-brain
+   #+begin_src emacs-lisp
+     (use-package org-brain :ensure t
+       :init
+       (global-set-key (kbd "M-'") 'org-brain-visualize)
+       (setq org-brain-path "~/MEGA/org/brain/")
+       ;; For Evil users
+       (with-eval-after-load 'evil
+         (evil-set-initial-state 'org-brain-visualize-mode 'emacs))
+       :config
+       (setq org-id-track-globally t)
+       (setq org-id-locations-file "~/.emacs.d/.org-id-locations")
+       (push '("b" "Brain" plain (function org-brain-goto-end)
+               "* %i%?" :empty-lines 1)
+             org-capture-templates)
+       (setq org-brain-visualize-default-choices 'all)
+       (setq org-brain-title-max-length 0)
+       (define-key org-brain-visualize-mode-map (kbd "^") 'org-brain-visualize-back))
+   #+end_src
+** Open links with firefox
+   #+begin_src emacs-lisp
+   (setq browse-url-browser-function 'browse-url-firefox)
+   #+end_src
+** indent-guide 
+   #+begin_src emacs-lisp
+   (use-package indent-guide)
+   (ident-guide-global-mode)
+   #+end_src
+** org-export
+   #+begin_src emacs-lisp
+   (require 'ox-latex)
+   (require 'ox-beamer)
+   #+end_src
+** desktop-environment
+   #+begin_src emacs-lisp
+   (use-package desktop-environment)
+   (desktop-environment-mode)
+   #+end_src
+** arch-linux
+   #+begin_src emacs-lisp
+   (use-package arch-packer)
+   #+end_src
+** My org traversal function
+   #+begin_src emacs-lisp
+     (defmacro traverse-org-headlines (headline &rest body)
+       (declare (indent defun))
+       (let ((buffer-symbol (make-symbol "buffer")))
+       `(let (,buffer-symbol) 
+          (org-check-agenda-file ,(cadr headline))
+          (setq ,buffer-symbol (if (file-exists-p ,(cadr headline))
+                                   (org-get-agenda-file-buffer ,(cadr headline))
+                                 (error "No such file %s" ,(cadr headline))))
+          (with-current-buffer ,buffer-symbol
+            (while (and (not (eobp))
+                        (outline-next-heading))
+              ,@body)))))
+
+     (defmacro traverse-org-files (files &rest body)
+       (declare (indent defun))
+       (let ((file-symbol (make-symbol "file")))
+         `(dolist (,file-symbol ,(cadr files))
+              (traverse-org-headlines (,(car files) ,file-symbol)
+                ,@body))))
+
+
+     (insert (format "%s" (macroexpand-all 
+                          ' (traverse-org-files (a org-agenda-files)
+                              (+ 1 2)))))
    #+end_src
 * Broken
 ** mu4e

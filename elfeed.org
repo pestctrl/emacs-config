@@ -72,6 +72,7 @@
 **** [[https://www.youtube.com/feeds/videos.xml?channel_id=UCuCkxoKLYO_EQ2GeFtbM_bw][Half as Interesting]]
 **** [[https://www.youtube.com/feeds/videos.xml?channel_id=UC9RM-iSvTu1uPJb8X5yp3EQ][Wendover Productions]]
 **** [[https://www.youtube.com/feeds/videos.xml?channel_id=UCBsuOBu-dxj5bx1KMgmar5g][TheHappieCat]]
+**** [[https://www.youtube.com/feeds/videos.xml?channel_id=UConVfxXodg78Tzh5nNu85Ew][Welch Labs]]
 *** ASMR                                                               :asmr:
     
 **** [[https://www.youtube.com/feeds/videos.xml?channel_id=UC768XN2ZjMYtNsPT6hcvbCA][Dana ASMR]]
@@ -188,7 +189,6 @@
 *** [[https://www.youtube.com/feeds/videos.xml?channel_id=UCNGSLqZab4TkgY8cnJQxgtA][psyfile]]
 *** [[https://www.youtube.com/feeds/videos.xml?channel_id=UCH4BNI0-FOK2dMXoFtViWHw][It's Okay To Be Smart]]
 *** [[https://www.youtube.com/feeds/videos.xml?channel_id=UCJ0yBou72Lz9fqeMXh9mkog][Physics Videos by Eugene Khutoryansky]]
-*** [[https://www.youtube.com/feeds/videos.xml?channel_id=UConVfxXodg78Tzh5nNu85Ew][Welch Labs]]
 *** [[https://www.youtube.com/feeds/videos.xml?channel_id=UCRIxFJ5UicWOUdoUYyJTD1Q][Gbay99]]
 *** [[https://www.youtube.com/feeds/videos.xml?channel_id=UCw26dm5ytO00bdWU3FEx9Jw][Shan-chan]]
 *** [[https://www.youtube.com/feeds/videos.xml?channel_id=UCt9ez6CnUQCFEUnxeBGlR9w][FamilyJules]]

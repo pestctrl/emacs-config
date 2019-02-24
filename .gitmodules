@@ -25,3 +25,6 @@
 [submodule "custom/org-ql"]
 	path = custom/org-ql
 	url = https://github.com/alphapapa/org-ql
+[submodule "custom/ts.el"]
+	path = custom/ts.el
+	url = https://github.com/alphapapa/ts.el

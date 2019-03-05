@@ -384,10 +384,11 @@
   (defun update-hard-drive-space-string ()
     (setq hard-drive-space
           (let ((space-left (get-hard-drive-space)))
-            (concat " "
-                    (substring space-left
-                               0
-                               (1- (length space-left)))))))
+            (propertize (concat " "
+                                (substring space-left
+                                           0
+                                           (1- (length space-left))))
+                        'face 'sml/time))))
 
   (defun display-hard-drive-space-mode ()
     (if (not (member 'hard-drive-space
@@ -539,6 +540,10 @@
                                          floating t)))
 
    #+END_SRC
+** Wallpaper
+   #+BEGIN_SRC emacs-lisp
+   (setq wallpaper-path "/home/benson/.emacs.d/res/digital_space_universe_4k_8k-wide.jpg")
+   #+END_SRC
 * Emacs
 ** Reload Config
  #+BEGIN_SRC emacs-lisp
@@ -567,9 +572,9 @@
 #+END_SRC
 ** which-key
 #+BEGIN_SRC emacs-lisp
-(use-package which-key)
-(which-key-mode)
-#+END_SRC
+  (use-package which-key)
+  (setq which-key-idle-delay 3)
+  (which-key-mode)
 ** beacon
    #+BEGIN_SRC emacs-lisp
      (use-package beacon)
@@ -597,10 +602,6 @@
  (load-theme 'calm-forest t)
  #+END_SRC
 
-** Wallpaper
-   #+BEGIN_SRC emacs-lisp
-   (setq wallpaper-path "/home/benson/.emacs.d/res/digital_space_universe_4k_8k-wide.jpg")
-   #+END_SRC
 ** Font
  #+BEGIN_SRC emacs-lisp
    ;;(set-face-attribute 'default t :font "Dotsies Training Wheels-20")
@@ -1016,11 +1017,10 @@
  (setq battery-mode-line-format "[%b%p%%%%]")
  #+END_SRC
 *** Smart Mode Line
-    #+BEGIN_SRC emacs-lisp#
+    #+BEGIN_SRC emacs-lisp
      (use-package smart-mode-line-powerline-theme)
      (use-package smart-mode-line)
      (setq sml/theme 'powerline)
-     (setq rm-blacklist  )
      (sml/setup)
     #+END_SRC
 *** Ocodo
@@ -1702,6 +1702,21 @@
                           'active
                         'stuck)))))))
 
+       (defmacro measure-time (&rest body)
+         "Measure the time it takes to evaluate BODY."
+         `(let ((time (current-time)))
+            ,@body
+            (message "%.06f" (float-time (time-since time)))))
+
+       (require 'memoize)
+       (defun reset-memo-for-projects ()
+         (interactive)
+         (ignore-errors
+           (memoize-restore 'my/get-project-type))
+         (memoize 'my/get-project-type))
+       (add-hook 'org-agenda-finalize-hook
+                 #'reset-memo-for-projects)
+
        ;; (defun my/show-stuck-projects ()
        ;;   "Only show subtrees that are stuck projects"
        ;;   (save-restriction
@@ -1741,10 +1756,11 @@
                                                (point) t)
                           'stuck)
                       (when (or (null my/stuck-projects-flag)
-                                (< stuck-projects-flag subtree-end))
+                                (< my/stuck-projects-flag subtree-end))
                         (setq my/stuck-projects-flag subtree-end))
                       nil)
                      (t subtree-end))))))
+       (byte-compile 'my/show-stuck-projects)
 
        (defvar my/done-projects-flag nil)
 
@@ -2118,7 +2134,8 @@
               (or (and (todo "HABIT")
                        (deadline <= today))
                   (todo "WAIT")
-                  (and (tags "REWARD")
+                  (and (todo "TODO")
+                       (tags "REWARD")
                        (priority = "A")))
               :super-groups ((:name "Tasks in other courts" :todo "WAIT")
                              (:name "Incomplete Habits" :todo "HABIT")
@@ -2635,6 +2652,8 @@
   (define-key projectile-mode-map (kbd "C-c C-p") 'projectile-command-map)
   (define-key projectile-command-map (kbd "C-a") 'projectile-add-known-project)
   (define-key projectile-command-map (kbd "C-r") 'projectile-remove-known-project)
+  (define-key projectile-command-map (kbd "C-f") 'counsel-projectile-find-file)
+  (define-key projectile-command-map (kbd "C-b") 'counsel-projectile-switch-to-buffer)
 
   (defun this-is-a-project (dir)
     (interactive "f")
@@ -2765,8 +2784,8 @@
       ;;   ("q" nil "quit" :color blue)
       ;;   ("Q" dap-disconnect :color red))
 
-      (use-package lsp-rust)
-      (use-package lsp-python)
+      ;(use-package lsp-rust)
+      ;(use-package lsp-python)
     #+end_src
 *** Rainbow delimiters
     #+begin_src emacs-lisp
@@ -3018,7 +3037,7 @@
            hscroll-step 1
            scroll-conservatively 101
            scroll-preserve-screen-position t
-           mouse-wheel-scroll-amount '(1)
+           mouse-wheel-scroll-amount '(3)
            mouse-wheel-progressive-speed nil)
    #+END_SRC
 ** AUR PKGBUILD
@@ -3182,7 +3201,7 @@
 ** indent-guide 
    #+begin_src emacs-lisp
    (use-package indent-guide)
-   (ident-guide-global-mode)
+   ;(indent-guide-global-mode)
    #+end_src
 ** org-export
    #+begin_src emacs-lisp
@@ -3221,9 +3240,36 @@
                 ,@body))))
 
 
-     (insert (format "%s" (macroexpand-all 
-                          ' (traverse-org-files (a org-agenda-files)
-                              (+ 1 2)))))
+     ;; (insert (format "%s" (macroexpand-all 
+     ;;                       ' (traverse-org-files (a org-agenda-files)
+     ;;                           (+ 1 2)))))
+   #+end_src
+** skeletor project templates
+   #+begin_src emacs-lisp
+   (use-package skeletor)
+   #+end_src
+** Compile java run test
+   #+begin_src emacs-lisp
+     (defun compile-java ()
+       (interactive)
+       (let ((fname (file-name-nondirectory buffer-file-name)))
+       (shell-command (format "javac %s" fname))
+       (message (shell-command-to-string (format "java %s" (substring fname 0 (- (length fname) 5)))))))
+
+     (global-set-key (kbd "C-<f1>") 'compile-java)
+   #+end_src
+** ansi-term colors
+   #+begin_src emacs-lisp
+   (setq ansi-color-names-vector
+   ["black" "red3" "green3" "yellow3" "DodgerBlue2" "magenta3" "cyan3" "gray90"])
+   #+end_src
+** sml faces
+   #+begin_src emacs-lisp
+     ;; (custom-set-faces
+     ;;  '(sml/line-number ((t (:inherit sml/global :background "#5f00af" :foreground "light gray" :weight normal))))
+     ;;  '(sml/time ((t (:inherit sml/global :background "#5f00af" :foreground "light gray" :weight normal))))
+     ;;  '(sml/charging ((t (:inherit sml/global :background "#5f00af" :foreground "#00FF00" :weight normal))))
+     ;;  '(sml/discharging ((t (:inherit sml/global :background "#5f00af" :foreground "deep pink" :weight normal)))))
    #+end_src
 * Broken
 ** mu4e

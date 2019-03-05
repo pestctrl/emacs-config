@@ -221,7 +221,7 @@ https://github.com/org-trello/org-trello/issues/258
           (incf levels))
         levels)))
 
-  (defun org-scan-tags (action matcher todo-only &optional start-level)
+  (defun my-org-scan-tags (action matcher todo-only &optional start-level)
     "Scan headline tags with inheritance and produce output ACTION.
 
     ACTION can be `sparse-tree' to produce a sparse tree in the current buffer,
@@ -389,6 +389,10 @@ https://github.com/org-trello/org-trello/issues/258
                  (not org-sparse-tree-open-archived-trees))
         (org-hide-archived-subtrees (point-min) (point-max)))
       (nreverse rtn)))
+
+  (advice-add 'org-scan-tags
+              :override
+              #'my-org-scan-tags)
 #+END_SRC
 * gdb window layout custom
   #+begin_src emacs-lisp

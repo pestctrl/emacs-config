@@ -2707,8 +2707,6 @@
       (use-package magit)
       (global-set-key (kbd "C-x g") 'magit-status)
       (global-set-key (kbd "C-x M-g") 'magit-dispatch-popup)
-      (when (eq system-type 'windows-nt)
-        (setq magit-git-executable "C:/msys64/usr/bin/git.exe"))
     #+END_SRC
 *** SPACES
     #+BEGIN_SRC emacs-lisp

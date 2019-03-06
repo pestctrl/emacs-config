@@ -1220,7 +1220,8 @@
 #+END_SRC
 **** Face
      #+BEGIN_SRC emacs-lisp
-     (setq org-ellipsis " ")
+       (when (not (eq system-type 'windows-nt))
+         (setq org-ellipsis " "))
      #+END_SRC
 **** My Template                                                     :BROKEN:
      #+BEGIN_SRC emacs-lisp
@@ -2222,7 +2223,8 @@
 **** org-bullets
 #+BEGIN_SRC emacs-lisp
 (use-package org-bullets)
-(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+(when (not (eq system-type 'windows-nt))
+(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 #+END_SRC
 **** calfw-org
    #+BEGIN_SRC emacs-lisp
@@ -2705,6 +2707,8 @@
       (use-package magit)
       (global-set-key (kbd "C-x g") 'magit-status)
       (global-set-key (kbd "C-x M-g") 'magit-dispatch-popup)
+      (when (eq system-type 'windows-nt)
+        (setq magit-git-executable "C:/msys64/usr/bin/git.exe"))
     #+END_SRC
 *** SPACES
     #+BEGIN_SRC emacs-lisp
@@ -3275,6 +3279,11 @@
      ;;  '(sml/time ((t (:inherit sml/global :background "#5f00af" :foreground "light gray" :weight normal))))
      ;;  '(sml/charging ((t (:inherit sml/global :background "#5f00af" :foreground "#00FF00" :weight normal))))
      ;;  '(sml/discharging ((t (:inherit sml/global :background "#5f00af" :foreground "deep pink" :weight normal)))))
+   #+end_src
+** expand-region
+   #+begin_src emacs-lisp
+   (use-package expand-region)
+   (global-set-key (kbd "C-'") 'er/expand-region)
    #+end_src
 * Broken
 ** mu4e

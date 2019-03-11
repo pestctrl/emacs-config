@@ -2660,7 +2660,7 @@
   (define-key projectile-command-map (kbd "C-a") 'projectile-add-known-project)
   (define-key projectile-command-map (kbd "C-r") 'projectile-remove-known-project)
   (define-key projectile-command-map (kbd "C-f") 'counsel-projectile-find-file)
-  (define-key projectile-command-map (kbd "C-b") 'counsel-projectile-switch-to-buffer)
+  (define-key projectile-command-map (kbd "C-b") 'projectile-ibuffer)
 
   (defun this-is-a-project (dir)
     (interactive "f")
@@ -3282,6 +3282,11 @@
    #+begin_src emacs-lisp
    (use-package expand-region)
    (global-set-key (kbd "C-'") 'er/expand-region)
+   #+end_src
+** wtf
+   #+begin_src emacs-lisp
+   (use-package wtf)
+   
    #+end_src
 * Broken
 ** mu4e

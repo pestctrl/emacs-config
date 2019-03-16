@@ -606,18 +606,21 @@
  #+BEGIN_SRC emacs-lisp
    ;;(set-face-attribute 'default t :font "Dotsies Training Wheels-20")
    ;;(add-to-list 'default-frame-alist '(font . "Dotsies Training Wheels-20"))
-   (set-default-font "LinuxLibertine")
-   (set-default-font "Hack 10")
-   (set-default-font "UbuntuMono 11")
-   (set-default-font "OfficeCodePro 11")
-   (set-default-font "RobotoMono 11")
-   (let ((font (format "%s"
-                       "RobotoMono-11"
-                       ;; "Tamzen"
-                       ;; "SourceCodePro"
-                       ;; "Gohu Gohufont"
-                       )))
-     (add-to-list 'default-frame-alist `(font . ,font)))
+   ;; (set-default-font "LinuxLibertine")
+   ;; (set-default-font "Hack 10")
+   ;; (set-default-font "UbuntuMono 11")
+   ;; (set-default-font "OfficeCodePro 11")
+   (if (eq system-type 'windows-nt)
+       (set-frame-font "Roboto Mono 10")
+     (set-frame-font "RobotoMono 11")
+     (let ((font
+	    (format "%s"
+		    "RobotoMono-11"
+		    ;; "Tamzen"
+		    ;; "SourceCodePro"
+		    ;; "Gohu Gohufont"
+		    )))
+       (add-to-list 'default-frame-alist `(font . ,font))))
    ;; (set-frame-font "Menlo")
    (defun reading-buffer ()
      (interactive)
@@ -1185,6 +1188,8 @@
 ** Org Mode
 *** Keybindings and customization
 #+BEGIN_SRC emacs-lisp
+  (use-package org)
+  (require 'org-agenda)
   (global-set-key (kbd "M-–") (lambda () (interactive) (org-agenda "" "p")))
   (global-set-key (kbd "M-•") (lambda () (interactive) (org-agenda "" "n")))
   (global-set-key "\C-cl" 'org-store-link)
@@ -1215,7 +1220,8 @@
 #+END_SRC
 **** Face
      #+BEGIN_SRC emacs-lisp
-     (setq org-ellipsis " ")
+       (when (not (eq system-type 'windows-nt))
+         (setq org-ellipsis " "))
      #+END_SRC
 **** My Template                                                     :BROKEN:
      #+BEGIN_SRC emacs-lisp
@@ -2217,7 +2223,8 @@
 **** org-bullets
 #+BEGIN_SRC emacs-lisp
 (use-package org-bullets)
-(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+(when (not (eq system-type 'windows-nt))
+(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 #+END_SRC
 **** calfw-org
    #+BEGIN_SRC emacs-lisp
@@ -2653,7 +2660,7 @@
   (define-key projectile-command-map (kbd "C-a") 'projectile-add-known-project)
   (define-key projectile-command-map (kbd "C-r") 'projectile-remove-known-project)
   (define-key projectile-command-map (kbd "C-f") 'counsel-projectile-find-file)
-  (define-key projectile-command-map (kbd "C-b") 'counsel-projectile-switch-to-buffer)
+  (define-key projectile-command-map (kbd "C-b") 'projectile-ibuffer)
 
   (defun this-is-a-project (dir)
     (interactive "f")
@@ -3270,6 +3277,16 @@
      ;;  '(sml/time ((t (:inherit sml/global :background "#5f00af" :foreground "light gray" :weight normal))))
      ;;  '(sml/charging ((t (:inherit sml/global :background "#5f00af" :foreground "#00FF00" :weight normal))))
      ;;  '(sml/discharging ((t (:inherit sml/global :background "#5f00af" :foreground "deep pink" :weight normal)))))
+   #+end_src
+** expand-region
+   #+begin_src emacs-lisp
+   (use-package expand-region)
+   (global-set-key (kbd "C-'") 'er/expand-region)
+   #+end_src
+** wtf
+   #+begin_src emacs-lisp
+   (use-package wtf)
+   
    #+end_src
 * Broken
 ** mu4e

@@ -210,7 +210,7 @@
        (interactive)
        (exwm-input--fake-key ?\C-t))
      (define-key *root-map* (kbd "C-t") 'annoying-key-thing)
-     (define-key *root-map* (kbd "C-b") 'previous-buffer)
+     (define-key *root-map* (kbd "C-b") (lambda () (interactive) (switch-to-buffer nil)))
      (define-key *root-map* (kbd "t") 'transpose-chars)
      (define-key *root-map* (kbd "c") 'multi-term)
      (define-key *root-map* (kbd "C-p") 'exwmx-launch-program)

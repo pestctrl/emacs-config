@@ -229,8 +229,12 @@
      (define-key *root-map* (kbd "q") (quickrun-lambda "qutebrowser" nil))
      (define-key *root-map* (kbd "V") (quickrun-lambda "VBoxManage startvm \"Windows 7\"" "VirtualBox Machine"))
      (define-key *root-map* (kbd "r") 'exwmx-name-buffer)
+     (define-key *root-map* (kbd ")") (lambda () (interactive) (leaving-computer) (shell-command "sleep 2s ; xset dpms force off")))
      (define-key *root-map* (kbd "C-n") 'switch-window)
-     (define-key *root-map* (kbd ")") (lambda () (interactive) (shell-command "sleep 2s ; xset dpms force off")))
+     (define-key *root-map* (kbd "i") 'org-mru-clock-in)
+     (define-key *root-map* (kbd "C-i") 'leaving-computer)
+     (define-key *root-map* (kbd "C") 'org-resolve-clocks)
+     (define-key *root-map* (kbd "j") 'org-clock-goto)
      (define-key *root-map* (kbd "n") 'toggle-notifications)
 
      (define-prefix-command '*window-map*)
@@ -3117,7 +3121,7 @@
    #+end_src
 ** org-mru-clock
    #+begin_src emacs-lisp
-   (use-package org-mru-clock)
+     (use-package org-mru-clock)
    #+end_src
 ** org-clock-convenience
    #+begin_src emacs-lisp

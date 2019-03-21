@@ -209,6 +209,10 @@
           (interactive)
           ,body))
 
+     (defun toggle-notifications ()
+       (interactive)
+       (shell-command "kill -s USR1 $(pidof deadd-notification-center)"))
+
      (define-prefix-command '*root-map*)
      ;(global-set-key (kbd "C-t") '*root-map*)
      (add-to-list 'exwm-input-prefix-keys ?\C-t)
@@ -227,6 +231,7 @@
      (define-key *root-map* (kbd "r") 'exwmx-name-buffer)
      (define-key *root-map* (kbd "C-n") 'switch-window)
      (define-key *root-map* (kbd ")") (lambda () (interactive) (shell-command "sleep 2s ; xset dpms force off")))
+     (define-key *root-map* (kbd "n") 'toggle-notifications)
 
      (define-prefix-command '*window-map*)
      (define-key *root-map* (kbd "w") '*window-map*)
@@ -333,6 +338,7 @@
   (setq kde-string "Xephyr -br -ac -noreset -resizeable -screen 1920x1080 :8 & sleep 1s; DISPLAY=:8 startkde")
   (defvar exwm-startup-programs
     '("megasync"
+      "deadd-notification-center"
       ("compton -f -i .7 -b")
       ("/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1")
       ("/usr/lib/notification-daemon-1.0/notification-daemon")

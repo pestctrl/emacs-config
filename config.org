@@ -8,6 +8,12 @@
       (interactive)
       (shell-command "setxkbmap de neo_dvorak"))
   #+END_SRC
+
+* Lib
+** memoize
+   #+begin_src emacs-lisp
+   (use-package memoize)
+   #+end_src
 * Custom file
   #+BEGIN_SRC emacs-lisp
   (setq custom-file "~/.emacs.d/custom.el")

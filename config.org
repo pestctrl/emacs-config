@@ -1260,17 +1260,16 @@
   (setq org-capture-templates
         '(("t" "Todo" entry (file "~/MEGA/org/agenda/refile.org")
            "* STUFF %?\n  :PROPERTIES:\n  :CREATED: %U\n  :VIEWING: %a\n  :END:")
-          ("r" "Reviews")
-          ("ra" "Automatic Review" entry (file+function "~/MEGA/org/entries/reviews.gpg" setup-automatic-review)
-           (file "~/MEGA/org/templates/review-interactive-entry.org"))
-          ("rw" "Weekly Review" entry (file "~/MEGA/org/entries/reviews.gpg")
-           (file "~/MEGA/org/templates/weekly-review-entry-template.org"))
-          ("rm" "Make-up Weekly Review" entry (file+function "~/MEGA/org/entries/reviews.gpg" setup-make-up-review)
+          ("r" "Review" entry (file+function "~/MEGA/org/entries/reviews.gpg" setup-automatic-review)
            (file "~/MEGA/org/templates/review-interactive-entry.org"))
           ("rt" "Review Task" entry (file+headline "~/MEGA/org/entries/reviews.gpg" "Tasks")
            "* TODO %?")
           ("d" "Dream" entry (file+olp+datetree "~/MEGA/org/entries/dream.org")
            "* %?")
+          ("D" "Distracted" entry (file "~/MEGA/org/agenda/refile.org")
+           "* TODO %?" :clock-in t :clock-resume t)
+          ("T" "New Task" entry (file "~/MEGA/org/agenda/refile.org")
+           "* TODO %?" :clock-in t :clock-keep t)
           ("m" "Money" plain (file "~/MEGA/org/entries/finances/ledger.ledger")
            (file "~/MEGA/org/templates/basic.ledger") :unnarrowed t :empty-lines 1)
           ("c" "Record Comms Message" entry (file+olp+datetree "~/MEGA/org/entries/comms.org")
@@ -1555,16 +1554,18 @@
 
        (defun my/is-standalone-task ()
          (and (not (member (org-get-todo-state) '("HOLD" "PROJECT" "SOMEDAY" "TICKLER" "SEQUENTIAL")))
-              (not (member "ARCHIVE" (org-get-tags)))
+              (not (member "ARCHIVE" (org-get-tags (point))))
               (not (my/is-part-of-subtree))
               (not (my/is-a-project))))
 
        (defun my/no-children ()
          (save-excursion
-           (let ((curr-indent (org-current-level)))
+           (let ((curr-indent (org-current-level))
+                 (substree-end (save-excursion (org-end-of-subtree t))))
              (while (and (outline-next-heading)
+                         (< (point) subtree-end)
                          (< curr-indent (org-current-level))
-                         (if (member "ARCHIVE" (org-get-tags))
+                         (if (member "ARCHIVE" (org-get-tags (point)))
                              (progn
                                (org-end-of-subtree)
                                (outline-next-heading))
@@ -1574,12 +1575,12 @@
                  (org-current-level)))))
 
        (defun my/is-unactionable-task ()
-         (or (member "NOT_TASKS" (org-get-tags))
+         (or (member "NOT_TASKS" (org-get-tags (point)))
              (member (org-get-todo-state) (cons "INACT" org-done-keywords))))
 
        (defun my/is-a-task ()
          (save-excursion
-           (and (not (member "NOT_TASKS" (org-get-tags)))
+           (and (not (member "NOT_TASKS" (org-get-tags (point))))
                 (or (and (equal "ONE" (org-get-todo-state))
                          (not (my/has-non-done-task)))
                     (and (org-get-todo-state)
@@ -1592,7 +1593,7 @@
                  has-subtask)
              (while (and (not has-subtask)
                          (outline-next-heading)
-                         (if (member "ARCHIVE" (org-get-tags))
+                         (if (member "ARCHIVE" (org-get-tags (point)))
                              (progn
                                (org-end-of-subtree)
                                (outline-next-heading))
@@ -1689,7 +1690,7 @@
              (while (and (not (and has-next-task
                                    has-stuck-project))
                          (< (point) subtree-end))
-               ;; (unless (member "ARCHIVE" (org-get-tags))
+               ;; (unless (member "ARCHIVE" (org-get-tags (point)))
                (cond ((my/is-a-project)
                       (setq has-project t) 
                       (when (eq (my/get-project-type file (point) t)
@@ -1732,65 +1733,71 @@
                           'active
                         'stuck)))))))
 
-       (defmacro measure-time (&rest body)
-         "Measure the time it takes to evaluate BODY."
-         `(let ((time (current-time)))
-            ,@body
-            (message "%.06f" (float-time (time-since time)))))
+       ;; (defmacro measure-time (&rest body)
+       ;;   "Measure the time it takes to evaluate BODY."
+       ;;   `(let ((time (current-time)))
+       ;;      ,@body
+       ;;      (message "%.06f" (float-time (time-since time)))))
 
-       (require 'memoize)
-       (defun reset-memo-for-projects ()
-         (interactive)
-         (ignore-errors
-           (memoize-restore 'my/get-project-type))
-         (memoize 'my/get-project-type))
-       (add-hook 'org-agenda-finalize-hook
-                 #'reset-memo-for-projects)
-
-       ;; (defun my/show-stuck-projects ()
-       ;;   "Only show subtrees that are stuck projects"
-       ;;   (save-restriction
-       ;;     (widen)
-       ;;     (let ((subtree-end (save-excursion (org-end-of-subtree t))))
-       ;;       (unless (or (and (my/is-a-task)
-       ;;                        (my/is-standalone-task)
-       ;;                        (not (org-get-scheduled-time (point)))
-       ;;                        (not (org-get-deadline-time (point))))
-       ;;                   (eq (my/get-project-type buffer-file-name (point) t)
-       ;;                       'stuck))
-       ;;         subtree-end))))
-
-       (defvar my/stuck-projects-flag nil)
+       ;; (require 'memoize)
+       ;; (defun reset-memo-for-projects ()
+       ;;   (interactive)
+       ;;   (ignore-errors
+       ;;     (memoize-restore 'my/get-project-type))
+       ;;   (memoize 'my/get-project-type))
+       ;; (add-hook 'org-agenda-finalize-hook
+       ;;           #'reset-memo-for-projects)
 
        (defun my/show-stuck-projects ()
          "Only show subtrees that are stuck projects"
          (save-restriction
            (widen)
            (let ((subtree-end (save-excursion (org-end-of-subtree t))))
-             (if (and my/stuck-projects-flag
-                      (< (point) my/stuck-projects-flag))
-                 (if (or (my/is-next-task)
-                         (my/is-unactionable-task)
-                         (and (not (my/is-a-task))
-                              (not (eq (my/get-project-type buffer-file-name (point) t)
-                                  'stuck))))
-                     subtree-end
-                   nil)
-               (setq my/stuck-projects-flag nil)
-               (cond ((and (my/is-a-task)
-                           (my/is-standalone-task)
-                           (not (org-get-scheduled-time (point)))
-                           (not (org-get-deadline-time (point))))
-                      nil)
-                     ((eq (my/get-project-type buffer-file-name
-                                               (point) t)
-                          'stuck)
-                      (when (or (null my/stuck-projects-flag)
-                                (< my/stuck-projects-flag subtree-end))
-                        (setq my/stuck-projects-flag subtree-end))
-                      nil)
-                     (t subtree-end))))))
-       (byte-compile 'my/show-stuck-projects)
+             ;; (setq debug-p (point)
+             ;;       debuf-f (buffer-file-name))
+             (unless (or (and (my/is-a-task)
+                              (my/is-standalone-task)
+                              (not (org-get-scheduled-time (point)))
+                              (not (org-get-deadline-time (point))))
+                         (eq (my/get-project-type buffer-file-name (point) t)
+                             'stuck))
+               subtree-end))))
+
+       ;; (defvar my/stuck-projects-flag nil)
+
+       ;; (defvar my/stuck-projects-file nil)
+
+       ;; (defun my/show-stuck-projects ()
+       ;;   "Only show subtrees that are stuck projects"
+       ;;   (setq stuck-here t)
+       ;;   (save-restriction
+       ;;     (widen)
+       ;;     (let ((subtree-end (save-excursion (org-end-of-subtree t))))
+       ;;       (if (and my/stuck-projects-flag
+       ;;                (string= my/stuck-projects-file
+       ;;                         (buffer-file-name))
+       ;;                (< (point) my/stuck-projects-flag))
+       ;;           (if (or (my/is-next-task)
+       ;;                   (my/is-unactionable-task)
+       ;;                   (and (not (my/is-a-task))
+       ;;                        (not (eq (my/get-project-type buffer-file-name (point) t)
+       ;;                            'stuck))))
+       ;;               subtree-end
+       ;;             nil)
+       ;;         (setq my/stuck-projects-flag nil
+       ;;               my/stuck-projects-file nil)
+       ;;         (cond ((and (my/is-a-task)
+       ;;                     (my/is-standalone-task)
+       ;;                     (not (org-get-scheduled-time (point)))
+       ;;                     (not (org-get-deadline-time (point))))
+       ;;                nil)
+       ;;               ((eq (my/get-project-type buffer-file-name
+       ;;                                         (point) t)
+       ;;                    'stuck)
+       ;;                (setq my/stuck-projects-flag subtree-end)
+       ;;                (setq my/stuck-projects-file (buffer-file-name))
+       ;;                nil)
+       ;;               (t subtree-end))))))
 
        (defvar my/done-projects-flag nil)
 
@@ -2160,14 +2167,14 @@
          (org-agenda-prepare "org-ql")
          (insert
           (save-window-excursion 
-            (org-ql-agenda '("~/MEGA/org/agenda/agenda.org")
+            (org-ql-agenda org-agenda-files
               (or (and (todo "HABIT")
                        (deadline <= today))
                   (todo "WAIT")
                   (and (todo "TODO")
                        (tags "REWARD")
                        (priority = "A")))
-              :super-groups ((:name "Tasks in other courts" :todo "WAIT")
+              :super-groups ((:name "Waiting tasks" :todo "WAIT")
                              (:name "Incomplete Habits" :todo "HABIT")
                              (:name "Rewards" :tag "REWARD")))
             (switch-to-buffer "*Org Agenda NG*")
@@ -3178,8 +3185,12 @@
    #+end_src
 ** org-clock stfuf
    #+begin_src emacs-lisp
-   (org-clock-persistence-insinuate)
-   (setq org-clock-in-resume t)
+     (org-clock-persistence-insinuate)
+     (setq org-clock-in-resume t)
+     (setq org-clock-mode-line-total 'today)
+     (setq org-clock-persist t)
+     (org-clock-persistence-insinuate)
+     (setq org-clock-continuously t)
    #+end_src
 ** org-edna
    #+begin_src emacs-lisp

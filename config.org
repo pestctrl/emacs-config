@@ -1037,10 +1037,18 @@
  #+END_SRC
 *** Smart Mode Line
     #+BEGIN_SRC emacs-lisp
-     (use-package smart-mode-line-powerline-theme)
-     (use-package smart-mode-line)
-     (setq sml/theme 'powerline)
-     (sml/setup)
+      (use-package smart-mode-line-powerline-theme)
+      (use-package smart-mode-line)
+      (require 'smart-mode-line-powerline-theme)
+      (require 'smart-mode-line)
+      (setq sml/theme 'powerline)
+      ;; (add-to-list 
+      ;;  'after-make-frame-functions
+      ;;  (lambda (&optional x)
+      ;;    (require 'smart-mode-line-powerline-theme)
+      ;;    (require 'smart-mode-line)
+      ;;    (setq sml/theme 'powerline)
+      ;;    (sml/setup)))
     #+END_SRC
 *** Ocodo
     #+BEGIN_SRC emacs-lisp#

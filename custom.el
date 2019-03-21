@@ -7,16 +7,15 @@
    ["black" "red3" "green3" "yellow3" "DodgerBlue2" "magenta3" "cyan3" "gray90"])
  '(custom-safe-themes
    (quote
-    ("84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484d94d5ff5b279" "003a9aa9e4acb50001a006cfde61a6c3012d373c4763b48ceb9d523ceba66829" default)))
+    ("3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "84d2f9eeb3f82d619ca4bfffe5f157282f4779732f48a5ac1484d94d5ff5b279" "003a9aa9e4acb50001a006cfde61a6c3012d373c4763b48ceb9d523ceba66829" default)))
  '(display-battery-mode t)
  '(display-time-mode t)
  '(org-agenda-files
    (quote
-    ("~/MEGA/org/agenda/agenda.org" "~/MEGA/org/agenda/refile.org")))
+    ("~/MEGA/org/agenda/ContView.org" "~/MEGA/org/agenda/UHNW.org" "~/MEGA/org/agenda/read.org" "~/MEGA/org/agenda/agenda.org" "~/MEGA/org/agenda/reference.org" "~/MEGA/org/agenda/refile.org")))
  '(package-selected-packages
    (quote
-    (wtf fontawesome expand-region treemacs-projectile memoize skeletor 0xc lsp-rust smart-mode-line-powerline-theme hyperbole eclim alert gscholar-bibtex org-noter pdf-tools md4rd arch-packer interleave sx desktop-environment org-journal-list indent-guide org-board org-brain org-edna org-clock-csv org-clock-convenience org-mru-clock lsp-ui dap-mode lsp-python lsp-java lsp-ruby lsp-mode smart-jump scrollkeeper elfeed-org elfeed rg ag dumb-jump rainbow-delimiters org-super-agenda htmlize exwm-x keyfreq org-jira eyebrowse omnisharp omnisharp-emacs typescript-mode csharp-mode restclient rjsx-mode go-mode go treemacs org-timeline plantuml-mode pkgbuild-mode airline-themes powerline magit-svn ein emacs-ipython-notebook processing-mode web-mode ledger-mode elpy skewer-mode js2-mode dired-narrow yaml-mode clj-refactor paredit geiser magit ensime yasnippet irony company dired-du ox-reveal oauth2 org-caldav calfw-org calfw-gcal calfw-ical calfw org-bullets ace-jump-mode switch-window counsel smex ivy helm counsel-projectile helm-projectile projectile slime pulseaudio-control evil undo-tree multi-term swiper color-theme-modern org org-plus-contrib use-package exwm)))
- '(wtf-custom-alist (quote (("PDF" . "Portable Document Format")))))
+    (hy-mode hacker-typer csv-mode switch-buffer-functions org-bookmark-heading system-packages org-projectile treemacs-projectile expand-region org-wunderlist lua-mode treemacs-icons-dired memoize skeletor 0xc lsp-rust smart-mode-line-powerline-theme hyperbole eclim alert gscholar-bibtex org-noter pdf-tools md4rd arch-packer interleave sx desktop-environment org-journal-list indent-guide org-board org-brain org-edna org-clock-csv org-clock-convenience org-mru-clock lsp-ui dap-mode lsp-python lsp-java lsp-ruby lsp-mode smart-jump scrollkeeper elfeed-org elfeed rg ag dumb-jump rainbow-delimiters org-super-agenda htmlize exwm-x keyfreq org-jira eyebrowse omnisharp omnisharp-emacs typescript-mode csharp-mode restclient rjsx-mode go-mode go treemacs org-timeline plantuml-mode pkgbuild-mode airline-themes powerline magit-svn ein emacs-ipython-notebook processing-mode web-mode ledger-mode elpy skewer-mode js2-mode dired-narrow yaml-mode clj-refactor paredit geiser magit ensime yasnippet irony company dired-du ox-reveal oauth2 org-caldav calfw-org calfw-gcal calfw-ical calfw org-bullets ace-jump-mode switch-window counsel smex ivy helm counsel-projectile helm-projectile projectile slime pulseaudio-control evil undo-tree multi-term swiper color-theme-modern org org-plus-contrib use-package exwm))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

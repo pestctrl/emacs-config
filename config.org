@@ -2676,6 +2676,7 @@
 *** Projectile and dumb-jump
 #+BEGIN_SRC emacs-lisp
   (use-package projectile)
+  (use-package treemacs-projectile)
   (use-package helm-projectile)
   (use-package counsel-projectile)
 
@@ -2908,6 +2909,7 @@
 *** Treemacs
     #+BEGIN_SRC emacs-lisp
     (use-package treemacs)
+    (load "treemacs-mode.el")
     #+END_SRC
 ** Freekeys
    #+BEGIN_SRC emacs-lisp#
@@ -3324,6 +3326,58 @@
    (use-package wtf)
    
    #+end_src
+** buffer-time-tracking
+   #+begin_src emacs-lisp
+     (use-package switch-buffer-functions)
+     ;;(load "switch-buffer-functions-autoloads.el")
+     (defun my/insert-into-buffers-csv (str str2 symb str3)
+       (let* ((buffer (find-file-noselect "~/MEGA/org/agenda/buffer_times.csv"))
+             (inhibit-message t))
+         (with-current-buffer buffer
+           (goto-char (point-max))
+           (insert (format-time-string "%Y-%m-%d %H:%M:%S" (current-time)))
+           (insert "," str "," (if str2 str2 "") "," str3 "," (if symb (symbol-name symb) ""))
+           (insert "\n")
+           (save-buffer))))
+
+     (defun my/record-buffer-switch (prev cur)
+       (let* (obuffer-name buffer-name buffer-fname buffer-mode buffer-def-dir)
+         (with-current-buffer cur
+           (setq buffer-name (buffer-name)
+                 buffer-fname (buffer-file-name)
+                 buffer-mode major-mode
+                 buffer-def-dir default-directory))
+         (when (buffer-live-p prev)
+           (with-current-buffer prev
+             (setq obuffer-name (buffer-name))))
+         (when (and (not (string= buffer-name " *Minibuf-1*"))
+                    ;; (or (not obuffer-name) (not (string= obuffer-name " *Minibuf-1*")))
+                    )
+           (my/insert-into-buffers-csv buffer-name buffer-fname buffer-mode buffer-def-dir))))
+
+     (add-hook 'switch-buffer-functions
+               'my/record-buffer-switch)
+
+     (defun leaving-computer ()
+       (interactive)
+       (my/insert-into-buffers-csv "Inactive" "" nil "")
+       (message "Computer is now inactive!"))
+
+   #+end_src
+** auto-save files in same directory
+   #+begin_src emacs-lisp
+     (setq backup-directory-alist `(("." . "~/.emacs.d/backups/")))
+     (setq backup-by-copying t)
+   #+end_src
+** Hy-mode
+   #+begin_src emacs-lisp
+   (use-package hy-mode)
+   #+end_src
+** csv-mode
+   #+begin_src emacs-lisp
+   (use-package csv-mode)
+   #+end_src
+
 * Broken
 ** mu4e
 *** General config

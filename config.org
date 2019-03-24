@@ -3021,7 +3021,10 @@
     #+BEGIN_SRC emacs-lisp
     (use-package csharp-mode)
     (use-package dotnet)
-    (use-package omnisharp)
+    (use-package omnisharp
+      :bind (:map omnisharp-mode-map
+              ([remap xref-find-definitions] . omnisharp-go-to-definition)
+              ([remap xref-find-references] . omnisharp-find-usages)))
     (add-hook 'csharp-mode-hook 'omnisharp-mode)
     (add-hook 'csharp-mode-hook 'company-mode)
     (add-hook 'csharp-mode-hook 'flycheck-mode)

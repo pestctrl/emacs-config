@@ -2792,15 +2792,21 @@
 *** Autocompletion
 #+BEGIN_SRC emacs-lisp
   (use-package company)
-  (use-package irony)
-  (add-hook 'c++-mode-hook 'irony-mode)
-  (add-hook 'c-mode-hook 'irony-mode)
-  (add-hook 'objc-mode-hook 'irony-mode)
-
-  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
-
-  (global-company-mode)
+  (setq company-idle-delay 0.2)
+  (add-hook 'emacs-lisp-mode-hook
+            'company-mode)
 #+END_SRC
+*** irony
+    #+begin_src emacs-lisp
+      (use-package irony)
+      (add-hook 'c++-mode-hook 'irony-mode)
+      (add-hook 'c-mode-hook 'irony-mode)
+      (add-hook 'objc-mode-hook 'irony-mode)
+
+      (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+
+      (global-company-mode)
+    #+end_src
 *** Yasnippets
     #+BEGIN_SRC emacs-lisp
     (use-package yasnippet)

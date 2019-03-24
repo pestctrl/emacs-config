@@ -343,6 +343,7 @@
   (defvar exwm-startup-programs
     '("megasync"
       "deadd-notification-center"
+      "/usr/lib/kdeconnectd"
       ("compton -f -i .7 -b")
       ("/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1")
       ("/usr/lib/notification-daemon-1.0/notification-daemon")
@@ -3508,7 +3509,12 @@
    #+begin_src emacs-lisp
    (use-package csv-mode)
    #+end_src
-
+** kdeconnect
+   #+begin_src emacs-lisp
+   (use-package kdeconnect)
+   (setq kdeconnect-devices "ddcc003536dcf16d")
+   (setq kdeconnect-active-device "ddcc003536dcf16d")
+   #+end_src
 * Broken
 ** mu4e
 *** General config

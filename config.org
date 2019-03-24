@@ -1478,7 +1478,7 @@
 
   (setq org-todo-keywords
          '((sequence "STUFF(s)" "SOMEDAY(P)" "INACT(i)" "|")
-           (sequence "TODO(t)" "ONE(o)" "NEXT(n)" "HABIT(H)" "|" "DONE(d!)")
+           (sequence "TODO(t)" "GOAL(g)" "ONE(o)" "NEXT(n)" "HABIT(H)" "|" "DONE(d!)")
            (sequence "PROJECT(p)" "SEQUENTIAL(S)" "ETERNAL(e)" "|" "COMPLETE(c)")
            (sequence  "WAIT(w@/!)" "HOLD(h)" "TICKLER())" "FORGOTTEN(f)" "|" "ABANDON(a@/!)")
            (sequence "TOP" "|")))
@@ -1538,9 +1538,167 @@
 
   (setq org-agenda-compact-blocks t)
 #+END_SRC
+**** My org traversal functions
+     #+begin_src emacs-lisp
+       (defun get-variables (l)
+         (cond ((null l) nil)
+               ((consp (car l))
+                (append (extract-variables (car l)) 
+                        (get-variables (cdr l))))
+               (t (cons (car l)
+                        (get-variables (cdr l))))))
+
+       (defun extract-variables (l)
+         (if (not (consp l))
+             l
+           (get-variables (cdr l))))
+
+       (defmacro org-loop/descendants (&rest body)
+         (declare (indent defun))
+         (let ((subtree-symbol (make-symbol "subtree-end")))
+           `(let ((,subtree-symbol (save-excursion (org-end-of-subtree t))))
+              (while (and (outline-next-heading)
+                          (< (point) ,subtree-symbol))
+                ,@body))))
+
+       (defmacro org-loop/children (&rest body)
+         (declare (indent defun))
+         (let ((subtree-symbol (make-symbol "subtree-end")))
+           `(let ((,subtree-symbol (save-excursion (org-end-of-subtree t))))
+              (outline-next-heading)
+              (while (and (org-end-of-subtree t t)
+                          (< (point) ,subtree-symbol))
+                ,@body))))
+
+       (defmacro orgc-loop/descendants (condition &rest body)
+         (declare (indent defun))
+         (let ((subtree-symbol (make-symbol "subtree-end")))
+           `(let ((,subtree-symbol (save-excursion (org-end-of-subtree t)))
+                  (,condition nil))
+              (while (and (not ,condition)
+                          (outline-next-heading)
+                          (< (point) ,subtree-symbol))
+                ,@body)
+              ,condition)))
+
+       (defmacro orgb-loop/descendants (condition &rest body)
+         (declare (indent defun))
+         (let ((subtree-symbol (make-symbol "subtree-end"))
+               (vars (extract-variables condition)))
+           `(let ((,subtree-symbol (save-excursion (org-end-of-subtree t)))
+                  ,@vars)
+              (while (and ,condition
+                          (outline-next-heading)
+                          (< (point) ,subtree-symbol))
+                ,@body)
+              ,condition)))
+
+       ;; (orgb-loop/descendants (and not-stuff stuff)
+       ;;   (+ 1 2))
+
+       (defmacro orgc-loop/children (condition &rest body)
+         (declare (indent defun))
+         (let ((subtree-symbol (make-symbol "subtree-end")))
+           `(let ((,subtree-symbol (save-excursion (org-end-of-subtree t)))
+                  (,condition nil))
+              (outline-next-heading)
+              (while (and (not ,condition)
+                          (< (point) ,subtree-symbol))
+                ,@body
+                (org-end-of-subtree t t))
+              ,condition)))
+
+       (defmacro orgc-loop/todo-descendants (condition &rest body)
+         (declare (indent defun))
+         (let ((todo-state (make-symbol "todo-state"))
+               (tags (make-symbol "tags")))
+           `(orgc-loop/descendants ,condition
+              (let ((,todo-state (org-get-todo-state))
+                    (,tags (org-get-tags (point))))
+                (when ,todo-state
+                  (if (member "ARCHIVE" ,tags)
+                      (org-end-of-subtree t)
+                    ,@body))))))
+
+       (defmacro orgc-loop/todo-children (condition &rest body)
+         (declare (indent defun))
+         (let ((todo-state (make-symbol "todo-state"))
+               (tags (make-symbol "tags")))
+           `(orgc-loop/children ,condition
+              (let ((,todo-state (org-get-todo-state))
+                    (,tags (org-get-tags (point))))
+                (when ,todo-state
+                  (if (member "ARCHIVE" ,tags)
+                      (org-end-of-subtree t)
+                    ,@body))))))
+
+       (defmacro orgb-loop/todo-children (condition &rest body)
+         (declare (indent defun))
+         (let ((todo-state (make-symbol "todo-state"))
+               (tags (make-symbol "tags")))
+           `(orgb-loop/children ,condition
+              (let ((,todo-state (org-get-todo-state))
+                    (,tags (org-get-tags (point))))
+                (when ,todo-state
+                  (if (member "ARCHIVE" ,tags)
+                      (org-end-of-subtree t)
+                    ,@body))))))
+
+       ;; (insert (format "\n%s" (macroexpand-all
+       ;;                       '(orgc-loop/todo-children todo
+       ;;                          (setq todo t)))))
+
+       (defmacro org-loop/todo-descendants (&rest body)
+         (declare (indent defun))
+         (let ((todo-state (make-symbol "todo-state"))
+               (tags (make-symbol "tags")))
+           `(org-loop/descendants 
+              (let ((,todo-state (org-get-todo-state))
+                    (,tags (org-get-tags (point))))
+                (when ,todo-state
+                  (if (member "ARCHIVE" ,tags)
+                       (org-end-of-subtree t)
+                    ,@body))))))
+
+       (defmacro org-loop/todo-children (condition &rest body)
+         (declare (indent defun))
+         (let ((todo-state (make-symbol "todo-state"))
+               (tags (make-symbol "tags")))
+           `(org-loop/children 
+              (let ((,todo-state (org-get-todo-state))
+                    (,tags (org-get-tags (point))))
+                (when (and ,todo-state
+                           (not (member "ARCHIVE") ,tags))
+                  ,@body)))))
+
+
+       (defmacro traverse-org-headlines (headline &rest body)
+         (declare (indent defun))
+         (let ((buffer-symbol (make-symbol "buffer")))
+         `(let (,buffer-symbol) 
+            (org-check-agenda-file ,(cadr headline))
+            (setq ,buffer-symbol (if (file-exists-p ,(cadr headline))
+                                     (org-get-agenda-file-buffer ,(cadr headline))
+                                   (error "No such file %s" ,(cadr headline))))
+            (with-current-buffer ,buffer-symbol
+              (while (and (not (eobp))
+                          (outline-next-heading))
+                ,@body)))))
+
+       (defmacro traverse-org-files (files &rest body)
+         (declare (indent defun))
+         (let ((file-symbol (make-symbol "file")))
+           `(dolist (,file-symbol ,(cadr files))
+                (traverse-org-headlines (,(car files) ,file-symbol)
+                  ,@body))))
+
+
+       ;; (insert (format "%s" (macroexpand-all 
+       ;;                       ' (traverse-org-files (a org-agenda-files)
+       ;;                           (+ 1 2)))))
+     #+end_src
 **** My Project code
      #+BEGIN_SRC emacs-lisp
-
        (defun my/is-part-of-subtree ()
          (save-excursion
            (and (not (= 1 (org-current-level)))
@@ -1559,24 +1717,21 @@
               (not (my/is-a-project))))
 
        (defun my/no-children ()
+         "t if heading has one subheading with a todo keyword"
          (save-excursion
-           (let ((curr-indent (org-current-level))
-                 (substree-end (save-excursion (org-end-of-subtree t))))
-             (while (and (outline-next-heading)
-                         (< (point) subtree-end)
-                         (< curr-indent (org-current-level))
-                         (if (member "ARCHIVE" (org-get-tags (point)))
-                             (progn
-                               (org-end-of-subtree)
-                               (outline-next-heading))
-                           t)
-                         (not (org-get-todo-state))))
-             (>= curr-indent
-                 (org-current-level)))))
+           (not (orgc-loop/todo-children has-children
+                  (setq has-children t)))))
 
        (defun my/is-unactionable-task ()
          (or (member "NOT_TASKS" (org-get-tags (point)))
              (member (org-get-todo-state) (cons "INACT" org-done-keywords))))
+
+       (defun my/has-non-done-task ()
+         (save-excursion
+           (orgc-loop/todo-children has-non-done-task
+             (when (not (member (org-get-todo-state)
+                                org-done-keywords))
+               (setq has-non-done-task t)))))
 
        (defun my/is-a-task ()
          (save-excursion
@@ -1584,35 +1739,20 @@
                 (or (and (equal "ONE" (org-get-todo-state))
                          (not (my/has-non-done-task)))
                     (and (org-get-todo-state)
-                         (not (member (org-get-todo-state) '("SOMEDAY" "WAIT")))
+                         (not (member (org-get-todo-state) '("PROJECT" "SOMEDAY" "WAIT" "HOLD")))
                          (my/no-children))))))
 
        (defun my/has-subtask ()
          (save-excursion
-           (let ((subtree-end (save-excursion (org-end-of-subtree t)))
-                 has-subtask)
-             (while (and (not has-subtask)
-                         (outline-next-heading)
-                         (if (member "ARCHIVE" (org-get-tags (point)))
-                             (progn
-                               (org-end-of-subtree)
-                               (outline-next-heading))
-                           t)
-                         (< (point) subtree-end))
-               (when (org-get-todo-state)
-                 (setq has-subtask t)))
-             has-subtask)))
+           (orgc-loop/todo-children has-subtask
+             (when (org-get-todo-state)
+               (setq has-subtask t)))))
 
        (defun my/has-next-task ()
          (save-excursion
-           (let ((subtree-end (save-excursion (org-end-of-subtree t)))
-                 has-next-task)
-             (while (and (not has-next-task)
-                         (outline-next-heading)
-                         (< (point) subtree-end))
+           (orgc-loop/todo-children has-next-task
                (when (my/is-next-task)
-                 (setq has-next-task t)))
-             has-next-task)))
+                 (setq has-next-task t)))))
 
        (defun my/is-next-task ()
          (let ((todo (org-get-todo-state)))
@@ -1620,17 +1760,6 @@
                (and (member todo '("TODO" "ONE" "NEXT"))
                     (or (org-get-scheduled-time (point))
                         (org-get-deadline-time (point)))))))
-
-       (defun my/has-non-done-task ()
-         (save-excursion
-           (let ((subtree-end (save-excursion (org-end-of-subtree t)))
-                 has-next-task)
-             (while (and (not has-next-task)
-                         (outline-next-heading)
-                         (< (point) subtree-end))
-               (when (not (member (org-get-todo-state) org-done-keywords))
-                 (setq has-next-task t)))
-             has-next-task)))
 
        (defun my/is-a-project ()
          (save-excursion
@@ -1684,25 +1813,20 @@
 
        (defun my/generous-active-project (file point)
          (save-excursion
-           (let ((subtree-end (save-excursion (org-end-of-subtree t)))
-                 has-task has-next-task has-project has-stuck-project)
-             (outline-next-heading)
-             (while (and (not (and has-next-task
-                                   has-stuck-project))
-                         (< (point) subtree-end))
-               ;; (unless (member "ARCHIVE" (org-get-tags (point)))
-               (cond ((my/is-a-project)
-                      (setq has-project t) 
-                      (when (eq (my/get-project-type file (point) t)
-                                'stuck)
-                        (setq has-stuck-project t)))
-                     ((my/is-a-task)
-                      (setq has-task t)
-                      (when (or (my/is-next-task) (equal (org-get-todo-state) "WAIT"))
-                        (setq has-next-task t)))
-                     )
-               (org-end-of-subtree t t)
-               );; )
+           (let (has-task has-next-task has-project has-stuck-project)
+             (orgc-loop/todo-children custom-condition
+               (if (and has-next-task has-stuck-project)
+                   (setq custom-condition t)
+                 (cond ((my/is-a-project)
+                        (setq has-project t)
+                        (when (eq (my/get-project-type file (point) t)
+                                  'stuck)
+                          (setq has-stuck-project t)))
+                       ((my/is-a-task)
+                        (setq has-task t)
+                        (when (or (my/is-next-task)
+                                  (equal (org-get-todo-state) "WAIT")) ;; Ew
+                          (setq has-next-task t))))))
              (or (and has-next-task 
                       (not has-stuck-project))
                  (and (not has-task) 
@@ -2105,7 +2229,7 @@
                  ("Cb" "Bus tasks" tags-todo "BUS")
                  ("Cr" "Articles to read" tags-todo "READ")
                  ;; ("D" "Old done tasks" todo "DONE|CANCELLED|COMPLETE")
-                 ("d" "Done Tasks" todo "DONE|CANCELLED|COMPLETE"
+                 ("d" "Done Tasks" todo "DONE|CANCELLED|COMPLETE|ABANDON"
                   ((org-agenda-overriding-header "Done Tasks")
                    (org-agenda-skip-function 'my/show-done-projects-and-tasks))))))
 
@@ -3298,33 +3422,6 @@
 ** arch-linux
    #+begin_src emacs-lisp
    (use-package arch-packer)
-   #+end_src
-** My org traversal function
-   #+begin_src emacs-lisp
-     (defmacro traverse-org-headlines (headline &rest body)
-       (declare (indent defun))
-       (let ((buffer-symbol (make-symbol "buffer")))
-       `(let (,buffer-symbol) 
-          (org-check-agenda-file ,(cadr headline))
-          (setq ,buffer-symbol (if (file-exists-p ,(cadr headline))
-                                   (org-get-agenda-file-buffer ,(cadr headline))
-                                 (error "No such file %s" ,(cadr headline))))
-          (with-current-buffer ,buffer-symbol
-            (while (and (not (eobp))
-                        (outline-next-heading))
-              ,@body)))))
-
-     (defmacro traverse-org-files (files &rest body)
-       (declare (indent defun))
-       (let ((file-symbol (make-symbol "file")))
-         `(dolist (,file-symbol ,(cadr files))
-              (traverse-org-headlines (,(car files) ,file-symbol)
-                ,@body))))
-
-
-     ;; (insert (format "%s" (macroexpand-all 
-     ;;                       ' (traverse-org-files (a org-agenda-files)
-     ;;                           (+ 1 2)))))
    #+end_src
 ** skeletor project templates
    #+begin_src emacs-lisp

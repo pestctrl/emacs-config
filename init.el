@@ -33,3 +33,5 @@
 (org-babel-load-file
  (expand-file-name "my-redefs.org"
                    user-emacs-directory))
+
+(setq my/finished t)

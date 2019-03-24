@@ -260,6 +260,10 @@
      (define-key *music-map* (kbd "n") (exec (shell-command "clementine --next")))
      (define-key *music-map* (kbd "p") (exec (shell-command "clementine --previous")))
      (define-key *root-map* (kbd "m") '*music-map*)
+
+     ;; Disable these
+     (define-key ibuffer-mode-map (kbd "C-t") nil)
+     (define-key dired-mode-map (kbd "C-t") nil)
    #+END_SRC
 ** Switch window
    #+BEGIN_SRC emacs-lisp
@@ -1139,8 +1143,6 @@
                '(lambda (buf)
                   (with-current-buffer buf
                     (eq major-mode 'helm-major-mode))))
-
-  (define-key ibuffer-mode-map (kbd "C-t") nil)
 
   (setq ibuffer-saved-filter-groups
         '(("General"
@@ -3018,8 +3020,13 @@
 *** C#
     #+BEGIN_SRC emacs-lisp
     (use-package csharp-mode)
+    (use-package dotnet)
     (use-package omnisharp)
     (add-hook 'csharp-mode-hook 'omnisharp-mode)
+    (add-hook 'csharp-mode-hook 'company-mode)
+    (add-hook 'csharp-mode-hook 'flycheck-mode)
+    (add-hook 'csharp-mode-hook 'auto-highlight-symbol-mode)
+    (add-hook 'csharp-mode-hook 'dotnet-mode)
     #+END_SRC
 *** React js
     #+BEGIN_SRC emacs-lisp

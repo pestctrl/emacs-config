@@ -593,7 +593,7 @@ https://github.com/org-trello/org-trello/issues/258
       (when (and switch-buffer-functions--in-minibuffer
                  (member this-command '(exit-minibuffer minibuffer-keyboard-quit ivy-alt-done)))
         (setq switch-buffer-functions--in-minibuffer nil))
-      (if (member this-command '(eval-expression counsel-M-x ivy-switch-buffer edebug-eval-expression)) ;; counsel-M-x doesn't work...
+      (if (member this-command '(eval-expression counsel-M-x ivy-switch-buffer edebug-eval-expression counsel-grep-or-swiper)) ;; counsel-M-x doesn't work...
           (setq switch-buffer-functions--in-minibuffer t)
         (unless (or (eq (current-buffer)
                         switch-buffer-functions--last-buffer))

@@ -3355,8 +3355,8 @@
                     )
            (my/insert-into-buffers-csv buffer-name buffer-fname buffer-mode buffer-def-dir))))
 
-     (add-hook 'switch-buffer-functions
-               'my/record-buffer-switch)
+     ;; (add-hook 'switch-buffer-functions
+     ;;           'my/record-buffer-switch)
 
      (defun leaving-computer ()
        (interactive)

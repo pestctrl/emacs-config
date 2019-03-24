@@ -178,20 +178,24 @@
 ** Youtube split
    #+BEGIN_SRC emacs-lisp
 
-     (defun youtube-split ()
-       (interactive)
+     (defun youtube-split (arg)
+       (interactive "P")
+       (delete-other-windows)
        (if-let (buf (get-buffer "youtube"))
            (switch-to-buffer buf)
-         (launch-program-with-name "firefox" "youtube"))
+         (when arg
+           (launch-program-with-name "firefox" "youtube")))
        (split-window (selected-window) 472 t t)
        (switch-window))
 
 
-     (defun big-youtube-split ()
-       (interactive)
+     (defun big-youtube-split (arg)
+       (interactive "P")
+       (delete-other-windows)
        (if-let (buf (get-buffer "youtube"))
            (switch-to-buffer buf)
-         (launch-program-with-name "firefox" "youtube"))
+         (when arg
+           (launch-program-with-name "firefox" "youtube")))
        (split-window (selected-window) 630 t t)
        (switch-window))
    #+END_SRC
@@ -216,12 +220,13 @@
      (define-prefix-command '*root-map*)
      ;(global-set-key (kbd "C-t") '*root-map*)
      (add-to-list 'exwm-input-prefix-keys ?\C-t)
-     (defun annoying-key-thing ()
-       (interactive)
-       (exwm-input--fake-key ?\C-t))
-     (define-key *root-map* (kbd "C-t") 'annoying-key-thing)
+     (defun simulate-C-t (arg)
+       (interactive "P")
+       (if (eq major-mode 'exwm-mode)
+           (exwm-input--fake-key ?\C-t)
+         (transpose-chars arg)))
      (define-key *root-map* (kbd "C-b") (lambda () (interactive) (switch-to-buffer nil)))
-     (define-key *root-map* (kbd "t") 'transpose-chars)
+     (define-key *root-map* (kbd "C-t") 'simulate-C-t)
      (define-key *root-map* (kbd "c") 'multi-term)
      (define-key *root-map* (kbd "C-p") 'exwmx-launch-program)
      (define-key *root-map* (kbd "e") (quickrun-lambda "emacs" "emacs"))

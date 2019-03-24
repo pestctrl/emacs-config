@@ -2693,6 +2693,7 @@
   (define-key projectile-command-map (kbd "C-r") 'projectile-remove-known-project)
   (define-key projectile-command-map (kbd "C-f") 'counsel-projectile-find-file)
   (define-key projectile-command-map (kbd "C-b") 'projectile-ibuffer)
+  (define-key projectile-command-map (kbd "C-c") 'projectile-compile-project)
 
   (defun this-is-a-project (dir)
     (interactive "f")
@@ -2776,56 +2777,73 @@
     #+END_SRC
 *** lsp-mode
     #+begin_src emacs-lisp
-      (use-package lsp-mode)
-      (use-package lsp-ui)
+            (use-package flycheck)
+            (global-flycheck-mode)
 
-      (use-package lsp-java)
-      (use-package dap-mode
-        :config
-        (dap-mode t)
-        (dap-ui-mode t))
-      (require 'dap-java)
+            (use-package lsp-mode)
+            (use-package lsp-ui)
 
-      ;; (defhydra dap-hydra (:color pink :hint nil :foreign-keys run)
-      ;;   ;;   "
-      ;;   ;; ^Stepping^          ^Switch^                 ^Breakpoints^           ^Eval
-      ;;   ;; ^^^^^^^^-----------------------------------------------------------------------------------------
-      ;;   ;; _n_: Next           _ss_: Session            _bt_: Toggle            _ee_: Eval
-      ;;   ;; _i_: Step in        _st_: Thread             _bd_: Delete            _er_: Eval region
-      ;;   ;; _o_: Step out       _sf_: Stack frame        _ba_: Add               _es_: Eval thing at point
-      ;;   ;; _c_: Continue       _sl_: List locals        _bc_: Set condition     _eii_: Inspect
-      ;;   ;; _r_: Restart frame  _sb_: List breakpoints   _bh_: Set hit count     _eir_: Inspect region
-      ;;   ;; _Q_: Disconnect     _sS_: List sessions      _bl_: Set log message   _eis_: Inspect thing at point
-      ;;   ;; "
-      ;;   ("n" dap-next)
-      ;;   ("i" dap-step-in)
-      ;;   ("o" dap-step-out)
-      ;;   ("c" dap-continue)
-      ;;   ("r" dap-restart-frame)
-      ;;   ("ss" dap-switch-session)
-      ;;   ("st" dap-switch-thread)
-      ;;   ("sf" dap-switch-stack-frame)
-      ;;   ("sl" dap-ui-locals)
-      ;;   ("sb" dap-ui-breakpoints)
-      ;;   ("sS" dap-ui-sessions)
-      ;;   ("bt" dap-breakpoint-toggle)
-      ;;   ("ba" dap-breakpoint-add)
-      ;;   ("bd" dap-breakpoint-delete)
-      ;;   ("bc" dap-breakpoint-condition)
-      ;;   ("bh" dap-breakpoint-hit-condition)
-      ;;   ("bl" dap-breakpoint-log-message)
-      ;;   ("ee" dap-eval)
-      ;;   ("er" dap-eval-region)
-      ;;   ("es" dap-eval-thing-at-point)
-      ;;   ("eii" dap-ui-inspect)
-      ;;   ("eir" dap-ui-inspect-region)
-      ;;   ("eis" dap-ui-inspect-thing-at-point)
-      ;;   ("q" nil "quit" :color blue)
-      ;;   ("Q" dap-disconnect :color red))
+            (define-key lsp-mode-map (kbd "C-c C-j") 'lsp-ui-peek-find-definitions)
+            (define-key lsp-mode-map (kbd "C-c C-r") 'lsp-ui-peek-find-references)
+            (define-key lsp-mode-map (kbd "C-c C-f") 'lsp-ui-peek-jump-forward)
+            (define-key lsp-mode-map (kbd "C-c C-b") 'lsp-ui-peek-jump-backward)
 
-      ;(use-package lsp-rust)
-      ;(use-package lsp-python)
+            (setq lsp-ui-flycheck-enable t)
+            (setq lsp-ui-flycheck-live-reporting t)
+            (use-package dap-mode
+              :config
+              (dap-mode t)
+              (dap-ui-mode t)
+              (define-key dap-mode-map (kbd "C-c n") 'dap-next))
+
+            ;; (defhydra dap-hydra (:color pink :hint nil :foreign-keys run)
+            ;;   ;;   "
+            ;;   ;; ^Stepping^          ^Switch^                 ^Breakpoints^           ^Eval
+            ;;   ;; ^^^^^^^^-----------------------------------------------------------------------------------------
+            ;;   ;; _n_: Next           _ss_: Session            _bt_: Toggle            _ee_: Eval
+            ;;   ;; _i_: Step in        _st_: Thread             _bd_: Delete            _er_: Eval region
+            ;;   ;; _o_: Step out       _sf_: Stack frame        _ba_: Add               _es_: Eval thing at point
+            ;;   ;; _c_: Continue       _sl_: List locals        _bc_: Set condition     _eii_: Inspect
+            ;;   ;; _r_: Restart frame  _sb_: List breakpoints   _bh_: Set hit count     _eir_: Inspect region
+            ;;   ;; _Q_: Disconnect     _sS_: List sessions      _bl_: Set log message   _eis_: Inspect thing at point
+            ;;   ;; "
+            ;;   ("n" dap-next)
+            ;;   ("i" dap-step-in)
+            ;;   ("o" dap-step-out)
+            ;;   ("c" dap-continue)
+            ;;   ("r" dap-restart-frame)
+            ;;   ("ss" dap-switch-session)
+            ;;   ("st" dap-switch-thread)
+            ;;   ("sf" dap-switch-stack-frame)
+            ;;   ("sl" dap-ui-locals)
+            ;;   ("sb" dap-ui-breakpoints)
+            ;;   ("sS" dap-ui-sessions)
+            ;;   ("bt" dap-breakpoint-toggle)
+            ;;   ("ba" dap-breakpoint-add)
+            ;;   ("bd" dap-breakpoint-delete)
+            ;;   ("bc" dap-breakpoint-condition)
+            ;;   ("bh" dap-breakpoint-hit-condition)
+            ;;   ("bl" dap-breakpoint-log-message)
+            ;;   ("ee" dap-eval) 
+            ;;   ("er" dap-eval-region)
+            ;;   ("es" dap-eval-thing-at-point)
+            ;;   ("eii" dap-ui-inspect)
+            ;;   ("eir" dap-ui-inspect-region)
+            ;;   ("eis" dap-ui-inspect-thing-at-point)
+            ;;   ("q" nil "quit" :color blue)
+            ;;   ("Q" dap-disconnect :color red))
+            ;(use-package lsp-python)
     #+end_src
+**** Java
+     #+begin_src emacs-lisp
+      (use-package lsp-java)
+      (require 'dap-java)
+     #+end_src
+**** ccls
+     #+begin_src emacs-lisp
+       (use-package ccls)
+       (require 'ccls)
+     #+end_src
 *** Rainbow delimiters
     #+begin_src emacs-lisp
       (use-package rainbow-delimiters)
@@ -2855,6 +2873,17 @@
          `(rainbow-delimiters-depth-11-face ((t (:foreground ,rainbow-green))))
          `(rainbow-delimiters-depth-12-face ((t (:foreground ,rainbow-yellow))))))
     #+end_src
+*** elisp
+**** pp-macros
+     #+begin_src emacs-lisp
+     (define-key emacs-lisp-mode-map (kbd "C-c e") 'pp-macroexpand-last-sexp)
+     #+end_src
+**** auto-highlight-symbol
+     #+begin_src emacs-lisp
+       (use-package auto-highlight-symbol)
+       (add-hook 'emacs-lisp-mode-hook
+                 'auto-highlight-symbol-mode)
+     #+end_src
 *** C#
     #+BEGIN_SRC emacs-lisp
     (use-package csharp-mode)
@@ -2911,6 +2940,27 @@
     (use-package treemacs)
     (load "treemacs-mode.el")
     #+END_SRC
+*** Hy-mode
+    #+begin_src emacs-lisp
+    (use-package hy-mode)
+    #+end_src
+*** glsl-mode
+    #+BEGIN_SRC emacs-lisp
+      (autoload 'glsl-mode "glsl-mode" nil t)
+      (add-to-list 'auto-mode-alist '("\\.glsl\\'" . glsl-mode))
+      (add-to-list 'auto-mode-alist '("\\.vert\\'" . glsl-mode))
+      (add-to-list 'auto-mode-alist '("\\.frag\\'" . glsl-mode))
+      (add-to-list 'auto-mode-alist '("\\.geom\\'" . glsl-mode))
+    #+END_SRC
+*** indent-guide 
+    #+begin_src emacs-lisp
+    (use-package indent-guide)
+    ;(indent-guide-global-mode)
+    #+end_src
+*** rust cargo
+    #+begin_src emacs-lisp
+    (use-package cargo)
+    #+end_src
 ** Freekeys
    #+BEGIN_SRC emacs-lisp#
    (use-package free-keys)
@@ -2933,14 +2983,6 @@
    #+BEGIN_SRC emacs-lisp
      (setq default-tab-width 4)
      (setq-default indent-tabs-mode nil)
-   #+END_SRC
-** glsl-mode
-   #+BEGIN_SRC emacs-lisp
-     (autoload 'glsl-mode "glsl-mode" nil t)
-     (add-to-list 'auto-mode-alist '("\\.glsl\\'" . glsl-mode))
-     (add-to-list 'auto-mode-alist '("\\.vert\\'" . glsl-mode))
-     (add-to-list 'auto-mode-alist '("\\.frag\\'" . glsl-mode))
-     (add-to-list 'auto-mode-alist '("\\.geom\\'" . glsl-mode))
    #+END_SRC
 ** pdf-tools use isearch
    #+BEGIN_SRC emacs-lisp
@@ -3243,11 +3285,6 @@
    #+begin_src emacs-lisp
    (setq browse-url-browser-function 'browse-url-firefox)
    #+end_src
-** indent-guide 
-   #+begin_src emacs-lisp
-   (use-package indent-guide)
-   ;(indent-guide-global-mode)
-   #+end_src
 ** org-export
    #+begin_src emacs-lisp
    (require 'ox-latex)
@@ -3368,10 +3405,6 @@
    #+begin_src emacs-lisp
      (setq backup-directory-alist `(("." . "~/.emacs.d/backups/")))
      (setq backup-by-copying t)
-   #+end_src
-** Hy-mode
-   #+begin_src emacs-lisp
-   (use-package hy-mode)
    #+end_src
 ** csv-mode
    #+begin_src emacs-lisp

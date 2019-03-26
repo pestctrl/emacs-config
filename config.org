@@ -205,6 +205,14 @@
        (when-let (buf (get-buffer "development"))
          (display-buffer-in-side-window buf `((side . left)))
          (set-window-parameter (selected-window) 'no-delete-other-windows t)))
+
+
+     (defun make-side-window ()
+       (interactive)
+       (when-let (buf (current-buffer))
+         (display-buffer-in-side-window buf `((side . right)))
+         (set-window-parameter (selected-window) 'no-delete-other-windows t)
+         (set-window-dedicated-p (selected-window) t)))
    #+END_SRC
 ** Disable simulation keys on an emacs window
    #+BEGIN_SRC emacs-lisp

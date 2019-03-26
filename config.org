@@ -198,6 +198,13 @@
            (launch-program-with-name "firefox" "youtube")))
        (split-window (selected-window) 630 t t)
        (switch-window))
+
+
+     (defun dev-side-window ()
+       (interactive)
+       (when-let (buf (get-buffer "development"))
+         (display-buffer-in-side-window buf `((side . left)))
+         (set-window-parameter (selected-window) 'no-delete-other-windows t)))
    #+END_SRC
 ** Disable simulation keys on an emacs window
    #+BEGIN_SRC emacs-lisp
@@ -2820,6 +2827,14 @@
   (use-package helm-projectile)
   (use-package counsel-projectile)
 
+  (defun projectile-stop-project-running ()
+    (interactive)
+    (if-let (buf (get-buffer "*compilation*"))
+      (let ((kill-buffer-query-functions nil))
+        (kill-buffer buf)
+        (delete-window))
+      (message "Project is not running")))
+
   (projectile-global-mode)
   ; Deprecated?
   (counsel-projectile-mode)
@@ -2834,6 +2849,7 @@
   (define-key projectile-command-map (kbd "C-f") 'counsel-projectile-find-file)
   (define-key projectile-command-map (kbd "C-b") 'projectile-ibuffer)
   (define-key projectile-command-map (kbd "C-c") 'projectile-compile-project)
+  (define-key projectile-command-map (kbd "C-d") 'projectile-stop-project-running)
 
   (defun this-is-a-project (dir)
     (interactive "f")
@@ -2917,62 +2933,62 @@
     #+END_SRC
 *** lsp-mode
     #+begin_src emacs-lisp
-            (use-package flycheck)
-            (global-flycheck-mode)
+      (use-package flycheck)
+      (global-flycheck-mode)
 
-            (use-package lsp-mode)
-            (use-package lsp-ui)
+      (use-package lsp-mode)
+      (use-package lsp-ui)
 
-            (define-key lsp-mode-map (kbd "C-c C-j") 'lsp-ui-peek-find-definitions)
-            (define-key lsp-mode-map (kbd "C-c C-r") 'lsp-ui-peek-find-references)
-            (define-key lsp-mode-map (kbd "C-c C-f") 'lsp-ui-peek-jump-forward)
-            (define-key lsp-mode-map (kbd "C-c C-b") 'lsp-ui-peek-jump-backward)
+      (define-key lsp-mode-map (kbd "M-.") 'lsp-ui-peek-find-definitions)
+      (define-key lsp-mode-map (kbd "C-c C-r") 'lsp-ui-peek-find-references)
+      (define-key lsp-mode-map (kbd "C-c C-f") 'lsp-ui-peek-jump-forward)
+      (define-key lsp-mode-map (kbd "C-c C-b") 'lsp-ui-peek-jump-backward)
 
-            (setq lsp-ui-flycheck-enable t)
-            (setq lsp-ui-flycheck-live-reporting t)
-            (use-package dap-mode
-              :config
-              (dap-mode t)
-              (dap-ui-mode t)
-              (define-key dap-mode-map (kbd "C-c n") 'dap-next))
+      (setq lsp-ui-flycheck-enable t)
+      (setq lsp-ui-flycheck-live-reporting t)
+      (use-package dap-mode
+        :config
+        (dap-mode t)
+        (dap-ui-mode t)
+        (define-key dap-mode-map (kbd "C-c n") 'dap-next))
 
-            ;; (defhydra dap-hydra (:color pink :hint nil :foreign-keys run)
-            ;;   ;;   "
-            ;;   ;; ^Stepping^          ^Switch^                 ^Breakpoints^           ^Eval
-            ;;   ;; ^^^^^^^^-----------------------------------------------------------------------------------------
-            ;;   ;; _n_: Next           _ss_: Session            _bt_: Toggle            _ee_: Eval
-            ;;   ;; _i_: Step in        _st_: Thread             _bd_: Delete            _er_: Eval region
-            ;;   ;; _o_: Step out       _sf_: Stack frame        _ba_: Add               _es_: Eval thing at point
-            ;;   ;; _c_: Continue       _sl_: List locals        _bc_: Set condition     _eii_: Inspect
-            ;;   ;; _r_: Restart frame  _sb_: List breakpoints   _bh_: Set hit count     _eir_: Inspect region
-            ;;   ;; _Q_: Disconnect     _sS_: List sessions      _bl_: Set log message   _eis_: Inspect thing at point
-            ;;   ;; "
-            ;;   ("n" dap-next)
-            ;;   ("i" dap-step-in)
-            ;;   ("o" dap-step-out)
-            ;;   ("c" dap-continue)
-            ;;   ("r" dap-restart-frame)
-            ;;   ("ss" dap-switch-session)
-            ;;   ("st" dap-switch-thread)
-            ;;   ("sf" dap-switch-stack-frame)
-            ;;   ("sl" dap-ui-locals)
-            ;;   ("sb" dap-ui-breakpoints)
-            ;;   ("sS" dap-ui-sessions)
-            ;;   ("bt" dap-breakpoint-toggle)
-            ;;   ("ba" dap-breakpoint-add)
-            ;;   ("bd" dap-breakpoint-delete)
-            ;;   ("bc" dap-breakpoint-condition)
-            ;;   ("bh" dap-breakpoint-hit-condition)
-            ;;   ("bl" dap-breakpoint-log-message)
-            ;;   ("ee" dap-eval) 
-            ;;   ("er" dap-eval-region)
-            ;;   ("es" dap-eval-thing-at-point)
-            ;;   ("eii" dap-ui-inspect)
-            ;;   ("eir" dap-ui-inspect-region)
-            ;;   ("eis" dap-ui-inspect-thing-at-point)
-            ;;   ("q" nil "quit" :color blue)
-            ;;   ("Q" dap-disconnect :color red))
-            ;(use-package lsp-python)
+      ;; (defhydra dap-hydra (:color pink :hint nil :foreign-keys run)
+      ;;   ;;   "
+      ;;   ;; ^Stepping^          ^Switch^                 ^Breakpoints^           ^Eval
+      ;;   ;; ^^^^^^^^-----------------------------------------------------------------------------------------
+      ;;   ;; _n_: Next           _ss_: Session            _bt_: Toggle            _ee_: Eval
+      ;;   ;; _i_: Step in        _st_: Thread             _bd_: Delete            _er_: Eval region
+      ;;   ;; _o_: Step out       _sf_: Stack frame        _ba_: Add               _es_: Eval thing at point
+      ;;   ;; _c_: Continue       _sl_: List locals        _bc_: Set condition     _eii_: Inspect
+      ;;   ;; _r_: Restart frame  _sb_: List breakpoints   _bh_: Set hit count     _eir_: Inspect region
+      ;;   ;; _Q_: Disconnect     _sS_: List sessions      _bl_: Set log message   _eis_: Inspect thing at point
+      ;;   ;; "
+      ;;   ("n" dap-next)
+      ;;   ("i" dap-step-in)
+      ;;   ("o" dap-step-out)
+      ;;   ("c" dap-continue)
+      ;;   ("r" dap-restart-frame)
+      ;;   ("ss" dap-switch-session)
+      ;;   ("st" dap-switch-thread)
+      ;;   ("sf" dap-switch-stack-frame)
+      ;;   ("sl" dap-ui-locals)
+      ;;   ("sb" dap-ui-breakpoints)
+      ;;   ("sS" dap-ui-sessions)
+      ;;   ("bt" dap-breakpoint-toggle)
+      ;;   ("ba" dap-breakpoint-add)
+      ;;   ("bd" dap-breakpoint-delete)
+      ;;   ("bc" dap-breakpoint-condition)
+      ;;   ("bh" dap-breakpoint-hit-condition)
+      ;;   ("bl" dap-breakpoint-log-message)
+      ;;   ("ee" dap-eval) 
+      ;;   ("er" dap-eval-region)
+      ;;   ("es" dap-eval-thing-at-point)
+      ;;   ("eii" dap-ui-inspect)
+      ;;   ("eir" dap-ui-inspect-region)
+      ;;   ("eis" dap-ui-inspect-thing-at-point)
+      ;;   ("q" nil "quit" :color blue)
+      ;;   ("Q" dap-disconnect :color red))
+      ;(use-package lsp-python)
     #+end_src
 **** Java
      #+begin_src emacs-lisp

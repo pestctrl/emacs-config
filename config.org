@@ -256,6 +256,7 @@
 
      (define-prefix-command '*firefox-map*)
      (define-key *firefox-map* (kbd "f") (quickrun-lambda "firefox" "firefox"))
+     (define-key *firefox-map* (kbd "d") (quickrun-lambda "firefox" "development"))
      (define-key *firefox-map* (kbd "s") (quickrun-lambda "firefox" "school"))
      (define-key *firefox-map* (kbd "w") (quickrun-lambda "firefox" "work"))
      (define-key *firefox-map* (kbd "y") (quickrun-lambda "firefox" "youtube"))
@@ -3553,6 +3554,14 @@
    (use-package kdeconnect)
    (setq kdeconnect-devices "ddcc003536dcf16d")
    (setq kdeconnect-active-device "ddcc003536dcf16d")
+   #+end_src
+** Purpose-mode
+   #+begin_src emacs-lisp
+   (use-package window-purpose)
+   (add-to-list 'purpose-user-mode-purposes '(exwm-mode . research))
+   (add-to-list 'purpose-user-mode-purposes '(js2-mode . dev))
+   (purpose-compile-user-configuration)
+   (purpose-mode)
    #+end_src
 * Broken
 ** mu4e

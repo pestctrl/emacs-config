@@ -217,8 +217,8 @@
    #+BEGIN_SRC emacs-lisp
      (defmacro exec (body)
        `(lambda ()
-	  (interactive)
-	  ,body))
+          (interactive)
+          ,body))
 
      (defun toggle-notifications ()
        (interactive)
@@ -230,8 +230,8 @@
      (defun simulate-C-t (arg)
        (interactive "P")
        (if (eq major-mode 'exwm-mode)
-	   (exwm-input--fake-key ?\C-t)
-	 (transpose-chars arg)))
+           (exwm-input--fake-key ?\C-t)
+         (transpose-chars arg)))
      (define-key *root-map* (kbd "C-b") (lambda () (interactive) (switch-to-buffer nil)))
      (define-key *root-map* (kbd "C-t") 'simulate-C-t)
      (define-key *root-map* (kbd "c") 'multi-term)

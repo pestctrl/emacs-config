@@ -3556,7 +3556,7 @@
    (setq kdeconnect-active-device "ddcc003536dcf16d")
    #+end_src
 ** Purpose-mode
-   #+begin_src emacs-lisp
+   #+begin_src emacs-lisp#
    (use-package window-purpose)
    (add-to-list 'purpose-user-mode-purposes '(exwm-mode . research))
    (add-to-list 'purpose-user-mode-purposes '(js2-mode . dev))

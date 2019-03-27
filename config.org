@@ -178,33 +178,60 @@
 ** Youtube split
    #+BEGIN_SRC emacs-lisp
 
-     (defun youtube-split (arg)
-       (interactive "P")
-       (delete-other-windows)
-       (if-let (buf (get-buffer "youtube"))
-           (switch-to-buffer buf)
-         (when arg
-           (launch-program-with-name "firefox" "youtube")))
-       (split-window (selected-window) 472 t t)
-       (switch-window))
+          (defun youtube-split (arg)
+            (interactive "P")
+            (delete-other-windows)
+            (if-let (buf (get-buffer "youtube"))
+                (switch-to-buffer buf)
+              (when arg
+                (launch-program-with-name "firefox" "youtube")))
+            (split-window (selected-window) 472 t t)
+            (switch-window))
 
 
-     (defun big-youtube-split (arg)
-       (interactive "P")
-       (delete-other-windows)
-       (if-let (buf (get-buffer "youtube"))
-           (switch-to-buffer buf)
-         (when arg
-           (launch-program-with-name "firefox" "youtube")))
-       (split-window (selected-window) 630 t t)
-       (switch-window))
+          (defun big-youtube-split (arg)
+            (interactive "P")
+            (delete-other-windows)
+            (if-let (buf (get-buffer "youtube"))
+                (switch-to-buffer buf)
+              (when arg
+                (launch-program-with-name "firefox" "youtube")))
+            (split-window (selected-window) 630 t t)
+            (switch-window))
+
+          (defun delete-all-side-windows ()
+            (interactive)
+            (let ((ignore-window-parameters t))
+              (delete-other-windows))
+            (message "Deleted side windows"))
+
+          (defun side-left-window ()
+            (interactive)
+            (let ((win (display-buffer-in-side-window
+                        (current-buffer)
+                        `((side . left)
+                          (no-delete-other-windows t)))))
+              (set-window-dedicated-p win t)))
 
 
-     (defun dev-side-window ()
-       (interactive)
-       (when-let (buf (get-buffer "development"))
-         (display-buffer-in-side-window buf `((side . left)))
-         (set-window-parameter (selected-window) 'no-delete-other-windows t)))
+          (defun side-right-window ()
+            (interactive)
+            (let ((win (display-buffer-in-side-window
+                        (current-buffer)
+                        `((side . right)
+                          (no-delete-other-windows t)))))
+              (set-window-dedicated-p win t)))
+
+
+          (defun side-bottom-window ()
+            (interactive)
+            (let ((win (display-buffer-in-side-window
+                        (current-buffer)
+                        `((side . bottom)
+                          (no-delete-other-windows t)))))
+              (set-window-dedicated-p win t)))
+
+          (setq window-sides-vertical t)
    #+END_SRC
 ** Disable simulation keys on an emacs window
    #+BEGIN_SRC emacs-lisp
@@ -253,6 +280,11 @@
      (define-key *root-map* (kbd "w") '*window-map*)
      (define-key *window-map* (kbd "y") 'youtube-split)
      (define-key *window-map* (kbd "Y") 'big-youtube-split)
+     (define-key *window-map* (kbd "j") 'side-bottom-window)
+     (define-key *window-map* (kbd "h") 'side-left-window)
+     (define-key *window-map* (kbd "l") 'side-right-window)
+     (define-key *window-map* (kbd "t") 'window-toggle-side-windows)
+     (define-key *window-map* (kbd "d") 'delete-all-side-windows)
 
      (define-prefix-command '*firefox-map*)
      (define-key *firefox-map* (kbd "f") (quickrun-lambda "firefox" "firefox"))

@@ -547,7 +547,7 @@
                (height (string-to-number (substring response 5 9))))
           (shell-command (format "xrandr --output %s --mode %s --above %s" secondary response primary))
           (let ((pos (completing-read "Position? " '("right-of" "above") nil t "^")))
-            (shell-command (format "xrandr --output %s --%s %s" primary pos secondary))))))
+            (shell-command (format "xrandr --output %s --%s %s" secondary pos primary))))))
     (setup-wallpaper))
   (add-hook 'exwm-init-hook 'my/setup-screens)
 

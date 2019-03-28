@@ -179,13 +179,15 @@
    #+BEGIN_SRC emacs-lisp
      (defun youtube-split (arg)
        (interactive "P")
-       (let ((buf (get-buffer "youtube")))
+       (let ((buf (get-buffer "youtube"))
+             (back (current-buffer)))
          (delete-other-windows)
          (if buf 
              (switch-to-buffer buf)
            (when arg
              (launch-program-with-name "firefox" "youtube")))
-         (side-window-op 'left 472 buf)))
+         (side-window-op 'left 472 buf)
+         (switch-to-buffer-back)))
 
      (defun big-youtube-split (arg)
        (interactive "P")

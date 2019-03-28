@@ -177,27 +177,25 @@
    #+END_SRC
 ** Youtube split
    #+BEGIN_SRC emacs-lisp
-
      (defun youtube-split (arg)
        (interactive "P")
-       (delete-other-windows)
-       (if-let (buf (get-buffer "youtube"))
-           (switch-to-buffer buf)
-         (when arg
-           (launch-program-with-name "firefox" "youtube")))
-       (split-window (selected-window) 472 t t)
-       (switch-window))
-
+       (let ((buf (get-buffer "youtube")))
+         (delete-other-windows)
+         (if buf 
+             (switch-to-buffer buf)
+           (when arg
+             (launch-program-with-name "firefox" "youtube")))
+         (side-window-op 'left 472 buf)))
 
      (defun big-youtube-split (arg)
        (interactive "P")
        (delete-other-windows)
-       (if-let (buf (get-buffer "youtube"))
-           (switch-to-buffer buf)
-         (when arg
-           (launch-program-with-name "firefox" "youtube")))
-       (split-window (selected-window) 630 t t)
-       (switch-window))
+       (let ((buf (get-buffer "youtube")))
+         (if buf
+             (switch-to-buffer buf)
+           (when arg
+             (launch-program-with-name "firefox" "youtube")))
+         (side-window-op 'left 630 buf)))
 
      (defun delete-all-side-windows ()
        (interactive)
@@ -205,32 +203,29 @@
          (delete-other-windows))
        (message "Deleted side windows"))
 
+     (defun side-window-op (side &optional size buffer)
+       (let ((prev-win (selected-window))
+             (win (display-buffer-in-side-window
+                   (or buffer (current-buffer))
+                   `((side . ,side)))))
+         (select-window win)
+         (set-window-dedicated-p win t)
+         (set-window-parameter win 'no-delete-other-windows t)
+         (when size
+           (window-resize win (- size (window-pixel-width)) t nil t))
+         (select-window prev-win)))
+
      (defun side-left-window ()
        (interactive)
-       (let ((win (display-buffer-in-side-window
-                   (current-buffer)
-                   `((side . left)
-                     (no-delete-other-windows t)))))
-         ;;(select-window win)
-         (set-window-dedicated-p win t)))
-
+       (side-window-op 'left))
 
      (defun side-right-window ()
        (interactive)
-       (let ((win (display-buffer-in-side-window
-                   (current-buffer)
-                   `((side . right)
-                     (no-delete-other-windows t)))))
-         (set-window-dedicated-p win t)))
-
+       (side-window-op 'right))
 
      (defun side-bottom-window ()
        (interactive)
-       (let ((win (display-buffer-in-side-window
-                   (current-buffer)
-                   `((side . bottom)
-                     (no-delete-other-windows t)))))
-         (set-window-dedicated-p win t)))
+       (side-window-op 'bottom))
 
      (setq window-sides-vertical t)
    #+END_SRC

@@ -609,6 +609,11 @@
    #+BEGIN_SRC emacs-lisp
    (setq wallpaper-path "/home/benson/.emacs.d/res/digital_space_universe_4k_8k-wide.jpg")
    #+END_SRC
+** Volume
+   #+BEGIN_SRC emacs-lisp
+   (use-package volume)
+   (define-key *root-map* (kbd "v") 'volume)
+   #+END_SRC
 * Emacs
 ** Reload Config
  #+BEGIN_SRC emacs-lisp
@@ -646,11 +651,6 @@
      (use-package beacon)
      (beacon-mode 1)
      (setq beacon-color "#006400")
-   #+END_SRC
-** Volume
-   #+BEGIN_SRC emacs-lisp
-   (use-package volume)
-   (global-set-key (kbd "C-c v") 'volume)
    #+END_SRC
 ** Dashboard
    #+BEGIN_SRC emacs-lisp

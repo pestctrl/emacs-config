@@ -2861,8 +2861,9 @@
 *** Yasnippets
     #+BEGIN_SRC emacs-lisp
     (use-package yasnippet)
-    ;(define-key yas-minor-mode-map (kbd "<backtab>") 'yas-expand)
-    (yas-global-mode 1)
+    (use-package java-snippets)
+    (define-key yas/keymap (kbd "<backtab>") 'yas-expand)
+    (yas-global-mode 0)
     #+END_SRC
 *** Projectile and dumb-jump
 #+BEGIN_SRC emacs-lisp
@@ -2870,6 +2871,8 @@
   (use-package treemacs-projectile)
   (use-package helm-projectile)
   (use-package counsel-projectile)
+
+  (setq projectile-enable-caching t)
 
   (defun projectile-stop-project-running ()
     (interactive)
@@ -2882,6 +2885,9 @@
   (projectile-global-mode)
   ; Deprecated?
   (counsel-projectile-mode)
+
+  (ivy-set-occur 'counsel-projectile-switch-to-buffer 'ivy-switch-buffer-occur)
+  
   (cons 'projectile-root-bottom-up
         (remove 'projectile-root-bottom-up
                 projectile-project-root-files-functions))
@@ -2980,21 +2986,45 @@
       (use-package flycheck)
       (global-flycheck-mode)
 
+      (add-to-list 'display-buffer-alist
+                   `(,(rx bos "*Flycheck errors*" eos)
+                     (display-buffer-reuse-window
+                      display-buffer-in-side-window)
+                     (side            . bottom)
+                     (reusable-frames . visible)
+                     (window-height   . 0.10)))
+
+      (require 'ansi-color)
+      (defun colorize-compilation-buffer ()
+        (let ((buffer-read-only nil))
+          (ansi-color-apply-on-region (point-min) (point-max))))
+        ;; (ansi-color-apply-on-region compilation-filter-start (point)))
+      (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
+
       (use-package lsp-mode)
       (use-package lsp-ui)
 
+      (add-hook 'java-mode-hook
+                'lsp)
+
       (define-key lsp-mode-map (kbd "M-.") 'lsp-ui-peek-find-definitions)
-      (define-key lsp-mode-map (kbd "C-c C-r") 'lsp-ui-peek-find-references)
-      (define-key lsp-mode-map (kbd "C-c C-f") 'lsp-ui-peek-jump-forward)
-      (define-key lsp-mode-map (kbd "C-c C-b") 'lsp-ui-peek-jump-backward)
+      (define-key lsp-mode-map (kbd "M-?") 'lsp-ui-peek-find-references)
+      (define-key lsp-mode-map (kbd "M-,") 'lsp-ui-peek-jump-backward)
+      (define-key lsp-mode-map (kbd "M-p") 'lsp-ui-peek-jump-forward)
 
       (setq lsp-ui-flycheck-enable t)
       (setq lsp-ui-flycheck-live-reporting t)
       (use-package dap-mode
         :config
-        (dap-mode t)
-        (dap-ui-mode t)
-        (define-key dap-mode-map (kbd "C-c n") 'dap-next))
+        (add-hook 'java-mode-hook
+                  'dap-mode)
+        (add-hook 'java-mode-hook
+                  'dap-ui-mode)
+        (define-key dap-mode-map (kbd "C-c h") 'dap-hydra)
+        (define-key dap-mode-map (kbd "C-c b") 'dap-breakpoint-toggle)
+        (define-key dap-mode-map (kbd "C-c d r") 'dap-java-debug)
+        (define-key dap-mode-map (kbd "C-c d m") 'dap-java-debug-test-class)
+        (define-key dap-mode-map (kbd "C-c r t") 'mvn-test))
 
       ;; (defhydra dap-hydra (:color pink :hint nil :foreign-keys run)
       ;;   ;;   "
@@ -3108,8 +3138,7 @@
     (add-hook 'go-mode-hook
            (lambda ()
              (add-hook 'before-save-hook 'gofmt-before-save)
-             (setq tab-width 4)
-             (setq indent-tabs-mode 1)))
+             (setq indent-tabs-mode nil)))
     #+END_SRC
 *** Elpy
     #+BEGIN_SRC emacs-lisp

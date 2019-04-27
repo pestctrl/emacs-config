@@ -37,3 +37,6 @@
 [submodule "custom/power-mode.el"]
 	path = custom/power-mode.el
 	url = https://github.com/ALSchwalm/power-mode.el
+[submodule "custom/leetcode-emacs"]
+	path = custom/leetcode-emacs
+	url = https://github.com/ginqi7/leetcode-emacs

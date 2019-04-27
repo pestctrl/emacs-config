@@ -34,9 +34,20 @@
 
      (defun exwmx-name-buffer ()
        (interactive)
-       (let ((name (completing-read "Name: " (mapcar (lambda (a) (plist-get a :instance)) (exwmx-appconfig--get-all-appconfigs)))))
-         (exwm-workspace-rename-buffer name)
-         (setq-local exwm-instance-name name)))
+       (let* ((xprograms (mapcar (lambda (a) (plist-get a :instance)) (exwmx-appconfig--get-all-appconfigs)))
+              (name (completing-read "Name: " xprograms)))
+         (if (and (get-buffer name)
+                  (y-or-n-p (format "Already a buffer named \"%s\". Would you like to swap?" name)))
+             (let ((oname (completing-read "Name of other buffer: " xprograms)))
+               (exwm-workspace-rename-buffer "This is a stupid name that no one would ever choose for a buffer, hopefully")
+               (save-window-excursion
+                 (switch-to-buffer (get-buffer name))
+                 (exwm-workspace-rename-buffer oname)
+                 (setq-local exwm-instance-name oname))
+               (exwm-workspace-rename-buffer name)
+               (setq-local exwm-instance-name name))
+           (exwm-workspace-rename-buffer name)
+           (setq-local exwm-instance-name name))))
 
      (defun exwm-rename-buffer ()
        (interactive)
@@ -266,6 +277,7 @@
      (define-key *root-map* (kbd "C-i") 'leaving-computer)
      (define-key *root-map* (kbd "C") 'org-resolve-clocks)
      (define-key *root-map* (kbd "j") 'org-clock-goto)
+     (define-key *root-map* (kbd "o") 'switch-window)
      (define-key *root-map* (kbd "n") 'toggle-notifications)
 
      (define-prefix-command '*window-map*)
@@ -275,8 +287,7 @@
      (define-key *window-map* (kbd "j") 'side-bottom-window)
      (define-key *window-map* (kbd "h") 'side-left-window)
      (define-key *window-map* (kbd "l") 'side-right-window)
-     (define-key *window-map* (kbd "t") 'window-toggle-side-windows)
-     (define-key *window-map* (kbd "d") 'delete-all-side-windows)
+     (define-key *window-map* (kbd "d") 'window-toggle-side-windows)
 
      (define-prefix-command '*firefox-map*)
      (define-key *firefox-map* (kbd "f") (quickrun-lambda "firefox" "firefox"))
@@ -1130,6 +1141,7 @@
    (define-key ivy-minibuffer-map (kbd "C-<return>") 'ivy-done)
    (global-set-key (kbd "C-h M-x") 'helm-M-x)
    (global-set-key (kbd "M-x") 'counsel-M-x)
+   (global-set-key (kbd "C-c C-r") 'ivy-resume)
    ;;   (global-set-key (kbd "C-x b") 'counsel-switch-buffer)
  #+END_SRC
 ** Swiper or counsel-grep
@@ -1244,6 +1256,11 @@
 (global-set-key (kbd "C-c SPC") 'ace-jump-mode)
 (global-set-key (kbd "C-c j") 'ace-jump-line-mode)
 #+END_SRC
+** Word traversal
+   #+begin_src emacs-lisp
+   (global-set-key (kbd "M-f") 'forward-to-word)
+   (global-set-key (kbd "M-F") 'forward-word)
+   #+end_src
 * Tools
 ** Encryption
 #+BEGIN_SRC emacs-lisp

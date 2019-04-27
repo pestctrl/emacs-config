@@ -1251,6 +1251,17 @@
   (epa-file-enable)
   (setq epa-pinentry-mode 'loopback)
   (setq epa-file-cache-passphrase-for-symmetric-encryption t)
+  (setenv "GPG_AGENT_INFO" nil)
+
+  (setq epg-gpg-program "gpg2")
+  (setq auth-source-debug t)
+  (setq auth-sources '((:source "~/.emacs.d/secrets/.authinfo.gpg")))
+
+  ;; (defun always-use-loopback (fun context args)
+  ;;   (setf (epg-context-pinentry-mode context) epa-pinentry-mode)
+  ;;   (funcall fun context args))
+
+  ;; (advice-remove 'epg--start :around #'always-use-loopback)
 #+END_SRC
 ** Org Mode
 *** Keybindings and customization
@@ -2478,12 +2489,6 @@
 
        (setq org-caldav-skip-conditions '(nottodo ("TODO" "NEXT"))
              org-caldav-exclude-tags '("ARCHIVE" "ONLYEMACS"))
-
-       (defun always-use-loopback (fun context args)
-         (setf (epg-context-pinentry-mode context) epa-pinentry-mode)
-         (funcall fun context args))
-
-       (advice-add 'epg--start :around #'always-use-loopback)
      #+END_SRC
 **** Reveal.js
      #+BEGIN_SRC emacs-lisp

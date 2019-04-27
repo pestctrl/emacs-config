@@ -605,3 +605,91 @@ https://github.com/org-trello/org-trello/issues/258
                                 previous
                                 current)))))
   #+end_src
+* Don't colorize joins and leaves
+  Makes for easier reading
+  #+begin_src emacs-lisp
+    (defvar dont-colorize-these-commands '("JOIN" "PART" "QUIT"))
+
+    (defun erc-colorize-privmsgs ()
+      "Function used in `erc-insert-modify-hook' to apply the same face to a
+    message coming from a user."
+      (erc-find-parsed-property)
+      (let* ((vector (erc-get-parsed-vector (point)))
+             (nickuserhost (erc-get-parsed-vector-nick vector))
+             (nickname (and nickuserhost
+                            (nth 0 (erc-parse-user nickuserhost))))
+             (match-face (erc-colorize-color nickname)))
+        (when (and match-face
+                   (not (member (erc-response.command vector)
+                                dont-colorize-these-commands)))
+          (erc-button-add-face (point-min) (point-max) match-face))))
+
+    (advice-add #'erc-colorize-message
+                :override
+                #'erc-colorize-privmsgs)
+  #+end_src
+* Auto commit when saving org files
+  #+begin_src emacs-lisp
+    (defvar org-agenda-git-repo-path (expand-file-name "~/MEGA/org/agenda"))
+
+    (defun auto-commit-agenda (&optional arg)
+      (when-let (f (buffer-file-name))
+        (let ((fname (expand-file-name f))
+              (sfname (buffer-name)))
+          (when (and (string-prefix-p org-agenda-git-repo-path
+                                      fname)
+                     (magit-anything-modified-p t fname))
+            (save-window-excursion 
+              (when (not (string= (magit-get-current-branch)
+                                  "master"))
+                (magit-git-command-topdir "git checkout master"))
+              (magit-git-command-topdir (format "git add %s" fname))
+              (magit-git-command-topdir (format "git commit -m \"%s modified, %s\""
+                                                sfname (current-time-string))))))))
+
+    (advice-add #'save-buffer
+                :after
+                #'auto-commit-agenda)
+  #+end_src
+* modify org agenda follow mode
+  #+begin_src emacs-lisp
+    (defun my/org-agenda-show (&optional full-entry)
+      "Display the Org file which contains the item at point.
+    With prefix argument FULL-ENTRY, make the entire entry visible
+    if it was hidden in the outline."
+      (interactive "P")
+      (let ((win (selected-window)))
+        (org-agenda-goto t)
+        (org-narrow-to-subtree)
+        (org-flag-subtree t)
+        (call-interactively 'outline-show-branches)
+        (org-hide-archived-subtrees (point-min) (point-max))
+        (select-window win)))
+
+    (defun my/org-agenda-do-context-action ()
+      "Show outline path and, maybe, follow mode window."
+      (let ((m (org-get-at-bol 'org-marker)))
+        (when (and (markerp m) (marker-buffer m))
+          (and org-agenda-follow-mode
+               (if org-agenda-follow-indirect
+                   (org-agenda-tree-to-indirect-buffer nil)
+                 (my/org-agenda-show)))
+          (and org-agenda-show-outline-path
+               (org-with-point-at m (org-display-outline-path t))))))
+
+    (advice-add #'org-agenda-do-context-action
+                :override
+                #'my/org-agenda-do-context-action)
+  #+end_src
+* ivy-occur take up whole buffer
+  #+begin_src emacs-lisp
+    (defun my/ivy-occur (&rest _)
+      (interactive)
+      (let ((buffer (current-buffer)))
+        (delete-window)
+        (switch-to-buffer buffer)))
+
+    ;;(advice-add #'ivy-occur :override #'my/ivy-occur)
+    ;;(advice-remove #'ivy-occur #'my/ivy-occur)
+
+  #+end_src

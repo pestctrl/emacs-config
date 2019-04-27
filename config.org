@@ -3146,7 +3146,6 @@
 *** Treemacs
     #+BEGIN_SRC emacs-lisp
     (use-package treemacs)
-    (load "treemacs-mode.el")
     #+END_SRC
 *** Hy-mode
     #+begin_src emacs-lisp

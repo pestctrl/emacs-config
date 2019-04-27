@@ -3679,6 +3679,94 @@
    (purpose-compile-user-configuration)
    (purpose-mode)
    #+end_src
+** erc
+   #+begin_src emacs-lisp
+     (use-package erc)
+     (use-package erc-hl-nicks)
+     (use-package erc-colorize)
+     (require 'netrc)
+     (erc-hl-nicks-mode)
+     (erc-colorize-mode)
+     (setq erc-user-full-name "Benson Chu")
+     (setq erc-kill-buffer-on-part t)
+     (setq erc-autojoin-channels-alist
+           '(("freenode.net" "#emacs" "#org-mode")))
+
+     (defun get-authinfo (host port)
+       (let* ((netrc (netrc-parse (expand-file-name "~/.emacs.d/secrets/.authinfo.gpg")))
+              (hostentry (netrc-machine netrc host port)))
+         (when hostentry (netrc-get hostentry "password"))))
+
+     (defun freenode-connect (nick password)
+       (erc :server "irc.freenode.net" :port 6667
+            :password password :nick nick))
+
+     (defun irc-connect ()
+       (interactive)
+       (when (y-or-n-p "Connect to IRC? ")
+         (freenode-connect "pest-ctrl" (get-authinfo "irc.freenode.net" "6667"))))
+   #+end_src
+** posting sourc code
+   #+begin_src emacs-lisp
+     (use-package webpaste)
+
+     (setq webpaste-paste-confirmation t)
+     (setq webpaste-provider-priority '("ix.io"))
+   #+end_src
+** eosd
+   #+begin_src emacs-lisp
+     (add-to-list 'load-path 
+                  "~/.emacs.d/custom/eosd")
+     (require 'eosd)
+   #+end_src
+** org-board
+   #+begin_src emacs-lisp
+     (use-package org-board)
+     (add-to-list 'org-board-agent-header-alist
+                  '("Linux" . "--user-agent=\"Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.6) Gecko/20070802 SeaMonkey/1.1.4\""))
+   #+end_src
+** helm-org-rifle
+   #+begin_src emacs-lisp
+   (use-package helm-org-rifle)
+   (global-set-key (kbd "C-c o r") 'helm-org-rifle)
+   #+end_src
+** helpful
+   #+begin_src emacs-lisp
+   (use-package helpful)
+   (global-set-key (kbd "C-h f") #'helpful-function)
+   (global-set-key (kbd "C-h v") #'helpful-variable)
+   (global-set-key (kbd "C-h k") #'helpful-key)
+   #+end_src
+** org-now
+   #+begin_src emacs-lisp
+     (add-to-list 'load-path "~/.emacs.d/custom/org-now")
+     (require 'org-now)
+     (setq org-now-location
+           nil)
+   #+end_src
+** ediff snippet 
+   #+begin_src emacs-lisp
+     (defun ediff-copy-both-to-C ()
+       (interactive)
+       (ediff-copy-diff ediff-current-difference nil 'C nil
+                        (concat
+                         (ediff-get-region-contents ediff-current-difference 'A ediff-control-buffer)
+                         (ediff-get-region-contents ediff-current-difference 'B ediff-control-buffer))))
+     (defun add-d-to-ediff-mode-map () (define-key ediff-mode-map "d" 'ediff-copy-both-to-C))
+     (add-hook 'ediff-keymap-setup-hook 'add-d-to-ediff-mode-map)
+   #+end_src
+** leetcode
+   #+begin_src emacs-lisp
+     (use-package ctable)
+     (use-package names)
+     (add-to-list 'load-path
+                  "~/.emacs.d/custom/leetcode-emacs")
+
+     (require 'leetcode)
+
+     (setq leetcode-path "~/MEGA/Leetcode/"
+          leetcode-language "java")
+   #+end_src
 * Broken
 ** mu4e
 *** General config

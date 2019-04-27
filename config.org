@@ -187,7 +187,7 @@
            (when arg
              (launch-program-with-name "firefox" "youtube")))
          (side-window-op 'left 472 buf)
-         (switch-to-buffer-back)))
+         (switch-to-buffer back)))
 
      (defun big-youtube-split (arg)
        (interactive "P")
@@ -198,12 +198,6 @@
            (when arg
              (launch-program-with-name "firefox" "youtube")))
          (side-window-op 'left 630 buf)))
-
-     (defun delete-all-side-windows ()
-       (interactive)
-       (let ((ignore-window-parameters t))
-         (delete-other-windows))
-       (message "Deleted side windows"))
 
      (defun side-window-op (side &optional size buffer)
        (let ((prev-win (selected-window))

@@ -3487,8 +3487,7 @@
        (interactive)
        (org-agenda-switch-to)
        (org-narrow-to-subtree)
-       (org-cycle)
-       (org-cycle))
+       (outline-show-branches))
      (define-key org-agenda-mode-map (kbd "S-<return>") 'my/org-agenda-narrow)
    #+end_src
 ** World time include Taiwan

@@ -3169,6 +3169,43 @@
     #+begin_src emacs-lisp
     (use-package cargo)
     #+end_src
+*** maven support
+    #+begin_src emacs-lisp
+    (use-package mvn)
+    #+end_src
+*** multiple-cursors
+    #+begin_src emacs-lisp
+    (use-package multiple-cursors)
+
+    (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+    (global-set-key (kbd "C-M->") 'mc/skip-to-next-like-this)
+    (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+    (global-set-key (kbd "C-M-<") 'mc/skip-to-previous-like-this)
+    (global-set-key (kbd "C-c C->") 'mc/mark-all-like-this)
+    #+end_src
+*** Setup-dev-environment
+    #+begin_src emacs-lisp
+      (defun setup-devenv ()
+        (interactive)
+        (flycheck-list-errors)
+        (treemacs)
+        (dap-ui-locals)
+        (when (y-or-n-p "Enter lsp? ")
+          (lsp)))
+    #+end_src
+*** skeletor project templates
+    #+begin_src emacs-lisp
+      (use-package skeletor)
+
+      (skeletor-define-template "java-maven"
+        :title "Java with Maven")
+    #+end_src
+*** Spaces
+    #+BEGIN_SRC emacs-lisp
+      (setq default-tab-width 4)
+      (setq-default indent-tabs-mode nil)
+      (setq-default tab-width 4)
+    #+END_SRC
 ** Freekeys
    #+BEGIN_SRC emacs-lisp#
    (use-package free-keys)
@@ -3186,11 +3223,6 @@
    #+BEGIN_SRC emacs-lisp
      (add-to-list 'load-path "~/.emacs.d/custom/youtube-dl-emacs/")
      (require 'youtube-dl)
-   #+END_SRC
-** Spaces
-   #+BEGIN_SRC emacs-lisp
-     (setq default-tab-width 4)
-     (setq-default indent-tabs-mode nil)
    #+END_SRC
 ** pdf-tools use isearch
    #+BEGIN_SRC emacs-lisp
@@ -3507,10 +3539,6 @@
 ** arch-linux
    #+begin_src emacs-lisp
    (use-package arch-packer)
-   #+end_src
-** skeletor project templates
-   #+begin_src emacs-lisp
-   (use-package skeletor)
    #+end_src
 ** Compile java run test
    #+begin_src emacs-lisp

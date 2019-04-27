@@ -3285,14 +3285,14 @@
                     (nnimap-address "imap.gmail.com")
                     (nnimap-server-port "imaps")
                     (nnimap-stream ssl)
-                    (nnimap-authinfo-file "~/.authinfo.gpg")))
+                    (nnimap-authinfo-file "~/.emacs.d/secrets/.authinfo.gpg")))
 
      (setq gnus-secondary-select-methods
            '((nnimap "work"
                    (nnimap-address "outlook.office365.com")
                    (nnimap-server-port "imaps")
                    (nnimap-stream ssl)
-                   (nnimap-authinfo-file "~/.authinfo.gpg"))))
+                   (nnimap-authinfo-file "~/.emacs.d/secrets/.authinfo.gpg"))))
 
      (setq smtpmail-smtp-server "smtp.gmail.com"
            smtpmail-smtp-service 587)

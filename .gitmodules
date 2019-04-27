@@ -28,3 +28,15 @@
 [submodule "custom/ts.el"]
 	path = custom/ts.el
 	url = https://github.com/alphapapa/ts.el
+[submodule "custom/eosd"]
+	path = custom/eosd
+	url = https://github.com/clarete/eosd
+[submodule "custom/org-now"]
+	path = custom/org-now
+	url = https://github.com/alphapapa/org-now
+[submodule "custom/power-mode.el"]
+	path = custom/power-mode.el
+	url = https://github.com/ALSchwalm/power-mode.el
+[submodule "custom/leetcode-emacs"]
+	path = custom/leetcode-emacs
+	url = https://github.com/ginqi7/leetcode-emacs

@@ -1282,6 +1282,7 @@
   (global-set-key (kbd "C-x C-o") 'org-agenda)
   (define-key org-mode-map (kbd "C-c SPC") nil)
   (define-key org-agenda-mode-map (kbd "a") 'org-agenda)
+  (define-key org-agenda-mode-map (kbd "H") 'org-agenda-follow-mode)
   (setq org-src-window-setup 'current-window)
 
   (add-hook 'org-mode-hook (lambda () (visual-line-mode 1)))
@@ -1617,12 +1618,10 @@
 
        (defmacro org-loop/children (&rest body)
          (declare (indent defun))
-         (let ((subtree-symbol (make-symbol "subtree-end")))
-           `(let ((,subtree-symbol (save-excursion (org-end-of-subtree t))))
-              (outline-next-heading)
-              (while (and (org-end-of-subtree t t)
-                          (< (point) ,subtree-symbol))
-                ,@body))))
+         `(progn
+            (outline-next-heading)
+            (while (outline-get-next-sibling)
+              ,@body)))
 
        (defmacro orgc-loop/descendants (condition &rest body)
          (declare (indent defun))
@@ -1780,11 +1779,15 @@
          (or (member "NOT_TASKS" (org-get-tags (point)))
              (member (org-get-todo-state) (cons "INACT" org-done-keywords))))
 
+       (defun my/is-non-done-task ()
+         (and (not (my/is-unactionable-task))
+              (not (member (org-get-todo-state)
+                           org-done-keywords))))
+
        (defun my/has-non-done-task ()
          (save-excursion
            (orgc-loop/todo-children has-non-done-task
-             (when (not (member (org-get-todo-state)
-                                org-done-keywords))
+             (when (my/is-non-done-task)
                (setq has-non-done-task t)))))
 
        (defun my/is-a-task ()
@@ -1876,7 +1879,7 @@
                         (when (eq (my/get-project-type file (point) t)
                                   'stuck)
                           (setq has-stuck-project t)))
-                       ((my/is-a-task)
+                       ((my/is-non-done-task)
                         (setq has-task t)
                         (when (or (my/is-next-task)
                                   (equal (org-get-todo-state) "WAIT")) ;; Ew
@@ -1890,8 +1893,7 @@
        (defun my/get-project-type (file point &optional ambiguous-to-stuck)
          (save-excursion
            (when (my/is-a-project)
-             (let ((subtree-end (save-excursion (org-end-of-subtree t)))
-                   (todo (org-get-todo-state)))
+             (let ((todo (org-get-todo-state)))
                (cond ((equal todo "ETERNAL") 'eternal)
                      ((equal todo "SOMEDAY") 'someday)
                      ((equal todo "HOLD") 'hold)
@@ -1930,16 +1932,19 @@
          "Only show subtrees that are stuck projects"
          (save-restriction
            (widen)
-           (let ((subtree-end (save-excursion (org-end-of-subtree t))))
+           (let ((subtree-end (save-excursion (org-end-of-subtree t)))
+                 (next-heading (save-excursion (outline-next-heading))))
              ;; (setq debug-p (point)
              ;;       debuf-f (buffer-file-name))
-             (unless (or (and (my/is-a-task)
-                              (my/is-standalone-task)
-                              (not (org-get-scheduled-time (point)))
-                              (not (org-get-deadline-time (point))))
-                         (eq (my/get-project-type buffer-file-name (point) t)
-                             'stuck))
-               subtree-end))))
+             (if (org-get-todo-state)
+                 (unless (or (and (my/is-a-task)
+                                  (my/is-standalone-task)
+                                  (not (org-get-scheduled-time (point)))
+                                  (not (org-get-deadline-time (point))))
+                             (eq (my/get-project-type buffer-file-name (point) t)
+                                 'stuck))
+                   subtree-end)
+               next-heading))))
 
        ;; (defvar my/stuck-projects-flag nil)
 
@@ -2008,8 +2013,8 @@
          (save-restriction
            (widen)
            (let ((subtree-end (save-excursion (org-end-of-subtree t))))
-             (unless (eq (my/get-project-type buffer-file-name (point) nil)
-                         'active)
+             (unless (member (my/get-project-type buffer-file-name (point) nil)
+                             '(active))
                subtree-end))))
 
        (defun my/show-hold-projects ()
@@ -2186,7 +2191,9 @@
                   ((tags-todo "-REFILE-HOLD/!"
                               ((org-agenda-overriding-header "Active Projects")
                                (org-agenda-skip-function 'my/show-active-projects)
-                               (org-tags-match-list-sublevels 'indented)))
+                               (org-tags-match-list-sublevels 'indented)
+                               (org-super-agenda-groups '((:name "Work" :tag "WORK")
+                                                          (:name "School" :tag "SCHOOL")))))
                    ,stuck-projects-view
                    (tags-todo "-REFILE/!"
                               ((org-agenda-overriding-header "Delayed projects")
@@ -2222,12 +2229,13 @@
                             (org-agenda-skip-deadline-if-done t)
                             (org-agenda-skip-scheduled-if-done t)
                             (org-super-agenda-groups '((:name "Overdue" :and (:deadline past :log nil :not (:tag "Work")))
+                                                       (:name "Upcoming" :and (:deadline future :not (:tag "Work")))
+                                                       (:name "Work Related" :tag "WORK")
                                                        (:name "Should do" :and (:scheduled past :log nil :not (:tag "Work")))
                                                        (:name "Today" :time-grid t 
                                                               :and (:not (:tag "Work")
                                                                     :not (:and (:not (:scheduled today)
                                                                                 :not (:deadline today)))))
-                                                       (:name "Work Related" :tag "WORK")
                                                        ))))))
                  ("c" "Access Comms" tags-todo "+COMMS/!TODO"
                   ((org-agenda-files '("~/MEGA/org/agenda/agenda.org" "~/MEGA/org/entries/comms.org"))))
@@ -2263,7 +2271,10 @@
                    (tags-todo "+VIDEO-LEARN/!TODO" ((org-agenda-overriding-header "Shorter")))))
                  ("f" "Calfw" 
                   cfw:open-org-calendar-no-projects)
-                 ("w" "Next week"
+                 ("w" "Work"
+                  ((tags-todo "+WORK/!"
+                              ((org-tags-match-list-sublevels 'indented)))))
+                 ("W" "Next week"
                   ((tags-todo "-REFILE/!"
                               ((org-agenda-overriding-header "Stuck Projects")
                                (org-tags-match-list-sublevels 'indented)
@@ -2349,12 +2360,14 @@
               (or (and (todo "HABIT")
                        (deadline <= today))
                   (todo "WAIT")
-                  (and (todo "TODO")
-                       (tags "REWARD")
-                       (priority = "A")))
+                  ;; (and (todo "TODO")
+                  ;;      (tags "REWARD")
+                  ;;      (priority = "A"))
+                  )
               :super-groups ((:name "Waiting tasks" :todo "WAIT")
                              (:name "Incomplete Habits" :todo "HABIT")
-                             (:name "Rewards" :tag "REWARD")))
+                             ;; (:name "Rewards" :tag "REWARD")
+                             ))
             (switch-to-buffer "*Org Agenda NG*")
             (let ((res (buffer-string)))
               (kill-buffer)
@@ -3567,6 +3580,7 @@
      (defun leaving-computer ()
        (interactive)
        (my/insert-into-buffers-csv "Inactive" "" nil "")
+       (org-clock-out nil t)
        (message "Computer is now inactive!"))
 
    #+end_src

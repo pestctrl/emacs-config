@@ -542,11 +542,16 @@
   (add-hook 'exwm-init-hook 'call-startup-programs)
   (add-hook 'exwm-init-hook 'setup-wallpaper)
 
+  (defvar my/monitor-primary "eDP1")
+  (defvar my/monitor-secondary nil)
+
   (defun my/setup-screens ()
     (interactive)
     (let ((primary (shell-command-to-string "xrandr --query | grep ' connected' | grep eDP | cut -d ' ' -f 1 | tr -d '\n'"))
           (secondary (shell-command-to-string "xrandr --query | grep ' connected' | grep -v eDP | cut -d ' ' -f 1 | tr -d '\n'")))
       (setq exwm-randr-workspace-output-plist `(0 ,primary 1 ,primary 2 ,secondary 3 ,secondary))
+      (setq my/monitor-primary primary
+            my/monitor-secondary secondary)
       (when (and (> (length secondary) 0)
                  (string= "yes" (completing-read (format "Monitor %s detected. Setup? " secondary) '("yes" "no"))))
         (let* ((response (completing-read (format "Resolution for %s? " secondary) '("2560x1440" "1920x1080" "3840x2160") nil t "^"))
@@ -558,6 +563,21 @@
     (setup-wallpaper))
   (add-hook 'exwm-init-hook 'my/setup-screens)
 
+  (defun my/flip-screens ()
+    (interactive)
+    (if (string= my/monitor-primary
+                 (cadr exwm-randr-workspace-output-plist))
+        (setq exwm-randr-workspace-output-plist
+              `(0 ,my/monitor-secondary
+                  1 ,my/monitor-secondary
+                  2 ,my/monitor-primary
+                  3 ,my/monitor-primary))
+      (setq exwm-randr-workspace-output-plist
+            `(0 ,my/monitor-primary
+                1 ,my/monitor-primary
+                2 ,my/monitor-secondary
+                3 ,my/monitor-secondary)))
+    (exwm-randr-refresh))
 #+END_SRC
 
 *** System tray, display time, display battery, display hard-drive-space

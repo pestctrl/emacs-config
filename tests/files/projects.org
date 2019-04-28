@@ -1,0 +1,119 @@
+* HOLD Test1 
+  :PROPERTIES:
+  :RESULT:   hold
+  :TEST:     t
+  :END:
+* PROJECT This is a class
+  SCHEDULED: <2019-03-15 Fri>
+** TODO Attend the class                                          :NOT_TASKS:
+   :PROPERTIES:
+   :ID:       af6ab367-dd78-465e-863a-35aadc662c16
+   :END:
+%%(org-class 2019 01 14 2019 04 29 1) 16:00-17:30 The class
+%%(org-class 2019 01 14 2019 04 29 3) 16:00-17:30 The class
+** PROJECT Grab the next Homework
+   SCHEDULED: <2019-03-20 Wed>
+   :PROPERTIES:
+   :ID:       035bbde3-aaa7-43fe-b909-9e4d1d4adf34
+   :END:
+*** Archive                                                         :ARCHIVE:
+**** DONE Homework 2
+     CLOSED: [2019-01-30 Wed 15:55] DEADLINE: <2019-01-30 Wed 16:00>
+     :PROPERTIES:
+     :ID:       3c453b83-dc5c-4a0a-a828-090b1190d5e3
+     :ARCHIVE_TIME: 2019-03-16 Sat 18:53
+     :END:
+**** DONE Homework 3
+     CLOSED: [2019-02-06 Wed 11:46] DEADLINE: <2019-02-06 Wed>
+     :PROPERTIES:
+     :ARCHIVE_TIME: 2019-03-16 Sat 18:53
+     :END:
+**** DONE Homework 4
+     CLOSED: [2019-02-13 Wed 17:15] DEADLINE: <2019-02-13 Wed>
+     :PROPERTIES:
+     :ARCHIVE_TIME: 2019-03-16 Sat 18:53
+     :END:
+**** DONE Homework 5
+     CLOSED: [2019-02-20 Wed 15:07] DEADLINE: <2019-02-20 Wed>
+     :PROPERTIES:
+     :ARCHIVE_TIME: 2019-03-16 Sat 18:53
+     :END:
+**** DONE Homework 6
+     CLOSED: [2019-02-27 Wed 16:37] SCHEDULED: <2019-02-24 Sun 19:00> DEADLINE: <2019-02-27 Wed>
+     :PROPERTIES:
+     :ARCHIVE_TIME: 2019-03-16 Sat 18:53
+     :END:
+     Org File
+**** DONE Homework 7
+     CLOSED: [2019-03-07 Thu 09:29] DEADLINE: <2019-03-06 Wed>
+     :PROPERTIES:
+     :ARCHIVE_TIME: 2019-03-16 Sat 18:53
+     :END:
+*** TODO Homework 9
+    DEADLINE: <2019-04-10 Wed>
+** DONE Exam 1
+   CLOSED: [2019-03-21 Thu 12:37] DEADLINE: <2019-03-20 Wed>
+   :PROPERTIES:
+   :CREATED:  [2019-02-27 Wed 16:36]
+   :END:
+** DONE Study for Midterm 1
+   CLOSED: [2019-04-08 Mon 14:26]
+* PROJECT This is another class
+  SCHEDULED: <2019-03-15 Fri>
+  :PROPERTIES:
+  :END:
+** TODO Attend Another Class
+   :PROPERTIES:
+   :ID:       af6ab367-dd78-465e-863a-35aadc662c16
+   :END:
+%%(org-class 2019 01 14 2019 04 29 1) 16:00-17:30 Another Class
+%%(org-class 2019 01 14 2019 04 29 3) 16:00-17:30 Another Class
+** TODO Task 1
+** PROJECT Grab the next Homework
+   SCHEDULED: <2019-03-20 Wed>
+   :PROPERTIES:
+   :ID:       035bbde3-aaa7-43fe-b909-9e4d1d4adf34
+   :END:
+*** Archive                                                         :ARCHIVE:
+**** DONE Homework 2
+     CLOSED: [2019-01-30 Wed 15:55] DEADLINE: <2019-01-30 Wed 16:00>
+     :PROPERTIES:
+     :ID:       3c453b83-dc5c-4a0a-a828-090b1190d5e3
+     :ARCHIVE_TIME: 2019-03-16 Sat 18:53
+     :END:
+**** DONE Homework 3
+     CLOSED: [2019-02-06 Wed 11:46] DEADLINE: <2019-02-06 Wed>
+     :PROPERTIES:
+     :ARCHIVE_TIME: 2019-03-16 Sat 18:53
+     :END:
+**** DONE Homework 4
+     CLOSED: [2019-02-13 Wed 17:15] DEADLINE: <2019-02-13 Wed>
+     :PROPERTIES:
+     :ARCHIVE_TIME: 2019-03-16 Sat 18:53
+     :END:
+
+**** DONE Homework 5
+     CLOSED: [2019-02-20 Wed 15:07] DEADLINE: <2019-02-20 Wed>
+     :PROPERTIES:
+     :ARCHIVE_TIME: 2019-03-16 Sat 18:53
+     :END:
+**** DONE Homework 6
+     CLOSED: [2019-02-27 Wed 16:37] SCHEDULED: <2019-02-24 Sun 19:00> DEADLINE: <2019-02-27 Wed>
+     :PROPERTIES:
+     :ARCHIVE_TIME: 2019-03-16 Sat 18:53
+     :END:
+     Org File
+**** DONE Homework 7
+     CLOSED: [2019-03-07 Thu 09:29] DEADLINE: <2019-03-06 Wed>
+     :PROPERTIES:
+     :ARCHIVE_TIME: 2019-03-16 Sat 18:53
+     :END:
+*** TODO Homework 9
+    DEADLINE: <2019-04-10 Wed>
+** DONE Exam 1
+   CLOSED: [2019-03-21 Thu 12:37] DEADLINE: <2019-03-20 Wed>
+   :PROPERTIES:
+   :CREATED:  [2019-02-27 Wed 16:36]
+   :END:
+** DONE Study for Midterm 1
+   CLOSED: [2019-04-08 Mon 14:26]

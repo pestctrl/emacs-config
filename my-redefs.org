@@ -638,11 +638,15 @@ https://github.com/org-trello/org-trello/issues/258
               (sfname (buffer-name)))
           (when (and (string-prefix-p org-agenda-git-repo-path
                                       fname)
-                     (magit-anything-modified-p t fname))
+                     (magit-anything-modified-p t fname)
+                     (not (magit-anything-unmerged-p fname))
+                     (or (string= (magit-get-current-branch)
+                                  "master")
+                         (progn
+                           (magit-git-command-topdir "git checkout master")
+                           (string= (magit-get-current-branch)
+                                    "master"))))
             (save-window-excursion 
-              (when (not (string= (magit-get-current-branch)
-                                  "master"))
-                (magit-git-command-topdir "git checkout master"))
               (magit-git-command-topdir (format "git add %s" fname))
               (magit-git-command-topdir (format "git commit -m \"%s modified, %s\""
                                                 sfname (current-time-string))))))))

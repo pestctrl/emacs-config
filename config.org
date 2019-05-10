@@ -2010,16 +2010,16 @@
                   "~/.emacs.d/custom/dired-plus")
      (require 'dired+)
      (setq dired-listing-switches "-al  --group-directories-first --sort=extension")
-     
+
      (setq diredp-hide-details-initially-flag nil)
      (setq diredp-hide-details-propagate-flag nil)
      (require 'dired-x)
      (setq-default dired-omit-files-p t)
      (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
-     (use-package dired-narrow
-       :ensure t
-       :bind (:map dired-mode-map
-                   ("/" . dired-narrow)))
+     ;; (use-package dired-narrow
+     ;;   :ensure t
+     ;;   :bind (:map dired-mode-map
+     ;;               ("/" . dired-narrow)))
    #+END_SRC
 ** Time to game!
    #+BEGIN_SRC emacs-lisp

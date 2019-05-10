@@ -333,8 +333,6 @@
                     (number-sequence 0 9))
           (,(kbd "s-b") . ivy-switch-buffer)
           (,(kbd "s-c") . org-capture)
-          (,(kbd "s-h") . split-window-right)
-          (,(kbd "s-t") . split-window-below)
           (,(kbd "s-n") . switch-window)
           (,(kbd "s-k") . ido-kill-buffer)
           (,(kbd "C-t") . *root-map*)

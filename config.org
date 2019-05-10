@@ -2531,6 +2531,25 @@
 
      (define-key *root-map* (kbd "C-r") 'un-za-warudo)
    #+end_src
+** Ace-window
+   #+begin_src emacs-lisp
+     (use-package ace-window)
+     (defhydra window-management-hydra (*root-map* "C-w")
+       "Manage window splits"
+       ("2" split-window-below)
+       ("3" split-window-right)
+       ("h" windmove-left)
+       ("j" windmove-down)
+       ("k" windmove-up)
+       ("l" windmove-right)
+       ("+" enlarge-window-horizontally)
+       ("-" shrink-window-horizontally)
+       ("M-+" enlarge-window)
+       ("M--" shrink-window)
+       ("x" delete-window)
+       ("q" nil))
+
+   #+end_src
 * Broken
 ** mu4e
 *** General config

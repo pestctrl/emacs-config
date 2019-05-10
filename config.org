@@ -2089,6 +2089,8 @@
                               (summary 1.0 point)))))
 
 
+     ;;(setq gnus-summary-line-format "%U%R%z%I%(%[%4L: %-23,23f%]%) %s\n")
+     (setq gnus-summary-line-format "%d %U%R%z%I%(%[%4L: %-23,23f%]%) %s\n")
    #+END_SRC
 ** Ledger mode
    #+BEGIN_SRC emacs-lisp

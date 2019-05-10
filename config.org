@@ -551,7 +551,7 @@
       (setq my/monitor-primary primary
             my/monitor-secondary secondary)
       (when (and (> (length secondary) 0)
-                 (string= "yes" (completing-read (format "Monitor %s detected. Setup? " secondary) '("yes" "no"))))
+                 (y-or-n-p (format "Monitor %s detected. Setup? " secondary)))
         (let* ((response (completing-read (format "Resolution for %s? " secondary) '("2560x1440" "1920x1080" "3840x2160") nil t "^"))
                (length (string-to-number (substring response 0 4)))
                (height (string-to-number (substring response 5 9))))

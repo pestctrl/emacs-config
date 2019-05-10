@@ -346,6 +346,7 @@
           (,(kbd "s-#") . (lambda () (interactive) (exwm-workspace-move-window 2)))
           (,(kbd "s-$") . (lambda () (interactive) (exwm-workspace-move-window 3)))))
 
+
   (defun dvorak? ()
     (string-match-p "de(neo_dvorak)" 
                     (shell-command-to-string "setxkbmap -v | grep symbols")))

@@ -673,6 +673,7 @@
    #+BEGIN_SRC emacs-lisp
      (use-package beacon)
      (beacon-mode 1)
+     (setq beacon-blink-delay 0.1)
      (setq beacon-color "#006400")
    #+END_SRC
 ** Dashboard

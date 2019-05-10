@@ -12,10 +12,78 @@
  '(display-time-mode t)
  '(org-agenda-files
    (quote
-    ("~/MEGA/org/agenda/research.org" "~/MEGA/org/agenda/long_term.org" "~/MEGA/org/agenda/ContView.org" "~/MEGA/org/agenda/UHNW.org" "~/MEGA/org/agenda/read.org" "~/MEGA/org/agenda/agenda.org" "~/MEGA/org/agenda/reference.org" "~/MEGA/org/agenda/refile.org")))
+    ("~/MEGA/org/2019-05-agenda/sandbox.org" "~/MEGA/org/2019-05-agenda/reference.org" "~/MEGA/org/2019-05-agenda/dev.org" "~/MEGA/org/2019-05-agenda/prod.org")))
  '(package-selected-packages
    (quote
-    (names ctable c-c-combo doom-themes helpful helm-org-rifle all-the-icons speed-type proof-general webpaste erc-hl-nick java-snippets mvn pass ivy-hydra erc-hl-nicks erc-colorize bbdb- bbdb-ext erc gnorb bbdb window-purpose tide company-flow tern-auto-complete tern dotnet dotnet-mode elisp-def auto-highlight-symbol ccls xcscope ggtags indium cargo gradle-mode kdeconnect hy-mode hacker-typer csv-mode switch-buffer-functions org-bookmark-heading system-packages org-projectile treemacs-projectile expand-region org-wunderlist lua-mode treemacs-icons-dired memoize skeletor 0xc lsp-rust smart-mode-line-powerline-theme hyperbole eclim alert gscholar-bibtex org-noter pdf-tools md4rd arch-packer interleave sx desktop-environment org-journal-list indent-guide org-board org-brain org-edna org-clock-csv org-clock-convenience org-mru-clock lsp-ui dap-mode lsp-python lsp-java lsp-ruby lsp-mode smart-jump scrollkeeper elfeed-org elfeed rg ag dumb-jump rainbow-delimiters org-super-agenda htmlize exwm-x keyfreq org-jira eyebrowse omnisharp omnisharp-emacs typescript-mode csharp-mode restclient rjsx-mode go-mode go treemacs org-timeline plantuml-mode pkgbuild-mode airline-themes powerline magit-svn ein emacs-ipython-notebook processing-mode web-mode ledger-mode elpy skewer-mode js2-mode dired-narrow yaml-mode clj-refactor paredit geiser magit ensime yasnippet irony company dired-du ox-reveal oauth2 org-caldav calfw-org calfw-gcal calfw-ical calfw org-bullets ace-jump-mode switch-window counsel smex ivy helm counsel-projectile helm-projectile projectile slime pulseaudio-control evil undo-tree multi-term swiper color-theme-modern org org-plus-contrib use-package exwm)))
+    (flymd telephone-line cnfonts names ctable c-c-combo doom-themes helpful helm-org-rifle all-the-icons speed-type proof-general webpaste erc-hl-nick java-snippets mvn pass ivy-hydra erc-hl-nicks erc-colorize bbdb- bbdb-ext erc gnorb bbdb window-purpose tide company-flow tern-auto-complete tern dotnet dotnet-mode elisp-def auto-highlight-symbol ccls xcscope ggtags indium cargo gradle-mode kdeconnect hy-mode hacker-typer csv-mode switch-buffer-functions org-bookmark-heading system-packages org-projectile treemacs-projectile expand-region org-wunderlist lua-mode treemacs-icons-dired memoize skeletor 0xc lsp-rust smart-mode-line-powerline-theme hyperbole eclim alert gscholar-bibtex org-noter pdf-tools md4rd arch-packer interleave sx desktop-environment org-journal-list indent-guide org-board org-brain org-edna org-clock-csv org-clock-convenience org-mru-clock lsp-ui dap-mode lsp-python lsp-java lsp-ruby lsp-mode smart-jump scrollkeeper elfeed-org elfeed rg ag dumb-jump rainbow-delimiters org-super-agenda htmlize exwm-x keyfreq org-jira eyebrowse omnisharp omnisharp-emacs typescript-mode csharp-mode restclient rjsx-mode go-mode go treemacs org-timeline plantuml-mode pkgbuild-mode airline-themes powerline magit-svn ein emacs-ipython-notebook processing-mode web-mode ledger-mode elpy skewer-mode js2-mode dired-narrow yaml-mode clj-refactor paredit geiser magit ensime yasnippet irony company dired-du ox-reveal oauth2 org-caldav calfw-org calfw-gcal calfw-ical calfw org-bullets ace-jump-mode switch-window counsel smex ivy helm counsel-projectile helm-projectile projectile slime pulseaudio-control evil undo-tree multi-term swiper color-theme-modern org org-plus-contrib use-package exwm)))
+ '(sml/mode-width
+   (if
+       (eq
+        (powerline-current-separator)
+        (quote arrow))
+       (quote right)
+     (quote full)))
+ '(sml/pos-id-separator
+   (quote
+    (""
+     (:propertize " " face powerline-active1)
+     (:eval
+      (propertize " "
+                  (quote display)
+                  (funcall
+                   (intern
+                    (format "powerline-%s-%s"
+                            (powerline-current-separator)
+                            (car powerline-default-separator-dir)))
+                   (quote powerline-active1)
+                   (quote powerline-active2))))
+     (:propertize " " face powerline-active2))))
+ '(sml/pos-minor-modes-separator
+   (quote
+    (""
+     (:propertize " " face powerline-active1)
+     (:eval
+      (propertize " "
+                  (quote display)
+                  (funcall
+                   (intern
+                    (format "powerline-%s-%s"
+                            (powerline-current-separator)
+                            (cdr powerline-default-separator-dir)))
+                   (quote powerline-active1)
+                   (quote sml/global))))
+     (:propertize " " face sml/global))))
+ '(sml/pre-id-separator
+   (quote
+    (""
+     (:propertize " " face sml/global)
+     (:eval
+      (propertize " "
+                  (quote display)
+                  (funcall
+                   (intern
+                    (format "powerline-%s-%s"
+                            (powerline-current-separator)
+                            (car powerline-default-separator-dir)))
+                   (quote sml/global)
+                   (quote powerline-active1))))
+     (:propertize " " face powerline-active1))))
+ '(sml/pre-minor-modes-separator
+   (quote
+    (""
+     (:propertize " " face powerline-active2)
+     (:eval
+      (propertize " "
+                  (quote display)
+                  (funcall
+                   (intern
+                    (format "powerline-%s-%s"
+                            (powerline-current-separator)
+                            (cdr powerline-default-separator-dir)))
+                   (quote powerline-active2)
+                   (quote powerline-active1))))
+     (:propertize " " face powerline-active1))))
+ '(sml/pre-modes-separator (propertize " " (quote face) (quote sml/modes)))
  '(wtf-custom-alist
    (quote
     (("AES" . "Advanced Encryption Standard")

@@ -2532,6 +2532,11 @@
    #+end_src
 ** freezing time
    #+begin_src emacs-lisp
+     (defvar my/frozen-time nil)
+
+     (defun my/current-time ()
+       my/frozen-time)
+
      ;; Change and freeze time
      (defun za-warudo ()
        "Freeze `current-time' at the current active or inactive timestamp. If point
@@ -2539,15 +2544,9 @@
      either by the timstamp under point or prompt, the time defaults to the
      current HH:MM of today at the selected date."
        (interactive)
-       (let ((time
-              (cond ((if (org-at-timestamp-p 'lax) t)
-                     (match-string 0))
-                    (t
-                     (org-read-date t nil nil "Input freeze time:")))))
-         (eval (macroexpand
-                `(defadvice current-time (around freeze activate)
-                   (setq ad-return-value ',
-                         (append (org-read-date nil t time) '(0 0))))))
+       (let ((time (org-read-date t nil nil "Input freeze time:")))
+         (setq my/frozen-time (append (org-read-date nil t time) '(0 0)))
+         (advice-add #'current-time :override #'my/current-time)
          (set-face-background 'fringe "firebrick2")
          (message "Toki yo tomare")))
 
@@ -2557,8 +2556,8 @@
      (defun un-za-warudo ()
        "Release the time frozen by `freeze-time'."
        (interactive)
-       (ad-remove-advice 'current-time 'around 'freeze)
-       (ad-activate 'current-time)
+       (advice-remove #'current-time #'my/current-time)
+       (setq my/frozen-time nil)
        (set-face-background 'fringe nil)
        (message "Soshite, toki wa ugoki dasu"))
 

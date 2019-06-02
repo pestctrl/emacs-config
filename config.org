@@ -2493,11 +2493,6 @@
      (add-to-list 'org-board-agent-header-alist
                   '("Linux" . "--user-agent=\"Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.6) Gecko/20070802 SeaMonkey/1.1.4\""))
    #+end_src
-** helm-org-rifle
-   #+begin_src emacs-lisp
-   (use-package helm-org-rifle)
-   (global-set-key (kbd "C-c o r") 'helm-org-rifle)
-   #+end_src
 ** helpful
    #+begin_src emacs-lisp
    (use-package helpful)

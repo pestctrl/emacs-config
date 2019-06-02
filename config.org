@@ -707,6 +707,49 @@
 
      (global-set-key (kbd "C-c C-e") 'my/eval-and-replace)
    #+end_src
+** dired
+*** Dired+, for formatting
+    #+BEGIN_SRC emacs-lisp
+      (add-to-list 'load-path
+                   "~/.emacs.d/custom/dired-plus")
+      (require 'dired+)
+      (setq dired-listing-switches "-al  --group-directories-first --sort=extension")
+
+      (setq diredp-hide-details-initially-flag nil)
+      (setq diredp-hide-details-propagate-flag nil)
+      (require 'dired-x)
+      (setq-default dired-omit-files-p t)
+      (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
+      ;; (use-package dired-narrow
+      ;;   :ensure t
+      ;;   :bind (:map dired-mode-map
+      ;;               ("/" . dired-narrow)))
+    #+END_SRC
+*** dired-hacks
+    #+begin_src emacs-lisp
+      (use-package dired-filter)
+      (setq dired-filter-group-saved-groups
+            '(("default"
+               ("PDF"
+                (extension . "pdf"))
+               ("LaTeX"
+                (extension "tex" "bib"))
+               ("Org"
+                (extension . "org"))
+               ("Archives"
+                (extension "zip" "rar" "gz" "bz2" "tar")))))
+
+      (use-package dired-subtree)
+
+      (define-key dired-mode-map (kbd "i") 'dired-subtree-insert)
+      (define-key dired-mode-map (kbd "I") 'dired-subtree-remove)
+
+      (use-package dired-collapse)
+    #+end_src
+*** dired-du
+    #+begin_src emacs-lisp
+    (use-package dired-du)
+    #+end_src
 * Look and feel
 ** Theme
  #+BEGIN_SRC emacs-lisp
@@ -2024,40 +2067,6 @@
      (define-key pdf-view-mode-map (kbd "d") (lambda () (interactive) (pdf-view-next-line-or-next-page 8)))
      (define-key pdf-view-mode-map (kbd "u") (lambda () (interactive) (pdf-view-previous-line-or-previous-page 8)))
    #+END_SRC
-** Dired+
-   #+BEGIN_SRC emacs-lisp
-     (add-to-list 'load-path
-                  "~/.emacs.d/custom/dired-plus")
-     (require 'dired+)
-     (setq dired-listing-switches "-al  --group-directories-first --sort=extension")
-
-     (setq diredp-hide-details-initially-flag nil)
-     (setq diredp-hide-details-propagate-flag nil)
-     (require 'dired-x)
-     (setq-default dired-omit-files-p t)
-     (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
-     ;; (use-package dired-narrow
-     ;;   :ensure t
-     ;;   :bind (:map dired-mode-map
-     ;;               ("/" . dired-narrow)))
-   #+END_SRC
-** dired-hacks
-   #+begin_src emacs-lisp
-     (use-package dired-filter)
-     (setq dired-filter-group-saved-groups
-           '(("default"
-              ("PDF"
-               (extension . "pdf"))
-              ("LaTeX"
-               (extension "tex" "bib"))
-              ("Org"
-               (extension . "org"))
-              ("Archives"
-               (extension "zip" "rar" "gz" "bz2" "tar")))))
-
-     (use-package dired-subtree)
-     (use-package dired-collapse)
-   #+end_src
 ** Time to game!
    #+BEGIN_SRC emacs-lisp
      (defvar my/games '("desmume" "mednaffe" "dolphin-emu" "m64py" "citra-qt" "steam " "th12"))
@@ -2209,10 +2218,6 @@
    #+begin_src emacs-lisp
      (custom-set-faces
       '(default ((t (:background "gray8" :foreground "#70FF00")))))
-   #+end_src
-** dired-du
-   #+begin_src emacs-lisp
-   (use-package dired-du)
    #+end_src
 ** scrollkeeper
    #+begin_src emacs-lisp

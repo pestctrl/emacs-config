@@ -255,7 +255,7 @@
        (shell-command "kill -s USR1 $(pidof deadd-notification-center)"))
 
      (define-prefix-command '*root-map*)
-     ;(global-set-key (kbd "C-t") '*root-map*)
+     ;;(global-set-key (kbd "C-t") '*root-map*)
      (add-to-list 'exwm-input-prefix-keys ?\C-t)
      (defun simulate-C-t (arg)
        (interactive "P")

@@ -562,16 +562,14 @@
    #+end_src
 ** Old meta project code
    #+begin_src emacs-lisp
-     (defun my/greedy-active-project (file point)
+     (defun my/active-sequential-project (file point)
        (save-excursion
          (let ((subtree-end (save-excursion (org-end-of-subtree t)))
                has-next-task has-active-project)
            (outline-next-heading)
-           (while (and (not (and has-next-task
-                                 has-active-project))
+           (while (and (not (or has-next-task
+                                has-active-project))
                        (< (point) subtree-end))
-             (while (string= "CAT" (org-get-todo-state))
-               (outline-next-heading))
              (cond ((and (my/is-a-task)
                          (my/is-next-task))
                     (setq has-next-task t))
@@ -583,16 +581,19 @@
            (or has-next-task
                has-active-project))))
 
-     (defun my/active-sequential-project (file point)
+     (defun my/greedy-active-project (file point)
        (save-excursion
          (let ((subtree-end (save-excursion (org-end-of-subtree t)))
                has-next-task has-active-project)
            (outline-next-heading)
-           (while (and (not (or has-next-task
-                                has-active-project))
+           (while (and (not (and has-next-task
+                                 has-active-project))
                        (< (point) subtree-end))
-             (cond ((and (my/is-a-task)
-                         (my/is-next-task))
+             (while (string= "CAT" (org-get-todo-state))
+               (outline-next-heading))
+             (cond ((or (and (my/is-a-task)
+                             (my/is-next-task))
+                        (string= "WAIT" (org-get-todo-state)))
                     (setq has-next-task t))
                    ((and (my/is-a-project)
                          (eq (my/get-project-type file (point) nil)

@@ -1,4 +1,118 @@
 
+* Plugins
+** fstree
+   #+BEGIN_SRC emacs-lisp
+     (add-to-list 'load-path
+                  "~/.emacs.d/custom/org-fstree")
+     (require 'org-fstree)
+   #+END_SRC
+** org-bullets
+#+BEGIN_SRC emacs-lisp
+(use-package org-bullets)
+(when (not (eq system-type 'windows-nt))
+(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+#+END_SRC
+** calfw-org
+ #+BEGIN_SRC emacs-lisp
+ (use-package calfw)
+ (use-package calfw-ical)
+ (use-package calfw-gcal)
+ (use-package calfw-org)
+ (global-set-key (kbd "C-c A") 'cfw:open-org-calendar)
+ (setq cfw:org-overwrite-default-keybinding t)
+ #+END_SRC
+** sync with google calendar
+   #+BEGIN_SRC emacs-lisp
+     (require 'url-http)
+     (use-package org-caldav)
+     (use-package oauth2)
+     (setq epa-pinentry-mode 'loopback)
+     (setq plstore-cache-passphrase-for-symmetric-encryption t)
+
+     (save-excursion
+       (let ((filename "~/.emacs.d/google-calendar-secret.el"))
+         (when (file-exists-p filename)
+           (set-buffer (find-file-noselect filename))
+           (let ((var (eval (read (buffer-string)))))
+             (setq org-caldav-oauth2-client-id (car var)
+                   org-caldav-oauth2-client-secret (cadr var)))
+           (kill-buffer))))
+
+     ;; (setq org-caldav-url 'google
+     ;;       org-caldav-calendar-id "jqeua8pamjrclakq3bg8mpnlis@group.calendar.google.com"
+     ;;       org-caldav-inbox "~/MEGA/org/agenda/test.org"
+     ;;       org-caldav-files '("~/MEGA/org/agenda/agenda.org")
+     ;;       org-icalendar-include-todo nil
+     ;;       org-icalendar-include-sexps t
+     ;;       org-icalendar-categories '(all-tags category)
+     ;;       org-icalendar-use-deadline '(event-if-todo event-if-not-todo todo-due)
+     ;;       org-icalendar-use-scheduled '(event-if-todo event-if-not-todo todo-start)
+     ;;       org-icalendar-with-timestamps nil
+     ;;       org-caldav-delete-org-entries 'never)
+
+     (setq org-caldav-url "https://99.57.234.31/remote.php/dav/calendars/bchu"
+           org-caldav-calendar-id "orgmode"
+           org-caldav-inbox "~/MEGA/org/agenda/test.org"
+           org-caldav-files '("~/MEGA/org/agenda/agenda.org" "~/MEGA/org/agenda/classes_caldav_workaround.org"))
+
+     (setq org-icalendar-alarm-time 30
+           org-icalendar-include-todo nil
+           org-icalendar-include-sexps t
+           org-icalendar-categories '(all-tags category)
+           org-icalendar-use-deadline '(event-if-todo event-if-not-todo todo-due)
+           org-icalendar-use-scheduled '(todo-start event-if-todo)
+           org-icalendar-with-timestamps nil
+           org-caldav-delete-org-entries 'never)
+
+     (setq org-caldav-skip-conditions '(nottodo ("TODO" "NEXT"))
+           org-caldav-exclude-tags '("ARCHIVE" "ONLYEMACS"))
+   #+END_SRC
+** Reveal.js
+   #+BEGIN_SRC emacs-lisp
+     (use-package ox-reveal)
+     (setq org-reveal-root "file:///home/benson/reveal.js")
+     (setq org-structure-template-alist (remove-if (lambda (c) (string= (car c) "n")) org-structure-template-alist))
+   #+END_SRC
+** org-protocol
+   #+BEGIN_SRC emacs-lisp
+   (require 'org-protocol)
+   #+END_SRC
+** org-timeline
+   #+BEGIN_SRC emacs-lisp
+   (use-package org-timeline)
+   (remove-hook 'org-agenda-finalize-hook 'org-timeline-insert-timeline)
+     
+   #+END_SRC
+** Code-blocks
+  #+BEGIN_SRC emacs-lisp
+    (require 'ob-core)
+    (require 'ob-clojure)
+    (require 'ob-plantuml)
+    (use-package plantuml-mode)
+
+    (setq org-babel-clojure-backend 'cider)
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((clojure . t)
+       (plantuml . t)))
+
+    (defun my-org-confirm-babel-evaluate (lang body)
+      (not (member lang '("plantuml"))))
+
+    (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
+    (setq org-plantuml-jar-path "/usr/share/java/plantuml/plantuml.jar")
+  #+END_SRC
+** org-super-agenda
+   #+begin_src emacs-lisp
+   (use-package org-super-agenda)
+   (org-super-agenda-mode)
+   #+end_src
+** helm-org-rifle
+   #+begin_src emacs-lisp
+     (use-package helm-org-rifle)
+     (global-set-key (kbd "C-c o r") 'helm-org-rifle)
+     (setq helm-org-rifle-test-against-path t)
+   #+end_src
 * My org traversal functions
   #+begin_src emacs-lisp
     (defun get-variables (l)
@@ -1060,114 +1174,6 @@
 
     (add-hook 'org-checkbox-statistics-hook 'my/org-checkbox-todo)
   #+END_SRC
-* Plugins
-** fstree
-   #+BEGIN_SRC emacs-lisp
-     (add-to-list 'load-path
-                  "~/.emacs.d/custom/org-fstree")
-     (require 'org-fstree)
-   #+END_SRC
-** org-bullets
-#+BEGIN_SRC emacs-lisp
-(use-package org-bullets)
-(when (not (eq system-type 'windows-nt))
-(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
-#+END_SRC
-** calfw-org
- #+BEGIN_SRC emacs-lisp
- (use-package calfw)
- (use-package calfw-ical)
- (use-package calfw-gcal)
- (use-package calfw-org)
- (global-set-key (kbd "C-c A") 'cfw:open-org-calendar)
- (setq cfw:org-overwrite-default-keybinding t)
- #+END_SRC
-** sync with google calendar
-   #+BEGIN_SRC emacs-lisp
-     (require 'url-http)
-     (use-package org-caldav)
-     (use-package oauth2)
-     (setq epa-pinentry-mode 'loopback)
-     (setq plstore-cache-passphrase-for-symmetric-encryption t)
-
-     (save-excursion
-       (let ((filename "~/.emacs.d/google-calendar-secret.el"))
-         (when (file-exists-p filename)
-           (set-buffer (find-file-noselect filename))
-           (let ((var (eval (read (buffer-string)))))
-             (setq org-caldav-oauth2-client-id (car var)
-                   org-caldav-oauth2-client-secret (cadr var)))
-           (kill-buffer))))
-
-     ;; (setq org-caldav-url 'google
-     ;;       org-caldav-calendar-id "jqeua8pamjrclakq3bg8mpnlis@group.calendar.google.com"
-     ;;       org-caldav-inbox "~/MEGA/org/agenda/test.org"
-     ;;       org-caldav-files '("~/MEGA/org/agenda/agenda.org")
-     ;;       org-icalendar-include-todo nil
-     ;;       org-icalendar-include-sexps t
-     ;;       org-icalendar-categories '(all-tags category)
-     ;;       org-icalendar-use-deadline '(event-if-todo event-if-not-todo todo-due)
-     ;;       org-icalendar-use-scheduled '(event-if-todo event-if-not-todo todo-start)
-     ;;       org-icalendar-with-timestamps nil
-     ;;       org-caldav-delete-org-entries 'never)
-
-     (setq org-caldav-url "https://99.57.234.31/remote.php/dav/calendars/bchu"
-           org-caldav-calendar-id "orgmode"
-           org-caldav-inbox "~/MEGA/org/agenda/test.org"
-           org-caldav-files '("~/MEGA/org/agenda/agenda.org" "~/MEGA/org/agenda/classes_caldav_workaround.org"))
-
-     (setq org-icalendar-alarm-time 30
-           org-icalendar-include-todo nil
-           org-icalendar-include-sexps t
-           org-icalendar-categories '(all-tags category)
-           org-icalendar-use-deadline '(event-if-todo event-if-not-todo todo-due)
-           org-icalendar-use-scheduled '(todo-start event-if-todo)
-           org-icalendar-with-timestamps nil
-           org-caldav-delete-org-entries 'never)
-
-     (setq org-caldav-skip-conditions '(nottodo ("TODO" "NEXT"))
-           org-caldav-exclude-tags '("ARCHIVE" "ONLYEMACS"))
-   #+END_SRC
-** Reveal.js
-   #+BEGIN_SRC emacs-lisp
-     (use-package ox-reveal)
-     (setq org-reveal-root "file:///home/benson/reveal.js")
-     (setq org-structure-template-alist (remove-if (lambda (c) (string= (car c) "n")) org-structure-template-alist))
-   #+END_SRC
-** org-protocol
-   #+BEGIN_SRC emacs-lisp
-   (require 'org-protocol)
-   #+END_SRC
-** org-timeline
-   #+BEGIN_SRC emacs-lisp
-   (use-package org-timeline)
-   (remove-hook 'org-agenda-finalize-hook 'org-timeline-insert-timeline)
-     
-   #+END_SRC
-** Code-blocks
-  #+BEGIN_SRC emacs-lisp
-    (require 'ob-core)
-    (require 'ob-clojure)
-    (require 'ob-plantuml)
-    (use-package plantuml-mode)
-
-    (setq org-babel-clojure-backend 'cider)
-    (org-babel-do-load-languages
-     'org-babel-load-languages
-     '((clojure . t)
-       (plantuml . t)))
-
-    (defun my-org-confirm-babel-evaluate (lang body)
-      (not (member lang '("plantuml"))))
-
-    (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
-    (setq org-plantuml-jar-path "/usr/share/java/plantuml/plantuml.jar")
-  #+END_SRC
-** org-super-agenda
-   #+begin_src emacs-lisp
-   (use-package org-super-agenda)
-   (org-super-agenda-mode)
-   #+end_src
 * View org files
 #+BEGIN_SRC emacs-lisp
 (defun make-org-file (filename)

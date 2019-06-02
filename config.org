@@ -731,10 +731,6 @@
       (require 'dired-x)
       (setq-default dired-omit-files-p t)
       (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
-      ;; (use-package dired-narrow
-      ;;   :ensure t
-      ;;   :bind (:map dired-mode-map
-      ;;               ("/" . dired-narrow)))
     #+END_SRC
 *** dired-hacks
     #+begin_src emacs-lisp

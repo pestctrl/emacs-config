@@ -631,9 +631,11 @@
        (my/has-todo-child))
 
      (defun my/show-meta (ambiguous-to-stuck)
-       (not (if ambiguous-to-stuck
-                (my/generous-active-project file point)
-              (my/greedy-active-project file point))))
+       (let ((file (buffer-file-name))
+             (point (point)))
+         (not (if ambiguous-to-stuck
+                  (my/generous-active-project file point)
+                (my/greedy-active-project file point)))))
 
      (defun my/show-seq (file point)
        (my/active-sequential-project file point))

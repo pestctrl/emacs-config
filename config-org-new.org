@@ -1369,3 +1369,16 @@
 
 #+END_SRC
 * Parallel org-tags-views
+* empty lines
+  #+begin_src emacs-lisp
+  (setq org-cycle-separator-lines 0)
+  #+end_src
+* invisibel
+  #+begin_src emacs-lisp
+    (setq org-catch-invisible-edits 'show-and-error)
+  #+end_src
+* link abbreviation
+  #+begin_src emacs-lisp
+    (setq org-link-abbrev-alist 
+          '(("youtube" . "https://youtube.com/watch?v=")))
+  #+end_src

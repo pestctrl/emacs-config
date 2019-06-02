@@ -2041,6 +2041,23 @@
      ;;   :bind (:map dired-mode-map
      ;;               ("/" . dired-narrow)))
    #+END_SRC
+** dired-hacks
+   #+begin_src emacs-lisp
+     (use-package dired-filter)
+     (setq dired-filter-group-saved-groups
+           '(("default"
+              ("PDF"
+               (extension . "pdf"))
+              ("LaTeX"
+               (extension "tex" "bib"))
+              ("Org"
+               (extension . "org"))
+              ("Archives"
+               (extension "zip" "rar" "gz" "bz2" "tar")))))
+
+     (use-package dired-subtree)
+     (use-package dired-collapse)
+   #+end_src
 ** Time to game!
    #+BEGIN_SRC emacs-lisp
      (defvar my/games '("desmume" "mednaffe" "dolphin-emu" "m64py" "citra-qt" "steam " "th12"))

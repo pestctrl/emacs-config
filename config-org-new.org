@@ -292,9 +292,17 @@
         `(dolist (,file-symbol ,(cadr files))
              (traverse-org-headlines (,(car files) ,file-symbol)
                ,@body))))
+  #+end_src
 
+* org-agenda base folder
+  #+begin_src emacs-lisp
+    (defvar my/org-folder "~/MEGA/org")
+    (defconst my/agenda-folder (expand-file-name "2019-05-agenda" my/org-folder))
 
-
+    (defun my/org-file (str)
+      (expand-file-name str my/org-folder))
+    (defun my/agenda-file (str)
+      (expand-file-name str my/agenda-folder))
   #+end_src
 * Keybindings
   #+begin_src emacs-lisp
@@ -1196,40 +1204,40 @@
 * Capture templates
   #+begin_src emacs-lisp
     (setq org-capture-templates
-          '(("t" "Todo" entry (file+olp "~/MEGA/org/2019-05-agenda/dev.org" "stuff")
+          `(("t" "Todo" entry (file ,(my/agenda-file "refile.org"))
              "* STUFF %?\n  :PROPERTIES:\n  :CREATED: %U\n  :VIEWING: %a\n  :END:")
-            ("r" "Review" entry (file+function "~/MEGA/org/entries/reviews.gpg" setup-automatic-review)
+            ("r" "Review" entry (file+function ,(my/org-file "entries/reviews.gpg") setup-automatic-review)
              (file "~/MEGA/org/templates/review-interactive-entry.org"))
-            ("rt" "Review Task" entry (file+headline "~/MEGA/org/entries/reviews.gpg" "Tasks")
+            ("rt" "Review Task" entry (file+headline ,(my/org-file "entries/reviews.gpg") "Tasks")
              "* TODO %?")
-            ("d" "Dream" entry (file+olp+datetree "~/MEGA/org/entries/dream.org")
+            ("d" "Dream" entry (file+olp+datetree ,(my/org-file "entries/dream.org"))
              "* %?")
-            ("D" "Distracted" entry (file+olp "~/MEGA/org/2019-05-agenda/sandbox.org" "stuff")
+            ("D" "Distracted" entry (file ,(my/agenda-file "dev.org"))
              "* TODO %?" :clock-in t :clock-resume t)
-            ("T" "New Task" entry (file+olp "~/MEGA/org/2019-05-agenda/sandbox.org" "stuff")
+            ("T" "New Task" entry (file ,(my/agenda-file "dev.org"))
              "* TODO %?" :clock-in t :clock-keep t)
-            ("m" "Money" plain (file "~/MEGA/org/entries/finances/ledger.ledger")
+            ("m" "Money" plain (file ,(my/org-file "entries/finances/ledger.ledger"))
              (file "~/MEGA/org/templates/basic.ledger") :unnarrowed t :empty-lines 1)
-            ("c" "Record Comms Message" entry (file+olp+datetree "~/MEGA/org/entries/comms.org")
+            ("c" "Record Comms Message" entry (file+olp+datetree ,(my/org-file "entries/comms.org"))
              "* TODO %?")
             ("j" "Journal")
-            ("je" "Journal Entry" entry (file+olp+datetree "~/MEGA/org/entries/journal.gpg")
+            ("je" "Journal Entry" entry (file+olp+datetree ,(my/org-file "entries/journal.gpg"))
              "* %<%R> %?\n%U\n\n")
-            ("jp" "Plan your day" entry (file+olp+datetree "~/MEGA/org/entries/journal.gpg")
+            ("jp" "Plan your day" entry (file+olp+datetree ,(my/org-file "entries/journal.gpg"))
              (file "~/MEGA/org/templates/daily-plan.org"))
             ("C" "Create checklist")
-            ("Cc" "Conference Via Bus" entry (file+olp "~/MEGA/org/2019-05-agenda/sandbox.org" "stuff")
+            ("Cc" "Conference Via Bus" entry (file ,(my/agenda-file "dev.org"))
              (file "~/MEGA/org/checklists/conference.org")
              :conference/airplane nil)
-            ("Cm" "Morning routine" entry (file "~/MEGA/org/entries/routines.org")
+            ("Cm" "Morning routine" entry (file ,(my/org-file "entries/routines.org"))
              (file "~/MEGA/org/checklists/mornings.org"))
-            ("Cn" "Nightly routine" entry (file "~/MEGA/org/entries/routines.org")
+            ("Cn" "Nightly routine" entry (file ,(my/org-file "entries/routines.org"))
              (file "~/MEGA/org/checklists/nights.org"))
-            ;; ("y" "Elfeed YouTube" entry (file+olp "~/MEGA/org/2019-05-agenda/dev.org" "rewards" "Videos")
+            ;; ("y" "Elfeed YouTube" entry (file+olp ,(my/agenda-file "dev.org") "rewards" "Videos")
             ;;  "* TODO %(identity elfeed-link-org-capture)")
-            ("p" "Protocol" entry (file+olp "~/MEGA/org/2019-05-agenda/dev.org" "stuff")
+            ("p" "Protocol" entry (file ,(my/agenda-file "refile.org"))
              "* STUFF %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
-            ("L" "Protocol Link" entry (file+olp "~/MEGA/org/2019-05-agenda/dev.org" "stuff")
+            ("L" "Protocol Link" entry (file ,(my/agenda-file "refile.org"))
              "* STUFF %? [[%:link][%:description]] \nCaptured On: %U")))
   #+end_src
 * Custom Journal

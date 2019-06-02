@@ -1031,7 +1031,7 @@
                 (org-agenda-clockreport-mode t))))))
 
   #+end_src
-* Checkbox
+* Checkbox hack
   #+BEGIN_SRC emacs-lisp
     (defun my/org-checkbox-todo ()
       "Switch header TODO state to DONE when all checkboxes are ticked, to TODO otherwise"

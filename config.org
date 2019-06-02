@@ -734,6 +734,8 @@
     #+END_SRC
 *** dired-hacks
     #+begin_src emacs-lisp
+      (use-package dired-narrow)
+      (define-key dired-filter-map (kbd "F") 'dired-narrow-fuzzy)
       (use-package dired-filter)
       (setq dired-filter-group-saved-groups
             '(("default"

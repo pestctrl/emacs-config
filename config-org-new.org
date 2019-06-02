@@ -661,6 +661,9 @@
                     'stuck))
                  ("META"
                   (if (my/show-meta ambiguous-to-stuck)
+                      'stuck 'active))
+                 ("TODO"
+                  (if (my/show-meta ambiguous-to-stuck)
                       'stuck 'active))))))))
    #+end_src
 * More alternative views

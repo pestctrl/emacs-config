@@ -937,7 +937,6 @@
 
     (setq org-agenda-hide-tags-regexp "NOT_TASKS\\|PROJECT")
 
-    (use-package org-super-agenda)
     (use-package htmlize)
     (org-super-agenda-mode)
     (setq org-super-agenda-header-separator "")

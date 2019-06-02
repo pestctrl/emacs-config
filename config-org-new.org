@@ -433,6 +433,7 @@
             ("SEQ" :foreground "white" :weight bold)
             ("EMPTY" :foreground "white" :weight bold)
             ("ABANDON" :foreground "dark gray" :weight bold)
+            ("CLOCK" :foreground "dark gray" :weight bold)
             ("TOP" :foreground "royal blue" :weight bold)
             ("INACT" :foreground "dark gray" :weight bold)
             ("FUTURE" :foreground "medium spring green" :weight bold)))

@@ -305,14 +305,6 @@
      (define-key *root-map* (kbd "m") '*music-map*)
 
    #+END_SRC
-** don't use C-t 
-   #+begin_src emacs-lisp
-     ;; Disable these
-     (with-eval-after-load "ibuf-ext"
-       (define-key ibuffer-mode-map (kbd "C-t") nil))
-
-     (define-key dired-mode-map (kbd "C-t") nil)
-   #+end_src
 ** Switch window
    #+BEGIN_SRC emacs-lisp
      (setq switch-window-input-style 'minibuffer)
@@ -325,6 +317,9 @@
 ** Keybindings
 #+BEGIN_SRC emacs-lisp
   (use-package transpose-frame)
+
+  (defconst my/keymap-key (kbd "C-t"))
+
   (setq exwm-input-global-keys
         `(([?\s-r] . exwm-reset)
           ([?\s-w] . exwm-workspace-switch)
@@ -339,7 +334,6 @@
           (,(kbd "s-c") . org-capture)
           (,(kbd "s-n") . switch-window)
           (,(kbd "s-k") . ido-kill-buffer)
-          (,(kbd "C-t") . *root-map*)
           (,(kbd "s-z") . resize-window)
           (,(kbd "s-s") . youtube-split)
           (,(kbd "s-n") . switch-to-next-buffer)
@@ -348,8 +342,14 @@
           (,(kbd "s-!") . (lambda () (interactive) (exwm-workspace-move-window 0)))
           (,(kbd "s-@") . (lambda () (interactive) (exwm-workspace-move-window 1)))
           (,(kbd "s-#") . (lambda () (interactive) (exwm-workspace-move-window 2)))
-          (,(kbd "s-$") . (lambda () (interactive) (exwm-workspace-move-window 3)))))
+          (,(kbd "s-$") . (lambda () (interactive) (exwm-workspace-move-window 3)))
+          (,my/keymap-key . *root-map*)))
 
+  ;; Disable C-t for all others
+  (with-eval-after-load "ibuf-ext"
+    (define-key ibuffer-mode-map my/keymap-key nil))
+
+  (define-key dired-mode-map my/keymap-key nil)
 
   (defun dvorak? ()
     (string-match-p "de(neo_dvorak)" 

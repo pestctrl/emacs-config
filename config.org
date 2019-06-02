@@ -302,8 +302,15 @@
      (define-key *music-map* (kbd "SPC") (exec (shell-command "clementine -t")))
      (define-key *music-map* (kbd "n") (exec (shell-command "clementine --next")))
      (define-key *music-map* (kbd "p") (exec (shell-command "clementine --previous")))
-     (define-key *root-map* (kbd "m") '*music-map*)
+     (defhydra clementine-volume-hydra (*music-map* "v")
+       "Clementine volume up and down"
+       ("j" (lambda () (interactive) (shell-command "clementine --volume-down")))
+       ("J" (lambda () (interactive) (shell-command "clementine --volume-decrease-by 25")))
+       ("k" (lambda () (interactive) (shell-command "clementine --volume-up")))
+       ("K" (lambda () (interactive) (shell-command "clementine --volume-increase-by 25")))
+       ("q" nil))
 
+     (define-key *root-map* (kbd "m") '*music-map*)
    #+END_SRC
 ** Switch window
    #+BEGIN_SRC emacs-lisp

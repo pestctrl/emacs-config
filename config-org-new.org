@@ -574,7 +574,7 @@
                          (my/is-next-task))
                     (setq has-next-task t))
                    ((and (my/is-a-project)
-                         (eq (my/get-project-type file (point) nil)
+                         (eq (my/get-project-type file (point) t)
                              'active))
                     (setq has-active-project t)))
              (org-end-of-subtree t t))

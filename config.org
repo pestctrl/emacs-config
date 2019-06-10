@@ -624,7 +624,7 @@
 ** Shutdown
    #+BEGIN_SRC emacs-lisp
      (add-hook 'exwm-exit-hook 'org-save-all-org-buffers)
-     (add-hook 'exwm-exit-hook 'save-org-agenda-files)
+     ;;(add-hook 'exwm-exit-hook 'save-org-agenda-files)
      (eval-after-load "term"
        '(progn 
           (define-key term-raw-map (kbd "C-c C-y") 'term-paste)

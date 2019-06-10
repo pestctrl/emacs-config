@@ -352,6 +352,10 @@
           (,(kbd "s-$") . (lambda () (interactive) (exwm-workspace-move-window 3)))
           (,my/keymap-key . *root-map*)))
 
+  (global-set-key (kbd "s-h") 'windmove-left)
+  (global-set-key (kbd "s-l") 'windmove-right)
+  (define-key desktop-environment-mode-map (kbd "s-l") nil)
+
   ;; Disable C-t for all others
   (with-eval-after-load "ibuf-ext"
     (define-key ibuffer-mode-map my/keymap-key nil))

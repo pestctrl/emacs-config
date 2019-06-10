@@ -1154,9 +1154,10 @@
                 (org-tags-match-list-sublevels 'indented)
                 (org-agenda-overriding-header "Next Tasks list")
                 (org-agenda-finalize-hook '(org-agenda-add-separater-between-project))))
-              ("c" "Look at clocking" agenda ""
-               ((org-agenda-skip-function 'my/agenda-custom-skip)
-                (org-agenda-span 'day)
+              ("c" "Comms" tags-todo "datetime"
+               ((org-agenda-overriding-header "Comms")))
+              ("C" "Look at clocking" agenda ""
+               ((org-agenda-span 'day)
                 (org-agenda-start-with-log-mode '(closed clock))
                 (org-agenda-clockreport-mode t))))))
 

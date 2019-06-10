@@ -1227,7 +1227,7 @@
              "* TODO %?" :clock-in t :clock-keep t)
             ("m" "Money" plain (file ,(my/org-file "entries/finances/ledger.ledger"))
              (file "~/MEGA/org/templates/basic.ledger") :unnarrowed t :empty-lines 1)
-            ("c" "Record Comms Message" entry (file+olp+datetree ,(my/org-file "entries/comms.org"))
+            ("c" "Record Comms Message" entry (file+olp+datetree ,(my/agenda-file "entries/datetree.org"))
              "* TODO %?")
             ("j" "Journal")
             ("je" "Journal Entry" entry (file+olp+datetree ,(my/org-file "entries/journal.gpg"))

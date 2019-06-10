@@ -1387,3 +1387,50 @@
     (setq org-link-abbrev-alist 
           '(("youtube" . "https://youtube.com/watch?v=")))
   #+end_src
+* refile to datetree
+  #+begin_src emacs-lisp
+    (defun my/org-read-datetree-date (d)
+      "Parse a time string D and return a date to pass to the datetree functions."
+      (let ((dtmp (nthcdr 3 (parse-time-string d))))
+        (list (cadr dtmp) (car dtmp) (caddr dtmp))))
+
+    (defun my/org-refile-to-archive-datetree (&optional bfn)
+      "Refile an entry to a datetree under an archive."
+      (interactive)
+      (require 'org-datetree)
+      (let* ((bfn (or bfn (find-file-noselect (expand-file-name (my/agenda-file "datetree.org")))))
+             (datetree-date (my/org-read-datetree-date (org-read-date t nil))))
+        (org-refile nil nil (list nil (buffer-file-name bfn) nil
+                                  (with-current-buffer bfn
+                                    (save-excursion
+                                      (org-datetree-find-date-create datetree-date)
+                                      (point))))))
+      (setq this-command 'my/org-refile-to-journal))
+  #+end_src
+* org-link use qutebrowser
+  #+begin_src emacs-lisp
+    (defun my/browse-url-qutebrowser (url &optional new-window)
+      (interactive)
+      (start-process (concat "qutebrowser " url)
+                     nil
+                     "qutebrowser"
+                     url))
+
+    ;;(setq browse-url-browser-function #'my/browse-url-qutebrowser)
+    (setq browse-url-browser-function #'browse-url-firefox)
+  #+end_src
+* convert orgzly scheduled timestamps to created
+  #+begin_src emacs-lisp
+    (defun my/scheduled-to-created ()
+      (when-let (time (org-get-scheduled-time (point)))
+        (let ((ts (format-time-string "[%Y-%m-%d %a]" time)))
+          (org-schedule '(4))
+          (org-set-property "CREATED" ts))))
+
+
+    (defun my/convert-orgzly-scheduled-to-created ()
+      (interactive)
+      (while (progn
+               (my/scheduled-to-created)
+               (outline-next-heading))))
+  #+end_src

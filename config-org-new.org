@@ -1249,9 +1249,9 @@
             ;; ("y" "Elfeed YouTube" entry (file+olp ,(my/agenda-file "dev.org") "rewards" "Videos")
             ;;  "* TODO %(identity elfeed-link-org-capture)")
             ("p" "Protocol" entry (file ,(my/agenda-file "refile.org"))
-             "* STUFF %^{Title}\nSource: %u, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
+             "* STUFF %^{Title}\nSource: %U, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
             ("L" "Protocol Link" entry (file ,(my/agenda-file "refile.org"))
-             "* STUFF %? [[%:link][%:description]] \nCaptured On: %U")))
+             "* STUFF %? [[%:link][%:description]] \n  :PROPERTIES:\n  :CREATED: %U\n  :VIEWING: %a\n  :END:")))
   #+end_src
 * Custom Journal
 ** Attempt 3

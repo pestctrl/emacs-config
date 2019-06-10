@@ -2120,6 +2120,14 @@
    #+BEGIN_SRC emacs-lisp
      (add-to-list 'load-path "~/.emacs.d/custom/youtube-dl-emacs/")
      (require 'youtube-dl)
+
+     (defun youtube-dl-song (url)
+       (interactive
+        (list (read-from-minibuffer
+               "URL: " (or (thing-at-point 'url)
+                           (when interprogram-paste-function
+                             (funcall interprogram-paste-function))))))
+       (async-shell-command (format "youtube-dl --audio-format mp3 --extract-audio \"%s\"" url)))
    #+END_SRC
 ** pdf-tools use isearch
    #+BEGIN_SRC emacs-lisp

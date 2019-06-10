@@ -1089,7 +1089,7 @@
                            ((org-agenda-overriding-header "Stuck Projects")
                             (org-agenda-skip-function 'my/dev-show-stuck-projects)
                             (org-tags-match-list-sublevels 'indented)))
-                (tags-todo (concat ,dev-tag "-short-PEOPLE")
+                (tags-todo (concat ,dev-tag "-short")
                            ((org-agenda-overriding-header "Active Projects")
                             (org-agenda-skip-function 'my/dev-show-active-projects)
                             (org-tags-match-list-sublevels 'indented))) 

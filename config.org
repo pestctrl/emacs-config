@@ -1213,7 +1213,8 @@
  #+END_SRC
 ** Swiper or counsel-grep
    #+BEGIN_SRC emacs-lisp
-     (global-set-key (kbd "C-s") 'counsel-grep-or-swiper)
+     (global-set-key (kbd "C-S-s") 'counsel-grep-or-swiper)
+     ;;(global-set-key (kbd "C-s") 'isearch-forward)
      (setq counsel-grep-base-command "grep --ignore-case -E -n -e %s %s")
    #+END_SRC
 ** help should still use regular search

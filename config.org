@@ -649,6 +649,10 @@
    (use-package volume)
    (define-key *root-map* (kbd "v") 'volume)
    #+END_SRC
+** exwm-edit
+   #+begin_src emacs-lisp
+     (use-package exwm-edit)
+   #+end_src
 * Emacs
 ** Reload Config
  #+BEGIN_SRC emacs-lisp
@@ -717,6 +721,17 @@
                 (insert (current-kill 0)))))
 
      (global-set-key (kbd "C-c C-e") 'my/eval-and-replace)
+   #+end_src
+** New Scratch buffer
+   #+begin_src emacs-lisp
+     (defun scratch-buffer ()
+       (interactive)
+       (let ((count 0))
+         (while (get-buffer (format "*scratch%d*" count))
+           (incf count))
+         (switch-to-buffer (get-buffer-create (format "*scratch%d*" count)))
+         (lisp-interaction-mode)
+         (insert initial-scratch-message)))
    #+end_src
 * Look and feel
 ** Theme
@@ -1228,6 +1243,11 @@
 (setq switch-window-qwerty-shortcuts
       '("a" "o" "e" "u" "i" "d" "h" "t" "n" "s"))
 #+END_SRC
+** iy-go-to-char
+   #+begin_src emacs-lisp
+   (use-package iy-go-to-char)
+   (global-set-key (kbd "M-m") 'iy-go-to-char)
+   #+end_src
 ** ibuffer
 *** Keybindings
 #+BEGIN_SRC emacs-lisp
@@ -2086,6 +2106,10 @@
                (interactive)
                (w3m-goto-url "https://google.com")))
    #+END_SRC
+** eshell
+   #+begin_src emacs-lisp
+   ;; (push "watch" eshell-visual-command)
+   #+end_src
 * New
 ** Youtube-dl
    #+BEGIN_SRC emacs-lisp

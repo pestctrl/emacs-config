@@ -21,6 +21,11 @@
   (setq backup-directory-alist `(("." . ,(concat user-emacs-directory "backups"))))
   #+END_SRC
 * EXWM
+** desktop-environment
+   #+begin_src emacs-lisp
+   (use-package desktop-environment)
+   (desktop-environment-mode)
+   #+end_src
 ** Meta
 #+BEGIN_SRC emacs-lisp
 (use-package exwm)
@@ -2415,11 +2420,6 @@
    #+begin_src emacs-lisp
    (require 'ox-latex)
    (require 'ox-beamer)
-   #+end_src
-** desktop-environment
-   #+begin_src emacs-lisp
-   (use-package desktop-environment)
-   (desktop-environment-mode)
    #+end_src
 ** arch-linux
    #+begin_src emacs-lisp

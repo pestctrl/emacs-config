@@ -410,7 +410,7 @@
             (:endgrouptag)))
 
 
-    (setq org-agenda-hide-tags-regexp "time\\|nontime\\|prod\\|dev\\|sandbox")
+    (setq org-agenda-hide-tags-regexp "time\\|nontime\\|prod\\|dev\\|sandbox\\|refile")
   #+end_src
 * org-todo-keywords
   #+begin_src emacs-lisp

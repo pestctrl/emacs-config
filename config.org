@@ -288,6 +288,7 @@
      (define-key *root-map* (kbd "j") 'org-clock-goto)
      (define-key *root-map* (kbd "o") 'switch-window)
      (define-key *root-map* (kbd "n") 'toggle-notifications)
+     (define-key *root-map* (kbd "C-d") 'dired-jump)
 
      (define-prefix-command '*window-map*)
      (define-key *root-map* (kbd "w") '*window-map*)

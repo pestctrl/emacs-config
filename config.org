@@ -2276,11 +2276,6 @@
        (global-set-key (kbd "C->") 'eyebrowse-next-window-config)
        (global-set-key (kbd "C-<") 'eyebrowse-prev-window-config))
    #+END_SRC
-** org-jira
-   #+BEGIN_SRC emacs-lisp
-   (use-package org-jira)
-   (setq jiralib-url "https://wenningbai.atlassian.net/")
-   #+END_SRC
 ** Writing mode
    #+BEGIN_SRC emacs-lisp
      (defun org-writing-mode ()
@@ -2310,78 +2305,6 @@
        (interactive "f")
        (setq default-directory dir))
    #+end_src
-** org-mru-clock
-   #+begin_src emacs-lisp
-     (use-package org-mru-clock)
-   #+end_src
-** org-clock-convenience
-   #+begin_src emacs-lisp
-     (defun my/org-clock-move-to-other ()
-       (interactive)
-       (forward-char 6)
-       (while (condition-case nil
-                  (progn 
-                    (previous-line)
-                    (org-clock-convenience-goto-ts)
-                    nil)
-                (error t))))
-
-     (defun my/org-clock-move-up ()
-       (interactive)
-       (org-clock-convenience-timestamp-up)
-       (my/org-clock-move-to-other)
-       (org-clock-convenience-timestamp-up))
-
-     (use-package org-clock-convenience
-       :ensure t
-       :bind (:map org-agenda-mode-map
-                   ("<S-up>" . org-clock-convenience-timestamp-up)
-                   ("<S-down>" . org-clock-convenience-timestamp-down)
-                   ("<S-M-up>" . org-clock-convenience-timestamp-up)
-                   ("<S-M-down>" . org-clock-convenience-timestamp-down)
-                   ("ö" . org-clock-convenience-fill-gap)
-                   ("é" . org-clock-convenience-fill-gap-both)))
-   #+end_src
-** org-clock-consisitency
-   #+begin_src emacs-lisp
-     (setq org-agenda-clock-consistency-checks
-           '(:max-duration "10:00"
-             :min-duration 0
-             :max-gap 0
-             :gap-ok-around ("4:00")
-             ;; :default-face ((:background "DarkRed")
-             ;;                (:foreground "white"))
-             ;; :overlap-face nil
-             ;; :gap-face ((:background "DarkRed")
-             ;;            (:foreground "white"))
-             ;; :no-end-time-face nil
-             ;; :long-face nil
-             ;; :short-face nil
-             ))
-   #+end_src
-** org-clock stfuf
-   #+begin_src emacs-lisp
-     (org-clock-persistence-insinuate)
-     (setq org-clock-in-resume t)
-     (setq org-clock-mode-line-total 'today)
-     (setq org-clock-persist t)
-     (org-clock-persistence-insinuate)
-     (setq org-clock-continuously t)
-   #+end_src
-** org-edna
-   #+begin_src emacs-lisp
-   (use-package org-edna)
-   (org-edna-load)
-   #+end_src
-** org agenda goto headline AND narrow
-   #+begin_src emacs-lisp
-     (defun my/org-agenda-narrow ()
-       (interactive)
-       (org-agenda-switch-to)
-       (org-narrow-to-subtree)
-       (outline-show-branches))
-     (define-key org-agenda-mode-map (kbd "S-<return>") 'my/org-agenda-narrow)
-   #+end_src
 ** World time include Taiwan
    #+begin_src emacs-lisp
      ;; (("America/Los_Angeles" "Seattle")
@@ -2392,34 +2315,6 @@
      ;;  ("Asia/Tokyo" "Tokyo"))
      (setq display-time-world-list
            '(("Asia/Taipei" "Taiwan")))
-   #+end_src
-** org-brain
-   #+begin_src emacs-lisp
-     (use-package org-brain :ensure t
-       :init
-       (global-set-key (kbd "M-'") 'org-brain-visualize)
-       (setq org-brain-path "~/MEGA/org/brain/")
-       ;; For Evil users
-       (with-eval-after-load 'evil
-         (evil-set-initial-state 'org-brain-visualize-mode 'emacs))
-       :config
-       (setq org-id-track-globally t)
-       (setq org-id-locations-file "~/.emacs.d/.org-id-locations")
-       (push '("b" "Brain" plain (function org-brain-goto-end)
-               "* %i%?" :empty-lines 1)
-             org-capture-templates)
-       (setq org-brain-visualize-default-choices 'all)
-       (setq org-brain-title-max-length 0)
-       (define-key org-brain-visualize-mode-map (kbd "^") 'org-brain-visualize-back))
-   #+end_src
-** Open links with firefox
-   #+begin_src emacs-lisp
-   (setq browse-url-browser-function 'browse-url-firefox)
-   #+end_src
-** org-export
-   #+begin_src emacs-lisp
-   (require 'ox-latex)
-   (require 'ox-beamer)
    #+end_src
 ** arch-linux
    #+begin_src emacs-lisp
@@ -2562,25 +2457,12 @@
                   "~/.emacs.d/custom/eosd")
      (require 'eosd)
    #+end_src
-** org-board
-   #+begin_src emacs-lisp
-     (use-package org-board)
-     (add-to-list 'org-board-agent-header-alist
-                  '("Linux" . "--user-agent=\"Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.6) Gecko/20070802 SeaMonkey/1.1.4\""))
-   #+end_src
 ** helpful
    #+begin_src emacs-lisp
    (use-package helpful)
    (global-set-key (kbd "C-h f") #'helpful-function)
    (global-set-key (kbd "C-h v") #'helpful-variable)
    (global-set-key (kbd "C-h k") #'helpful-key)
-   #+end_src
-** org-now
-   #+begin_src emacs-lisp
-     (add-to-list 'load-path "~/.emacs.d/custom/org-now")
-     (require 'org-now)
-     (setq org-now-location
-           nil)
    #+end_src
 ** ediff snippet 
    #+begin_src emacs-lisp

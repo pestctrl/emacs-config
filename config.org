@@ -745,7 +745,7 @@
            (incf count))
          (switch-to-buffer (get-buffer-create (format "*scratch%d*" count)))
          (lisp-interaction-mode)
-         (insert initial-scratch-message)))
+         (insert (substitute-command-keys initial-scratch-message))))
    #+end_src
 * Look and feel
 ** Theme

@@ -24,6 +24,10 @@
 (require 'org)
 (require 'use-package)
 
+;; Remove comment if want to debug
+;; (progn
+;;   (toggle-debug-on-error))
+
 (setq use-package-always-ensure t)
 
 (org-babel-load-file

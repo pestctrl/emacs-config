@@ -298,6 +298,7 @@
      (define-key *window-map* (kbd "h") 'side-left-window)
      (define-key *window-map* (kbd "l") 'side-right-window)
      (define-key *window-map* (kbd "d") 'window-toggle-side-windows)
+     (define-key *window-map* (kbd "b") 'my/exwm-background-window)
 
      (define-prefix-command '*firefox-map*)
      (define-key *firefox-map* (kbd "f") (quickrun-lambda "firefox" "firefox"))
@@ -360,6 +361,61 @@
      (global-set-key (kbd "s-v") #'my/toggle-viewing-background)
    #+end_src
 
+** Send a window to the back, for viewing while transparent
+   #+begin_src emacs-lisp
+     ;; exwm--id-buffer-alist
+     ;; xcb:ConfigureWindow
+     ;; exwm-floating--set-floating
+     ;; https://www.x.org/releases/X11R7.7/doc/libxcb/tutorial/index.html#winmap
+
+     ;; (progn
+     ;;   (xcb:+request exwm--connection (make-instance 'xcb:MapWindow :window id))
+     ;;   (xcb:flush exwm--connection))
+
+     (defvar my/exwm-background-window -1)
+
+     (defun my/exwm-hide-advice (fun id)
+       (unless (= my/exwm-background-window id)
+         (funcall fun id)))
+
+     (advice-add #'exwm-layout--hide :around #'my/exwm-hide-advice)
+
+     (defun my/xelb-foreground-window (id)
+       (let ((req (make-instance 'xcb:ConfigureWindow
+                                 :value-mask xcb:ConfigWindow:StackMode
+                                 :stack-mode xcb:StackMode:Above
+                                 :window id)))
+         (xcb:+request exwm--connection req)
+         (xcb:flush exwm--connection)))
+
+     (defun my/exwm-show-advice (id &optional window)
+       (when (= my/exwm-background-window id)
+         (setq my/exwm-background-window -1)
+         (my/xelb-foreground-window id)))
+
+     (advice-add #'exwm-layout--show :before #'my/exwm-show-advice)
+
+     (setq my/exwm-background-window -1)
+
+     (defun my/xelb-background-window (id)
+       (let ((req (make-instance 'xcb:ConfigureWindow
+                                 :value-mask xcb:ConfigWindow:StackMode
+                                 :stack-mode xcb:StackMode:Below
+                                 :window id)))
+         (xcb:+request exwm--connection req)
+         (xcb:flush exwm--connection)))
+
+     (defun my/exwm-background-window ()
+       (interactive)
+       (when (not (= my/exwm-background-window -1))
+         (let ((id my/exwm-background-window))
+           (my/xelb-foreground-window id)
+           (exwm-layout--hide id)))
+       (when exwm--id
+         (setq my/exwm-background-window exwm--id)
+         (my/xelb-background-window exwm--id)))
+
+   #+end_src
 ** Switch window
    #+BEGIN_SRC emacs-lisp
      (setq switch-window-input-style 'minibuffer)

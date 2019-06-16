@@ -1322,6 +1322,10 @@
    (global-set-key (kbd "C-c C-r") 'ivy-resume)
    ;;   (global-set-key (kbd "C-x b") 'counsel-switch-buffer)
  #+END_SRC
+*** f3 helm
+    #+begin_src emacs-lisp
+    (use-package f3)
+    #+end_src
 ** Swiper or counsel-grep
    #+BEGIN_SRC emacs-lisp
      (global-set-key (kbd "C-S-s") 'counsel-grep-or-swiper)
@@ -1444,6 +1448,10 @@
    #+begin_src emacs-lisp
    (global-set-key (kbd "M-f") 'forward-to-word)
    (global-set-key (kbd "M-F") 'forward-word)
+   #+end_src
+** poshint
+   #+begin_src emacs-lisp
+   (use-package pophint)
    #+end_src
 * Tools
 ** org-mode

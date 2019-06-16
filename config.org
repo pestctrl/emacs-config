@@ -322,6 +322,44 @@
 
      (define-key *root-map* (kbd "m") '*music-map*)
    #+END_SRC
+** transparency toggle
+   #+begin_src emacs-lisp
+     ;; Set the alpha
+     (defvar my/current-transparency 85)
+     (setq window-system-default-frame-alist `((x . ((alpha . (,my/current-transparency . 50)) ))))
+
+     (defun my/increase-transparency ()
+       (interactive)
+       (if (>= my/current-transparency 100)
+           (message "Max opacity")
+         (setf my/current-transparency
+               (+ my/current-transparency 5))
+         (set-frame-parameter (selected-frame) 'alpha `(,my/current-transparency . 50))
+         (message (format "%d" my/current-transparency))))
+
+     (defun my/decrease-transparency ()
+       (interactive)
+       (if (<= my/current-transparency 0)
+           (message "Minimum opacity")
+         (setf my/current-transparency
+               (- my/current-transparency 5))
+         (set-frame-parameter (selected-frame) 'alpha `(,my/current-transparency . 50))
+         (message (format "%d" my/current-transparency))))
+
+     (define-key desktop-environment-mode-map (kbd "<S-XF86MonBrightnessDown>") #'my/decrease-transparency)
+     (define-key desktop-environment-mode-map (kbd "<S-XF86MonBrightnessUp>") #'my/increase-transparency)
+
+     (defvar my/viewing-background nil)
+
+     (defun my/toggle-viewing-background ()
+       (interactive)
+       (setq my/current-transparency (if my/viewing-background 85 0)
+             my/viewing-background (not my/viewing-background))
+       (set-frame-parameter (selected-frame) 'alpha `(,my/current-transparency . 50)))
+
+     (global-set-key (kbd "s-v") #'my/toggle-viewing-background)
+   #+end_src
+
 ** Switch window
    #+BEGIN_SRC emacs-lisp
      (setq switch-window-input-style 'minibuffer)
@@ -624,10 +662,7 @@
                (modify-all-frames-parameters
 		'((buffer-predicate . my-buffer-predicate)))))
 
-   ;(add-to-list 'default-frame-alist '(alpha . (85 . 50)))
-   (setq window-system-default-frame-alist '((x . ((alpha . (85 . 50)) ))))
-   ;Display hard drive space
-
+   ;; Display hard drive space
    (add-hook 'display-time-hook 'update-hard-drive-space-string)
 
    (display-time-mode)

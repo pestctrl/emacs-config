@@ -373,10 +373,6 @@
      ;; exwm-floating--set-floating
      ;; https://www.x.org/releases/X11R7.7/doc/libxcb/tutorial/index.html#winmap
 
-     ;; (progn
-     ;;   (xcb:+request exwm--connection (make-instance 'xcb:MapWindow :window id))
-     ;;   (xcb:flush exwm--connection))
-
      (defvar my/exwm-background-window -1)
 
      (defun my/exwm-hide-advice (fun id)

@@ -414,8 +414,158 @@
            (exwm-layout--hide id)))
        (when exwm--id
          (setq my/exwm-background-window exwm--id)
-         (my/xelb-background-window exwm--id)))
+         (my/xelb-background-window exwm--id))
+       (ibuffer))
 
+     ;; Weird behavior when un-fullscreening a
+     ;; youtube window that has been backgrounded
+     (defun my/exwm-unset-fullscreen (&optional id)
+       ;; I don't forsee the error happening
+       ;; in a situation where an id is not passed
+       (when (and id
+                  (= id my/exwm-background-window))
+         (let ((buffer (exwm--id->buffer id)))
+           ;; Hmm, there seems to be a bug in exwm, where this doesn't respond properly.
+           ;; Even without my code
+           ;; Fullscreened window, in another workspace, browse-url, can't reset screen for some resaon 
+           ;; (switch-to-buffer buffer)
+           ;; For now, we shall just unbreak it by running the advice
+           (my/exwm-show-advice my/exwm-background-window))))
+     ;; (my/exwm-show-advice my/exwm-background-window)
+
+     ;; Further investigation required to fix this bug.
+     ;; Relevant functions:
+     ;; exwm--on-ClientMessage - This function is called during the browse-url. It will attempt to un-fullscreen the firefox window
+     ;; exwm-layout-unset-fullscreen - This is the function that is dispatched to by the previous function
+
+     (advice-add #'exwm-layout-unset-fullscreen
+                 :before
+                 #'my/exwm-unset-fullscreen)
+   #+end_src
+
+** toggle dedicated
+   #+begin_src emacs-lisp
+     (defun my/toggle-dedicated-window ()
+       (interactive)
+       (let ((win (selected-window)))
+         (set-window-dedicated-p win (not (window-dedicated-p win)))))
+   #+end_src
+** Send emacs frame to the background
+   #+begin_src emacs-lisp
+     (defvar my/background-workspace nil)
+
+     (defun my/exwm-workspace--set-active (fun frame active)
+       (if (eq frame my/background-workspace)
+         (if (not active)
+             (set-frame-parameter frame 'alpha `(100 . 100))
+           (set-frame-parameter frame 'alpha `(,my/current-transparency . 50))
+           (funcall fun frame active))
+         (funcall fun frame active)))
+
+     (advice-add #'exwm-workspace--set-active :around #'my/exwm-workspace--set-active)
+
+     (defun my/exwm-workspace-background ()
+       (interactive)
+       (setq my/background-workspace
+             (cond ((not (= -1 my/exwm-background-window))
+                    (message "Can't set workspace as background when X window is background")
+                    nil)
+                   ((null my/background-workspace)
+                    (message "Frame is now the background frame!")
+                    (selected-frame))
+                   ((not (eq my/background-workspace (selected-frame)))
+                    (set-frame-parameter my/background-workspace 'alpha `(,my/current-transparency . 50))
+                    (message "Frame is now the background frame!")
+                    (selected-frame))
+                   (t (message "No longer background frame!")
+                      nil))))
+
+     (global-set-key (kbd "s-b") #'my/exwm-workspace-background)
+
+     (message "Can't set workspace as background when X window is background")
+     (advice-add #'exwm-workspace--set-active :around #'my/exwm-workspace--set-active)
+
+   #+end_src
+** send keyevent to specific window
+   #+begin_src emacs-lisp
+     (defun my/exwm-input--fake-key-to-window (id event)
+       "Fake a key event equivalent to Emacs event EVENT."
+       (let* ((keysym (xcb:keysyms:event->keysym exwm--connection event))
+              keycode)
+         (when (= 0 (car keysym))
+           (user-error "[EXWM] Invalid key: %s" (single-key-description event)))
+         (setq keycode (xcb:keysyms:keysym->keycode exwm--connection
+                                                    (car keysym)))
+         (when (/= 0 keycode)
+           (exwm--log "id=#x%x event=%s keycode" id event keycode)
+           (dolist (class '(xcb:KeyPress xcb:KeyRelease))
+             (xcb:+request exwm--connection
+                 (make-instance 'xcb:SendEvent
+                                :propagate 0 :destination id
+                                :event-mask xcb:EventMask:NoEvent
+                                :event (xcb:marshal
+                                        (make-instance class
+                                                       :detail keycode
+                                                       :time xcb:Time:CurrentTime
+                                                       :root exwm--root :event id
+                                                       :child 0
+                                                       :root-x 0 :root-y 0
+                                                       :event-x 0 :event-y 0
+                                                       :state (cdr keysym)
+                                                       :same-screen 1)
+                                        exwm--connection)))))
+         (xcb:flush exwm--connection)))
+
+     (defun my/exwm-send-key-to-background ()
+       (interactive)
+       (if (= my/exwm-background-window -1)
+           (message "There is no background window...")
+         (let ((event (read-event "Sequence? ")))
+           (my/exwm-input--fake-key-to-window my/exwm-background-window event))))
+
+     (defun my/exwm-send-key-to-background-loop ()
+       (interactive)
+       (if (= my/exwm-background-window -1)
+           (message "There is no background window...")
+         (let (event)
+           (while (not (= 113 (setq event (read-key "Sequence? "))))
+             (my/exwm-input--fake-key-to-window my/exwm-background-window event)))))
+
+     (define-key *root-map* (kbd "k") #'my/exwm-send-key-to-background)
+     (define-key *root-map* (kbd "C-k") #'my/exwm-send-key-to-background-loop)
+   #+end_src
+** This is so that I can send fullscreen windows to the back
+   #+begin_src emacs-lisp
+     (cl-defun my/exwm-layout-set-fullscreen (&optional id)
+       "Make window ID fullscreen."
+       (interactive)
+       (exwm--log "id=#x%x" (or id 0))
+       (unless (and (or id (derived-mode-p 'exwm-mode))
+                    (not (exwm-layout--fullscreen-p)))
+         (cl-return-from exwm-layout-set-fullscreen))
+       (with-current-buffer (if id (exwm--id->buffer id) (window-buffer))
+         ;; Expand the X window to fill the whole screen.
+         (with-slots (x y width height) (exwm-workspace--get-geometry exwm--frame)
+           (exwm--set-geometry exwm--id x y width height))
+         ;; Raise the X window.
+         (xcb:+request exwm--connection
+             (make-instance 'xcb:ConfigureWindow
+                            :window exwm--id
+                            :value-mask (logior xcb:ConfigWindow:BorderWidth
+                                                xcb:ConfigWindow:StackMode)
+                            :border-width 0
+                            :stack-mode xcb:StackMode:Above))
+         (xcb:+request exwm--connection
+             (make-instance 'xcb:ewmh:set-_NET_WM_STATE
+                            :window exwm--id
+                            :data (vector xcb:Atom:_NET_WM_STATE_FULLSCREEN)))
+         (xcb:flush exwm--connection)
+         ;;(set-window-dedicated-p (get-buffer-window) t)
+         (cl-pushnew xcb:Atom:_NET_WM_STATE_FULLSCREEN exwm--ewmh-state)
+         (exwm-input--release-keyboard exwm--id)))
+
+
+     (advice-add #'exwm-layout-set-fullscreen :override #'my/exwm-layout-set-fullscreen)
    #+end_src
 ** Switch window
    #+BEGIN_SRC emacs-lisp

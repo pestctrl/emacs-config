@@ -25,6 +25,12 @@
   (setq backup-directory-alist `(("." . ,(concat user-emacs-directory "backups"))))
   #+END_SRC
 * EXWM
+** e2wm
+   #+begin_src emacs-lisp
+     (use-package e2wm)
+
+     (global-set-key (kbd "M-+") 'e2wm:start-management)
+   #+end_src
 ** desktop-environment
    #+begin_src emacs-lisp
    (use-package desktop-environment)

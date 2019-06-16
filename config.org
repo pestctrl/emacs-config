@@ -360,9 +360,8 @@
 
      (defun my/toggle-viewing-background ()
        (interactive)
-       (setq my/current-transparency (if my/viewing-background 85 0)
-             my/viewing-background (not my/viewing-background))
-       (set-frame-parameter (selected-frame) 'alpha `(,my/current-transparency . 50)))
+       (setq my/viewing-background (not my/viewing-background))
+       (set-frame-parameter (selected-frame) 'alpha `(,(if my/viewing-background 0 my/current-transparency) . 50)))
 
      (global-set-key (kbd "s-v") #'my/toggle-viewing-background)
    #+end_src

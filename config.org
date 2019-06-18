@@ -1531,14 +1531,14 @@ Needs to be fixed"
 *** Config
 #+BEGIN_SRC emacs-lisp
   (require 'ibuf-ext)
-  (autoload 'ibuffer "ibuffer" "List buffers." t)
+
   (add-to-list 'ibuffer-never-show-predicates
                '(lambda (buf)
                   (with-current-buffer buf
                     (eq major-mode 'helm-major-mode))))
 
   (setq ibuffer-saved-filter-groups
-        '(("General"
+        '(("default"
            ("X-Windows"       (mode . exwm-mode))
            ("Terminals"       (mode . term-mode))
            ("emacs-config"    (or (filename . ".emacs.d")
@@ -1581,9 +1581,10 @@ Needs to be fixed"
 
   (add-hook 'ibuffer-mode-hook
             '(lambda ()
-               (ibuffer-auto-mode 1)
-               (ibuffer-switch-to-saved-filter-groups "General")
-               (ibuffer-do-sort-by-alphabetic)))
+                (ibuffer-switch-to-saved-filter-groups "default")
+                (ibuffer-do-sort-by-alphabetic)))
+
+  ;; (setq ibuffer-mode-hook nil )(list (car ibuffer-mode-hook)))
 #+END_SRC
 *** Custom Filters
 #+BEGIN_SRC emacs-lisp

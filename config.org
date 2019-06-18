@@ -335,7 +335,6 @@
    #+END_SRC
 ** transparency toggle
    #+begin_src emacs-lisp
-     ;; Set the alpha
      (defvar my/current-transparency 85)
      (setq window-system-default-frame-alist `((x . ((alpha . (,my/current-transparency . 50)) ))))
 
@@ -363,6 +362,9 @@
      (defvar my/viewing-background nil)
 
      (defun my/toggle-viewing-background ()
+  "Allow for easy switching between 0 transparency and 
+current transparency, in order to take peeks at the 
+X window in the background."
        (interactive)
        (setq my/viewing-background (not my/viewing-background))
        (set-frame-parameter (selected-frame) 'alpha `(,(if my/viewing-background 0 my/current-transparency) . 50)))
@@ -372,10 +374,11 @@
 
 ** Send a window to the back, for viewing while transparent
    #+begin_src emacs-lisp
-     ;; exwm--id-buffer-alist
-     ;; xcb:ConfigureWindow
-     ;; exwm-floating--set-floating
-     ;; https://www.x.org/releases/X11R7.7/doc/libxcb/tutorial/index.html#winmap
+;; Reference material: 
+;; - exwm--id-buffer-alist
+;; - xcb:ConfigureWindow
+;; - exwm-floating--set-floating
+;; - https://www.x.org/releases/X11R7.7/doc/libxcb/tutorial/index.html#winmap
 
      (defvar my/exwm-background-window -1)
 
@@ -447,13 +450,6 @@
                  #'my/exwm-unset-fullscreen)
    #+end_src
 
-** toggle dedicated
-   #+begin_src emacs-lisp
-     (defun my/toggle-dedicated-window ()
-       (interactive)
-       (let ((win (selected-window)))
-         (set-window-dedicated-p win (not (window-dedicated-p win)))))
-   #+end_src
 ** Send emacs frame to the background
    #+begin_src emacs-lisp
      (defvar my/background-workspace nil)
@@ -469,6 +465,10 @@
      (advice-add #'exwm-workspace--set-active :around #'my/exwm-workspace--set-active)
 
      (defun my/exwm-workspace-background ()
+  "Sets the current  EXWM workspace to be persistent. 
+When you switch away from the workspace, the workspace 
+will become opaque in order to maximize visibility behind
+the other workspace. "
        (interactive)
        (setq my/background-workspace
              (cond ((not (= -1 my/exwm-background-window))
@@ -486,9 +486,7 @@
 
      (global-set-key (kbd "s-b") #'my/exwm-workspace-background)
 
-     (message "Can't set workspace as background when X window is background")
      (advice-add #'exwm-workspace--set-active :around #'my/exwm-workspace--set-active)
-
    #+end_src
 ** send keyevent to specific window
    #+begin_src emacs-lisp
@@ -521,6 +519,10 @@
          (xcb:flush exwm--connection)))
 
      (defun my/exwm-send-key-to-background ()
+  "If an X window is in the background, send a key input to that window. 
+Not entirely bug-free, due to my lack of understanding of reading and 
+translating key sequences. Some keys like 'escape' don't always work. 
+Needs to be fixed"
        (interactive)
        (if (= my/exwm-background-window -1)
            (message "There is no background window...")
@@ -528,6 +530,7 @@
            (my/exwm-input--fake-key-to-window my/exwm-background-window event))))
 
      (defun my/exwm-send-key-to-background-loop ()
+  "Suffers from same bugs as the other one, but loops until 'q' is pressed."
        (interactive)
        (if (= my/exwm-background-window -1)
            (message "There is no background window...")
@@ -537,6 +540,13 @@
 
      (define-key *root-map* (kbd "k") #'my/exwm-send-key-to-background)
      (define-key *root-map* (kbd "C-k") #'my/exwm-send-key-to-background-loop)
+   #+end_src
+** toggle dedicated
+   #+begin_src emacs-lisp
+     (defun my/toggle-dedicated-window ()
+       (interactive)
+       (let ((win (selected-window)))
+         (set-window-dedicated-p win (not (window-dedicated-p win)))))
    #+end_src
 ** This is so that I can send fullscreen windows to the back
    #+begin_src emacs-lisp

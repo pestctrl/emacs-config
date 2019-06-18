@@ -308,6 +308,10 @@
 
      (define-prefix-command '*firefox-map*)
      (define-key *firefox-map* (kbd "f") (quickrun-lambda "firefox" "firefox"))
+     (define-key *firefox-map* (kbd "1") (quickrun-lambda "firefox" "firefox1"))
+     (define-key *firefox-map* (kbd "2") (quickrun-lambda "firefox" "firefox2"))
+     (define-key *firefox-map* (kbd "3") (quickrun-lambda "firefox" "firefox3"))
+     (define-key *firefox-map* (kbd "4") (quickrun-lambda "firefox" "firefox4"))
      (define-key *firefox-map* (kbd "d") (quickrun-lambda "firefox" "development"))
      (define-key *firefox-map* (kbd "s") (quickrun-lambda "firefox" "school"))
      (define-key *firefox-map* (kbd "w") (quickrun-lambda "firefox" "work"))

@@ -732,7 +732,7 @@ Needs to be fixed"
     (launch-program (concat "xwinwrap -ni -ov -g 1920x1080+1280+0 -s -st -sp -nf -- mpv --loop=inf -wid WID " live-wallpaper-path) "xwinwrap"))
 
   (defun get-hard-drive-space ()
-    (shell-command-to-string "df -h -P -l ~/ | tail -n 1 | tr -s ' ' | cut -d ' ' -f 4"))
+    (shell-command-to-string "df -h -P -l / | tail -n 1 | tr -s ' ' | cut -d ' ' -f 4"))
 
   (defun update-hard-drive-space-string ()
     (setq hard-drive-space

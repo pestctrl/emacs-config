@@ -2808,6 +2808,14 @@ Needs to be fixed"
        ("q" nil))
 
    #+end_src
+** function to set tabwith
+   #+begin_src emacs-lisp
+     (defun my/TABS (num)
+       (interactive "p")
+       (setq tab-width (if (= num 1)
+                           8
+                         num)))
+   #+end_src
 * Broken
 ** mu4e
 *** General config

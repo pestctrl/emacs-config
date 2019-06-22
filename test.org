@@ -1,0 +1,88 @@
+* Changing the transparency of specific windows
+  #+begin_src emacs-lisp
+    ;; Stack Trace
+    ;; - https://www.google.com/search?client=firefox-b-1-d&q=change+window+transparency+compton
+    ;; - https://github.com/chjj/compton/issues/219
+    ;; - _NET_WM_WINDOW_OPACITY
+    ;; - https://github.com/i3/i3/issues/2840
+    ;; - Failure
+
+    ;; - https://www.google.com/search?client=firefox-b-1-d&ei=Qn4OXarOFNG4tQX1yKrwAg&q=dynamically+set+window+transparency+compton&oq=dynamically+set+window+transparency+compton&gs_l=psy-ab.3...1302.1926..2080...0.0..0.121.655.6j1......0....1..gws-wiz.......0i71j33i22i29i30j35i304i39j33i160.w6gx35dRUJc
+    ;; - https://www.reddit.com/r/unixporn/comments/3osw03/toggling_transparency_on_windows_in_compton_and/
+    ;; - https://github.com/freedesktop/transset
+    ;; - XChangeProperty
+    ;; - https://gitlab.peach-bun.com/pinion/SFML/commit/135c1716e877464db720265f37316cbb54ef13f2?expanded=1&view=parallel
+    ;; - xcb_change_property
+    ;; - https://www.x.org/releases/current/doc/man/man3/xcb_change_property.3.xhtml
+
+    ;; Also found this: https://xcb.freedesktop.org/XmlXcb/
+    ;; C-h f xcb change property
+    ;; Found xcb:ChangeProperty
+    ;; Let the hacking begin
+
+    ;; Found xcb:ewmh:-atoms
+    ;; added opacity to list
+    ;; called init function xcb:ewmh:init
+    ;; found opacity is cardinal atom through xprop
+
+    ;; example c call: https://github.com/ehntoo/unagi/blob/master/plugins/opacity.c, line 71
+    ;; True example: https://github.com/polybar/polybar/blob/ca4426a9620f4db05a0117282fbed3a32a14ec92/src/x11/ewmh.cpp#L168
+
+    ;; reading from transset
+    ;; So in C with Xlib, NWWO (my new abbreviation) is essentially an unsigned int.
+    ;; max value is completely opaque, min is the opposite.
+    ;; However, it's converted to a char array when passed to xlib xchangeproperty
+
+    ;; xcb_change_property(conn->connection, XCB_PROP_MODE_REPLACE, win, _NET_WM_WINDOW_OPACITY, XCB_ATOM_CARDINAL, 32, 1, &values);
+
+    (defun my/int-to-char-array (int)
+      (cl-labels ((thunk (int depth)
+                         (if (= depth 4)
+                             nil
+                           (cons (% int 256)
+                                 (thunk (/ depth 256)
+                                        (1+ depth))))))
+        (thunk int 0)))
+
+
+    (let ((window-id 48234499))
+      (xcb:+request exwm--connection
+          (make-instance
+           xcb:ChangeProperty
+           :mode xcb:PropMode:Replace :window window-id
+           :property xcb:Atom:_NET_WM_WINDOW_OPACITY :type xcb:Atom:CARDINAL
+           :format 32 :data-len 1 :data (0 0 0 255)))
+      (xcb:flush exwm--connection))
+
+    (defun my/set-transparency (window-id value)
+      "`value` should be an float between 0 and and 1,"
+      (xcb:+request exwm--connection
+          (make-instance
+           xcb:ChangeProperty
+           :mode xcb:PropMode:Replace :window window-id
+           :property xcb:Atom:_NET_WM_WINDOW_OPACITY :type xcb:Atom:CARDINAL
+           :format 32 :data-len 1 :data (my/int-to-char-array (round (* 4294967295 0.1)))))
+      (xcb:flush exwm--connection))
+
+    (defun my/get-transparency (window-id))
+
+    (defun my/increase-transparency (window-id))
+
+    (defun my/decrease-transparency (window-id))
+
+    (defun my/reset-transparency (window-id))
+
+    (let ((window-id 79691779))
+      (xcb:-+request exwm--connection
+                     (make-instance xcb:ChangeProperty :mode xcb:PropMode:Replace :window window-id :property xcb:Atom:_NET_WM_WINDOW_OPACITY :type xcb:Atom:CARDINAL :format 32 :data-len 1 :data 10))
+      (xcb:flush exwm--connection))
+
+    (let ((name (symbol-name '_NET_WM_WINDOW_TYPE)))
+      (slot-value
+       (xcb:+request-unchecked+reply exwm--connection
+           (make-instance 'xcb:InternAtom
+                          :only-if-exists 0
+                          :name-len (length name)
+                          :name name))
+       'atom))
+  #+end_src

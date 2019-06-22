@@ -1,6 +1,11 @@
 #+TITLE: Emacs Configuration
 #+AUTHOR: Benson Chu
 
+* Bugs
+** Need this to fix broken config
+   #+begin_src emacs-lisp
+   (use-package magit-popup)
+   #+end_src
 * Neo keyboard issues
   #+BEGIN_SRC emacs-lisp
     (global-set-key (kbd "M-Ä") 'eval-expression)
@@ -2704,9 +2709,9 @@
    #+end_src
 ** eosd
    #+begin_src emacs-lisp
-     (add-to-list 'load-path 
-                  "~/.emacs.d/custom/eosd")
-     (require 'eosd)
+     ;; (add-to-list 'load-path 
+     ;;              "~/.emacs.d/custom/eosd")
+     ;; (require 'eosd)
    #+end_src
 ** helpful
    #+begin_src emacs-lisp

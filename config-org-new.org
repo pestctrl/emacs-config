@@ -627,17 +627,17 @@
    #+end_src
 ** Project show
    #+begin_src emacs-lisp
-     (defun my/show-empty ()
+     (defun my/stuck-empty ()
        (my/has-todo-child))
 
-     (defun my/show-meta (ambiguous-to-stuck)
+     (defun my/stuck-meta (ambiguous-to-stuck)
        (let ((file (buffer-file-name))
              (point (point)))
          (not (if ambiguous-to-stuck
                   (my/generous-active-project file point)
                 (my/greedy-active-project file point)))))
 
-     (defun my/show-seq (file point)
+     (defun my/active-seq (file point)
        (my/active-sequential-project file point))
 
      (defun my/get-project-type (file point &optional ambiguous-to-stuck)
@@ -654,16 +654,16 @@
                  ("FUTURE" 'someday)
                  ("HOLD" 'hold)
                  ("SEQ"
-                  (if (my/show-seq file point)
-                      'stuck 'active))
+                  (if (my/active-seq file point)
+                      'active 'stuck))
                  ("EMPTY"
-                  (when (my/show-empty)
+                  (when (my/stuck-empty)
                     'stuck))
                  ("META"
-                  (if (my/show-meta ambiguous-to-stuck)
+                  (if (my/stuck-meta ambiguous-to-stuck)
                       'stuck 'active))
                  ("TODO"
-                  (if (my/show-meta ambiguous-to-stuck)
+                  (if (my/stuck-meta ambiguous-to-stuck)
                       'stuck 'active))))))))
    #+end_src
 * More alternative views

@@ -313,6 +313,10 @@
 
      (define-prefix-command '*firefox-map*)
      (define-key *firefox-map* (kbd "f") (quickrun-lambda "firefox" "firefox"))
+     (define-key *firefox-map* (kbd "1") (quickrun-lambda "firefox" "firefox1"))
+     (define-key *firefox-map* (kbd "2") (quickrun-lambda "firefox" "firefox2"))
+     (define-key *firefox-map* (kbd "3") (quickrun-lambda "firefox" "firefox3"))
+     (define-key *firefox-map* (kbd "4") (quickrun-lambda "firefox" "firefox4"))
      (define-key *firefox-map* (kbd "d") (quickrun-lambda "firefox" "development"))
      (define-key *firefox-map* (kbd "s") (quickrun-lambda "firefox" "school"))
      (define-key *firefox-map* (kbd "w") (quickrun-lambda "firefox" "work"))
@@ -336,7 +340,6 @@
    #+END_SRC
 ** transparency toggle
    #+begin_src emacs-lisp
-     ;; Set the alpha
      (defvar my/current-transparency 85)
      (setq window-system-default-frame-alist `((x . ((alpha . (,my/current-transparency . 50)) ))))
 
@@ -364,6 +367,9 @@
      (defvar my/viewing-background nil)
 
      (defun my/toggle-viewing-background ()
+  "Allow for easy switching between 0 transparency and 
+current transparency, in order to take peeks at the 
+X window in the background."
        (interactive)
        (setq my/viewing-background (not my/viewing-background))
        (set-frame-parameter (selected-frame) 'alpha `(,(if my/viewing-background 0 my/current-transparency) . 50)))
@@ -373,10 +379,11 @@
 
 ** Send a window to the back, for viewing while transparent
    #+begin_src emacs-lisp
-     ;; exwm--id-buffer-alist
-     ;; xcb:ConfigureWindow
-     ;; exwm-floating--set-floating
-     ;; https://www.x.org/releases/X11R7.7/doc/libxcb/tutorial/index.html#winmap
+;; Reference material: 
+;; - exwm--id-buffer-alist
+;; - xcb:ConfigureWindow
+;; - exwm-floating--set-floating
+;; - https://www.x.org/releases/X11R7.7/doc/libxcb/tutorial/index.html#winmap
 
      (defvar my/exwm-background-window -1)
 
@@ -448,13 +455,6 @@
                  #'my/exwm-unset-fullscreen)
    #+end_src
 
-** toggle dedicated
-   #+begin_src emacs-lisp
-     (defun my/toggle-dedicated-window ()
-       (interactive)
-       (let ((win (selected-window)))
-         (set-window-dedicated-p win (not (window-dedicated-p win)))))
-   #+end_src
 ** Send emacs frame to the background
    #+begin_src emacs-lisp
      (defvar my/background-workspace nil)
@@ -470,6 +470,10 @@
      (advice-add #'exwm-workspace--set-active :around #'my/exwm-workspace--set-active)
 
      (defun my/exwm-workspace-background ()
+  "Sets the current  EXWM workspace to be persistent. 
+When you switch away from the workspace, the workspace 
+will become opaque in order to maximize visibility behind
+the other workspace. "
        (interactive)
        (setq my/background-workspace
              (cond ((not (= -1 my/exwm-background-window))
@@ -487,9 +491,7 @@
 
      (global-set-key (kbd "s-b") #'my/exwm-workspace-background)
 
-     (message "Can't set workspace as background when X window is background")
      (advice-add #'exwm-workspace--set-active :around #'my/exwm-workspace--set-active)
-
    #+end_src
 ** send keyevent to specific window
    #+begin_src emacs-lisp
@@ -522,6 +524,10 @@
          (xcb:flush exwm--connection)))
 
      (defun my/exwm-send-key-to-background ()
+  "If an X window is in the background, send a key input to that window. 
+Not entirely bug-free, due to my lack of understanding of reading and 
+translating key sequences. Some keys like 'escape' don't always work. 
+Needs to be fixed"
        (interactive)
        (if (= my/exwm-background-window -1)
            (message "There is no background window...")
@@ -529,6 +535,7 @@
            (my/exwm-input--fake-key-to-window my/exwm-background-window event))))
 
      (defun my/exwm-send-key-to-background-loop ()
+  "Suffers from same bugs as the other one, but loops until 'q' is pressed."
        (interactive)
        (if (= my/exwm-background-window -1)
            (message "There is no background window...")
@@ -538,6 +545,13 @@
 
      (define-key *root-map* (kbd "k") #'my/exwm-send-key-to-background)
      (define-key *root-map* (kbd "C-k") #'my/exwm-send-key-to-background-loop)
+   #+end_src
+** toggle dedicated
+   #+begin_src emacs-lisp
+     (defun my/toggle-dedicated-window ()
+       (interactive)
+       (let ((win (selected-window)))
+         (set-window-dedicated-p win (not (window-dedicated-p win)))))
    #+end_src
 ** This is so that I can send fullscreen windows to the back
    #+begin_src emacs-lisp
@@ -723,7 +737,7 @@
     (launch-program (concat "xwinwrap -ni -ov -g 1920x1080+1280+0 -s -st -sp -nf -- mpv --loop=inf -wid WID " live-wallpaper-path) "xwinwrap"))
 
   (defun get-hard-drive-space ()
-    (shell-command-to-string "df -h -P -l ~/ | tail -n 1 | tr -s ' ' | cut -d ' ' -f 4"))
+    (shell-command-to-string "df -h -P -l / | tail -n 1 | tr -s ' ' | cut -d ' ' -f 4"))
 
   (defun update-hard-drive-space-string ()
     (setq hard-drive-space
@@ -1522,14 +1536,14 @@
 *** Config
 #+BEGIN_SRC emacs-lisp
   (require 'ibuf-ext)
-  (autoload 'ibuffer "ibuffer" "List buffers." t)
+
   (add-to-list 'ibuffer-never-show-predicates
                '(lambda (buf)
                   (with-current-buffer buf
                     (eq major-mode 'helm-major-mode))))
 
   (setq ibuffer-saved-filter-groups
-        '(("General"
+        '(("default"
            ("X-Windows"       (mode . exwm-mode))
            ("Terminals"       (mode . term-mode))
            ("emacs-config"    (or (filename . ".emacs.d")
@@ -1572,9 +1586,12 @@
 
   (add-hook 'ibuffer-mode-hook
             '(lambda ()
-               (ibuffer-auto-mode 1)
-               (ibuffer-switch-to-saved-filter-groups "General")
-               (ibuffer-do-sort-by-alphabetic)))
+                (ibuffer-switch-to-saved-filter-groups "default")
+                (ibuffer-do-sort-by-alphabetic)
+                ;; (ibuffer-auto-mode)
+                ))
+
+  ;; (setq ibuffer-mode-hook nil)(list (car ibuffer-mode-hook)))
 #+END_SRC
 *** Custom Filters
 #+BEGIN_SRC emacs-lisp
@@ -2683,8 +2700,9 @@
      (setq erc-kill-buffer-on-part t)
      (setq erc-autojoin-channels-alist
            '(("freenode.net" "#emacs" "#org-mode"
-              "##linux" "#compilers" "#pltclub"
-              "##cs" "##computerscience" "##programming")))
+              "##linux" "#compilers" "#pltclub" 
+              "##cs" "##computerscience" "##programming" "#lisp" "##lisp"
+              "#sbcl" "#ecl")))
 
      (defun get-authinfo (host port)
        (let* ((netrc (netrc-parse (expand-file-name "~/.emacs.d/secrets/.authinfo.gpg")))
@@ -2794,6 +2812,14 @@
        ("x" delete-window)
        ("q" nil))
 
+   #+end_src
+** function to set tabwith
+   #+begin_src emacs-lisp
+     (defun my/TABS (num)
+       (interactive "p")
+       (setq tab-width (if (= num 1)
+                           8
+                         num)))
    #+end_src
 * Broken
 ** mu4e

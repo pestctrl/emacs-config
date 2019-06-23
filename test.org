@@ -35,6 +35,11 @@
 
     ;; xcb_change_property(conn->connection, XCB_PROP_MODE_REPLACE, win, _NET_WM_WINDOW_OPACITY, XCB_ATOM_CARDINAL, 32, 1, &values);
 
+    (require 'dash)
+    (require 'hydra)
+
+    (defconst my/unsigned-int-max 4294967295)
+
     (defun my/int-to-char-array (int)
       (cl-labels ((thunk (int depth)
                          (if (= depth 4)
@@ -52,45 +57,63 @@
           (decf iter))
         sum))
 
-    (let ((window-id 46137347))
-      (my/set-transparency window-id 0.5)
-      (my/char-array-to-int (slot-value (my/get-transparency window-id) 'value)))
+    (defun my/map-to-unsigned-int (percent)
+      (round (* my/unsigned-int-max percent)))
+
+    (defun my/map-to-percent (val)
+      (/ val (float my/unsigned-int-max)))
 
     (defun my/set-transparency (window-id value)
       "`value` should be an float between 0 and and 1,"
-      (xcb:+request exwm--connection
-          (make-instance
-           xcb:ChangeProperty
-           :mode xcb:PropMode:Replace :window window-id
-           :property xcb:Atom:_NET_WM_WINDOW_OPACITY :type xcb:Atom:CARDINAL
-           :format 32 :data-len 1 :data (my/int-to-char-array (round (* 4294967295 value)))))
+      (->> value
+           (my/map-to-unsigned-int)
+           (my/int-to-char-array)
+           (make-instance xcb:ChangeProperty
+                          :mode xcb:PropMode:Replace :window window-id
+                          :property xcb:Atom:_NET_WM_WINDOW_OPACITY :type xcb:Atom:CARDINAL
+                          :format 32 :data-len 1 :data)
+           (xcb:+request))
       (xcb:flush exwm--connection))
-
+  
     (defun my/get-transparency (window-id)
-      (xcb:+request-unchecked+reply exwm--connection
-          (make-instance
-           xcb:GetProperty
-           :delete 0 :window window-id
-           :property xcb:Atom:_NET_WM_WINDOW_OPACITY :type xcb:Atom:CARDINAL
-           :long-offset 0 :long-length 1)))
+      (let ((reply (->> window-id
+                        (make-instance xcb:GetProperty :delete 0
+                                       :property xcb:Atom:_NET_WM_WINDOW_OPACITY :type xcb:Atom:CARDINAL
+                                       :long-offset 0 :long-length 1
+                                       :window)
+                        (xcb:+request-unchecked+reply exwm--connection))))
+        (let ((char-arr (slot-value reply 'value)))
+          (if (zerop (length char-arr))
+              1.0
+            (-> char-arr
+                (my/char-array-to-int)
+                (my/map-to-percent))))))
 
-    (defun my/increase-transparency (window-id))
+    (defun my/increase-window-transparency ()
+      (interactive)
+      (when-let (id (exwm--buffer->id (current-buffer)))
+        (let* ((curr-trans (my/get-transparency id))
+               (new-trans (+ curr-trans 0.1)))
+          (my/set-transparency
+           id (if (< 1 new-trans) 1 new-trans)))))
 
-    (defun my/decrease-transparency (window-id))
+    (defun my/decrease-window-transparency ()
+      (interactive)
+      (when-let (id (exwm--buffer->id (current-buffer)))
+        (let* ((curr-trans (my/get-transparency id))
+               (new-trans (- curr-trans 0.1)))
+          (my/set-transparency
+           id (if (< new-trans 0) 0 new-trans)))))
 
-    (defun my/reset-transparency (window-id))
+    (defun my/reset-window-transparency ()
+      (interactive)
+      (when-let (id (exwm--buffer->id (current-buffer)))
+        (my/set-transparency id 1.0)))
 
-    (let ((window-id 79691779))
-      (xcb:-+request exwm--connection
-                     (make-instance xcb:ChangeProperty :mode xcb:PropMode:Replace :window window-id :property xcb:Atom:_NET_WM_WINDOW_OPACITY :type xcb:Atom:CARDINAL :format 32 :data-len 1 :data 10))
-      (xcb:flush exwm--connection))
-
-    (let ((name (symbol-name '_NET_WM_WINDOW_TYPE)))
-      (slot-value
-       (xcb:+request-unchecked+reply exwm--connection
-           (make-instance 'xcb:InternAtom
-                          :only-if-exists 0
-                          :name-len (length name)
-                          :name name))
-       'atom))
+    (defhydra window-transparency-hydra (*window-map* "t")
+      "Manage window splits"
+      ("j" my/decrease-window-transparency)
+      ("k" my/increase-window-transparency)
+      ("r" my/reset-window-transparency)
+      ("q" nil))
   #+end_src

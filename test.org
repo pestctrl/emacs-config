@@ -25,7 +25,7 @@
     ;; called init function xcb:ewmh:init
     ;; found opacity is cardinal atom through xprop
 
-    ;; example c call: https://github.com/ehntoo/unagi/blob/master/plugins/opacity.c, line 71
+    ;; example c call: https://github.com/ehntoo/unagi/blob/master/plugins/opacity.c#L71
     ;; True example: https://github.com/polybar/polybar/blob/ca4426a9620f4db05a0117282fbed3a32a14ec92/src/x11/ewmh.cpp#L168
 
     ;; reading from transset
@@ -40,19 +40,21 @@
                          (if (= depth 4)
                              nil
                            (cons (% int 256)
-                                 (thunk (/ depth 256)
+                                 (thunk (/ int 256)
                                         (1+ depth))))))
         (thunk int 0)))
 
+    (defun my/char-array-to-int (arr)
+      (let ((iter (1- (length arr)))
+            (sum 0))
+        (while (>= iter 0)
+          (setf sum (+ (* 256 sum) (aref arr iter)))
+          (decf iter))
+        sum))
 
-    (let ((window-id 48234499))
-      (xcb:+request exwm--connection
-          (make-instance
-           xcb:ChangeProperty
-           :mode xcb:PropMode:Replace :window window-id
-           :property xcb:Atom:_NET_WM_WINDOW_OPACITY :type xcb:Atom:CARDINAL
-           :format 32 :data-len 1 :data (0 0 0 255)))
-      (xcb:flush exwm--connection))
+    (let ((window-id 46137347))
+      (my/set-transparency window-id 0.5)
+      (my/char-array-to-int (slot-value (my/get-transparency window-id) 'value)))
 
     (defun my/set-transparency (window-id value)
       "`value` should be an float between 0 and and 1,"
@@ -61,10 +63,16 @@
            xcb:ChangeProperty
            :mode xcb:PropMode:Replace :window window-id
            :property xcb:Atom:_NET_WM_WINDOW_OPACITY :type xcb:Atom:CARDINAL
-           :format 32 :data-len 1 :data (my/int-to-char-array (round (* 4294967295 0.1)))))
+           :format 32 :data-len 1 :data (my/int-to-char-array (round (* 4294967295 value)))))
       (xcb:flush exwm--connection))
 
-    (defun my/get-transparency (window-id))
+    (defun my/get-transparency (window-id)
+      (xcb:+request-unchecked+reply exwm--connection
+          (make-instance
+           xcb:GetProperty
+           :delete 0 :window window-id
+           :property xcb:Atom:_NET_WM_WINDOW_OPACITY :type xcb:Atom:CARDINAL
+           :long-offset 0 :long-length 1)))
 
     (defun my/increase-transparency (window-id))
 

@@ -1409,6 +1409,14 @@
 
   ;(add-hook 'exwm-workspace-switch-hook 'ibuffer)
 #+END_SRC
+*** view-mode
+    #+begin_src emacs-lisp
+      (defun my/ibuffer-view ()
+        (interactive)
+        (ibuffer-visit-buffer)
+        (view-mode))
+      (define-key ibuffer-mode-map (kbd "v") #'my/ibuffer-view)
+    #+end_src
 ** Ace jump
 #+BEGIN_SRC emacs-lisp
 (use-package ace-jump-mode)

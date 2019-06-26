@@ -72,9 +72,9 @@
                           :mode xcb:PropMode:Replace :window window-id
                           :property xcb:Atom:_NET_WM_WINDOW_OPACITY :type xcb:Atom:CARDINAL
                           :format 32 :data-len 1 :data)
-           (xcb:+request))
+           (xcb:+request exwm--connection))
       (xcb:flush exwm--connection))
-  
+
     (defun my/get-transparency (window-id)
       (let ((reply (->> window-id
                         (make-instance xcb:GetProperty :delete 0

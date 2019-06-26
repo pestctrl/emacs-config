@@ -282,7 +282,7 @@
        (if (eq major-mode 'exwm-mode)
            (exwm-input--fake-key ?\C-t)
          (transpose-chars arg)))
-     (define-key *root-map* (kbd "C-b") (lambda () (interactive) (switch-to-buffer nil)))
+     (define-key *root-map* (kbd "C-b") (lambda () (interactive) (switch-to-buffer (other-buffer (current-buffer) 1))))
      (define-key *root-map* (kbd "C-t") 'simulate-C-t)
      (define-key *root-map* (kbd "c") 'multi-term)
      (define-key *root-map* (kbd "C-p") 'exwmx-launch-program)
@@ -309,7 +309,6 @@
      (define-key *window-map* (kbd "h") 'side-left-window)
      (define-key *window-map* (kbd "l") 'side-right-window)
      (define-key *window-map* (kbd "d") 'window-toggle-side-windows)
-     (define-key *window-map* (kbd "b") 'my/exwm-background-window)
 
      (define-prefix-command '*firefox-map*)
      (define-key *firefox-map* (kbd "f") (quickrun-lambda "firefox" "firefox"))
@@ -338,216 +337,18 @@
 
      (define-key *root-map* (kbd "m") '*music-map*)
    #+END_SRC
-** transparency toggle
+** exwm-background
    #+begin_src emacs-lisp
-     (defvar my/current-transparency 85)
-     (setq window-system-default-frame-alist `((x . ((alpha . (,my/current-transparency . 50)) ))))
-
-     (defun my/increase-transparency ()
-       (interactive)
-       (if (>= my/current-transparency 100)
-           (message "Max opacity")
-         (setf my/current-transparency
-               (+ my/current-transparency 5))
-         (set-frame-parameter (selected-frame) 'alpha `(,my/current-transparency . 50))
-         (message (format "%d" my/current-transparency))))
-
-     (defun my/decrease-transparency ()
-       (interactive)
-       (if (<= my/current-transparency 0)
-           (message "Minimum opacity")
-         (setf my/current-transparency
-               (- my/current-transparency 5))
-         (set-frame-parameter (selected-frame) 'alpha `(,my/current-transparency . 50))
-         (message (format "%d" my/current-transparency))))
-
-     (define-key desktop-environment-mode-map (kbd "<S-XF86MonBrightnessDown>") #'my/decrease-transparency)
-     (define-key desktop-environment-mode-map (kbd "<S-XF86MonBrightnessUp>") #'my/increase-transparency)
-
-     (defvar my/viewing-background nil)
-
-     (defun my/toggle-viewing-background ()
-       "Allow for easy switching between 0 transparency and 
-     current transparency, in order to take peeks at the 
-     X window in the background."
-       (interactive)
-       (setq my/viewing-background (not my/viewing-background))
-       (set-frame-parameter (selected-frame) 'alpha `(,(if my/viewing-background 0 my/current-transparency) . 50)))
-
-     (global-set-key (kbd "s-v") #'my/toggle-viewing-background)
-   #+end_src
-
-** Send a window to the back, for viewing while transparent
-   #+begin_src emacs-lisp
-;; Reference material: 
-;; - exwm--id-buffer-alist
-;; - xcb:ConfigureWindow
-;; - exwm-floating--set-floating
-;; - https://www.x.org/releases/X11R7.7/doc/libxcb/tutorial/index.html#winmap
-
-     (defvar my/exwm-background-window -1)
-
-     (defun my/exwm-hide-advice (fun id)
-       (unless (= my/exwm-background-window id)
-         (funcall fun id)))
-
-     (advice-add #'exwm-layout--hide :around #'my/exwm-hide-advice)
-
-     (defun my/xelb-foreground-window (id)
-       (let ((req (make-instance 'xcb:ConfigureWindow
-                                 :value-mask xcb:ConfigWindow:StackMode
-                                 :stack-mode xcb:StackMode:Above
-                                 :window id)))
-         (xcb:+request exwm--connection req)
-         (xcb:flush exwm--connection)))
-
-     (defun my/exwm-show-advice (id &optional window)
-       (when (= my/exwm-background-window id)
-         (setq my/exwm-background-window -1)
-         (my/xelb-foreground-window id)))
-
-     (advice-add #'exwm-layout--show :before #'my/exwm-show-advice)
-
-     (setq my/exwm-background-window -1)
-
-     (defun my/xelb-background-window (id)
-       (let ((req (make-instance 'xcb:ConfigureWindow
-                                 :value-mask xcb:ConfigWindow:StackMode
-                                 :stack-mode xcb:StackMode:Below
-                                 :window id)))
-         (xcb:+request exwm--connection req)
-         (xcb:flush exwm--connection)))
-
-     (defun my/exwm-background-window ()
-       (interactive)
-       (when (not (= my/exwm-background-window -1))
-         (let ((id my/exwm-background-window))
-           (my/xelb-foreground-window id)
-           (exwm-layout--hide id)))
-       (when exwm--id
-         (setq my/exwm-background-window exwm--id)
-         (my/xelb-background-window exwm--id))
-       (ibuffer))
-
-     ;; Weird behavior when un-fullscreening a
-     ;; youtube window that has been backgrounded
-     (defun my/exwm-unset-fullscreen (&optional id)
-       ;; I don't forsee the error happening
-       ;; in a situation where an id is not passed
-       (when (and id
-                  (= id my/exwm-background-window))
-         (let ((buffer (exwm--id->buffer id)))
-           ;; Hmm, there seems to be a bug in exwm, where this doesn't respond properly.
-           ;; Even without my code
-           ;; Fullscreened window, in another workspace, browse-url, can't reset screen for some resaon 
-           ;; (switch-to-buffer buffer)
-           ;; For now, we shall just unbreak it by running the advice
-           (my/exwm-show-advice my/exwm-background-window))))
-     ;; (my/exwm-show-advice my/exwm-background-window)
-
-     ;; Further investigation required to fix this bug.
-     ;; Relevant functions:
-     ;; exwm--on-ClientMessage - This function is called during the browse-url. It will attempt to un-fullscreen the firefox window
-     ;; exwm-layout-unset-fullscreen - This is the function that is dispatched to by the previous function
-
-     (advice-add #'exwm-layout-unset-fullscreen
-                 :before
-                 #'my/exwm-unset-fullscreen)
-   #+end_src
-
-** Send emacs frame to the background
-   #+begin_src emacs-lisp
-     (defvar my/background-workspace nil)
-
-     (defun my/exwm-workspace--set-active (fun frame active)
-       (if (eq frame my/background-workspace)
-         (if (not active)
-             (set-frame-parameter frame 'alpha `(100 . 100))
-           (set-frame-parameter frame 'alpha `(,my/current-transparency . 50))
-           (funcall fun frame active))
-         (funcall fun frame active)))
-
-     (advice-add #'exwm-workspace--set-active :around #'my/exwm-workspace--set-active)
-
-     (defun my/exwm-workspace-background ()
-  "Sets the current  EXWM workspace to be persistent. 
-When you switch away from the workspace, the workspace 
-will become opaque in order to maximize visibility behind
-the other workspace. "
-       (interactive)
-       (setq my/background-workspace
-             (cond ((not (= -1 my/exwm-background-window))
-                    (message "Can't set workspace as background when X window is background")
-                    nil)
-                   ((null my/background-workspace)
-                    (message "Frame is now the background frame!")
-                    (selected-frame))
-                   ((not (eq my/background-workspace (selected-frame)))
-                    (set-frame-parameter my/background-workspace 'alpha `(,my/current-transparency . 50))
-                    (message "Frame is now the background frame!")
-                    (selected-frame))
-                   (t (message "No longer background frame!")
-                      nil))))
-
-     (global-set-key (kbd "s-b") #'my/exwm-workspace-background)
-
-     (advice-add #'exwm-workspace--set-active :around #'my/exwm-workspace--set-active)
-   #+end_src
-** send keyevent to specific window
-   #+begin_src emacs-lisp
-     (defun my/exwm-input--fake-key-to-window (id event)
-       "Fake a key event equivalent to Emacs event EVENT."
-       (let* ((keysym (xcb:keysyms:event->keysym exwm--connection event))
-              keycode)
-         (when (= 0 (car keysym))
-           (user-error "[EXWM] Invalid key: %s" (single-key-description event)))
-         (setq keycode (xcb:keysyms:keysym->keycode exwm--connection
-                                                    (car keysym)))
-         (when (/= 0 keycode)
-           (exwm--log "id=#x%x event=%s keycode" id event keycode)
-           (dolist (class '(xcb:KeyPress xcb:KeyRelease))
-             (xcb:+request exwm--connection
-                 (make-instance 'xcb:SendEvent
-                                :propagate 0 :destination id
-                                :event-mask xcb:EventMask:NoEvent
-                                :event (xcb:marshal
-                                        (make-instance class
-                                                       :detail keycode
-                                                       :time xcb:Time:CurrentTime
-                                                       :root exwm--root :event id
-                                                       :child 0
-                                                       :root-x 0 :root-y 0
-                                                       :event-x 0 :event-y 0
-                                                       :state (cdr keysym)
-                                                       :same-screen 1)
-                                        exwm--connection)))))
-         (xcb:flush exwm--connection)))
-
-     (defun my/exwm-send-key-to-background ()
-       "If an X window is in the background, send a key input to that window. 
-     Not entirely bug-free, due to my lack of understanding of reading and 
-     translating key sequences. Some keys like 'escape' don't always work. 
-     Needs to be fixed"
-       (interactive)
-       (if (= my/exwm-background-window -1)
-           (message "There is no background window...")
-         (let ((event (read-event "Sequence? ")))
-           (my/exwm-input--fake-key-to-window my/exwm-background-window event))))
-
-     (defun my/exwm-send-key-to-background-loop ()
-       "Suffers from same bugs as the other one, but loops until 'q' is pressed."
-       (interactive)
-       (if (= my/exwm-background-window -1)
-           (message "There is no background window...")
-         (let (event)
-           (while (progn
-                    (setq event (read-key "Sequence? "))
-                    (or (not (eq (type-of event) 'integer))
-                        (not (= 113 event))))
-             (my/exwm-input--fake-key-to-window my/exwm-background-window event)))))
-
-     (define-key *root-map* (kbd "k") #'my/exwm-send-key-to-background)
-     (define-key *root-map* (kbd "C-k") #'my/exwm-send-key-to-background-loop)
+     (setq window-system-default-frame-alist `((x . ((alpha . (,my/current-transparency . 50))))))
+     (add-to-list 'load-path "~/.emacs.d/custom/exwm-background/")
+     (require 'exwm-background)
+     (global-set-key (kbd "s-v") #'exwm-background/toggle-viewing-background)
+     (global-set-key (kbd "s-b") #'exwm-background/exwm-background-window)
+     (define-key desktop-environment-mode-map (kbd "<S-XF86MonBrightnessDown>") #'exwm-background/decrease-transparency)
+     (define-key desktop-environment-mode-map (kbd "<S-XF86MonBrightnessUp>") #'exwm-background/increase-transparency)
+     (define-key *window-map* (kbd "b") #'exwm-background/exwm-background-window)
+     (define-key *root-map* (kbd "k") #'exwm-background/exwm-send-key-to-background)
+     (define-key *root-map* (kbd "C-k") #'exwm-background/exwm-send-key-to-background-loop)
    #+end_src
 ** toggle dedicated
    #+begin_src emacs-lisp

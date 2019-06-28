@@ -32,44 +32,4 @@
  (front-context-string . "#+TITLE: Emacs C")
  (rear-context-string)
  (position . 1))
-("org-with-clock macro"
- (filename . "~/.dotfiles/emacs/.emacs.d/elpa/org-plus-contrib-20190204/org-clock.el")
- (front-context-string . "(defmacro org-wi")
- (rear-context-string . "nt-function 1)\n\n")
- (position . 31777))
-("Setting clock start time"
- (filename . "~/.dotfiles/emacs/.emacs.d/elpa/org-plus-contrib-20190204/org-clock.el")
- (front-context-string . "(setq org-clock-")
- (rear-context-string . "um-start)))\n	   ")
- (position . 48907))
-("Setting the clock out time"
- (filename . "~/.dotfiles/emacs/.emacs.d/elpa/org-plus-contrib-20190204/org-clock.el")
- (front-context-string . "(setq org-clock-")
- (rear-context-string . "m remove)\n      ")
- (position . 58424))
-("Resolve clocks entry"
- (filename . "~/.dotfiles/emacs/.emacs.d/elpa/org-plus-contrib-20190204/org-clock.el")
- (front-context-string . " (&optional only")
- (rear-context-string . "g-resolve-clocks")
- (position . 40352))
-("Find the open clocks"
- (filename . "~/.dotfiles/emacs/.emacs.d/elpa/org-plus-contrib-20190204/org-clock.el")
- (front-context-string . "(org-time-string")
- (rear-context-string . "d 1) t)\n		      ")
- (position . 31168))
-("org-capture-last-stored-marker"
- (filename . "~/MEGA/org/2019-05-agenda/sandbox.org")
- (front-context-string . "*** TODO Checkou")
- (rear-context-string . "ial]]\n    :END:\n")
- (position . 111682))
-("org-capture-last-stored"
- (filename . "~/MEGA/org/2019-05-agenda/refile.org")
- (front-context-string . "* STUFF Multiply")
- (rear-context-string . "EWING: \n  :END:\n")
- (position . 18239))
-("org-refile-last-stored"
- (filename . "~/MEGA/org/2019-05-agenda/refile.org")
- (front-context-string . "** STUFF [[https")
- (rear-context-string . "rive]]\n   :END:\n")
- (position . 16449))
 )

@@ -1432,13 +1432,13 @@
    #+begin_src emacs-lisp
    (use-package pophint)
    #+end_src
+* org-mode in separate file
+  #+begin_src emacs-lisp
+    (org-babel-load-file
+     (expand-file-name "config-org-new.org"
+                       user-emacs-directory))
+  #+end_src
 * Tools
-** org-mode
-   #+begin_src emacs-lisp
-     (org-babel-load-file
-      (expand-file-name "config-org-new.org"
-                        user-emacs-directory))
-   #+end_src
 ** Encryption
 #+BEGIN_SRC emacs-lisp
   (require 'epa-file)

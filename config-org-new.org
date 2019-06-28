@@ -862,22 +862,38 @@
         (org-end-of-subtree t t)))
 
 
-    (defvar my/done-projects-flag nil)
+    ;; (defvar my/done-projects-flag nil)
+
+    ;; (defun my/show-done-projects-and-tasks ()
+    ;;   "Show top level leaf of these todos: DONE|CANCELLED|COMPLETE"
+    ;;   (save-restriction
+    ;;     (widen)
+    ;;     (let ((subtree-end (save-excursion (org-end-of-subtree t)))
+    ;;           (next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+    ;;       (if my/done-projects-flag
+    ;;           (let ((ov my/done-projects-flag))
+    ;;             (setq my/done-projects-flag nil)
+    ;;             ov)
+    ;;         (if (member (org-get-todo-state) org-done-keywords)
+    ;;             (progn (setq my/done-projects-flag subtree-end)
+    ;;                    nil)
+    ;;           next-headline)))))
 
     (defun my/show-done-projects-and-tasks ()
       "Show top level leaf of these todos: DONE|CANCELLED|COMPLETE"
       (save-restriction
         (widen)
-        (let ((subtree-end (save-excursion (org-end-of-subtree t)))
-              (next-headline (save-excursion (or (outline-next-heading) (point-max)))))
-          (if my/done-projects-flag
-              (let ((ov my/done-projects-flag))
-                (setq my/done-projects-flag nil)
-                ov)
-            (if (member (org-get-todo-state) org-done-keywords)
-                (progn (setq my/done-projects-flag subtree-end)
-                       nil)
-              next-headline)))))
+        (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+          (unless (and (member (org-get-todo-state) org-done-keywords)
+                       (not (my/is-part-of-subtree)))
+            next-headline))))
+
+    (defun my/show-top-level ()
+      (save-restriction
+        (widen)
+        (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+          (unless (not (my/is-part-of-subtree))
+            next-headline))))
   #+end_src
 * Stuff                                                                 :FIX:
   #+begin_src emacs-lisp#

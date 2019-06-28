@@ -2,7 +2,12 @@
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("exwm-background"
+(("Weekly Review Template"
+ (filename . "~/MEGA/org/templates/weekly-review.org")
+ (front-context-string . "* %(format-time-")
+ (rear-context-string)
+ (position . 1))
+("exwm-background"
  (filename . "~/.emacs.d/custom/exwm-background/")
  (front-context-string . "screenshots\n  -r")
  (rear-context-string . "96 Jun 16 21:35 ")
@@ -59,12 +64,12 @@
  (position . 111682))
 ("org-capture-last-stored"
  (filename . "~/MEGA/org/2019-05-agenda/refile.org")
- (front-context-string . "* STUFF [[https:")
- (rear-context-string . "egogo]]\n  :END:\n")
- (position . 14556))
+ (front-context-string . "* STUFF Multiply")
+ (rear-context-string . "EWING: \n  :END:\n")
+ (position . 18239))
 ("org-refile-last-stored"
- (filename . "~/MEGA/org/2019-05-agenda/dev.org")
- (front-context-string . "** TODO Lonnie's")
- (rear-context-string . "6-23 Sun 13:38]\n")
- (position . 74646))
+ (filename . "~/MEGA/org/2019-05-agenda/refile.org")
+ (front-context-string . "** STUFF [[https")
+ (rear-context-string . "rive]]\n   :END:\n")
+ (position . 16449))
 )

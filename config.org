@@ -339,9 +339,9 @@
    #+END_SRC
 ** exwm-background
    #+begin_src emacs-lisp
-     (setq window-system-default-frame-alist `((x . ((alpha . (,my/current-transparency . 50))))))
      (add-to-list 'load-path "~/.emacs.d/custom/exwm-background/")
      (require 'exwm-background)
+     (setq window-system-default-frame-alist `((x . ((alpha . (,exwm-background/current-transparency . 50))))))
      (global-set-key (kbd "s-v") #'exwm-background/toggle-viewing-background)
      (global-set-key (kbd "s-b") #'exwm-background/exwm-background-window)
      (define-key desktop-environment-mode-map (kbd "<S-XF86MonBrightnessDown>") #'exwm-background/decrease-transparency)

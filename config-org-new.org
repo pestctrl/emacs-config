@@ -1267,6 +1267,8 @@
              (file ,(my/org-file "templates/basic.ledger")) :unnarrowed t :empty-lines 1)
             ("c" "Record Comms Message" entry (file+olp+datetree ,(my/agenda-file "datetree.org"))
              "* TODO %?")
+            ("e" "Emacs config snippet" entry (file+headline "~/.emacs.d/config.org" "New")
+             "* %^{Title}\n   #+begin_src emacs-lisp\n   %?\n   #+end_src")
             ("j" "Journal")
             ("je" "Journal Entry" entry (file+olp+datetree ,(my/org-file "entries/journal.gpg"))
              "* %<%R> %?\n%U\n\n")

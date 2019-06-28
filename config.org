@@ -1350,8 +1350,9 @@
         '(("default"
            ("X-Windows"       (mode . exwm-mode))
            ("Terminals"       (mode . term-mode))
-           ("emacs-config"    (or (filename . ".emacs.d")
-                                  (filename . "emacs-config")))
+           ("emacs-config"    (not (or (mode . magit-status-mode)
+                                       (not (or (filename . ".emacs.d")
+                                                (filename . "emacs-config"))))))
            ("code-aux"        (or (mode . slime-repl-mode)
                                   (mode . magit-status-mode)
                                   (mode . ein:notebooklist-mode)

@@ -1415,7 +1415,8 @@
       (defun my/ibuffer-view ()
         (interactive)
         (ibuffer-visit-buffer)
-        (view-mode))
+        (when (null exwm--id)
+          (view-mode)))
       (define-key ibuffer-mode-map (kbd "v") #'my/ibuffer-view)
     #+end_src
 ** Ace jump

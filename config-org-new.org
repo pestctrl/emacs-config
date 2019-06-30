@@ -1279,7 +1279,9 @@
               ("C" "Look at clocking" agenda ""
                ((org-agenda-span 'day)
                 (org-agenda-start-with-log-mode '(closed clock))
-                (org-agenda-clockreport-mode t))))))
+                (org-agenda-clockreport-mode t)))
+              ("r" "Reviews" tags "+LEVEL=3+ITEM={Review}"
+               ((org-agenda-files '(,(my/org-file "entries/reviews.gpg"))))))))
 
   #+end_src
 * Checkbox hack

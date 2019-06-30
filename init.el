@@ -39,3 +39,4 @@
                    user-emacs-directory))
 
 (setq my/finished t)
+;; Testing pull from windows

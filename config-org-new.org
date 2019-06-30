@@ -314,8 +314,7 @@
   (global-set-key (kbd "<f5>") 'org-agenda)
   (global-set-key (kbd "C-x C-o") 'org-agenda)
   (define-key org-agenda-mode-map (kbd "a") 'org-agenda)
-  (define-key org-agenda-mode-map (kbd "H") 'org-agenda-follow-mode)
-
+  
   (setq org-src-window-setup 'current-window)
 
   (setq org-list-allow-alphabetical t)  
@@ -327,6 +326,89 @@
       (if (string= "yes" (completing-read "Are you sure you want to use that keybinding? " '("yes" "no")))
           (kill-whole-line arg)
         (org-cut-subtree))))
+  #+end_src
+* Different kinds of follow
+  #+begin_src emacs-lisp
+    (define-prefix-command '*org-agenda-follow-map*)
+
+    (define-key org-agenda-mode-map (kbd "F") '*org-agenda-follow-map*)
+
+    (define-key *org-agenda-follow-map* (kbd "SPC") 'my/org-agenda-default-follow)
+    (define-key *org-agenda-follow-map* (kbd "p") 'my/org-agenda-project-follow)
+    (define-key *org-agenda-follow-map* (kbd "r") 'my/org-agenda-review-follow)
+
+
+    (defun advice-unadvice (sym)
+      "Remove all advices from symbol SYM."
+      (interactive "aFunction symbol: ")
+      (advice-mapc (lambda (advice _props) (advice-remove sym advice)) sym))
+
+    (defun my/org-agenda-default-follow ()
+      (interactive)
+      (advice-unadvice 'org-agenda-do-context-action)
+      (org-agenda-follow-mode))
+
+    (defun my/org-agenda-project-follow ()
+      (interactive)
+      (advice-add 'org-agenda-do-context-action
+                  :override
+                  'my/org-agenda-do-context-action-for-project)
+      (org-agenda-follow-mode))
+
+    (defun my/org-agenda-review-follow ()
+      (interactive)
+      (advice-add 'org-agenda-do-context-action
+                  :override
+                  'my/org-agenda-do-context-action-for-review)
+      (org-agenda-follow-mode))
+
+    (defun my/org-agenda-show-project (&optional full-entry)
+      "Display the Org file which contains the item at point.
+        With prefix argument FULL-ENTRY, make the entire entry visible
+        if it was hidden in the outline."
+      (interactive "P")
+      (let ((win (selected-window)))
+        (org-agenda-goto t)
+        (org-narrow-to-subtree)
+        (org-flag-subtree t)
+        (call-interactively 'outline-show-branches)
+        (org-hide-archived-subtrees (point-min) (point-max))
+        (select-window win)))
+
+    (defun my/org-agenda-do-context-action-for-project ()
+      "Show outline path and, maybe, follow mode window."
+      (let ((m (org-get-at-bol 'org-marker)))
+        (when (and (markerp m) (marker-buffer m))
+          (and org-agenda-follow-mode
+               (if org-agenda-follow-indirect
+                   (org-agenda-tree-to-indirect-buffer nil)
+                 (my/org-agenda-show-project)))
+          (and org-agenda-show-outline-path
+               (org-with-point-at m (org-display-outline-path t))))))
+
+    (defun my/org-agenda-show-review (&optional full-entry)
+      "Display the Org file which contains the item at point.
+        With prefix argument FULL-ENTRY, make the entire entry visible
+        if it was hidden in the outline."
+      (interactive "P")
+      (let ((win (selected-window)))
+        (org-agenda-goto t)
+        (org-narrow-to-subtree)
+        (org-flag-subtree t)
+        (call-interactively 'org-show-entry)
+        (org-hide-archived-subtrees (point-min) (point-max))
+        (select-window win)))
+
+    (defun my/org-agenda-do-context-action-for-review ()
+      "Show outline path and, maybe, follow mode window."
+      (let ((m (org-get-at-bol 'org-marker)))
+        (when (and (markerp m) (marker-buffer m))
+          (and org-agenda-follow-mode
+               (if org-agenda-follow-indirect
+                   (org-agenda-tree-to-indirect-buffer nil)
+                 (my/org-agenda-show-review)))
+          (and org-agenda-show-outline-path
+               (org-with-point-at m (org-display-outline-path t))))))
   #+end_src
 
 * My Template

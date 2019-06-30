@@ -652,36 +652,6 @@ https://github.com/org-trello/org-trello/issues/258
                 :after
                 #'auto-commit-agenda)
   #+end_src
-* modify org agenda follow mode
-  #+begin_src emacs-lisp
-    (defun my/org-agenda-show (&optional full-entry)
-      "Display the Org file which contains the item at point.
-    With prefix argument FULL-ENTRY, make the entire entry visible
-    if it was hidden in the outline."
-      (interactive "P")
-      (let ((win (selected-window)))
-        (org-agenda-goto t)
-        (org-narrow-to-subtree)
-        (org-flag-subtree t)
-        (call-interactively 'outline-show-branches)
-        (org-hide-archived-subtrees (point-min) (point-max))
-        (select-window win)))
-
-    (defun my/org-agenda-do-context-action ()
-      "Show outline path and, maybe, follow mode window."
-      (let ((m (org-get-at-bol 'org-marker)))
-        (when (and (markerp m) (marker-buffer m))
-          (and org-agenda-follow-mode
-               (if org-agenda-follow-indirect
-                   (org-agenda-tree-to-indirect-buffer nil)
-                 (my/org-agenda-show)))
-          (and org-agenda-show-outline-path
-               (org-with-point-at m (org-display-outline-path t))))))
-
-    (advice-add #'org-agenda-do-context-action
-                :override
-                #'my/org-agenda-do-context-action)
-  #+end_src
 * ivy-occur take up whole buffer
   #+begin_src emacs-lisp
     (defun my/ivy-occur (&rest _)

@@ -2692,7 +2692,7 @@
       ;; Disable automatic movement of point by default
       (add-hook 'subed-mode-hook 'subed-disable-sync-point-to-player)
       ;; Break lines automatically while typing
-      (add-hook 'subed-mode-hook 'turn-on-auto-fill))
+      (add-hook 'subed-mode-hook 'turn-on-auto-fill)
       ;; Break lines at 50 characters
       (add-hook 'subed-mode-hook (lambda () (setq-local fill-column 50)))
     #+end_src

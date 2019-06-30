@@ -42,4 +42,4 @@
 	url = https://github.com/ginqi7/leetcode-emacs
 [submodule "custom/subed"]
 	path = custom/subed
-	url = http://github.com/rndusr/subed
+	url = https://github.com/rndusr/subed

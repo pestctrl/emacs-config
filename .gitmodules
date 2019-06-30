@@ -43,3 +43,6 @@
 [submodule "custom/subed"]
 	path = custom/subed
 	url = https://github.com/rndusr/subed
+[submodule "custom/exwm-background"]
+	path = custom/exwm-background
+	url = https://github.com/pestctrl/exwm-background

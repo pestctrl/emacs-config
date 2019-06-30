@@ -2680,6 +2680,19 @@
 
       (global-set-key (kbd "C-x r m") #'my/bookmark-set)
     #+end_src
+** Subtitles editing 
+    #+begin_src emacs-lisp
+      (add-to-list 'load-path "~/.emacs.d/custom/subed/subed")
+
+      (require 'subed)
+
+      ;; Disable automatic movement of point by default
+      (add-hook 'subed-mode-hook 'subed-disable-sync-point-to-player)
+      ;; Break lines automatically while typing
+      (add-hook 'subed-mode-hook 'turn-on-auto-fill))
+      ;; Break lines at 50 characters
+      (add-hook 'subed-mode-hook (lambda () (setq-local fill-column 50)))
+    #+end_src
 * Broken
 ** mu4e
 *** General config

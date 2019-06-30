@@ -2669,11 +2669,13 @@
         (let* ((buffer (find-file-noselect "~/.emacs.d/my-bookmarks"))
                (bookmark (car bookmark-alist))
                (bookmark-name (car bookmark))
-               (bookmark-file (file-name-nondirectory (buffer-file-name))))
+               (bookmark-file (and (buffer-file-name)
+                                   (file-name-nondirectory (buffer-file-name)))))
           (with-current-buffer buffer
             (goto-char (point-min))
             (when (not (or (save-excursion (re-search-forward bookmark-name))
-                           (save-excursion (re-search-forward bookmark-file))))
+                           (and bookmark-file
+                                (save-excursion (re-search-forward bookmark-file)))))
               (re-search-forward "(")
               (insert (pp bookmark))
               (save-buffer)

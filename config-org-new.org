@@ -1374,70 +1374,73 @@
 * Custom Journal
 ** Attempt 3
 #+BEGIN_SRC emacs-lisp
-    (defvar yearly-theme "Thought")
+  (defvar yearly-theme "Thought")
 
-    (defun completed-tags-search (start-date end-date)
-      (let ((org-agenda-overriding-header "* Log")
-            (tag-search (concat (format "TODO=\"DONE\"&CLOSED>=\"<%s>\"&CLOSED<=\"<%s>\""
-                                        start-date
-                                        end-date))))
-        (org-tags-view nil tag-search)))
+  (defun completed-tags-search (start-date end-date)
+    (let ((org-agenda-overriding-header "* Log")
+          (tag-search (concat (format "TODO=\"DONE\"&CLOSED>=\"<%s>\"&CLOSED<=\"<%s>\""
+                                      start-date
+                                      end-date))))
+      (org-tags-view nil tag-search)))
 
-    (defun get-tasks-from (start-date end-date)
-      (let (string)
-        (save-window-excursion
-          (completed-tags-search start-date end-date)
-          (setq string (mapconcat 'identity
-                                  (mapcar (lambda (a)
-                                            (concat "***" a))
-                                          (butlast (cdr (split-string (buffer-string) "\n")) 1)) 
-                                  "\n"))
-          (kill-buffer))
-        string))
+  (defun get-tasks-from (start-date end-date)
+    (let (string)
+      (save-window-excursion
+        (completed-tags-search start-date end-date)
+        (setq string (mapconcat 'identity
+                                (mapcar (lambda (a)
+                                          (concat "***" a))
+                                        (butlast (cdr (split-string (buffer-string) "\n")) 1)) 
+                                "\n"))
+        (kill-buffer))
+      string))
 
-    (defun get-journal-entries-from (start-date end-date)
-      (let ((string "")
-            match)
-        (save-window-excursion
-          (switch-to-buffer (find-file "~/MEGA/org/entries/journal.gpg"))
-          (goto-char (point-min))
-          (while (setq match 
-                       (re-search-forward
-                        "^\\*\\*\\* \\(2[0-9]\\{3\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\) \\w+$" nil t))
-            (let ((date (match-string 1)))
-              (when (and (org-time< start-date date)
-                         (or (not end-date) (org-time< date end-date)))
-                (org-narrow-to-subtree)
-                (setq string (concat string "\n" (buffer-string)))
-                (widen))))
-          (not-modified)
-          (kill-buffer))
-        string))
+  (defun get-journal-entries-from (start-date end-date)
+    (let ((string "")
+          match)
+      (save-window-excursion
+        (switch-to-buffer (find-file "~/MEGA/org/entries/journal.gpg"))
+        (goto-char (point-min))
+        (while (setq match 
+                     (re-search-forward
+                      "^\\*\\*\\* \\(2[0-9]\\{3\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\) \\w+$" nil t))
+          (let ((date (match-string 1)))
+            (when (and (org-time< start-date date)
+                       (or (not end-date) (org-time< date end-date)))
+              (org-narrow-to-subtree)
+              (setq string (concat string "\n" (buffer-string)))
+              (widen))))
+        (not-modified)
+        (kill-buffer))
+      string))
 
-    (defun weekly-review-file ()
-      (set-buffer
-       (org-capture-target-buffer (format "~/MEGA/org/entries/review/%s/Year of %s, Week %s.org"
-                                          (format-time-string "%Y")
-                                          yearly-theme
-                                          (format-time-string "%V")))))
+  (defun weekly-review-file ()
+    (set-buffer
+     (org-capture-target-buffer (format "~/MEGA/org/entries/review/%s/Year of %s, Week %s.org"
+                                        (format-time-string "%Y")
+                                        yearly-theme
+                                        (format-time-string "%V")))))
 
-    (defun make-up-review-file ()
-      (let* ((date (org-read-date))
-             (week (number-to-string
-                    (org-days-to-iso-week
-                     (org-time-string-to-absolute date)))))
-        (org-capture-put :start-date date)
-        (org-capture-put :start-week week)
-        (set-buffer 
-         (org-capture-target-buffer
-          (format "~/MEGA/org/entries/review/%s/Year of %s, Week %s-%s.org"
-                  (format-time-string "%Y")
-                  yearly-theme
-                  week
-                  (format-time-string "%V"))))))
+  (defun make-up-review-file ()
+    (let* ((date (org-read-date))
+           (week (number-to-string
+                  (org-days-to-iso-week
+                   (org-time-string-to-absolute date)))))
+      (org-capture-put :start-date date)
+      (org-capture-put :start-week week)
+      (set-buffer 
+       (org-capture-target-buffer
+        (format "~/MEGA/org/entries/review/%s/Year of %s, Week %s-%s.org"
+                (format-time-string "%Y")
+                yearly-theme
+                week
+                (format-time-string "%V"))))))
 
-    (defun output-date ()
-      (when my/review-date-old
+  (defun output-date ()
+    (let ((desc (plist-get org-capture-plist :description)))
+      (when (and (not org-note-abort)
+                 my/review-date-old
+                 (string= desc "Review"))
         (save-window-excursion
           (switch-to-buffer (find-file "~/.emacs.d/last-review.el"))
           (erase-buffer)
@@ -1445,49 +1448,48 @@
           (save-buffer)
           (kill-buffer)
           "")
-          )
-      (setq my/review-date-old nil))
-    (add-hook 'org-capture-before-finalize-hook 'output-date)
+        (setq my/review-date-old nil))))
+  (add-hook 'org-capture-after-finalize-hook 'output-date)
 
-    (defun get-last-review-date ()
-      (save-window-excursion
-        (set-buffer (find-file "~/.emacs.d/last-review.el"))
-        (let ((res (buffer-string)))
-          (kill-buffer)
-          res)))
+  (defun get-last-review-date ()
+    (save-window-excursion
+      (set-buffer (find-file "~/.emacs.d/last-review.el"))
+      (let ((res (buffer-string)))
+        (kill-buffer)
+        res)))
 
-    (defun setup-make-up-review ()
-      (let* ((date (org-read-date))
-             (week (number-to-string
-                    (org-days-to-iso-week
-                     (org-time-string-to-absolute date)))))
-        (org-capture-put :start-date date)
-        (org-capture-put :start-week week)))
+  (defun setup-make-up-review ()
+    (let* ((date (org-read-date))
+           (week (number-to-string
+                  (org-days-to-iso-week
+                   (org-time-string-to-absolute date)))))
+      (org-capture-put :start-date date)
+      (org-capture-put :start-week week)))
 
 
-    (defvar my/review-date-old nil)
-    (defun setup-automatic-review ()
-      (let* ((date (org-read-date nil nil (get-last-review-date)))
-             (week (format "%02d" 
-                    (org-days-to-iso-week
-                     (org-time-string-to-absolute date)))))
-        (setq my/review-date-old date)
-        (setq my/review-visibility-level 6)
-        (org-capture-put :start-date date)
-        (org-capture-put :start-week week)
-        (goto-char (point-min))
-        (re-search-forward "Reviews")))
+  (defvar my/review-date-old nil)
+  (defun setup-automatic-review ()
+    (let* ((date (org-read-date nil nil (get-last-review-date)))
+           (week (format "%02d" 
+                  (org-days-to-iso-week
+                   (org-time-string-to-absolute date)))))
+      (setq my/review-date-old date)
+      (setq my/review-visibility-level 6)
+      (org-capture-put :start-date date)
+      (org-capture-put :start-week week)
+      (goto-char (point-min))
+      (re-search-forward "Reviews")))
 
-    (defvar my/review-visibility-level nil)
+  (defvar my/review-visibility-level nil)
 
-    (defun my/review-set-visibility ()
-      (when my/review-visibility-level
-        (outline-hide-sublevels my/review-visibility-level)
-        (org-show-entry)
-        (setq my/review-visibility-level nil)))
+  (defun my/review-set-visibility ()
+    (when my/review-visibility-level
+      (outline-hide-sublevels my/review-visibility-level)
+      (org-show-entry)
+      (setq my/review-visibility-level nil)))
 
-    (add-hook 'org-capture-mode-hook
-              'my/review-set-visibility)
+  (add-hook 'org-capture-mode-hook
+            'my/review-set-visibility)
 
 
 #+END_SRC

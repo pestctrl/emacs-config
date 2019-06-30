@@ -2,7 +2,12 @@
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("Weekly Review Template"
+(("templates"
+ (filename . "~/MEGA/org/templates/")
+ (front-context-string . "basic.ledger\n  -")
+ (rear-context-string . "67 Jun 28 18:03 ")
+ (position . 183))
+("Weekly Review Template"
  (filename . "~/MEGA/org/templates/weekly-review.org")
  (front-context-string . "* %(format-time-")
  (rear-context-string)

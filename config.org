@@ -2659,6 +2659,13 @@
                      (apply output-func (list (format "%d: %s\n" val key))))
                    h)))
     #+end_src
+** bookmark+
+   #+begin_src emacs-lisp
+     (add-to-list 'load-path
+                  "~/.emacs.d/custom/bookmark-plus")
+
+     (require 'bookmark+)
+   #+end_src
 ** Custom bookmarks location 
     #+begin_src emacs-lisp
       (bookmark-load "~/.emacs.d/my-bookmarks")
@@ -2681,7 +2688,7 @@
               (save-buffer)
               (kill-buffer)))))
 
-      (global-set-key (kbd "C-x r m") #'my/bookmark-set)
+      ;; (global-set-key (kbd "C-x r m") #'my/bookmark-set)
     #+end_src
 ** Subtitles editing 
     #+begin_src emacs-lisp

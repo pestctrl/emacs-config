@@ -1563,23 +1563,23 @@
 ** Elfeed
 *** Setup feeds
  #+BEGIN_SRC emacs-lisp
-     ;; Load elfeed-org
-     (use-package elfeed)
-     (use-package elfeed-org)
-
-     (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org"))
-     (elfeed-org)
-     (setq-default elfeed-search-filter "@6-months-ago +unread -youtube")
-     (define-key elfeed-search-mode-map "U" 'elfeed-search-fetch-visible)
-     (define-key elfeed-search-mode-map "Y" (lambda ()
-                          (interactive)
-                          (elfeed-search-set-filter "+youtube +unread")))
-     (define-key elfeed-search-mode-map "A" (lambda ()
-                          (interactive)
                           (elfeed-search-set-filter "@6-months-ago +unread -youtube")))
-     (define-key elfeed-search-mode-map "h" (lambda ()
-                          (interactive)
-                          (elfeed-search-set-filter nil)))
+   ;; Load elfeed-org
+   (use-package elfeed)
+   (use-package elfeed-org)
+
+   (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org"))
+   (elfeed-org)
+   (setq-default elfeed-search-filter "@6-months-ago +unread -youtube")
+   (define-key elfeed-search-mode-map "U" 'elfeed-search-fetch-visible)
+   (define-key elfeed-search-mode-map "Y" (lambda ()
+                                            (interactive)
+                                            (elfeed-search-set-filter "+youtube +unread")))
+   (define-key elfeed-search-mode-map "N" (lambda ()
+                                            (interactive)
+   (define-key elfeed-search-mode-map "h" (lambda ()
+                                            (interactive)
+                                            (elfeed-search-set-filter nil)))
  #+END_SRC
 *** youtube-dl
   #+begin_src emacs-lisp

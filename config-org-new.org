@@ -1254,7 +1254,7 @@
                          (org-super-agenda-groups '((:name "Overdue" :and (:deadline past :log nil ))
                                                     (:name "Upcoming" :deadline future)
                                                     (:name "Should do" :and (:scheduled past :log nil ))
-                                                    (:name "Today" :time-grid t 
+                                                    (:name "Today" :time-grid t
                                                            :and (:not (:and (:not (:scheduled today)
                                                                                   :not (:deadline today)))))))))))
               ("D" "Done Tasks" todo "DONE|CANCELLED|COMPLETE|ABANDON"
@@ -1268,7 +1268,7 @@
                ((org-agenda-skip-function 'my/show-next-tasks-and-standalone-tasks)
                 (org-agenda-overriding-header "Next Tasks list")
                 (org-tags-match-list-sublevels t)
-                (org-agenda-sorting-strategy '(deadline-up))))               
+                (org-agenda-sorting-strategy '(deadline-up))))
               ("L" "Leaf Task List" tags-todo "-REFILE-HOLD-WAIT"
                ((org-agenda-skip-function 'my/show-leaf-tasks)
                 (org-tags-match-list-sublevels 'indented)
@@ -1282,7 +1282,6 @@
                 (org-agenda-clockreport-mode t)))
               ("r" "Reviews" tags "+LEVEL=3+ITEM={Review}"
                ((org-agenda-files '(,(my/org-file "entries/reviews.gpg"))))))))
-
   #+end_src
 * Checkbox hack
   #+BEGIN_SRC emacs-lisp

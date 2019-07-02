@@ -722,6 +722,8 @@
      (defun my/active-seq (file point)
        (my/active-sequential-project file point))
 
+     ;;(defun my/active-act)
+
      (defun my/get-project-type (file point &optional ambiguous-to-stuck)
        (save-excursion
          (when (my/is-a-project)

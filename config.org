@@ -2703,6 +2703,11 @@
       ;; Break lines at 50 characters
       (add-hook 'subed-mode-hook (lambda () (setq-local fill-column 50)))
     #+end_src
+** docker
+    #+begin_src emacs-lisp
+    (use-package docker)
+    (global-set-key (kbd "C-x C-d") #'docker)
+    #+end_src
 * Broken
 ** mu4e
 *** General config

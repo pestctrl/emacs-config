@@ -1374,7 +1374,7 @@
             ("p" "Protocol" entry (file ,(my/agenda-file "refile.org"))
              "* STUFF %^{Title}\nSource: %U, %c\n #+BEGIN_QUOTE\n%i\n#+END_QUOTE\n\n\n%?")
             ("L" "Protocol Link" entry (file ,(my/agenda-file "refile.org"))
-             "* STUFF %? [[%:link][%:description]] \n  :PROPERTIES:\n  :CREATED: %U\n  :VIEWING: %a\n  :END:")))
+             "* STUFF %? [[%:link][%:description]]\n  :PROPERTIES:\n  :CREATED: %U\n  :VIEWING: %a\n  :URL: %:link\n  :END:")))
   #+end_src
 * Custom Journal
 ** Attempt 3
@@ -1498,6 +1498,17 @@
 
 
 #+END_SRC
+* prompt for automatic org-board
+  #+begin_src emacs-lisp
+    (defun my/org-board-prompt ()
+      (let ((desc (plist-get org-capture-plist :description)))
+        (when (and (not org-note-abort)
+                   (string= desc "Protocol Link")
+                   (y-or-n-p "Do you want to archive the page? "))
+          (call-interactively #'org-board-archive))))
+
+    (add-hook 'org-capture-before-finalize-hook 'my/org-board-prompt)
+  #+end_src
 * Parallel org-tags-views
 * empty lines
   #+begin_src emacs-lisp

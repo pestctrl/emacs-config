@@ -1563,7 +1563,6 @@
 ** Elfeed
 *** Setup feeds
  #+BEGIN_SRC emacs-lisp
-                          (elfeed-search-set-filter "@6-months-ago +unread -youtube")))
    ;; Load elfeed-org
    (use-package elfeed)
    (use-package elfeed-org)
@@ -1577,6 +1576,7 @@
                                             (elfeed-search-set-filter "+youtube +unread")))
    (define-key elfeed-search-mode-map "N" (lambda ()
                                             (interactive)
+                                            (elfeed-search-set-filter "@1-day-ago +unread -youtube")))
    (define-key elfeed-search-mode-map "h" (lambda ()
                                             (interactive)
                                             (elfeed-search-set-filter nil)))

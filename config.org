@@ -2663,7 +2663,7 @@
      (require 'bookmark+)
    #+end_src
 ** Custom bookmarks location 
-    #+begin_src emacs-lisp
+    #+begin_src emacs-lisp#
       (bookmark-load "~/.emacs.d/my-bookmarks")
 
       (defun my/bookmark-set (&optional name no-overwrite)

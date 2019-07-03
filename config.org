@@ -626,7 +626,7 @@
 #+END_SRC
 
 ** Startup
-
+   
 *** Emacs server, startup programs, wallpaper
 #+BEGIN_SRC emacs-lisp
   (add-hook 'exwm-init-hook 'server-start)

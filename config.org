@@ -1431,10 +1431,6 @@
    (global-set-key (kbd "M-f") 'forward-to-word)
    (global-set-key (kbd "M-F") 'forward-word)
    #+end_src
-** poshint
-   #+begin_src emacs-lisp
-   (use-package pophint)
-   #+end_src
 * org-mode in separate file
   #+begin_src emacs-lisp
     (org-babel-load-file
@@ -2787,6 +2783,10 @@
      (setq org-wunderlist-file  "~/MEGA/org/agenda/Wunderlist.org"
            org-wunderlist-dir "~/MEGA/org/agenda/org-wunderlist/")
    #+END_SRC
+** poshint
+   #+begin_src emacs-lisp#
+   (use-package pophint)
+   #+end_src
 * Disabled
 ** nnreddit
  #+BEGIN_SRC emacs-lisp#

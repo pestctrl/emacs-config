@@ -7,7 +7,7 @@
      (require 'org-fstree)
    #+END_SRC
 ** org-bullets
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp#
 (use-package org-bullets)
 (when (not (eq system-type 'windows-nt))
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))

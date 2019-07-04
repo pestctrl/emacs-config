@@ -2163,13 +2163,20 @@
     #+end_src
 *** multiple-cursors
     #+begin_src emacs-lisp
-    (use-package multiple-cursors)
+      (use-package multiple-cursors)
 
-    (global-set-key (kbd "C->") 'mc/mark-next-like-this)
-    (global-set-key (kbd "C-M->") 'mc/skip-to-next-like-this)
-    (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-    (global-set-key (kbd "C-M-<") 'mc/skip-to-previous-like-this)
-    (global-set-key (kbd "C-c C->") 'mc/mark-all-like-this)
+      (define-prefix-command '*multiple-cursors-map*)
+      (define-key *multiple-cursors-map* (kbd "a") 'mc/mark-all-like-this)
+
+      (defhydra mc-interactive (*multiple-cursors-map* "i")
+	"For those looping commands"
+	("n" mc/mark-next-like-this)
+	("p" mc/mark-previous-like-this)
+	("s" mc/skip-to-next-like-this)
+	("S" mc/skip-to-previous-like-this)
+	("q" nil))
+
+      (global-set-key (kbd "C-c m") '*multiple-cursors-map*)
     #+end_src
 *** Setup-dev-environment
     #+begin_src emacs-lisp

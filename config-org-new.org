@@ -972,11 +972,19 @@
                        (not (my/is-part-of-subtree)))
             next-headline))))
 
+    (defun my/parent-is-eternal ()
+      (save-excursion
+        (and (not (= 1 (org-current-level)))
+             (progn
+               (org-up-heading-safe)
+               (string= (org-get-todo-state) "ETERNAL")))))
+
     (defun my/show-top-level ()
       (save-restriction
         (widen)
         (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
-          (unless (not (my/is-part-of-subtree))
+          (unless (or (not (my/is-part-of-subtree))
+                      (my/parent-is-eternal))
             next-headline))))
   #+end_src
 * Stuff                                                                 :FIX:

@@ -1694,3 +1694,7 @@
      (setq org-now-location
            nil)
    #+end_src
+* org-use-speed-commands
+  #+begin_src emacs-lisp
+    (setq org-use-speed-commands t)
+  #+end_src

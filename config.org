@@ -345,6 +345,7 @@
    #+begin_src emacs-lisp
      (add-to-list 'load-path "~/.emacs.d/custom/exwm-background/")
      (require 'exwm-background)
+     (define-key *window-map* (kbd "t") 'exwm-background/window-transparency-hydra/body)
      (setq window-system-default-frame-alist `((x . ((alpha . (,exwm-background/current-transparency . 50))))))
      (global-set-key (kbd "s-v") #'exwm-background/toggle-viewing-background)
      (global-set-key (kbd "s-b") #'exwm-background/exwm-background-window)

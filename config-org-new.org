@@ -1159,6 +1159,9 @@
                                                    :and (:not (:and (:not (:scheduled today)
                                                                      :not (:deadline today)))))))))))
 
+    (defconst my/non-agenda-files
+      '("~/MEGA/org/entries/reviews.gpg" "~/MEGA/org/2019-05-agenda/datetree.org" "~/MEGA/org/2019-05-agenda/reference.org" "~/MEGA/org/entries/journal.gpg"))
+
     (let* ((prod-tag "+time")
            (dev-tag "+dev")
            (sandbox-tag "+sandbox"))
@@ -1273,7 +1276,8 @@
                                                                                   :not (:deadline today)))))))))))
               ("D" "Done Tasks" todo "DONE|CANCELLED|COMPLETE|ABANDON"
                ((org-agenda-overriding-header "Done Tasks")
-                (org-agenda-skip-function 'my/show-top-level)))
+                (org-agenda-skip-function 'my/show-top-level)
+                (org-agenda-files ',(remove-if (lambda (x) (member x my/non-agenda-files)) org-agenda-files))))
               ("A" "Archive trees" tags "ARCHIVE"
                ((org-tags-match-list-sublevels nil)
                 (org-agenda-skip-archived-trees nil)

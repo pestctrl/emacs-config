@@ -2714,6 +2714,21 @@
     (use-package docker)
     (global-set-key (kbd "C-x C-d") #'docker)
     #+end_src
+** notmuch
+   #+begin_src emacs-lisp
+     (use-package notmuch)
+
+     (custom-set-faces 
+      `(notmuch-search-unread-face ((t (:foreground "white")))))
+
+     (setq notmuch-saved-searches
+           '((:name "inbox" :query "tag:inbox" :key "i")
+             (:name "unread" :query "tag:unread" :key "u")
+             (:name "flagged" :query "tag:flagged" :key "f")
+             (:name "sent" :query "tag:sent" :key "t")
+             (:name "drafts" :query "tag:draft" :key "d")
+             (:name "all mail" :query "*" :key "a")))
+   #+end_src
 * Broken
 ** mu4e
 *** General config

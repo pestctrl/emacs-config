@@ -490,6 +490,7 @@
   (setq i3-string "Xephyr -br -ac -noreset -resizeable -screen 1920x1080 :8 & sleep 1s; DISPLAY=:8 i3")
   (setq xfce4-string "Xephyr -br -ac -noreset -resizeable -screen 1920x1080 :8 & sleep 1s; DISPLAY=:8 xfce4-session")
   (setq kde-string "Xephyr -br -ac -noreset -resizeable -screen 1920x1080 :8 & sleep 1s; DISPLAY=:8 startkde")
+  (setq kde+exwm-string "Xephyr -br -ac -noreset -resizeable -screen 1920x1080 :8 & sleep 1s; DISPLAY=:8 KDEWM=/usr/bin/emacs startkde")
   (defvar exwm-startup-programs
     '("megasync"
       "deadd-notification-center"
@@ -511,6 +512,10 @@
     (launch-program xfce4-string))
 
   (defun launch-kde ()
+    (interactive)
+    (launch-program kde-string))
+
+  (defun launch-kde+emacs ()
     (interactive)
     (launch-program kde-string))
 

@@ -823,6 +823,29 @@
          (lisp-interaction-mode)
          (insert (substitute-command-keys initial-scratch-message))))
    #+end_src
+** uniq emacs
+    #+begin_src emacs-lisp
+      (defun case-fold-string= (a b)
+        (eq t (compare-strings a nil nil b nil nil t)))
+      (defun case-fold-string-hash (a)
+        (sxhash (upcase a)))
+
+      (define-hash-table-test 'case-fold
+        'case-fold-string= 'case-fold-string-hash)
+
+      (defun uniq (beg end)
+        "Print counts of strings in region."
+        (interactive "r")
+        (let ((h (make-hash-table :test 'case-fold))
+              (lst (split-string (buffer-substring-no-properties beg end) "\n"
+                                 'omit-nulls " "))
+              (output-func (if current-prefix-arg 'insert 'princ)))
+          (dolist (str lst)
+            (puthash str (1+ (gethash str h 0)) h))
+          (maphash (lambda (key val)
+                     (apply output-func (list (format "%d: %s\n" val key))))
+                   h)))
+    #+end_src
 * Look and feel
 ** Theme
  #+BEGIN_SRC emacs-lisp
@@ -1821,6 +1844,110 @@
    #+begin_src emacs-lisp
    ;; (push "watch" eshell-visual-command)
    #+end_src
+** Ledger mode
+   #+BEGIN_SRC emacs-lisp
+     (use-package ledger-mode
+       :mode "\\.dat\\'")
+     (setq ledger-reports
+           '(("expmonth" "%(binary) -f %(ledger-file) -M reg Expenses")
+             ("owedmom" "%(binary) -f %(ledger-file) reg Liabilities")
+             ("progress" "%(binary) -f %(ledger-file) reg Assets Equity Liabilities")
+             ("cleared" "%(binary) -f %(ledger-file) cleared")
+             ("food" "%(binary) -f %(ledger-file) --add-budget reg Assets")
+             (#("bal" 0 1
+                (idx 1))
+              "%(binary) -f %(ledger-file) bal")
+             (#("reg" 0 1
+                (idx 4))
+              "%(binary) -f %(ledger-file) reg")
+             (#("payee" 0 1
+                (idx 3))
+              "%(binary) -f %(ledger-file) reg @%(payee)")
+             (#("account" 0 1
+                (idx 0))
+              "%(binary) -f %(ledger-file) reg %(account)")))
+
+     (setq dynamic-reports
+           '(("budgetcal" "%(binary) -f ~/MEGA/org/entries/food.ledger --daily --add-budget reg Expenses")))
+
+     (defun ledger-dynamic-report ()
+       (interactive)
+       (let* ((ledger-reports dynamic-reports)
+              (report-name (ledger-report-read-name)))
+         (ledger-report report-name nil)))
+   #+END_SRC
+** Gnus
+   #+BEGIN_SRC emacs-lisp
+     (add-hook 'gnus-group-mode-hook 'gnus-topic-mode)
+
+     (setq user-mail-address "bensonchu457@gmail.com"
+           user-full-name "Benson Chu")
+
+     (setq gnus-select-method
+           '(nnimap "gmail"
+                    (nnimap-address "imap.gmail.com")
+                    (nnimap-server-port "imaps")
+                    (nnimap-stream ssl)
+                    (nnimap-authinfo-file "~/.emacs.d/secrets/.authinfo.gpg")))
+
+     (setq gnus-secondary-select-methods
+           '((nnimap "work"
+                   (nnimap-address "outlook.office365.com")
+                   (nnimap-server-port "imaps")
+                   (nnimap-stream ssl)
+                   (nnimap-authinfo-file "~/.emacs.d/secrets/.authinfo.gpg"))))
+
+     (setq smtpmail-smtp-server "smtp.gmail.com"
+           smtpmail-smtp-service 587)
+
+     (setq gnus-mark-article-hook nil)
+
+     (gnus-add-configuration
+      '(article
+        (horizontal 1.0
+                    (vertical 25
+                              (group 1.0))
+                    (vertical 1.0
+                              (summary 0.25 point)
+                              (article 1.0)))))
+
+     (gnus-add-configuration
+      '(summary
+        (horizontal 1.0
+                    (vertical 25
+                              (group 1.0))
+                    (vertical 1.0
+                              (summary 1.0 point)))))
+
+
+     ;;(setq gnus-summary-line-format "%U%R%z%I%(%[%4L: %-23,23f%]%) %s\n")
+     (setq gnus-summary-line-format "%d %U%R%z%I%(%[%4L: %-23,23f%]%) %s\n")
+   #+END_SRC
+** notmuch
+   #+begin_src emacs-lisp
+     (use-package notmuch)
+
+     (custom-set-faces 
+      `(notmuch-search-unread-face ((t (:foreground "white")))))
+
+     (setq notmuch-search-oldest-first nil
+           notmuch-saved-searches
+           '((:name "inbox" :query "tag:inbox" :key "i")
+             (:name "work" :query "tag:work" :key "w")
+             (:name "recruiting" :query "tag:recruiting" :key "r")
+             (:name "unread" :query "tag:unread" :key "u")
+             (:name "flagged" :query "tag:flagged" :key "f")
+             (:name "sent" :query "tag:sent" :key "t")
+             (:name "drafts" :query "tag:draft" :key "d")
+             (:name "all mail" :query "*" :key "a")))
+
+     (defun my/notmuch-delete-mail ()
+       (interactive)
+       (notmuch-search-tag '("+deleted")))
+
+     (define-key 'notmuch-search-mode-map (kbd "d") #'my/notmuch-delete-mail)
+
+   #+end_src
 * Programming
 ** Autocompletion
 #+BEGIN_SRC emacs-lisp
@@ -2269,85 +2396,6 @@
    (add-hook 'css-mode-hook 'skewer-css-mode)
    (add-hook 'html-mode-hook 'skewer-html-mode)
    #+END_SRC
-** Gnus
-   #+BEGIN_SRC emacs-lisp
-     (add-hook 'gnus-group-mode-hook 'gnus-topic-mode)
-
-     (setq user-mail-address "bensonchu457@gmail.com"
-           user-full-name "Benson Chu")
-
-     (setq gnus-select-method
-           '(nnimap "gmail"
-                    (nnimap-address "imap.gmail.com")
-                    (nnimap-server-port "imaps")
-                    (nnimap-stream ssl)
-                    (nnimap-authinfo-file "~/.emacs.d/secrets/.authinfo.gpg")))
-
-     (setq gnus-secondary-select-methods
-           '((nnimap "work"
-                   (nnimap-address "outlook.office365.com")
-                   (nnimap-server-port "imaps")
-                   (nnimap-stream ssl)
-                   (nnimap-authinfo-file "~/.emacs.d/secrets/.authinfo.gpg"))))
-
-     (setq smtpmail-smtp-server "smtp.gmail.com"
-           smtpmail-smtp-service 587)
-
-     (setq gnus-mark-article-hook nil)
-
-     (gnus-add-configuration
-      '(article
-        (horizontal 1.0
-                    (vertical 25
-                              (group 1.0))
-                    (vertical 1.0
-                              (summary 0.25 point)
-                              (article 1.0)))))
-
-     (gnus-add-configuration
-      '(summary
-        (horizontal 1.0
-                    (vertical 25
-                              (group 1.0))
-                    (vertical 1.0
-                              (summary 1.0 point)))))
-
-
-     ;;(setq gnus-summary-line-format "%U%R%z%I%(%[%4L: %-23,23f%]%) %s\n")
-     (setq gnus-summary-line-format "%d %U%R%z%I%(%[%4L: %-23,23f%]%) %s\n")
-   #+END_SRC
-** Ledger mode
-   #+BEGIN_SRC emacs-lisp
-     (use-package ledger-mode
-       :mode "\\.dat\\'")
-     (setq ledger-reports
-           '(("expmonth" "%(binary) -f %(ledger-file) -M reg Expenses")
-             ("owedmom" "%(binary) -f %(ledger-file) reg Liabilities")
-             ("progress" "%(binary) -f %(ledger-file) reg Assets Equity Liabilities")
-             ("cleared" "%(binary) -f %(ledger-file) cleared")
-             ("food" "%(binary) -f %(ledger-file) --add-budget reg Assets")
-             (#("bal" 0 1
-                (idx 1))
-              "%(binary) -f %(ledger-file) bal")
-             (#("reg" 0 1
-                (idx 4))
-              "%(binary) -f %(ledger-file) reg")
-             (#("payee" 0 1
-                (idx 3))
-              "%(binary) -f %(ledger-file) reg @%(payee)")
-             (#("account" 0 1
-                (idx 0))
-              "%(binary) -f %(ledger-file) reg %(account)")))
-
-     (setq dynamic-reports
-           '(("budgetcal" "%(binary) -f ~/MEGA/org/entries/food.ledger --daily --add-budget reg Expenses")))
-
-     (defun ledger-dynamic-report ()
-       (interactive)
-       (let* ((ledger-reports dynamic-reports)
-              (report-name (ledger-report-read-name)))
-         (ledger-report report-name nil)))
-   #+END_SRC
 ** ediff
    #+BEGIN_SRC emacs-lisp
    (setq ediff-window-setup-function 'ediff-setup-windows-plain)
@@ -2647,29 +2695,6 @@
                            8
                          num)))
    #+end_src
-** uniq emacs
-    #+begin_src emacs-lisp
-      (defun case-fold-string= (a b)
-        (eq t (compare-strings a nil nil b nil nil t)))
-      (defun case-fold-string-hash (a)
-        (sxhash (upcase a)))
-
-      (define-hash-table-test 'case-fold
-        'case-fold-string= 'case-fold-string-hash)
-
-      (defun uniq (beg end)
-        "Print counts of strings in region."
-        (interactive "r")
-        (let ((h (make-hash-table :test 'case-fold))
-              (lst (split-string (buffer-substring-no-properties beg end) "\n"
-                                 'omit-nulls " "))
-              (output-func (if current-prefix-arg 'insert 'princ)))
-          (dolist (str lst)
-            (puthash str (1+ (gethash str h 0)) h))
-          (maphash (lambda (key val)
-                     (apply output-func (list (format "%d: %s\n" val key))))
-                   h)))
-    #+end_src
 ** bookmark+
    #+begin_src emacs-lisp
      (add-to-list 'load-path
@@ -2719,31 +2744,6 @@
     (use-package docker)
     (global-set-key (kbd "C-x C-d") #'docker)
     #+end_src
-** notmuch
-   #+begin_src emacs-lisp
-     (use-package notmuch)
-
-     (custom-set-faces 
-      `(notmuch-search-unread-face ((t (:foreground "white")))))
-
-     (setq notmuch-search-oldest-first nil
-           notmuch-saved-searches
-           '((:name "inbox" :query "tag:inbox" :key "i")
-             (:name "work" :query "tag:work" :key "w")
-             (:name "recruiting" :query "tag:recruiting" :key "r")
-             (:name "unread" :query "tag:unread" :key "u")
-             (:name "flagged" :query "tag:flagged" :key "f")
-             (:name "sent" :query "tag:sent" :key "t")
-             (:name "drafts" :query "tag:draft" :key "d")
-             (:name "all mail" :query "*" :key "a")))
-
-     (defun my/notmuch-delete-mail ()
-       (interactive)
-       (notmuch-search-tag '("+deleted")))
-
-     (define-key 'notmuch-search-mode-map (kbd "d") #'my/notmuch-delete-mail)
-
-   #+end_src
 * Broken
 ** mu4e
 *** General config

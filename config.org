@@ -743,6 +743,272 @@
    #+begin_src emacs-lisp
      (use-package exwm-edit)
    #+end_src
+** Floating windows don't need that many faces ^_^
+   #+begin_src emacs-lisp
+     (defun my/frame-dont-copy-faces (frame &optional parameters)
+       "Initialize the frame-local faces of FRAME.
+     Calculate the face definitions using the face specs, custom theme
+     settings, X resources, and `face-new-frame-defaults'.
+     Finally, apply any relevant face attributes found amongst the
+     frame parameters in PARAMETERS."
+       ;; The `reverse' is so that `default' goes first.
+       ;; (dolist (face (nreverse (face-list)))
+       ;;   (condition-case ()
+       ;;   (progn
+       ;;     ;; Initialize faces from face spec and custom theme.
+       ;;     (face-spec-recalc face frame)
+       ;;     ;; Apply attributes specified by face-new-frame-defaults
+       ;;     (internal-merge-in-global-face face frame))
+       ;;     ;; Don't let invalid specs prevent frame creation.
+       ;;     (error nil)))
+
+       ;; Apply attributes specified by frame parameters.
+       (let ((face-params '((foreground-color default :foreground)
+                    (background-color default :background)
+                            (font default :font)
+                    (border-color border :background)
+                    (cursor-color cursor :background)
+                    (scroll-bar-foreground scroll-bar :foreground)
+                    (scroll-bar-background scroll-bar :background)
+                    (mouse-color mouse :background))))
+         (dolist (param face-params)
+           (let* ((param-name (nth 0 param))
+              (value (cdr (assq param-name parameters))))
+         (if value
+             (set-face-attribute (nth 1 param) frame
+                                 (nth 2 param) value))))))
+
+     (defun my/exwm-floating--set-floating (id)
+       "Make window ID floating."
+       (let ((window (get-buffer-window (exwm--id->buffer id))))
+         (when window
+           ;; Hide the non-floating X window first.
+           (set-window-buffer window (other-buffer nil t))))
+       (let* ((original-frame (buffer-local-value 'exwm--frame
+                                                  (exwm--id->buffer id)))
+              ;; Create new frame
+              (frame (with-current-buffer
+                         (or (get-buffer "*scratch*")
+                             (progn
+                               (set-buffer-major-mode
+                                (get-buffer-create "*scratch*"))
+                               (get-buffer "*scratch*")))
+                       (prog2
+                           (advice-add 'face-set-after-frame-default :override 'my/frame-dont-copy-faces)
+                           (make-frame
+                            `((minibuffer . ,(minibuffer-window exwm--frame))
+                              (left . ,(* window-min-width -100))
+                              (top . ,(* window-min-height -100))
+                              (width . ,window-min-width)
+                              (height . ,window-min-height)
+                              (unsplittable . t)))
+                         (advice-remove 'face-set-after-frame-default 'my/frame-dont-copy-faces)))) ;and fix the size later
+              (outer-id (string-to-number (frame-parameter frame 'outer-window-id)))
+              (window-id (string-to-number (frame-parameter frame 'window-id)))
+              (frame-container (xcb:generate-id exwm--connection))
+              (window (frame-first-window frame)) ;and it's the only window
+              (x (slot-value exwm--geometry 'x))
+              (y (slot-value exwm--geometry 'y))
+              (width (slot-value exwm--geometry 'width))
+              (height (slot-value exwm--geometry 'height)))
+         (exwm--log "Floating geometry (original): %dx%d%+d%+d" width height x y)
+         ;; Save frame parameters.
+         (set-frame-parameter frame 'exwm-outer-id outer-id)
+         (set-frame-parameter frame 'exwm-id window-id)
+         (set-frame-parameter frame 'exwm-container frame-container)
+         ;; Fix illegal parameters
+         ;; FIXME: check normal hints restrictions
+         (let* ((workarea (elt exwm-workspace--workareas
+                               (exwm-workspace--position original-frame)))
+                (x* (aref workarea 0))
+                (y* (aref workarea 1))
+                (width* (aref workarea 2))
+                (height* (aref workarea 3)))
+           ;; Center floating windows
+           (when (and (or (= x 0) (= x x*))
+                      (or (= y 0) (= y y*)))
+             (let ((buffer (exwm--id->buffer exwm-transient-for))
+                   window edges)
+               (when (and buffer (setq window (get-buffer-window buffer)))
+                 (setq edges (window-inside-absolute-pixel-edges window))
+                 (unless (and (<= width (- (elt edges 2) (elt edges 0)))
+                              (<= height (- (elt edges 3) (elt edges 1))))
+                   (setq edges nil)))
+               (if edges
+                   ;; Put at the center of leading window
+                   (setq x (+ x* (/ (- (elt edges 2) (elt edges 0) width) 2))
+                         y (+ y* (/ (- (elt edges 3) (elt edges 1) height) 2)))
+                 ;; Put at the center of screen
+                 (setq x (/ (- width* width) 2)
+                       y (/ (- height* height) 2)))))
+           (if (> width width*)
+               ;; Too wide
+               (progn (setq x x*
+                            width width*))
+             ;; Invalid width
+             (when (= 0 width) (setq width (/ width* 2)))
+             ;; Make sure at least half of the window is visible
+             (unless (< x* (+ x (/ width 2)) (+ x* width*))
+               (setq x (+ x* (/ (- width* width) 2)))))
+           (if (> height height*)
+               ;; Too tall
+               (setq y y*
+                     height height*)
+             ;; Invalid height
+             (when (= 0 height) (setq height (/ height* 2)))
+             ;; Make sure at least half of the window is visible
+             (unless (< y* (+ y (/ height 2)) (+ y* height*))
+               (setq y (+ y* (/ (- height* height) 2)))))
+           ;; The geometry can be overridden by user options.
+           (let ((x** (plist-get exwm--configurations 'x))
+                 (y** (plist-get exwm--configurations 'y))
+                 (width** (plist-get exwm--configurations 'width))
+                 (height** (plist-get exwm--configurations 'height)))
+             (if (integerp x**)
+                 (setq x (+ x* x**))
+               (when (and (floatp x**)
+                          (>= 1 x** 0))
+                 (setq x (+ x* (round (* x** width*))))))
+             (if (integerp y**)
+                 (setq y (+ y* y**))
+               (when (and (floatp y**)
+                          (>= 1 y** 0))
+                 (setq y (+ y* (round (* y** height*))))))
+             (if (integerp width**)
+                 (setq width width**)
+               (when (and (floatp width**)
+                          (> 1 width** 0))
+                 (setq width (max 1 (round (* width** width*))))))
+             (if (integerp height**)
+                 (setq height height**)
+               (when (and (floatp height**)
+                          (> 1 height** 0))
+                 (setq height (max 1 (round (* height** height*))))))))
+         (exwm--set-geometry id x y nil nil)
+         (xcb:flush exwm--connection)
+         (exwm--log "Floating geometry (corrected): %dx%d%+d%+d" width height x y)
+         ;; Fit frame to client
+         ;; It seems we have to make the frame invisible in order to resize it
+         ;; timely.
+         ;; The frame will be made visible by `select-frame-set-input-focus'.
+         (make-frame-invisible frame)
+         (let* ((edges (window-inside-pixel-edges window))
+                (frame-width (+ width (- (frame-pixel-width frame)
+                                         (- (elt edges 2) (elt edges 0)))))
+                (frame-height (+ height (- (frame-pixel-height frame)
+                                           (- (elt edges 3) (elt edges 1)))))
+                (floating-mode-line (plist-get exwm--configurations
+                                               'floating-mode-line))
+                (floating-header-line (plist-get exwm--configurations
+                                                 'floating-header-line)))
+           (if floating-mode-line
+               (setq exwm--mode-line-format (or exwm--mode-line-format
+                                                mode-line-format)
+                     mode-line-format floating-mode-line)
+             (if (and (not (plist-member exwm--configurations 'floating-mode-line))
+                      exwm--mwm-hints-decorations)
+                 (when exwm--mode-line-format
+                   (setq mode-line-format exwm--mode-line-format))
+               ;; The mode-line need to be hidden in floating mode.
+               (setq frame-height (- frame-height (window-mode-line-height
+                                                   (frame-root-window frame)))
+                     exwm--mode-line-format (or exwm--mode-line-format
+                                                mode-line-format)
+                     mode-line-format nil)))
+           (if floating-header-line
+               (setq header-line-format floating-header-line)
+             (if (and (not (plist-member exwm--configurations
+                                         'floating-header-line))
+                      exwm--mwm-hints-decorations)
+                 (setq header-line-format nil)
+               ;; The header-line need to be hidden in floating header.
+               (setq frame-height (- frame-height (window-header-line-height
+                                                   (frame-root-window frame)))
+                     header-line-format nil)))
+           (set-frame-size frame frame-width frame-height t)
+           ;; Create the frame container as the parent of the frame.
+           (xcb:+request exwm--connection
+               (make-instance 'xcb:CreateWindow
+                              :depth 0
+                              :wid frame-container
+                              :parent exwm--root
+                              :x (- x (elt edges 0))
+                              :y (- y (elt edges 1))
+                              :width width
+                              :height height
+                              :border-width
+                              (with-current-buffer (exwm--id->buffer id)
+                                (let ((border-witdh (plist-get exwm--configurations
+                                                               'border-width)))
+                                  (if (and (integerp border-witdh)
+                                           (>= border-witdh 0))
+                                      border-witdh
+                                    exwm-floating-border-width)))
+                              :class xcb:WindowClass:InputOutput
+                              :visual 0
+                              :value-mask (logior xcb:CW:BackPixmap
+                                                  (if exwm-floating--border-pixel
+                                                      xcb:CW:BorderPixel 0)
+                                                  xcb:CW:OverrideRedirect
+                                                  (if exwm-floating--border-colormap
+                                                      xcb:CW:Colormap 0))
+                              :background-pixmap xcb:BackPixmap:ParentRelative
+                              :border-pixel exwm-floating--border-pixel
+                              :override-redirect 1
+                              :colormap exwm-floating--border-colormap))
+           (xcb:+request exwm--connection
+               (make-instance 'xcb:ewmh:set-_NET_WM_NAME
+                              :window frame-container
+                              :data
+                              (format "EXWM floating frame container for 0x%x" id)))
+           ;; Map it.
+           (xcb:+request exwm--connection
+               (make-instance 'xcb:MapWindow :window frame-container))
+           ;; Put the X window right above this frame container.
+           (xcb:+request exwm--connection
+               (make-instance 'xcb:ConfigureWindow
+                              :window id
+                              :value-mask (logior xcb:ConfigWindow:Sibling
+                                                  xcb:ConfigWindow:StackMode)
+                              :sibling frame-container
+                              :stack-mode xcb:StackMode:Above)))
+         ;; Reparent this frame to its container.
+         (xcb:+request exwm--connection
+             (make-instance 'xcb:ReparentWindow
+                            :window outer-id :parent frame-container :x 0 :y 0))
+         (exwm-floating--set-allowed-actions id nil)
+         (xcb:flush exwm--connection)
+         ;; Set window/buffer
+         (with-current-buffer (exwm--id->buffer id)
+           (setq window-size-fixed exwm--fixed-size
+                 exwm--floating-frame frame)
+           ;; Do the refresh manually.
+           (remove-hook 'window-configuration-change-hook #'exwm-layout--refresh)
+           (set-window-buffer window (current-buffer)) ;this changes current buffer
+           (add-hook 'window-configuration-change-hook #'exwm-layout--refresh)
+           (set-window-dedicated-p window t)
+           (exwm-layout--show id window))
+         (with-current-buffer (exwm--id->buffer id)
+           (if (exwm-layout--iconic-state-p id)
+               ;; Hide iconic floating X windows.
+               (exwm-floating-hide)
+             (with-selected-frame exwm--frame
+               (exwm-layout--refresh)))
+           (select-frame-set-input-focus frame))
+         ;; FIXME: Strangely, the Emacs frame can move itself at this point
+         ;;        when there are left/top struts set.  Force resetting its
+         ;;        position seems working, but it'd better to figure out why.
+         ;; FIXME: This also happens in another case (#220) where the cause is
+         ;;        still unclear.
+         (exwm--set-geometry outer-id 0 0 nil nil)
+         (xcb:flush exwm--connection))
+       (with-current-buffer (exwm--id->buffer id)
+         (run-hooks 'exwm-floating-setup-hook))
+       ;; Redraw the frame.
+       (redisplay))
+
+     (advice-add #'exwm-floating--set-floating :override #'my/exwm-floating--set-floating)
+   #+end_src
 * Emacs
 ** Reload Config
  #+BEGIN_SRC emacs-lisp

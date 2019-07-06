@@ -2199,20 +2199,27 @@
      (setq notmuch-search-oldest-first nil
            notmuch-saved-searches
            '((:name "inbox" :query "tag:inbox" :key "i")
+             (:name "inbox today" :query "date:yesterday.. tag:inbox" :key "t")
              (:name "work" :query "tag:work" :key "w")
+             (:name "mailing lists" :query "tag:mlist" :key "m")
              (:name "recruiting" :query "tag:recruiting" :key "r")
              (:name "unread" :query "tag:unread" :key "u")
              (:name "flagged" :query "tag:flagged" :key "f")
-             (:name "sent" :query "tag:sent" :key "t")
+             (:name "sent" :query "tag:sent" :key "s")
              (:name "drafts" :query "tag:draft" :key "d")
              (:name "all mail" :query "*" :key "a")))
 
      (defun my/notmuch-delete-mail ()
        (interactive)
-       (notmuch-search-tag '("+deleted")))
+       (notmuch-search-tag '("+deleted"))
+       (next-line))
+
+     (defun my/undelete-mail ()
+       (interactive)
+       (notmuch-search-tag '("-deleted")))
 
      (define-key 'notmuch-search-mode-map (kbd "d") #'my/notmuch-delete-mail)
-
+     (define-key 'notmuch-search-mode-map (kbd "u") #'my/undelete-mail)
    #+end_src
 * Programming
 ** Autocompletion

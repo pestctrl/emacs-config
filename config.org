@@ -2726,13 +2726,23 @@
      (custom-set-faces 
       `(notmuch-search-unread-face ((t (:foreground "white")))))
 
-     (setq notmuch-saved-searches
+     (setq notmuch-search-oldest-first nil
+           notmuch-saved-searches
            '((:name "inbox" :query "tag:inbox" :key "i")
+             (:name "work" :query "tag:work" :key "w")
+             (:name "recruiting" :query "tag:recruiting" :key "r")
              (:name "unread" :query "tag:unread" :key "u")
              (:name "flagged" :query "tag:flagged" :key "f")
              (:name "sent" :query "tag:sent" :key "t")
              (:name "drafts" :query "tag:draft" :key "d")
              (:name "all mail" :query "*" :key "a")))
+
+     (defun my/notmuch-delete-mail ()
+       (interactive)
+       (notmuch-search-tag '("+deleted")))
+
+     (define-key 'notmuch-search-mode-map (kbd "d") #'my/notmuch-delete-mail)
+
    #+end_src
 * Broken
 ** mu4e

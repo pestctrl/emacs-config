@@ -6,7 +6,11 @@
 /recentf
 /request
 /elpa
-/ido.last
+/quelpa
+/ido.last*
+/hackernews
+/eshell
+/cnfonts
 /smex-items
 /tramp
 /backups

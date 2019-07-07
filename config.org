@@ -2217,7 +2217,8 @@
      (use-package notmuch)
 
      (custom-set-faces 
-      `(notmuch-search-unread-face ((t (:foreground "white")))))
+      '(notmuch-search-unread-face ((t (:foreground "white"))))
+      '(notmuch-message-summary-face ((t (:background "steel blue" :foreground "snow")))))
 
      (setq notmuch-search-oldest-first nil
            notmuch-saved-searches

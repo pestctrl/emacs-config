@@ -2228,21 +2228,47 @@
              (:name "recruiting" :query "tag:recruiting" :key "r")
              (:name "unread" :query "tag:unread" :key "u")
              (:name "flagged" :query "tag:flagged" :key "f")
-             (:name "sent" :query "tag:sent" :key "s")
-             (:name "drafts" :query "tag:draft" :key "d")
+             ;; (:name "sent" :query "tag:sent" :key "s")
+             ;; (:name "drafts" :query "tag:draft" :key "d")
              (:name "all mail" :query "*" :key "a")))
+
+     (setq mail-specify-envelope-from t
+           message-sendmail-envelope-from 'header
+           mail-envelope-from 'header)
+
+     (defun my/choose-email-address-and-send ()
+       (interactive)
+       (let ((resp (completing-read "Which email? " '("bchu3@cougarnet.uh.edu" "bensonchu457@gmail.com") nil t "^")))
+         (setq smtpmail-smtp-server
+               (if (string= resp "bensonchu457@gmail.com")
+                   "smtp.gmail.com"
+                 "smtp.office365.com"))
+         (notmuch-mua-send-and-exit)))
+
+     (define-key notmuch-message-mode-map (kbd "C-c C-c") #'my/choose-email-address-and-send)
 
      (defun my/notmuch-delete-mail ()
        (interactive)
        (notmuch-search-tag '("+deleted"))
-       (next-line))
+       (notmuch-search-next-thread))
 
      (defun my/undelete-mail ()
        (interactive)
        (notmuch-search-tag '("-deleted")))
 
+     (defun my/recruiting-mail ()
+       (interactive)
+       (notmuch-search-tag '("-inbox" "+recruiting"))
+       (notmuch-search-next-thread))
+
      (define-key 'notmuch-search-mode-map (kbd "d") #'my/notmuch-delete-mail)
      (define-key 'notmuch-search-mode-map (kbd "u") #'my/undelete-mail)
+     (define-key 'notmuch-search-mode-map (kbd "f") #'my/recruiting-mail)
+     (define-key 'notmuch-search-mode-map (kbd "<mouse-1>") nil)
+
+     (add-to-list 'notmuch-tagging-keys
+                  '("r" ("-inbox" "+recruiting") "Recruiting"))
+   #+end_src
 ** mu4e
    #+BEGIN_SRC emacs-lisp
      (require 'mu4e)

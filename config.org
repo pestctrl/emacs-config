@@ -2142,6 +2142,21 @@
               (report-name (ledger-report-read-name)))
          (ledger-report report-name nil)))
    #+END_SRC
+* Email
+** general-options
+   #+begin_src emacs-lisp
+     (setq user-mail-address "bensonchu457@gmail.com"
+           user-full-name "Benson Chu")
+
+     (setq smtpmail-smtp-server "smtp.gmail.com"
+           smtpmail-smtp-service 587
+           send-mail-function 'smtpmail-send-it
+           message-send-mail-function 'smtpmail-send-it)
+
+     ;; (setq smtpmail-smtp-server "smtp.office365.com"
+     ;;       smtpmail-smtp-service 587
+     ;;       smtpmail-local-domain nil)
+   #+end_src
 ** Gnus
    #+BEGIN_SRC emacs-lisp
      (add-hook 'gnus-group-mode-hook 'gnus-topic-mode)
@@ -2149,22 +2164,30 @@
      (setq user-mail-address "bensonchu457@gmail.com"
            user-full-name "Benson Chu")
 
-     (setq gnus-select-method
-           '(nnimap "gmail"
-                    (nnimap-address "imap.gmail.com")
-                    (nnimap-server-port "imaps")
-                    (nnimap-stream ssl)
-                    (nnimap-authinfo-file "~/.emacs.d/secrets/.authinfo.gpg")))
+     (setq gnus-select-method 
+           '(nnmaildir "gmail" 
+                       (directory "~/.offlineimap_mail/personal")
+                       (directory-files nnheader-directory-files-safe) 
+                       (get-new-mail nil)))
 
      (setq gnus-secondary-select-methods
-           '((nnimap "work"
-                   (nnimap-address "outlook.office365.com")
-                   (nnimap-server-port "imaps")
-                   (nnimap-stream ssl)
-                   (nnimap-authinfo-file "~/.emacs.d/secrets/.authinfo.gpg"))))
+           '((nnmaildir "work" 
+                        (directory "~/.offlineimap_mail/work")
+                        (directory-files nnheader-directory-files-safe) 
+                        (get-new-mail nil))))
 
-     (setq smtpmail-smtp-server "smtp.gmail.com"
-           smtpmail-smtp-service 587)
+     ;; (setq gnus-select-method
+     ;;       '(nnimap "Local"
+     ;;                (nnimap-address "localhost")
+     ;;                (nnimap-stream network)
+     ;;                (nnimap-server-port 143)))
+
+     ;; (setq gnus-select-method
+     ;;       '(nnimap "gmail"
+     ;;                (nnimap-address "imap.gmail.com")
+     ;;                (nnimap-server-port "imaps")
+     ;;                (nnimap-stream ssl)
+     ;;                (nnimap-authinfo-file "~/.emacs.d/secrets/.authinfo.gpg")))
 
      (setq gnus-mark-article-hook nil)
 
@@ -2220,6 +2243,63 @@
 
      (define-key 'notmuch-search-mode-map (kbd "d") #'my/notmuch-delete-mail)
      (define-key 'notmuch-search-mode-map (kbd "u") #'my/undelete-mail)
+** mu4e
+   #+BEGIN_SRC emacs-lisp
+     (require 'mu4e)
+
+     (add-to-list 'mu4e-view-actions
+                  '("ViewInBrowser" . mu4e-action-view-in-browser) t)
+
+     ;; (global-set-key (kbd "<f8>") 'mu4e)
+
+     (setq mu4e-maildir "~/.offlineimap_mail"
+           mu4e-sent-folder   "/personal/[Gmail].Sent Mail"
+           mu4e-drafts-folder "/personal/[Gmail].Drafts"
+           mu4e-refile-folder "/personal/[Gmail].Archive")
+
+     (defvar my-mu4e-account-alist
+       '(("Gmail"
+          (mu4e-sent-folder "/work/Sent Mail")
+          (mu4e-drafts-folder "/Gmail/[Gmail].Drafts")
+          (mu4e-refile-folder "/Gmail/[Gmail].Archive")
+          (user-mail-address "bensonchu457@gmail.com")
+          (smtpmail-default-smtp-server "smtp.gmail.com")
+          (smtpmail-smtp-user "bensonchu457")
+          (smtpmail-smtp-server "smtp.gmail.com"))
+         ("work"
+          (mu4e-sent-folder "/work/Sent")
+          (mu4e-drafts-folder "/work/Drafts")
+          (mu4e-refile-folder "/work/Archive")
+          (user-mail-address "bchu3@uh.edu")
+          (smtpmail-default-smtp-server "smtp.account2.example.com")
+          (smtpmail-smtp-user "bchu3")
+          (smtpmail-smtp-server "smtp.account2.example.com"))))
+
+
+
+     ;;(defun my-mu4e-set-account ()
+     ;;  "Set the account for composing a message."
+     ;;  (let* ((account
+     ;;    (if mu4e-compose-parent-message
+     ;;        (let ((maildir (mu4e-message-field mu4e-compose-parent-message :maildir)))
+     ;;      (string-match "/\\(.*?\\)/" maildir)
+     ;;      (match-string 1 maildir))
+     ;;      (completing-read (format "Compose with account: (%s) "
+     ;;                   (mapconcat #'(lambda (var) (car var))
+     ;;                      my-mu4e-account-alist "/"))
+     ;;               (mapcar #'(lambda (var) (car var)) my-mu4e-account-alist)
+     ;;               nil t nil nil (caar my-mu4e-account-alist))))
+     ;;   (account-vars (cdr (assoc account my-mu4e-account-alist))))
+     ;;    (if account-vars
+     ;;        (mapc #'(lambda (var)
+     ;;        (set (car var) (cadr var)))
+     ;;        account-vars)
+     ;;      (error "No email account found"))))
+
+     ;;  (add-hook 'mu4e~headers-jump-to-maildir 'my-mu4e-set-account)
+
+
+   #+END_SRC
    #+end_src
 * Programming
 ** Autocompletion
@@ -3018,67 +3098,8 @@
     (global-set-key (kbd "C-x C-d") #'docker)
     #+end_src
 * Broken
-** mu4e
-*** General config
- #+BEGIN_SRC emacs-lisp#
- (require 'mu4e)
-
- (add-to-list 'mu4e-view-actions
-   '("ViewInBrowser" . mu4e-action-view-in-browser) t)
-   (global-set-key (kbd "<f8>") 'mu4e)
- #+END_SRC
-*** Multiple accounts
-    #+BEGIN_SRC emacs-lisp
-    (setq mu4e-sent-folder "/Gmail/[Gmail].Sent Mail"
-    mu4e-drafts-folder "/Gmail/[Gmail].Drafts"
-    mu4e-refile-folder "/Gmail/[Gmail].Archive"
-    user-mail-address "bensonchu457@gmail.com"
-    smtpmail-default-smtp-server "smtp.gmail.com"
-    smtpmail-smtp-server "smtp.gmail.com")
-   
-    (defvar my-mu4e-account-alist
-    '(("Gmail"
-    (mu4e-sent-folder "/work/Sent Mail")
-    (mu4e-drafts-folder "/Gmail/[Gmail].Drafts")
-    (mu4e-refile-folder "/Gmail/[Gmail].Archive")
-    (user-mail-address "bensonchu457@gmail.com")
-    (smtpmail-default-smtp-server "smtp.gmail.com")
-    (smtpmail-smtp-user "bensonchu457")
-    (smtpmail-smtp-server "smtp.gmail.com"))
-    ("work"
-    (mu4e-sent-folder "/work/Sent")
-    (mu4e-drafts-folder "/work/Drafts")
-    (mu4e-refile-folder "/work/Archive")
-    (user-mail-address "bchu3@uh.edu")
-    (smtpmail-default-smtp-server "smtp.account2.example.com")
-    (smtpmail-smtp-user "bchu3")
-    (smtpmail-smtp-server "smtp.account2.example.com"))))
 
 
-
- ;(defun my-mu4e-set-account ()
- ;  "Set the account for composing a message."
- ;  (let* ((account
- ;    (if mu4e-compose-parent-message
- ;        (let ((maildir (mu4e-message-field mu4e-compose-parent-message :maildir)))
- ;      (string-match "/\\(.*?\\)/" maildir)
- ;      (match-string 1 maildir))
- ;      (completing-read (format "Compose with account: (%s) "
- ;                   (mapconcat #'(lambda (var) (car var))
- ;                      my-mu4e-account-alist "/"))
- ;               (mapcar #'(lambda (var) (car var)) my-mu4e-account-alist)
- ;               nil t nil nil (caar my-mu4e-account-alist))))
- ;   (account-vars (cdr (assoc account my-mu4e-account-alist))))
- ;    (if account-vars
- ;        (mapc #'(lambda (var)
- ;        (set (car var) (cadr var)))
- ;        account-vars)
- ;      (error "No email account found"))))
-
- ;  (add-hook 'mu4e~headers-jump-to-maildir 'my-mu4e-set-account)
-
-
-    #+END_SRC
 ** Wunderlist
    #+BEGIN_SRC emacs-lisp#
      (use-package org-wunderlist)

@@ -2326,6 +2326,25 @@
 
 
    #+END_SRC
+** html view firefox no copiousoutput
+   #+begin_src emacs-lisp
+     (add-to-list 'mailcap-mime-data
+                  '("text"
+                    ("html"
+                     (viewer . "/usr/bin/xdg-open %s ")
+                     (type . "text/html"))
+                    ("plain"
+                     (viewer . view-mode)
+                     (type . "text/plain"))
+                    ("plain"
+                     (viewer . fundamental-mode)
+                     (type . "text/plain"))
+                    ("enriched"
+                     (viewer . enriched-decode)
+                     (type . "text/enriched"))
+                    ("dns"
+                     (viewer . dns-mode)
+                     (type . "text/dns"))))
    #+end_src
 * Programming
 ** Autocompletion

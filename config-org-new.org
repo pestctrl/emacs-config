@@ -1710,3 +1710,15 @@
   #+begin_src emacs-lisp
     (setq org-use-speed-commands t)
   #+end_src
+* new headline set property
+  #+begin_src emacs-lisp
+    (defun my/org-set-created-property (&rest args)
+      (let ((fname (expand-file-name (buffer-file-name))))
+        (when (remove-if-not (lambda (x) (string= fname (expand-file-name x))) org-agenda-files)
+          (let ((ts (format-time-string "[%Y-%m-%d %a %H:%S]")))
+            (org-set-property "CREATED" ts)))))
+
+    (advice-add #'org-insert-heading
+                :after
+                #'my/org-set-created-property)
+  #+end_src

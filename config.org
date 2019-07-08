@@ -3156,6 +3156,18 @@
    #+begin_src emacs-lisp
      (setq compilation-scroll-output t)
    #+end_src
+** google-it with qutebrowser
+   #+begin_src emacs-lisp
+     (require 'url-util)
+
+     (defun my/google-it ()
+       (interactive)
+       (let* ((resp (read-from-minibuffer "What is your query? "))
+              (cleaned-resp (url-hexify-string resp)))
+         (launch-program (format "qutebrowser \"https://google.com/search?q=%s\"" cleaned-resp))))
+
+     (define-key *root-map* (kbd "g") #'my/google-it)
+   #+end_src
 * Broken
 ** Wunderlist
    #+BEGIN_SRC emacs-lisp#

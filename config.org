@@ -3168,6 +3168,11 @@
 
      (define-key *root-map* (kbd "g") #'my/google-it)
    #+end_src
+** 256-color
+   #+begin_src emacs-lisp
+     (use-package eterm-256color)
+     (add-hook 'term-mode-hook #'eterm-256color-mode)
+   #+end_src
 * Broken
 ** Wunderlist
    #+BEGIN_SRC emacs-lisp#

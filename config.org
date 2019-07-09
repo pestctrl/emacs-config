@@ -2301,9 +2301,7 @@
 	    (user-mail-address "bchu3@uh.edu")
 	    (smtpmail-default-smtp-server "smtp.account2.example.com")
 	    (smtpmail-smtp-user "bchu3")
-	    (smtpmail-smtp-server "smtp.account2.example.com")))))a
-
-
+	    (smtpmail-smtp-server "smtp.account2.example.com")))))
 
        ;;(defun my-mu4e-set-account ()
        ;;  "Set the account for composing a message."

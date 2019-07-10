@@ -1144,9 +1144,22 @@
       (buffer-face-mode))
  #+END_SRC
 ** mode-line
+*** Smart Mode Line
+    #+BEGIN_SRC emacs-lisp
+      (use-package smart-mode-line-powerline-theme)
+      (use-package smart-mode-line)
+      (setq sml/theme 'powerline)
+      ;; (add-to-list 
+      ;;  'after-make-frame-functions
+      ;;  (lambda (&optional x)
+      ;;    (require 'smart-mode-line-powerline-theme)
+      ;;    (require 'smart-mode-line)
+      ;;    (setq sml/theme 'powerline)
+      ;;    (sml/setup)))
+    #+END_SRC
 *** Powerline
 **** Test new mode-line
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp#
   (defun my-airline-theme ()
     "Set the airline mode-line-format"
     (interactive)
@@ -1535,19 +1548,6 @@
  (my-airline-theme)
  (setq battery-mode-line-format "[%b%p%%%%]")
  #+END_SRC
-*** Smart Mode Line
-    #+BEGIN_SRC emacs-lisp
-      (use-package smart-mode-line-powerline-theme)
-      (use-package smart-mode-line)
-      (setq sml/theme 'powerline)
-      ;; (add-to-list 
-      ;;  'after-make-frame-functions
-      ;;  (lambda (&optional x)
-      ;;    (require 'smart-mode-line-powerline-theme)
-      ;;    (require 'smart-mode-line)
-      ;;    (setq sml/theme 'powerline)
-      ;;    (sml/setup)))
-    #+END_SRC
 *** Ocodo
     #+BEGIN_SRC emacs-lisp#
     (use-package ocodo-svg-modelines)

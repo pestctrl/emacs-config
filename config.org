@@ -1118,31 +1118,6 @@
  (use-package color-theme-modern)
  (load-theme 'calm-forest t)
  #+END_SRC
-** Font
- #+BEGIN_SRC emacs-lisp
-   ;;(set-face-attribute 'default t :font "Dotsies Training Wheels-20")
-   ;;(add-to-list 'default-frame-alist '(font . "Dotsies Training Wheels-20"))
-   ;; (set-default-font "LinuxLibertine")
-   ;; (set-default-font "Hack 10")
-   ;; (set-default-font "UbuntuMono 11")
-   ;; (set-default-font "OfficeCodePro 11")
-   (if (eq system-type 'windows-nt)
-       (set-frame-font "Roboto Mono 10")
-     (set-frame-font "RobotoMono 11")
-     (let ((font
-	    (format "%s"
-		    "RobotoMono-11"
-		    ;; "Tamzen"
-		    ;; "SourceCodePro"
-		    ;; "Gohu Gohufont"
-		    )))
-       (add-to-list 'default-frame-alist `(font . ,font))))
-   ;; (set-frame-font "Menlo")
-   (defun reading-buffer ()
-     (interactive)
-      (setq buffer-face-mode-face '(:family "LinuxLibertine" :height 200))
-      (buffer-face-mode))
- #+END_SRC
 ** mode-line
 *** Smart Mode Line
     #+BEGIN_SRC emacs-lisp
@@ -1583,8 +1558,14 @@
    #+END_SRC
 ** new-text-color
    #+begin_src emacs-lisp
-     (custom-set-faces
-      '(default ((t (:background "gray8" :foreground "#70FF00")))))
+     (set-face-attribute 'default nil :background "gray8" :foreground "#F0FF00")
+   #+end_src
+** sml faces
+   #+begin_src emacs-lisp
+     ;; (set-face-attribute 'sml/line-number t :inherit sml/global :background "#5f00af" :foreground "light gray" :weight normal)
+     ;; (set-face-attribute 'sml/time        t :inherit sml/global :background "#5f00af" :foreground "light gray" :weight normal)
+     ;; (set-face-attribute 'sml/charging    t :inherit sml/global :background "#5f00af" :foreground "#00FF00" :weight normal)
+     ;; (set-face-attribute 'sml/discharging t :inherit sml/global :background "#5f00af" :foreground "deep pink" :weight normal)
    #+end_src
 * Navigation
 ** IDO
@@ -2245,9 +2226,8 @@
    #+begin_src emacs-lisp
      (use-package notmuch)
 
-     (custom-set-faces 
-      '(notmuch-search-unread-face ((t (:foreground "white"))))
-      '(notmuch-message-summary-face ((t (:background "steel blue" :foreground "snow")))))
+     (set-face-attribute 'notmuch-search-unread-face nil :foreground "white")
+     (set-face-attribute 'notmuch-message-summary-face nil :background "steel blue" :foreground "snow")
 
      (setq notmuch-search-oldest-first nil
            notmuch-saved-searches
@@ -2626,19 +2606,15 @@
            (rainbow-red  "#C90067")
            (rainbow-7  "#00AA5D")
            (rainbow-8  "#FE7380"))
-       (custom-set-faces 
-        `(rainbow-delimiters-depth-1-face  ((t (:foreground ,rainbow-purple))))
-        `(rainbow-delimiters-depth-2-face  ((t (:foreground ,rainbow-green))))
-        `(rainbow-delimiters-depth-3-face  ((t (:foreground ,rainbow-blue))))
-        `(rainbow-delimiters-depth-4-face  ((t (:foreground ,rainbow-red))))
-        `(rainbow-delimiters-depth-5-face  ((t (:foreground ,rainbow-yellow))))
-        `(rainbow-delimiters-depth-6-face  ((t (:foreground ,rainbow-blue))))
-        `(rainbow-delimiters-depth-7-face  ((t (:foreground ,rainbow-red))))
-        `(rainbow-delimiters-depth-8-face  ((t (:foreground ,rainbow-8))))
-        `(rainbow-delimiters-depth-9-face  ((t (:foreground ,rainbow-purple))))
-        `(rainbow-delimiters-depth-10-face ((t (:foreground ,rainbow-blue))))
-        `(rainbow-delimiters-depth-11-face ((t (:foreground ,rainbow-green))))
-        `(rainbow-delimiters-depth-12-face ((t (:foreground ,rainbow-yellow))))))
+       (set-face-attribute 'rainbow-delimiters-depth-1-face  t :foreground rainbow-purple)
+       (set-face-attribute 'rainbow-delimiters-depth-2-face  t :foreground rainbow-green)
+       (set-face-attribute 'rainbow-delimiters-depth-3-face  t :foreground rainbow-blue)
+       (set-face-attribute 'rainbow-delimiters-depth-4-face  t :foreground rainbow-red)
+       (set-face-attribute 'rainbow-delimiters-depth-5-face  t :foreground rainbow-yellow)
+       (set-face-attribute 'rainbow-delimiters-depth-6-face  t :foreground rainbow-blue)
+       (set-face-attribute 'rainbow-delimiters-depth-7-face  t :foreground rainbow-red)
+       (set-face-attribute 'rainbow-delimiters-depth-8-face  t :foreground rainbow-8)
+       (set-face-attribute 'rainbow-delimiters-depth-9-face  t :foreground rainbow-purple))
    #+end_src
 ** elisp
 *** pp-macros
@@ -2904,14 +2880,6 @@
    #+begin_src emacs-lisp
    (setq ansi-color-names-vector
    ["black" "red3" "green3" "yellow3" "DodgerBlue2" "magenta3" "cyan3" "gray90"])
-   #+end_src
-** sml faces
-   #+begin_src emacs-lisp
-     ;; (custom-set-faces
-     ;;  '(sml/line-number ((t (:inherit sml/global :background "#5f00af" :foreground "light gray" :weight normal))))
-     ;;  '(sml/time ((t (:inherit sml/global :background "#5f00af" :foreground "light gray" :weight normal))))
-     ;;  '(sml/charging ((t (:inherit sml/global :background "#5f00af" :foreground "#00FF00" :weight normal))))
-     ;;  '(sml/discharging ((t (:inherit sml/global :background "#5f00af" :foreground "deep pink" :weight normal)))))
    #+end_src
 ** expand-region
    #+begin_src emacs-lisp

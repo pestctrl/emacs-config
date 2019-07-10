@@ -29,7 +29,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:background "gray8" :foreground "#70FF00"))))
+ '(notmuch-message-summary-face ((t (:background "steel blue" :foreground "snow"))))
+ '(notmuch-search-unread-face ((t (:foreground "white"))))
  '(org-agenda-date-today ((t (:inherit org-agenda-date :foreground "cyan" :slant italic :weight bold :height 1.1))))
  '(org-agenda-structure ((t (:foreground "LightSkyBlue" :box (:line-width 1 :color "grey75" :style released-button)))))
  '(org-ellipsis ((t (:foreground "turquoise"))))

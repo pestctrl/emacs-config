@@ -3172,6 +3172,10 @@
      (use-package eterm-256color)
      (add-hook 'term-mode-hook #'eterm-256color-mode)
    #+end_src
+** read only buffers in view-mode
+    #+begin_src emacs-lisp
+      (setq view-read-only t)
+    #+end_src
 * Broken
 ** Wunderlist
    #+BEGIN_SRC emacs-lisp#

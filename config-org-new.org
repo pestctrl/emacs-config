@@ -22,7 +22,7 @@
  (setq cfw:org-overwrite-default-keybinding t)
  #+END_SRC
 ** sync with google calendar
-   #+BEGIN_SRC emacs-lisp#
+   #+BEGIN_SRC emacs-lisp
      (defvar url-http-method)
      (defvar url-http-data)
      (defvar url-http-extra-headers)
@@ -30,8 +30,9 @@
      (defvar url-callback-function)
 
      (require 'url-http)
-     (use-package org-caldav)
-     (use-package oauth2)
+     (unless (package-installed-p 'org-caldav)
+       (use-package oauth2)
+       (use-package org-caldav))
      (setq epa-pinentry-mode 'loopback)
      (setq plstore-cache-passphrase-for-symmetric-encryption t)
 

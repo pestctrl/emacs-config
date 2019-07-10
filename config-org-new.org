@@ -1730,3 +1730,9 @@
 
     (add-hook 'org-agenda-finalize-hook #'org-agenda-delete-empty-compact-blocks)
   #+end_src
+* org-mode faces
+  #+begin_src emacs-lisp
+    (set-face-attribute 'org-agenda-date-today t :inherit 'org-agenda-date :foreground "cyan" :slant 'italic :weight 'bold :height 1.1)
+    (set-face-attribute 'org-agenda-structure  t :foreground "LightSkyBlue" :box '(:line-width 1 :color "grey75" :style 'released-button))
+    (set-face-attribute 'org-ellipsis          t :foreground "turquoise" :underline nil)
+  #+end_src

@@ -22,7 +22,13 @@
  (setq cfw:org-overwrite-default-keybinding t)
  #+END_SRC
 ** sync with google calendar
-   #+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lisp#
+     (defvar url-http-method)
+     (defvar url-http-data)
+     (defvar url-http-extra-headers)
+     (defvar oauth--token-data)
+     (defvar url-callback-function)
+
      (require 'url-http)
      (use-package org-caldav)
      (use-package oauth2)

@@ -1118,7 +1118,6 @@
  (use-package color-theme-modern)
  (load-theme 'calm-forest t)
  #+END_SRC
-
 ** Font
  #+BEGIN_SRC emacs-lisp
    ;;(set-face-attribute 'default t :font "Dotsies Training Wheels-20")

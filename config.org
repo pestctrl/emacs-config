@@ -2222,7 +2222,7 @@
      (setq notmuch-search-oldest-first nil
            notmuch-saved-searches
            '((:name "inbox" :query "tag:inbox" :key "i")
-             (:name "inbox today" :query "date:yesterday.. tag:inbox" :key "t")
+             (:name "inbox today" :query "date:7d.. tag:inbox" :key "t")
              (:name "work" :query "tag:work" :key "w")
              (:name "mailing lists" :query "tag:mlist" :key "m")
              (:name "recruiting" :query "tag:recruiting" :key "r")

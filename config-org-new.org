@@ -142,6 +142,7 @@
         `(let ((,subtree-symbol (save-excursion (org-end-of-subtree t))))
            (while (and (outline-next-heading)
                        (< (point) ,subtree-symbol))
+             ,@body))))
 
     (defmacro orgc-loop/descendants (condition &rest body)
       (declare (indent defun))
@@ -165,7 +166,6 @@
                        (< (point) ,subtree-symbol))
              ,@body)
            ,condition)))
-             ,@body))))
 
     (defmacro orgc-loop/todo-descendants (condition &rest body)
       (declare (indent defun))

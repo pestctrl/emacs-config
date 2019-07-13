@@ -188,7 +188,7 @@
                  (,tags (org-get-tags (point))))
              (when ,todo-state
                (if (member "ARCHIVE" ,tags)
-                    (org-end-of-subtree t)
+                   (org-end-of-subtree t)
                  ,@body))))))
 
     (defmacro org-loop/children (&rest body)
@@ -283,22 +283,22 @@
     (defmacro traverse-org-headlines (headline &rest body)
       (declare (indent defun))
       (let ((buffer-symbol (make-symbol "buffer")))
-      `(let (,buffer-symbol) 
-         (org-check-agenda-file ,(cadr headline))
-         (setq ,buffer-symbol (if (file-exists-p ,(cadr headline))
-                                  (org-get-agenda-file-buffer ,(cadr headline))
-                                (error "No such file %s" ,(cadr headline))))
-         (with-current-buffer ,buffer-symbol
-           (while (and (not (eobp))
-                       (outline-next-heading))
-             ,@body)))))
+        `(let (,buffer-symbol)
+           (org-check-agenda-file ,(cadr headline))
+           (setq ,buffer-symbol (if (file-exists-p ,(cadr headline))
+                                    (org-get-agenda-file-buffer ,(cadr headline))
+                                  (error "No such file %s" ,(cadr headline))))
+           (with-current-buffer ,buffer-symbol
+             (while (and (not (eobp))
+                         (outline-next-heading))
+               ,@body)))))
 
     (defmacro traverse-org-files (files &rest body)
       (declare (indent defun))
       (let ((file-symbol (make-symbol "file")))
         `(dolist (,file-symbol ,(cadr files))
-             (traverse-org-headlines (,(car files) ,file-symbol)
-               ,@body))))
+           (traverse-org-headlines (,(car files) ,file-symbol)
+             ,@body))))
   #+end_src
 
 * org-agenda base folder

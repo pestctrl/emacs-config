@@ -256,17 +256,17 @@
                    (org-end-of-subtree t)
                  ,@body))))))
 
-    (defmacro orgb-loop/todo-children (condition &rest body)
-      (declare (indent defun))
-      (let ((todo-state (make-symbol "todo-state"))
-            (tags (make-symbol "tags")))
-        `(orgb-loop/children ,condition
-           (let ((,todo-state (org-get-todo-state))
-                 (,tags (org-get-tags (point))))
-             (when ,todo-state
-               (if (member "ARCHIVE" ,tags)
-                   (org-end-of-subtree t)
-                 ,@body))))))
+    ;; (defmacro orgb-loop/todo-children (condition &rest body)
+    ;;   (declare (indent defun))
+    ;;   (let ((todo-state (make-symbol "todo-state"))
+    ;;         (tags (make-symbol "tags")))
+    ;;     `(orgb-loop/children ,condition
+    ;;        (let ((,todo-state (org-get-todo-state))
+    ;;              (,tags (org-get-tags (point))))
+    ;;          (when ,todo-state
+    ;;            (if (member "ARCHIVE" ,tags)
+    ;;                (org-end-of-subtree t)
+    ;;              ,@body))))))
 
     (defmacro org-loop/todo-children (condition &rest body)
       (declare (indent defun))

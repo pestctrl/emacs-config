@@ -2288,58 +2288,57 @@
    #+end_src
 ** mu4e
    #+BEGIN_SRC emacs-lisp
-     (require 'mu4e)
+     (unless (eq system-type 'windows-nt)
+       (require 'mu4e)
 
-     (add-to-list 'mu4e-view-actions
-                  '("ViewInBrowser" . mu4e-action-view-in-browser) t)
+       (add-to-list 'mu4e-view-actions
+		    '("ViewInBrowser" . mu4e-action-view-in-browser) t)
 
-     ;; (global-set-key (kbd "<f8>") 'mu4e)
+       ;; (global-set-key (kbd "<f8>") 'mu4e)
 
-     (setq mu4e-maildir "~/.offlineimap_mail"
-           mu4e-sent-folder   "/personal/[Gmail].Sent Mail"
-           mu4e-drafts-folder "/personal/[Gmail].Drafts"
-           mu4e-refile-folder "/personal/[Gmail].Archive")
+       (setq mu4e-maildir "~/.offlineimap_mail"
+	     mu4e-sent-folder   "/personal/[Gmail].Sent Mail"
+	     mu4e-drafts-folder "/personal/[Gmail].Drafts"
+	     mu4e-refile-folder "/personal/[Gmail].Archive")
 
-     (defvar my-mu4e-account-alist
-       '(("Gmail"
-          (mu4e-sent-folder "/work/Sent Mail")
-          (mu4e-drafts-folder "/Gmail/[Gmail].Drafts")
-          (mu4e-refile-folder "/Gmail/[Gmail].Archive")
-          (user-mail-address "bensonchu457@gmail.com")
-          (smtpmail-default-smtp-server "smtp.gmail.com")
-          (smtpmail-smtp-user "bensonchu457")
-          (smtpmail-smtp-server "smtp.gmail.com"))
-         ("work"
-          (mu4e-sent-folder "/work/Sent")
-          (mu4e-drafts-folder "/work/Drafts")
-          (mu4e-refile-folder "/work/Archive")
-          (user-mail-address "bchu3@uh.edu")
-          (smtpmail-default-smtp-server "smtp.account2.example.com")
-          (smtpmail-smtp-user "bchu3")
-          (smtpmail-smtp-server "smtp.account2.example.com"))))
+       (defvar my-mu4e-account-alist
+	 '(("Gmail"
+	    (mu4e-sent-folder "/work/Sent Mail")
+	    (mu4e-drafts-folder "/Gmail/[Gmail].Drafts")
+	    (mu4e-refile-folder "/Gmail/[Gmail].Archive")
+	    (user-mail-address "bensonchu457@gmail.com")
+	    (smtpmail-default-smtp-server "smtp.gmail.com")
+	    (smtpmail-smtp-user "bensonchu457")
+	    (smtpmail-smtp-server "smtp.gmail.com"))
+	   ("work"
+	    (mu4e-sent-folder "/work/Sent")
+	    (mu4e-drafts-folder "/work/Drafts")
+	    (mu4e-refile-folder "/work/Archive")
+	    (user-mail-address "bchu3@uh.edu")
+	    (smtpmail-default-smtp-server "smtp.account2.example.com")
+	    (smtpmail-smtp-user "bchu3")
+	    (smtpmail-smtp-server "smtp.account2.example.com")))))
 
+       ;;(defun my-mu4e-set-account ()
+       ;;  "Set the account for composing a message."
+       ;;  (let* ((account
+       ;;    (if mu4e-compose-parent-message
+       ;;        (let ((maildir (mu4e-message-field mu4e-compose-parent-message :maildir)))
+       ;;      (string-match "/\\(.*?\\)/" maildir)
+       ;;      (match-string 1 maildir))
+       ;;      (completing-read (format "Compose with account: (%s) "
+       ;;                   (mapconcat #'(lambda (var) (car var))
+       ;;                      my-mu4e-account-alist "/"))
+       ;;               (mapcar #'(lambda (var) (car var)) my-mu4e-account-alist)
+       ;;               nil t nil nil (caar my-mu4e-account-alist))))
+       ;;   (account-vars (cdr (assoc account my-mu4e-account-alist))))
+       ;;    (if account-vars
+       ;;        (mapc #'(lambda (var)
+       ;;        (set (car var) (cadr var)))
+       ;;        account-vars)
+       ;;      (error "No email account found"))))
 
-
-     ;;(defun my-mu4e-set-account ()
-     ;;  "Set the account for composing a message."
-     ;;  (let* ((account
-     ;;    (if mu4e-compose-parent-message
-     ;;        (let ((maildir (mu4e-message-field mu4e-compose-parent-message :maildir)))
-     ;;      (string-match "/\\(.*?\\)/" maildir)
-     ;;      (match-string 1 maildir))
-     ;;      (completing-read (format "Compose with account: (%s) "
-     ;;                   (mapconcat #'(lambda (var) (car var))
-     ;;                      my-mu4e-account-alist "/"))
-     ;;               (mapcar #'(lambda (var) (car var)) my-mu4e-account-alist)
-     ;;               nil t nil nil (caar my-mu4e-account-alist))))
-     ;;   (account-vars (cdr (assoc account my-mu4e-account-alist))))
-     ;;    (if account-vars
-     ;;        (mapc #'(lambda (var)
-     ;;        (set (car var) (cadr var)))
-     ;;        account-vars)
-     ;;      (error "No email account found"))))
-
-     ;;  (add-hook 'mu4e~headers-jump-to-maildir 'my-mu4e-set-account)
+       ;;  (add-hook 'mu4e~headers-jump-to-maildir 'my-mu4e-set-account)
 
 
    #+END_SRC

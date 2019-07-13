@@ -595,7 +595,8 @@
 
 
      ;; Project Stuff
-     (defconst my/project-keywords '("PROJECT" "META" "SEQ" "EMPTY" "ETERNAL" "SPEC" "HOLD"))
+     (defconst my/project-keywords '("PROJECT" "META" "META1" "SEQ" "EMPTY" "ETERNAL" "SPEC" "HOLD"))
+     (defconst my/active-projects-and-tasks '("PROJECT" "META" "META1" "SEQ" "EMPTY" "ONE" "TODO"))
 
      (defun my/is-a-project ()
        (save-excursion
@@ -1115,15 +1116,15 @@
             (forward-line)))))
 
     (defun production-agenda (tag)
-      `((tags-todo (concat ,tag "&TODO=\"STUFF\"")
+      `((tags-todo (concat ,tag "/STUFF")
                    ((org-agenda-overriding-header "Refile tasks")))
-        (tags-todo ,tag
+        (tags-todo (concat ,tag ,(mapconcat #'identity my/active-projects-and-tasks "|"))
                    ((org-agenda-overriding-header "Stuck Projects")
                     (org-agenda-skip-function 'my/show-stuck-projects)
                     (org-tags-match-list-sublevels 'indented)))
-        (tags-todo ,(concat tag "&TODO=\"WAIT\"")
+        (tags-todo ,(concat tag "/WAIT")
                    ((org-agenda-overriding-header "Tasks in other courts")))
-        (tags-todo ,(concat tag "&TODO=\"NEXT\"")
+        (tags-todo ,(concat tag "/NEXT")
                    ((org-agenda-overriding-header "Things to do")
                    ))
         (agenda ""
@@ -1174,23 +1175,23 @@
               ("pw" "work" ,(production-agenda "+work"))
               ("ps" "school" ,(production-agenda "+school"))
               ("d" "dev"
-               ((tags-todo (concat ,dev-tag "&refile")
+               ((tags-todo (concat ,dev-tag "&refile/STUFF")
                            ((org-agenda-overriding-header "Refile tasks")))
-                (tags-todo (concat ,dev-tag "")
+                (tags-todo (concat ,dev-tag "/!" (mapconcat #'identity my/active-projects-and-tasks "|"))
                            ((org-agenda-overriding-header "Stuck Projects")
                             (org-agenda-skip-function 'my/dev-show-stuck-projects)
                             (org-tags-match-list-sublevels 'indented)
                             (org-agenda-sorting-strategy
                              '((agenda category-keep)))))
-                (tags-todo (concat ,dev-tag "-short")
+                (tags-todo (concat ,dev-tag "-short" "/!" (mapconcat #'identity my/active-projects-and-tasks "|"))
                            ((org-agenda-overriding-header "Active Projects")
                             (org-agenda-skip-function 'my/dev-show-active-projects)
                             (org-tags-match-list-sublevels 'indented)
                             (org-agenda-sorting-strategy
                              '((agenda category-keep)))))
-                (tags-todo (concat ,dev-tag "&TODO=\"WAIT\"")
+                (tags-todo (concat ,dev-tag "/WAIT")
                            ((org-agenda-overriding-header "Waiting tasks")))
-                (tags-todo ,(concat dev-tag "&TODO=\"NEXT\"")
+                (tags-todo ,(concat dev-tag "/NEXT")
                            ((org-agenda-overriding-header "Things to do")))
                 (agenda ""
                         ((org-agenda-skip-function 'my/agenda-custom-skip)
@@ -1237,7 +1238,7 @@
                             (org-agenda-skip-function 'my/show-stuck-projects)
                             (org-agenda-sorting-strategy
                              '(category-keep))))
-                (tags-todo "-REFILE-HOLD+TODO+sandbox=\"WAIT\""
+                (tags-todo "-REFILE-HOLD+TODO+sandbox/WAIT"
                            (;(org-agenda-skip-function 'my/only-next-projects-and-tasks)
                             (org-agenda-overriding-header "Tasks in other courts")
                             (org-tags-match-list-sublevels t)))

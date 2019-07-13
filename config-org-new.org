@@ -144,6 +144,15 @@
                        (< (point) ,subtree-symbol))
              ,@body))))
 
+    (defmacro org-loop!/descendants (&rest body)
+      (declare (indent defun))
+      ;; (let ((subtree-symbol (make-symbol "subtree-end")))
+      ;;   `(let ((,subtree-symbol (save-excursion (org-end-of-subtree t))))
+      ;;      (while (and (outline-next-heading)
+      ;;                  (< (point) ,subtree-symbol))
+      ;;        ,@body)))
+      )
+
     (defmacro orgc-loop/descendants (condition &rest body)
       (declare (indent defun))
       (let ((subtree-symbol (make-symbol "subtree-end")))

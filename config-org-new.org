@@ -1695,7 +1695,7 @@
     (defun my/org-set-created-property (&rest args)
       (let ((fname (expand-file-name (buffer-file-name))))
         (when (remove-if-not (lambda (x) (string= fname (expand-file-name x))) org-agenda-files)
-          (let ((ts (format-time-string "[%Y-%m-%d %a %H:%S]")))
+          (let ((ts (format-time-string "[%Y-%m-%d %a %H:%M]")))
             (org-set-property "CREATED" ts)))))
 
     (advice-add #'org-insert-heading

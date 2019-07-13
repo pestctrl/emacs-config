@@ -1793,3 +1793,7 @@
     (set-face-attribute 'org-agenda-structure  t :foreground "LightSkyBlue" :box '(:line-width 1 :color "grey75" :style 'released-button))
     (set-face-attribute 'org-ellipsis          t :foreground "turquoise" :underline nil)
   #+end_src
+* org-notmuch
+  #+begin_src emacs-lisp
+    (require 'org-notmuch)
+  #+end_src

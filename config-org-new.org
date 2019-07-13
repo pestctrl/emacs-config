@@ -1816,3 +1816,36 @@
 
     (add-hook 'org-after-refile-insert-hook 'my/org-clean-tags)
   #+end_src
+* archive sibling remove sub archive sibling
+  #+begin_src emacs-lisp
+    (defun my/org-un-project ()
+      (interactive)
+      (let ((level (org-current-level)))
+        (org-map-entries 'org-do-promote (format "LEVEL>%d" level) 'tree)
+        (org-cycle t)))
+
+    (defun my/org-delete-promote ()
+      (interactive)
+      (my/org-un-project)
+      (org-cut-subtree))
+
+    (defun my/is-archive-tree ()
+      (and (string= "Archive"
+                    (org-get-heading t t t t))
+           (member "ARCHIVE" (org-get-tags))))
+
+    (defun my/archive-remove-all-sibling (&rest args)
+      (save-excursion
+        (let (points)
+          (org-loop/descendants
+            (when (my/is-archive-tree)
+              (push (point) points)))
+          (mapcar (lambda (p)
+                    (goto-char p)
+                    (my/org-delete-promote))
+                  points))))
+
+    (advice-add #'org-archive-to-archive-sibling
+                :before
+                #'my/archive-remove-all-sibling)
+  #+end_src

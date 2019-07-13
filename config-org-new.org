@@ -1494,11 +1494,15 @@
 #+END_SRC
 * prompt for automatic org-board
   #+begin_src emacs-lisp
+    (defun my/org-add-tag (tag)
+      (org-set-tags (cons tag (org-get-tags nil t))))
+
     (defun my/org-board-prompt ()
       (let ((desc (plist-get org-capture-plist :description)))
         (when (and (not org-note-abort)
                    (string= desc "Protocol Link")
                    (y-or-n-p "Do you want to archive the page? "))
+          (my/org-add-tag "offline")
           (call-interactively #'org-board-archive))))
 
     (add-hook 'org-capture-before-finalize-hook 'my/org-board-prompt)

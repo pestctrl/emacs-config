@@ -1797,3 +1797,22 @@
   #+begin_src emacs-lisp
     (require 'org-notmuch)
   #+end_src
+* remove inherited tags
+  #+begin_src emacs-lisp
+    (defun my/org-remove-inherited-tag-strings ()
+      "Removes inherited tags from the headline-at-point's tag string.
+    Note this does not change the inherited tags for a headline,
+    just the tag string."
+      (interactive)
+      (org-set-tags (seq-remove (lambda (tag)
+                                  (get-text-property 0 'inherited tag))
+                                (org-get-tags))))
+
+    (defun my/org-clean-tags ()
+      "Visit last refiled headline and remove inherited tags from tag string."
+      (save-window-excursion
+        (org-refile-goto-last-stored)
+        (my/org-remove-inherited-tag-strings)))
+
+    (add-hook 'org-after-refile-insert-hook 'my/org-clean-tags)
+  #+end_src

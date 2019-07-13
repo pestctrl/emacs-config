@@ -664,6 +664,7 @@
           (let ((pos (completing-read "Position? " '("left-of" "above") nil t "^")))
             (shell-command (format "xrandr --output %s --%s %s" secondary pos primary))))))
     (setup-wallpaper))
+
   (add-hook 'exwm-init-hook 'my/setup-screens)
 
   (defun my/flip-screens ()

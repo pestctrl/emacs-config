@@ -721,32 +721,32 @@ https://github.com/org-trello/org-trello/issues/258
                 #'erc-colorize-privmsgs)
   #+end_src
 * Auto commit when saving org files
-  #+begin_src emacs-lisp
-    (defvar org-agenda-git-repo-path (expand-file-name "~/MEGA/org/agenda"))
+#+begin_src emacs-lisp
+  (defconst org-agenda-git-repo-path (expand-file-name "~/MEGA/org/2019-05-agenda"))
 
-    (defun auto-commit-agenda (&optional arg)
-      (when-let (f (buffer-file-name))
-        (let ((fname (expand-file-name f))
-              (sfname (buffer-name)))
-          (when (and (string-prefix-p org-agenda-git-repo-path
-                                      fname)
-                     (magit-anything-modified-p t fname)
-                     (not (magit-anything-unmerged-p fname))
-                     (or (string= (magit-get-current-branch)
-                                  "master")
-                         (progn
-                           (magit-git-command-topdir "git checkout master")
-                           (string= (magit-get-current-branch)
-                                    "master"))))
-            (save-window-excursion 
-              (magit-git-command-topdir (format "git add %s" fname))
-              (magit-git-command-topdir (format "git commit -m \"%s modified, %s\""
-                                                sfname (current-time-string))))))))
+  (defun auto-commit-agenda (&optional arg)
+    (when-let (f (buffer-file-name))
+      (let ((fname (expand-file-name f))
+            (sfname (buffer-name)))
+        (when (and (string-prefix-p org-agenda-git-repo-path
+                                    fname)
+                   (magit-anything-modified-p t fname)
+                   (not (magit-merge-in-progress-p))
+                   (or (string= (magit-get-current-branch)
+                                "master")
+                       (progn
+                         (magit-git-command-topdir "git checkout master")
+                         (string= (magit-get-current-branch)
+                                  "master"))))
+          (save-window-excursion 
+            (magit-stage-file fname)
+            (magit-commit-create `("-m" ,(format "\"%s\" modified, %s"
+                                                 sfname (current-time-string)))))))))
 
-    (advice-add #'save-buffer
-                :after
-                #'auto-commit-agenda)
-  #+end_src
+  (advice-add #'save-buffer
+              :after
+              #'auto-commit-agenda)
+#+end_src
 * ivy-occur take up whole buffer
   #+begin_src emacs-lisp
     (defun my/ivy-occur (&rest _)

@@ -1864,3 +1864,7 @@
                 :before
                 #'my/archive-remove-all-sibling)
   #+end_src
+* org agenda start on saturday
+#+begin_src emacs-lisp
+  (setq org-agenda-start-on-weekday 6)
+#+end_src

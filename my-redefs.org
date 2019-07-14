@@ -221,7 +221,7 @@ https://github.com/org-trello/org-trello/issues/258
           (incf levels))
         levels)))
 
-  (defun my-org-scan-tags (action matcher todo-only &optional start-level)
+  (defun my/org-scan-tags (action matcher todo-only &optional start-level)
     "Scan headline tags with inheritance and produce output ACTION.
 
     ACTION can be `sparse-tree' to produce a sparse tree in the current buffer,

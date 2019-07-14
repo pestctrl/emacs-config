@@ -1868,3 +1868,10 @@
 #+begin_src emacs-lisp
   (setq org-agenda-start-on-weekday 6)
 #+end_src
+* org mode startup
+#+begin_src emacs-lisp
+  (with-eval-after-load 'org
+    (setq org-startup-indented t) ; Enable `org-indent-mode' by default
+    (add-hook 'org-mode-hook #'visual-line-mode)
+    (add-hook 'org-mode-hook #'auto-fill-mode))
+ #+end_src

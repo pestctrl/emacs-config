@@ -1599,7 +1599,8 @@
       "Refile an entry to a datetree under an archive."
       (interactive)
       (require 'org-datetree)
-      (let* ((bfn (or bfn (find-file-noselect (expand-file-name (my/agenda-file "datetree.org")))))
+      (let* ((org-read-date-prefer-future nil)
+             (bfn (or bfn (find-file-noselect (expand-file-name (my/agenda-file "datetree.org")))))
              (datetree-date (my/org-read-datetree-date (org-read-date t nil))))
         (org-refile nil nil (list nil (buffer-file-name bfn) nil
                                   (with-current-buffer bfn

@@ -521,9 +521,7 @@
 
   (defun lock-screen ()
     (interactive)
-    (let ((res (shell-command-to-string "pgrep i3lock-fancy")))
-      (when (zerop (length res))
-        (shell-command "i3lock-fancy"))))
+    (shell-command "i3lock-fancy & disown"))
 
   (setq enable-recursive-minibuffers t)
   (defun counsel-shell-command ()

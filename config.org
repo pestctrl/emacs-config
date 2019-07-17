@@ -484,7 +484,6 @@
 #+END_SRC
 ** Helper functions
 #+BEGIN_SRC emacs-lisp
-
   (defvar wallpaper-path "/home/benson/.emacs.d/res/digital_space_universe_4k_8k-wide.jpg")
   (defvar live-wallpaper-path "/home/benson/MEGA/pictures/wallpapers/videos/bg.mp4")
   (setq i3-string "Xephyr -br -ac -noreset -resizeable -screen 1920x1080 :8 & sleep 1s; DISPLAY=:8 i3")

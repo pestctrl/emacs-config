@@ -3159,6 +3159,10 @@
     #+begin_src emacs-lisp
       (setq view-read-only t)
     #+end_src
+** hyperbole
+#+begin_src emacs-lisp
+  (use-package hyperbole)
+#+end_src
 * Broken
 ** Wunderlist
    #+BEGIN_SRC emacs-lisp#

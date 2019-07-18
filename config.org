@@ -3,48 +3,47 @@
 
 * Bugs
 ** Need this to fix broken config
-   #+begin_src emacs-lisp
-   (use-package magit-popup)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package magit-popup)
+#+end_src
 * Neo keyboard issues
-  #+BEGIN_SRC emacs-lisp
-    (global-set-key (kbd "M-Ä") 'eval-expression)
-    (defun reset-keyboard ()
-      (interactive)
-      (shell-command "setxkbmap de neo_dvorak"))
-  #+END_SRC
-
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "M-Ä") 'eval-expression)
+  (defun reset-keyboard ()
+    (interactive)
+    (shell-command "setxkbmap de neo_dvorak"))
+#+END_SRC
 * Lib
 ** memoize
-   #+begin_src emacs-lisp
-   (use-package memoize)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package memoize)
+#+end_src
 ** hydra
-   #+begin_src emacs-lisp
-   (use-package hydra)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package hydra)
+#+end_src
 ** cl
-   #+begin_src emacs-lisp
-   (require 'cl)
-   #+end_src
+#+begin_src emacs-lisp
+  (require 'cl)
+#+end_src
 * Custom file
-  #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
   (setq custom-file "~/.emacs.d/custom.el")
   (load custom-file 'noerror)
   (setq backup-directory-alist `(("." . ,(concat user-emacs-directory "backups"))))
-  #+END_SRC
+#+END_SRC
 * EXWM
 ** e2wm
-   #+begin_src emacs-lisp
-     (use-package e2wm)
-
-     (global-set-key (kbd "M-+") 'e2wm:start-management)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package e2wm
+    :bind (("M-+" . e2wm:start-management)))
+#+end_src
 ** desktop-environment
-   #+begin_src emacs-lisp
-   (use-package desktop-environment)
-   (desktop-environment-mode)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package desktop-environment
+    :init
+    (desktop-environment-mode))
+#+end_src
 ** Meta
 #+BEGIN_SRC emacs-lisp
 (use-package exwm)
@@ -53,356 +52,356 @@
 (fringe-mode '(10 . 0))
 #+END_SRC
 ** Naming Windows
-   #+BEGIN_SRC emacs-lisp
-     (defvar my/window-name nil)
+#+BEGIN_SRC emacs-lisp
+  (defvar my/window-name nil)
 
-     (defun exwmx-name-buffer ()
-       (interactive)
-       (let* ((xprograms (mapcar (lambda (a) (plist-get a :instance)) (exwmx-appconfig--get-all-appconfigs)))
-              (name (completing-read "Name: " xprograms)))
-         (if (and (get-buffer name)
-                  (y-or-n-p (format "Already a buffer named \"%s\". Would you like to swap?" name)))
-             (let ((oname (completing-read "Name of other buffer: " xprograms)))
-               (exwm-workspace-rename-buffer "This is a stupid name that no one would ever choose for a buffer, hopefully")
-               (save-window-excursion
-                 (switch-to-buffer (get-buffer name))
-                 (exwm-workspace-rename-buffer oname)
-                 (setq-local exwm-instance-name oname))
-               (exwm-workspace-rename-buffer name)
-               (setq-local exwm-instance-name name))
-           (exwm-workspace-rename-buffer name)
-           (setq-local exwm-instance-name name))))
+  (defun exwmx-name-buffer ()
+    (interactive)
+    (let* ((xprograms (mapcar (lambda (a) (plist-get a :instance)) (exwmx-appconfig--get-all-appconfigs)))
+           (name (completing-read "Name: " xprograms)))
+      (if (and (get-buffer name)
+               (y-or-n-p (format "Already a buffer named \"%s\". Would you like to swap?" name)))
+          (let ((oname (completing-read "Name of other buffer: " xprograms)))
+            (exwm-workspace-rename-buffer "This is a stupid name that no one would ever choose for a buffer, hopefully")
+            (save-window-excursion
+              (switch-to-buffer (get-buffer name))
+              (exwm-workspace-rename-buffer oname)
+              (setq-local exwm-instance-name oname))
+            (exwm-workspace-rename-buffer name)
+            (setq-local exwm-instance-name name))
+        (exwm-workspace-rename-buffer name)
+        (setq-local exwm-instance-name name))))
 
-     (defun exwm-rename-buffer ()
-       (interactive)
-       (when my/window-name
-         (exwm-workspace-rename-buffer my/window-name)
-         (setq-local exwm-instance-name my/window-name)
-         (setq my/window-name nil)))
+  (defun exwm-rename-buffer ()
+    (interactive)
+    (when my/window-name
+      (exwm-workspace-rename-buffer my/window-name)
+      (setq-local exwm-instance-name my/window-name)
+      (setq my/window-name nil)))
 
-     ;; Add these hooks in a suitable place (e.g., as done in exwm-config-default)
-     (add-hook 'exwm-manage-finish-hook 'exwm-rename-buffer)
+  ;; Add these hooks in a suitable place (e.g., as done in exwm-config-default)
+  (add-hook 'exwm-manage-finish-hook 'exwm-rename-buffer)
 
-     (defun launch-program-with-name (cmd name)
-       (interactive)
-       (when name (setq my/window-name name))
-       (start-process-shell-command cmd nil cmd))
-   #+END_SRC
+  (defun launch-program-with-name (cmd name)
+    (interactive)
+    (when name (setq my/window-name name))
+    (start-process-shell-command cmd nil cmd))
+#+END_SRC
 ** exwm-x stuff and naming windows
-   #+BEGIN_SRC emacs-lisp
-     (use-package exwm-x)
-     (require 'exwmx-quickrun) 
+#+BEGIN_SRC emacs-lisp
+  (use-package exwm-x)
+  (require 'exwmx-quickrun) 
 
-     (defun exwmx-quickrun (command &optional search-alias ruler)
-       (exwmx--switch-window)
-       (let* ((ruler-plist-p (and ruler (exwmx--plist-p ruler)))
-              (keys
-               ;; Deal with ruler which is like (:class :instance :title)
-               (if (and ruler (listp ruler) (not ruler-plist-p))
-                   (exwmx--clean-keylist ruler)
-                 '(:class :instance)))
-              (appconfigs (exwmx-appconfig--get-all-appconfigs))
-              (cmd (if search-alias
-                       (or (plist-get (exwmx-appconfig--search
-                                       `((:alias ,command)))
-                                      :command)
-                           (when appconfigs
-                             (let ((appconfig (exwmx-appconfig--select-appconfig)))
-                               (plist-put appconfig :alias command)
-                               (exwmx-appconfig--add-appconfig appconfig)
-                               (plist-get appconfig :command))))
-                     command))
-              (buffer (or (if search-alias
-                              (exwmx-quickrun--find-buffer
-                               (if ruler-plist-p
-                                   ruler
-                                 (exwmx-appconfig--get-subset
-                                  (exwmx-appconfig--search
-                                   `((:alias ,command)))
-                                  keys)))
-                            (exwmx-quickrun--find-buffer
-                             (if ruler-plist-p
-                                 ruler
-                               (exwmx-appconfig--get-subset
-                                (exwmx-appconfig--search
-                                 `((:command ,command)))
-                                keys)))))))
-         (if (and search-alias (not cmd))
-             (message "EXWM-X: please run `exwmx-appconfig' to add appconfig.")
-           (message "EXWM-X Quick Run: %s" cmd))
-         ;; If current application window is a floating-window, minumize it.
-         (when (and (eq major-mode 'exwm-mode)
-                    exwm--floating-frame)
-           (exwm-floating-hide))
-         (if buffer
-             (exwm-workspace-switch-to-buffer buffer)
-           (when cmd
-             (launch-program-with-name cmd (plist-get ruler :instance))))))
+  (defun exwmx-quickrun (command &optional search-alias ruler)
+    (exwmx--switch-window)
+    (let* ((ruler-plist-p (and ruler (exwmx--plist-p ruler)))
+           (keys
+            ;; Deal with ruler which is like (:class :instance :title)
+            (if (and ruler (listp ruler) (not ruler-plist-p))
+                (exwmx--clean-keylist ruler)
+              '(:class :instance)))
+           (appconfigs (exwmx-appconfig--get-all-appconfigs))
+           (cmd (if search-alias
+                    (or (plist-get (exwmx-appconfig--search
+                                    `((:alias ,command)))
+                                   :command)
+                        (when appconfigs
+                          (let ((appconfig (exwmx-appconfig--select-appconfig)))
+                            (plist-put appconfig :alias command)
+                            (exwmx-appconfig--add-appconfig appconfig)
+                            (plist-get appconfig :command))))
+                  command))
+           (buffer (or (if search-alias
+                           (exwmx-quickrun--find-buffer
+                            (if ruler-plist-p
+                                ruler
+                              (exwmx-appconfig--get-subset
+                               (exwmx-appconfig--search
+                                `((:alias ,command)))
+                               keys)))
+                         (exwmx-quickrun--find-buffer
+                          (if ruler-plist-p
+                              ruler
+                            (exwmx-appconfig--get-subset
+                             (exwmx-appconfig--search
+                              `((:command ,command)))
+                             keys)))))))
+      (if (and search-alias (not cmd))
+          (message "EXWM-X: please run `exwmx-appconfig' to add appconfig.")
+        (message "EXWM-X Quick Run: %s" cmd))
+      ;; If current application window is a floating-window, minumize it.
+      (when (and (eq major-mode 'exwm-mode)
+                 exwm--floating-frame)
+        (exwm-floating-hide))
+      (if buffer
+          (exwm-workspace-switch-to-buffer buffer)
+        (when cmd
+          (launch-program-with-name cmd (plist-get ruler :instance))))))
 
-     (defun exwmx-quickrun--find-buffer (ruler)
-       "Find a exwm buffer which match `ruler', ruler is
-        a plist with three keys: :class, :instance and :title."
-       (let ((current (current-buffer))
-             (buffers (buffer-list))
-             (result '()))
-         (while buffers
-           (let ((buffer (pop buffers))
-                 (class (plist-get ruler :class))
-                 (instance (plist-get ruler :instance))
-                 (title (plist-get ruler :title)))
-             (with-current-buffer buffer
-               (when (and (or class instance title)
-                          (exwmx--string-match-p (or class ".*") exwm-class-name)
-                          (exwmx--string-match-p (or instance ".*") exwm-instance-name)
-                          (exwmx--string-match-p (or title ".*") exwm-title))
-                 (push buffer result)))))
-         (setq result (reverse result))
-         ;; If two more buffers are found, switch between these buffer.
-         (if (and (cadr result)
-                  (eq (car result) current))
-             (cadr result)
-           (car result))))
+  (defun exwmx-quickrun--find-buffer (ruler)
+    "Find a exwm buffer which match `ruler', ruler is
+          a plist with three keys: :class, :instance and :title."
+    (let ((current (current-buffer))
+          (buffers (buffer-list))
+          (result '()))
+      (while buffers
+        (let ((buffer (pop buffers))
+              (class (plist-get ruler :class))
+              (instance (plist-get ruler :instance))
+              (title (plist-get ruler :title)))
+          (with-current-buffer buffer
+            (when (and (or class instance title)
+                       (exwmx--string-match-p (or class ".*") exwm-class-name)
+                       (exwmx--string-match-p (or instance ".*") exwm-instance-name)
+                       (exwmx--string-match-p (or title ".*") exwm-title))
+              (push buffer result)))))
+      (setq result (reverse result))
+      ;; If two more buffers are found, switch between these buffer.
+      (if (and (cadr result)
+               (eq (car result) current))
+          (cadr result)
+        (car result))))
 
-     (defmacro quickrun-lambda (cmd instance)
-       (if (null instance)
-           `(lambda ()
-              (interactive)
-              (exwmx-quickrun ,cmd))
-         `(lambda ()
-            (interactive)
-            (exwmx-quickrun ,cmd nil '(:class ".*" :instance ,instance)))))
+  (defmacro quickrun-lambda (cmd instance)
+    (if (null instance)
+        `(lambda ()
+           (interactive)
+           (exwmx-quickrun ,cmd))
+      `(lambda ()
+         (interactive)
+         (exwmx-quickrun ,cmd nil '(:class ".*" :instance ,instance)))))
 
-     (use-package dmenu)            
+  (use-package dmenu)            
 
-     (make-thread 
-      #'dmenu--cache-executable-files)
+  (make-thread 
+   #'dmenu--cache-executable-files)
 
 
-     (defun read-program ()
-       (funcall #'ido-completing-read "$ "
-                (append dmenu--history-list
-                        (cl-remove-if (lambda (x)
-                                        (member x dmenu--history-list))
-                                      dmenu--cache-executable-files))))
+  (defun read-program ()
+    (funcall #'ido-completing-read "$ "
+             (append dmenu--history-list
+                     (cl-remove-if (lambda (x)
+                                     (member x dmenu--history-list))
+                                   dmenu--cache-executable-files))))
 
-     (defun launch-program (command &optional process-name)
-       (interactive (list (read-program)))
-       (setq dmenu--history-list (cons command (remove command dmenu--history-list)))
-       (when (> (length dmenu--history-list)
-                dmenu-history-size)
-         (setcdr (nthcdr (- dmenu-history-size 1)
-                         dmenu--history-list)
-                 nil))
-       (let ((name (or process-name command)))
-         (start-process-shell-command name nil command)))
+  (defun launch-program (command &optional process-name)
+    (interactive (list (read-program)))
+    (setq dmenu--history-list (cons command (remove command dmenu--history-list)))
+    (when (> (length dmenu--history-list)
+             dmenu-history-size)
+      (setcdr (nthcdr (- dmenu-history-size 1)
+                      dmenu--history-list)
+              nil))
+    (let ((name (or process-name command)))
+      (start-process-shell-command name nil command)))
 
-     (defun exwmx-launch-program (command &optional process-name)
-       (interactive (list (read-program)))
-       (setq dmenu--history-list (cons command (remove command dmenu--history-list)))
-       (when (> (length dmenu--history-list)
-                dmenu-history-size)
-         (setcdr (nthcdr (- dmenu-history-size 1)
-                         dmenu--history-list)
-                 nil))
-       (exwmx-quickrun command))
+  (defun exwmx-launch-program (command &optional process-name)
+    (interactive (list (read-program)))
+    (setq dmenu--history-list (cons command (remove command dmenu--history-list)))
+    (when (> (length dmenu--history-list)
+             dmenu-history-size)
+      (setcdr (nthcdr (- dmenu-history-size 1)
+                      dmenu--history-list)
+              nil))
+    (exwmx-quickrun command))
 
-     ;; (exwmx-quickrun "firefox" nil '(:class ".*" :instance "School"))
+  ;; (exwmx-quickrun "firefox" nil '(:class ".*" :instance "School"))
 
-     ;; (exwmx-quickrun--find-buffer '(:class ".*" :instance "Hello"))
-   #+END_SRC
+  ;; (exwmx-quickrun--find-buffer '(:class ".*" :instance "Hello"))
+#+END_SRC
 ** Youtube split
-   #+BEGIN_SRC emacs-lisp
-     (defun youtube-split (arg)
-       (interactive "P")
-       (let ((buf (get-buffer "youtube"))
-             (back (current-buffer)))
-         (delete-other-windows)
-         (if buf 
-             (switch-to-buffer buf)
-           (when arg
-             (launch-program-with-name "firefox" "youtube")))
-         (side-window-op 'left 472 buf)
-         (switch-to-buffer back)))
+#+BEGIN_SRC emacs-lisp
+  (defun youtube-split (arg)
+    (interactive "P")
+    (let ((buf (get-buffer "youtube"))
+          (back (current-buffer)))
+      (delete-other-windows)
+      (if buf 
+          (switch-to-buffer buf)
+        (when arg
+          (launch-program-with-name "firefox" "youtube")))
+      (side-window-op 'left 472 buf)
+      (switch-to-buffer back)))
 
-     (defun big-youtube-split (arg)
-       (interactive "P")
-       (delete-other-windows)
-       (let ((buf (get-buffer "youtube")))
-         (if buf
-             (switch-to-buffer buf)
-           (when arg
-             (launch-program-with-name "firefox" "youtube")))
-         (side-window-op 'left 630 buf)))
+  (defun big-youtube-split (arg)
+    (interactive "P")
+    (delete-other-windows)
+    (let ((buf (get-buffer "youtube")))
+      (if buf
+          (switch-to-buffer buf)
+        (when arg
+          (launch-program-with-name "firefox" "youtube")))
+      (side-window-op 'left 630 buf)))
 
-     (defun side-window-op (side &optional size buffer)
-       (let ((prev-win (selected-window))
-             (win (display-buffer-in-side-window
-                   (or buffer (current-buffer))
-                   `((side . ,side)))))
-         (select-window win)
-         (set-window-dedicated-p win t)
-         (set-window-parameter win 'no-delete-other-windows t)
-         (when size
-           (window-resize win (- size (window-pixel-width)) t nil t))
-         (select-window prev-win)))
+  (defun side-window-op (side &optional size buffer)
+    (let ((prev-win (selected-window))
+          (win (display-buffer-in-side-window
+                (or buffer (current-buffer))
+                `((side . ,side)))))
+      (select-window win)
+      (set-window-dedicated-p win t)
+      (set-window-parameter win 'no-delete-other-windows t)
+      (when size
+        (window-resize win (- size (window-pixel-width)) t nil t))
+      (select-window prev-win)))
 
-     (defun side-left-window ()
-       (interactive)
-       (side-window-op 'left))
+  (defun side-left-window ()
+    (interactive)
+    (side-window-op 'left))
 
-     (defun side-right-window ()
-       (interactive)
-       (side-window-op 'right))
+  (defun side-right-window ()
+    (interactive)
+    (side-window-op 'right))
 
-     (defun side-bottom-window ()
-       (interactive)
-       (side-window-op 'bottom))
+  (defun side-bottom-window ()
+    (interactive)
+    (side-window-op 'bottom))
 
-     (setq window-sides-vertical t)
-   #+END_SRC
+  (setq window-sides-vertical t)
+#+END_SRC
 ** Disable simulation keys on an emacs window
-   #+BEGIN_SRC emacs-lisp
-     (add-hook 'exwm-manage-finish-hook
-               (lambda ()
-                 (when (and exwm-class-name (string= exwm-class-name "Emacs"))
-                   (exwm-input-set-local-simulation-keys nil))))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'exwm-manage-finish-hook
+            (lambda ()
+              (when (and exwm-class-name (string= exwm-class-name "Emacs"))
+                (exwm-input-set-local-simulation-keys nil))))
+#+END_SRC
 ** Custom keymap
-   #+BEGIN_SRC emacs-lisp
-     (defmacro exec (body)
-       `(lambda ()
-          (interactive)
-          ,body))
-
-     (defun toggle-notifications ()
+#+BEGIN_SRC emacs-lisp
+  (defmacro exec (body)
+    `(lambda ()
        (interactive)
-       (shell-command "kill -s USR1 $(pidof deadd-notification-center)"))
+       ,body))
 
-     (define-prefix-command '*root-map*)
-     ;;(global-set-key (kbd "C-t") '*root-map*)
-     (add-to-list 'exwm-input-prefix-keys ?\C-t)
-     (defun simulate-C-t (arg)
-       (interactive "P")
-       (if (eq major-mode 'exwm-mode)
-           (exwm-input--fake-key ?\C-t)
-         (transpose-chars arg)))
-     (define-key *root-map* (kbd "C-b") (lambda () (interactive) (switch-to-buffer (other-buffer (current-buffer) 1))))
-     (define-key *root-map* (kbd "C-t") 'simulate-C-t)
-     (define-key *root-map* (kbd "c") 'multi-term)
-     (define-key *root-map* (kbd "C-p") 'exwmx-launch-program)
-     (define-key *root-map* (kbd "e") (quickrun-lambda "emacs" "emacs"))
-     (define-key *root-map* (kbd "s") (quickrun-lambda "steam" nil))
-     (define-key *root-map* (kbd "q") (quickrun-lambda "qutebrowser" nil))
-     (define-key *root-map* (kbd "V") (quickrun-lambda "VBoxManage startvm \"Windows 7\"" "VirtualBox Machine"))
-     (define-key *root-map* (kbd "r") 'exwmx-name-buffer)
-     (define-key *root-map* (kbd ")") (lambda () (interactive) (leaving-computer) (shell-command "sleep 2s ; xset dpms force off")))
-     (define-key *root-map* (kbd "C-n") 'switch-window)
-     (define-key *root-map* (kbd "i") 'org-mru-clock-in)
-     (define-key *root-map* (kbd "C-i") 'leaving-computer)
-     (define-key *root-map* (kbd "C") 'org-resolve-clocks)
-     (define-key *root-map* (kbd "j") 'org-clock-goto)
-     (define-key *root-map* (kbd "o") 'switch-window)
-     (define-key *root-map* (kbd "n") 'toggle-notifications)
-     (define-key *root-map* (kbd "C-d") 'dired-jump)
+  (defun toggle-notifications ()
+    (interactive)
+    (shell-command "kill -s USR1 $(pidof deadd-notification-center)"))
 
-     (define-prefix-command '*window-map*)
-     (define-key *root-map* (kbd "w") '*window-map*)
-     (define-key *window-map* (kbd "y") 'youtube-split)
-     (define-key *window-map* (kbd "Y") 'big-youtube-split)
-     (define-key *window-map* (kbd "j") 'side-bottom-window)
-     (define-key *window-map* (kbd "h") 'side-left-window)
-     (define-key *window-map* (kbd "l") 'side-right-window)
-     (define-key *window-map* (kbd "d") 'window-toggle-side-windows)
+  (define-prefix-command '*root-map*)
+  ;;(global-set-key (kbd "C-t") '*root-map*)
+  (add-to-list 'exwm-input-prefix-keys ?\C-t)
+  (defun simulate-C-t (arg)
+    (interactive "P")
+    (if (eq major-mode 'exwm-mode)
+        (exwm-input--fake-key ?\C-t)
+      (transpose-chars arg)))
+  (define-key *root-map* (kbd "C-b") (lambda () (interactive) (switch-to-buffer (other-buffer (current-buffer) 1))))
+  (define-key *root-map* (kbd "C-t") 'simulate-C-t)
+  (define-key *root-map* (kbd "c") 'multi-term)
+  (define-key *root-map* (kbd "C-p") 'exwmx-launch-program)
+  (define-key *root-map* (kbd "e") (quickrun-lambda "emacs" "emacs"))
+  (define-key *root-map* (kbd "s") (quickrun-lambda "steam" nil))
+  (define-key *root-map* (kbd "q") (quickrun-lambda "qutebrowser" nil))
+  (define-key *root-map* (kbd "V") (quickrun-lambda "VBoxManage startvm \"Windows 7\"" "VirtualBox Machine"))
+  (define-key *root-map* (kbd "r") 'exwmx-name-buffer)
+  (define-key *root-map* (kbd ")") (lambda () (interactive) (leaving-computer) (shell-command "sleep 2s ; xset dpms force off")))
+  (define-key *root-map* (kbd "C-n") 'switch-window)
+  (define-key *root-map* (kbd "i") 'org-mru-clock-in)
+  (define-key *root-map* (kbd "C-i") 'leaving-computer)
+  (define-key *root-map* (kbd "C") 'org-resolve-clocks)
+  (define-key *root-map* (kbd "j") 'org-clock-goto)
+  (define-key *root-map* (kbd "o") 'switch-window)
+  (define-key *root-map* (kbd "n") 'toggle-notifications)
+  (define-key *root-map* (kbd "C-d") 'dired-jump)
 
-     (define-prefix-command '*firefox-map*)
-     (define-key *firefox-map* (kbd "f") (quickrun-lambda "firefox" "firefox"))
-     (define-key *firefox-map* (kbd "1") (quickrun-lambda "firefox" "firefox1"))
-     (define-key *firefox-map* (kbd "2") (quickrun-lambda "firefox" "firefox2"))
-     (define-key *firefox-map* (kbd "3") (quickrun-lambda "firefox" "firefox3"))
-     (define-key *firefox-map* (kbd "4") (quickrun-lambda "firefox" "firefox4"))
-     (define-key *firefox-map* (kbd "d") (quickrun-lambda "firefox" "development"))
-     (define-key *firefox-map* (kbd "s") (quickrun-lambda "firefox" "school"))
-     (define-key *firefox-map* (kbd "w") (quickrun-lambda "firefox" "work"))
-     (define-key *firefox-map* (kbd "y") (quickrun-lambda "firefox" "youtube"))
+  (define-prefix-command '*window-map*)
+  (define-key *root-map* (kbd "w") '*window-map*)
+  (define-key *window-map* (kbd "y") 'youtube-split)
+  (define-key *window-map* (kbd "Y") 'big-youtube-split)
+  (define-key *window-map* (kbd "j") 'side-bottom-window)
+  (define-key *window-map* (kbd "h") 'side-left-window)
+  (define-key *window-map* (kbd "l") 'side-right-window)
+  (define-key *window-map* (kbd "d") 'window-toggle-side-windows)
 
-     (define-key *root-map* (kbd "f") '*firefox-map*)
+  (define-prefix-command '*firefox-map*)
+  (define-key *firefox-map* (kbd "f") (quickrun-lambda "firefox" "firefox"))
+  (define-key *firefox-map* (kbd "1") (quickrun-lambda "firefox" "firefox1"))
+  (define-key *firefox-map* (kbd "2") (quickrun-lambda "firefox" "firefox2"))
+  (define-key *firefox-map* (kbd "3") (quickrun-lambda "firefox" "firefox3"))
+  (define-key *firefox-map* (kbd "4") (quickrun-lambda "firefox" "firefox4"))
+  (define-key *firefox-map* (kbd "d") (quickrun-lambda "firefox" "development"))
+  (define-key *firefox-map* (kbd "s") (quickrun-lambda "firefox" "school"))
+  (define-key *firefox-map* (kbd "w") (quickrun-lambda "firefox" "work"))
+  (define-key *firefox-map* (kbd "y") (quickrun-lambda "firefox" "youtube"))
 
-     (define-prefix-command '*music-map*)
-     (define-key *music-map* (kbd "SPC") (exec (shell-command "clementine -t")))
-     (define-key *music-map* (kbd "n") (exec (shell-command "clementine --next")))
-     (define-key *music-map* (kbd "p") (exec (shell-command "clementine --previous")))
-     (defhydra clementine-volume-hydra (*music-map* "v")
-       "Clementine volume up and down"
-       ("j" (lambda () (interactive) (shell-command "clementine --volume-down")))
-       ("J" (lambda () (interactive) (shell-command "clementine --volume-decrease-by 25")))
-       ("k" (lambda () (interactive) (shell-command "clementine --volume-up")))
-       ("K" (lambda () (interactive) (shell-command "clementine --volume-increase-by 25")))
-       ("q" nil))
+  (define-key *root-map* (kbd "f") '*firefox-map*)
 
-     (define-key *root-map* (kbd "m") '*music-map*)
-   #+END_SRC
+  (define-prefix-command '*music-map*)
+  (define-key *music-map* (kbd "SPC") (exec (shell-command "clementine -t")))
+  (define-key *music-map* (kbd "n") (exec (shell-command "clementine --next")))
+  (define-key *music-map* (kbd "p") (exec (shell-command "clementine --previous")))
+  (defhydra clementine-volume-hydra (*music-map* "v")
+    "Clementine volume up and down"
+    ("j" (lambda () (interactive) (shell-command "clementine --volume-down")))
+    ("J" (lambda () (interactive) (shell-command "clementine --volume-decrease-by 25")))
+    ("k" (lambda () (interactive) (shell-command "clementine --volume-up")))
+    ("K" (lambda () (interactive) (shell-command "clementine --volume-increase-by 25")))
+    ("q" nil))
+
+  (define-key *root-map* (kbd "m") '*music-map*)
+#+END_SRC
 ** exwm-background
-   #+begin_src emacs-lisp
-     (add-to-list 'load-path "~/.emacs.d/custom/exwm-background/")
-     (require 'exwm-background)
-     (define-key *window-map* (kbd "t") 'exwm-background/window-transparency-hydra/body)
-     (setq window-system-default-frame-alist `((x . ((alpha . (,exwm-background/current-transparency . 50))))))
-     (global-set-key (kbd "s-v") #'exwm-background/toggle-viewing-background)
-     (global-set-key (kbd "s-b") #'exwm-background/exwm-background-window)
-     (define-key desktop-environment-mode-map (kbd "<S-XF86MonBrightnessDown>") #'exwm-background/decrease-transparency)
-     (define-key desktop-environment-mode-map (kbd "<S-XF86MonBrightnessUp>") #'exwm-background/increase-transparency)
-     (define-key *window-map* (kbd "b") #'exwm-background/exwm-background-window)
-     (define-key *root-map* (kbd "k") #'exwm-background/exwm-send-key-to-background)
-     (define-key *root-map* (kbd "C-k") #'exwm-background/exwm-send-key-to-background-loop)
-   #+end_src
+#+begin_src emacs-lisp
+  (add-to-list 'load-path "~/.emacs.d/custom/exwm-background/")
+  (require 'exwm-background)
+  (define-key *window-map* (kbd "t") 'exwm-background/window-transparency-hydra/body)
+  (setq window-system-default-frame-alist `((x . ((alpha . (,exwm-background/current-transparency . 50))))))
+  (global-set-key (kbd "s-v") #'exwm-background/toggle-viewing-background)
+  (global-set-key (kbd "s-b") #'exwm-background/exwm-background-window)
+  (define-key desktop-environment-mode-map (kbd "<S-XF86MonBrightnessDown>") #'exwm-background/decrease-transparency)
+  (define-key desktop-environment-mode-map (kbd "<S-XF86MonBrightnessUp>") #'exwm-background/increase-transparency)
+  (define-key *window-map* (kbd "b") #'exwm-background/exwm-background-window)
+  (define-key *root-map* (kbd "k") #'exwm-background/exwm-send-key-to-background)
+  (define-key *root-map* (kbd "C-k") #'exwm-background/exwm-send-key-to-background-loop)
+#+end_src
 ** toggle dedicated
-   #+begin_src emacs-lisp
-     (defun my/toggle-dedicated-window ()
-       (interactive)
-       (let ((win (selected-window)))
-         (set-window-dedicated-p win (not (window-dedicated-p win)))))
-   #+end_src
+#+begin_src emacs-lisp
+  (defun my/toggle-dedicated-window ()
+    (interactive)
+    (let ((win (selected-window)))
+      (set-window-dedicated-p win (not (window-dedicated-p win)))))
+#+end_src
 ** This is so that I can send fullscreen windows to the back
-   #+begin_src emacs-lisp
-     (cl-defun my/exwm-layout-set-fullscreen (&optional id)
-       "Make window ID fullscreen."
-       (interactive)
-       (exwm--log "id=#x%x" (or id 0))
-       (unless (and (or id (derived-mode-p 'exwm-mode))
-                    (not (exwm-layout--fullscreen-p)))
-         (cl-return-from exwm-layout-set-fullscreen))
-       (with-current-buffer (if id (exwm--id->buffer id) (window-buffer))
-         ;; Expand the X window to fill the whole screen.
-         (with-slots (x y width height) (exwm-workspace--get-geometry exwm--frame)
-           (exwm--set-geometry exwm--id x y width height))
-         ;; Raise the X window.
-         (xcb:+request exwm--connection
-             (make-instance 'xcb:ConfigureWindow
-                            :window exwm--id
-                            :value-mask (logior xcb:ConfigWindow:BorderWidth
-                                                xcb:ConfigWindow:StackMode)
-                            :border-width 0
-                            :stack-mode xcb:StackMode:Above))
-         (xcb:+request exwm--connection
-             (make-instance 'xcb:ewmh:set-_NET_WM_STATE
-                            :window exwm--id
-                            :data (vector xcb:Atom:_NET_WM_STATE_FULLSCREEN)))
-         (xcb:flush exwm--connection)
-         ;;(set-window-dedicated-p (get-buffer-window) t)
-         (cl-pushnew xcb:Atom:_NET_WM_STATE_FULLSCREEN exwm--ewmh-state)
-         (exwm-input--release-keyboard exwm--id)))
+#+begin_src emacs-lisp
+  (cl-defun my/exwm-layout-set-fullscreen (&optional id)
+    "Make window ID fullscreen."
+    (interactive)
+    (exwm--log "id=#x%x" (or id 0))
+    (unless (and (or id (derived-mode-p 'exwm-mode))
+                 (not (exwm-layout--fullscreen-p)))
+      (cl-return-from exwm-layout-set-fullscreen))
+    (with-current-buffer (if id (exwm--id->buffer id) (window-buffer))
+      ;; Expand the X window to fill the whole screen.
+      (with-slots (x y width height) (exwm-workspace--get-geometry exwm--frame)
+        (exwm--set-geometry exwm--id x y width height))
+      ;; Raise the X window.
+      (xcb:+request exwm--connection
+          (make-instance 'xcb:ConfigureWindow
+                         :window exwm--id
+                         :value-mask (logior xcb:ConfigWindow:BorderWidth
+                                             xcb:ConfigWindow:StackMode)
+                         :border-width 0
+                         :stack-mode xcb:StackMode:Above))
+      (xcb:+request exwm--connection
+          (make-instance 'xcb:ewmh:set-_NET_WM_STATE
+                         :window exwm--id
+                         :data (vector xcb:Atom:_NET_WM_STATE_FULLSCREEN)))
+      (xcb:flush exwm--connection)
+      ;;(set-window-dedicated-p (get-buffer-window) t)
+      (cl-pushnew xcb:Atom:_NET_WM_STATE_FULLSCREEN exwm--ewmh-state)
+      (exwm-input--release-keyboard exwm--id)))
 
 
-     (advice-add #'exwm-layout-set-fullscreen :override #'my/exwm-layout-set-fullscreen)
-   #+end_src
+  (advice-add #'exwm-layout-set-fullscreen :override #'my/exwm-layout-set-fullscreen)
+#+end_src
 ** Switch window
-   #+BEGIN_SRC emacs-lisp
-     (setq switch-window-input-style 'minibuffer)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (setq switch-window-input-style 'minibuffer)
+#+END_SRC
 ** Multimonitor support
 #+BEGIN_SRC emacs-lisp
-(require 'exwm-randr)
-(exwm-randr-enable)
+  (require 'exwm-randr)
+  (exwm-randr-enable)
 #+END_SRC
 ** Keybindings
 #+BEGIN_SRC emacs-lisp
@@ -474,7 +473,7 @@
                          exwm-workspace--switch-map nil
                          `(exwm-workspace--switch-history . ,current-idx)))
            (workspace-idx (mod (1- (cl-position history-idx exwm-workspace--switch-history
-                                       :test #'equal)) 
+                                                :test #'equal)) 
                                10)))
       (elt exwm-workspace--list workspace-idx)))
 
@@ -568,68 +567,68 @@
                      t)))
 #+END_SRC
 ** Workspace WIP
-   #+BEGIN_SRC emacs-lisp
-     (defvar workspace-list '(("s" 0 "school")
-                              ("y" 1 "youtube")
-                              ("w" 2 "work")
-                              ("r" 3 "research")
-                              ("c" 4 "code"))
-       "My custom workspace list")
+#+BEGIN_SRC emacs-lisp
+  (defvar workspace-list '(("s" 0 "school")
+                           ("y" 1 "youtube")
+                           ("w" 2 "work")
+                           ("r" 3 "research")
+                           ("c" 4 "code"))
+    "My custom workspace list")
 
-     (defun workspace-switch-prompt ()
-       (exwm-workspace--update-switch-history)
-       (let* ((current-workspace (exwm-workspace--position exwm-workspace--current))
-              (workspace-string (elt exwm-workspace--switch-history current-workspace)))
-         (mapcar (lambda (x)
-                   (setq workspace-string
-                         (replace-regexp-in-string (number-to-string (cadr x))
-                                                   (caddr x)
-                                                   workspace-string)))
-                 workspace-list)
-         workspace-string))
+  (defun workspace-switch-prompt ()
+    (exwm-workspace--update-switch-history)
+    (let* ((current-workspace (exwm-workspace--position exwm-workspace--current))
+           (workspace-string (elt exwm-workspace--switch-history current-workspace)))
+      (mapcar (lambda (x)
+                (setq workspace-string
+                      (replace-regexp-in-string (number-to-string (cadr x))
+                                                (caddr x)
+                                                workspace-string)))
+              workspace-list)
+      workspace-string))
 
-     (defun my-workspace-switch ()
-       (interactive)
-       (let* ((letter (read-char (workspace-switch-prompt)))
-             (ws-info (assoc (char-to-string letter)
-                             workspace-list)))
-         (if ws-info
-           (exwm-workspace-switch (cadr ws-info))
-           (exwm-workspace-switch (string-to-number
-                                   (char-to-string
-                                    letter))))))
+  (defun my-workspace-switch ()
+    (interactive)
+    (let* ((letter (read-char (workspace-switch-prompt)))
+          (ws-info (assoc (char-to-string letter)
+                          workspace-list)))
+      (if ws-info
+        (exwm-workspace-switch (cadr ws-info))
+        (exwm-workspace-switch (string-to-number
+                                (char-to-string
+                                 letter))))))
 
-     (global-set-key (kbd "s-w") 'my-workspace-switch)
-     (global-set-key (kbd "s-l") '(lambda () (interactive) (launch-program "i3lock-fancy")))
-   #+END_SRC
+  (global-set-key (kbd "s-w") 'my-workspace-switch)
+  (global-set-key (kbd "s-l") '(lambda () (interactive) (launch-program "i3lock-fancy")))
+#+END_SRC
 ** Simulation keys
 #+BEGIN_SRC emacs-lisp
-(setq exwm-input-simulation-keys
- '(
-    ;; movement
-    ([?\C-b] . left)
-    ([?\M-b] . C-left)
-    ([?\C-f] . right)
-    ([?\M-f] . C-right)
-    ([?\C-p] . up)
-    ([?\C-n] . down)
-    ([?\C-a] . home)
-    ([?\C-e] . end)
-    ([?\M-v] . prior)
-    ([?\C-v] . next)
-    ([?\C-d] . delete)
-    ([?\M-d] . backspace)
-    ([?\C-k] . (S-end delete))
-    ;; cut/paste.
-    ([?\C-w] . ?\C-x)
-    ([?\M-w] . ?\C-c)
-    ([?\C-y] . ?\C-v)
-    ;; search
-    ([?\C-s] . ?\C-f)
-    ([?\C-.] . ?\C-w)
-    ([?\C-/] . ?\C-z)
-    ([?\M-s] . ?\C-s)
-))
+  (setq exwm-input-simulation-keys
+   '(
+      ;; movement
+      ([?\C-b] . left)
+      ([?\M-b] . C-left)
+      ([?\C-f] . right)
+      ([?\M-f] . C-right)
+      ([?\C-p] . up)
+      ([?\C-n] . down)
+      ([?\C-a] . home)
+      ([?\C-e] . end)
+      ([?\M-v] . prior)
+      ([?\C-v] . next)
+      ([?\C-d] . delete)
+      ([?\M-d] . backspace)
+      ([?\C-k] . (S-end delete))
+      ;; cut/paste.
+      ([?\C-w] . ?\C-x)
+      ([?\M-w] . ?\C-c)
+      ([?\C-y] . ?\C-v)
+      ;; search
+      ([?\C-s] . ?\C-f)
+      ([?\C-.] . ?\C-w)
+      ([?\C-/] . ?\C-z)
+      ([?\M-s] . ?\C-s)
+  ))
 #+END_SRC
 
 ** Startup
@@ -682,356 +681,356 @@
 #+END_SRC
 
 *** System tray, display time, display battery, display hard-drive-space
- #+BEGIN_SRC emacs-lisp   
-   (require 'exwm-systemtray)
-   (exwm-systemtray-enable)
-   (setq display-time-day-and-date t)
+#+BEGIN_SRC emacs-lisp   
+  (require 'exwm-systemtray)
+  (exwm-systemtray-enable)
+  (setq display-time-day-and-date t)
 
-   (defvar my/exclude-buffer-modes '(helm-major-mode messages-buffer-mode special-mode))
+  (defvar my/exclude-buffer-modes '(helm-major-mode messages-buffer-mode special-mode))
 
-   (defun my-buffer-predicate (buf)
-     (with-current-buffer buf
-       (if (memq major-mode my/exclude-buffer-modes)
-           nil
-         (exwm-layout--other-buffer-predicate buf))))
+  (defun my-buffer-predicate (buf)
+    (with-current-buffer buf
+      (if (memq major-mode my/exclude-buffer-modes)
+          nil
+        (exwm-layout--other-buffer-predicate buf))))
 
-   (add-hook 'exwm-init-hook
-             (lambda ()
-               (interactive) 
-               (modify-all-frames-parameters
-		'((buffer-predicate . my-buffer-predicate)))))
+  (add-hook 'exwm-init-hook
+            (lambda ()
+              (interactive) 
+              (modify-all-frames-parameters
+       '((buffer-predicate . my-buffer-predicate)))))
 
-   ;; Display hard drive space
-   (add-hook 'display-time-hook 'update-hard-drive-space-string)
+  ;; Display hard drive space
+  (add-hook 'display-time-hook 'update-hard-drive-space-string)
 
-   (display-time-mode)
-   (display-battery-mode)
-   (display-hard-drive-space-mode)
- #+END_SRC
+  (display-time-mode)
+  (display-battery-mode)
+  (display-hard-drive-space-mode)
+#+END_SRC
 
 ** Shutdown
-   #+BEGIN_SRC emacs-lisp
-     (add-hook 'exwm-exit-hook 'org-save-all-org-buffers)
-     ;;(add-hook 'exwm-exit-hook 'save-org-agenda-files)
-     (eval-after-load "term"
-       '(progn 
-          (define-key term-raw-map (kbd "C-c C-y") 'term-paste)
-          (define-key term-raw-map (kbd "M-x") 'helm-M-x)))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'exwm-exit-hook 'org-save-all-org-buffers)
+  ;;(add-hook 'exwm-exit-hook 'save-org-agenda-files)
+  (eval-after-load "term"
+    '(progn 
+       (define-key term-raw-map (kbd "C-c C-y") 'term-paste)
+       (define-key term-raw-map (kbd "M-x") 'helm-M-x)))
+#+END_SRC
 ** Xephyr launches in tiling-mode
-   #+BEGIN_SRC emacs-lisp
-     (setq exwm-manage-configurations `(((equal exwm-class-name "Xephyr")
-                                         floating nil 
-                                         char-mode t
-                                         fullscreen t)
-                                        ((equal exwm-class-name "plasmashell")
-                                         floating t)))
+#+BEGIN_SRC emacs-lisp
+  (setq exwm-manage-configurations `(((equal exwm-class-name "Xephyr")
+                                      floating nil 
+                                      char-mode t
+                                      fullscreen t)
+                                     ((equal exwm-class-name "plasmashell")
+                                      floating t)))
 
-   #+END_SRC
+#+END_SRC
 ** Wallpaper
-   #+BEGIN_SRC emacs-lisp
-   (setq wallpaper-path "/home/benson/.emacs.d/res/digital_space_universe_4k_8k-wide.jpg")
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (setq wallpaper-path "/home/benson/.emacs.d/res/digital_space_universe_4k_8k-wide.jpg")
+#+END_SRC
 ** Volume
-   #+BEGIN_SRC emacs-lisp
-   (use-package volume)
-   (define-key *root-map* (kbd "v") 'volume)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package volume)
+  (define-key *root-map* (kbd "v") 'volume)
+#+END_SRC
 ** exwm-edit
-   #+begin_src emacs-lisp
-     (use-package exwm-edit)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package exwm-edit)
+#+end_src
 ** Floating windows don't need that many faces ^_^
-   #+begin_src emacs-lisp
-     (defun my/frame-dont-copy-faces (frame &optional parameters)
-       "Initialize the frame-local faces of FRAME.
-     Calculate the face definitions using the face specs, custom theme
-     settings, X resources, and `face-new-frame-defaults'.
-     Finally, apply any relevant face attributes found amongst the
-     frame parameters in PARAMETERS."
-       ;; The `reverse' is so that `default' goes first.
-       ;; (dolist (face (nreverse (face-list)))
-       ;;   (condition-case ()
-       ;;   (progn
-       ;;     ;; Initialize faces from face spec and custom theme.
-       ;;     (face-spec-recalc face frame)
-       ;;     ;; Apply attributes specified by face-new-frame-defaults
-       ;;     (internal-merge-in-global-face face frame))
-       ;;     ;; Don't let invalid specs prevent frame creation.
-       ;;     (error nil)))
+#+begin_src emacs-lisp
+  (defun my/frame-dont-copy-faces (frame &optional parameters)
+    "Initialize the frame-local faces of FRAME.
+  Calculate the face definitions using the face specs, custom theme
+  settings, X resources, and `face-new-frame-defaults'.
+  Finally, apply any relevant face attributes found amongst the
+  frame parameters in PARAMETERS."
+    ;; The `reverse' is so that `default' goes first.
+    ;; (dolist (face (nreverse (face-list)))
+    ;;   (condition-case ()
+    ;;   (progn
+    ;;     ;; Initialize faces from face spec and custom theme.
+    ;;     (face-spec-recalc face frame)
+    ;;     ;; Apply attributes specified by face-new-frame-defaults
+    ;;     (internal-merge-in-global-face face frame))
+    ;;     ;; Don't let invalid specs prevent frame creation.
+    ;;     (error nil)))
 
-       ;; Apply attributes specified by frame parameters.
-       (let ((face-params '((foreground-color default :foreground)
-                    (background-color default :background)
-                            (font default :font)
-                    (border-color border :background)
-                    (cursor-color cursor :background)
-                    (scroll-bar-foreground scroll-bar :foreground)
-                    (scroll-bar-background scroll-bar :background)
-                    (mouse-color mouse :background))))
-         (dolist (param face-params)
-           (let* ((param-name (nth 0 param))
-              (value (cdr (assq param-name parameters))))
-         (if value
-             (set-face-attribute (nth 1 param) frame
-                                 (nth 2 param) value))))))
+    ;; Apply attributes specified by frame parameters.
+    (let ((face-params '((foreground-color default :foreground)
+                 (background-color default :background)
+                         (font default :font)
+                 (border-color border :background)
+                 (cursor-color cursor :background)
+                 (scroll-bar-foreground scroll-bar :foreground)
+                 (scroll-bar-background scroll-bar :background)
+                 (mouse-color mouse :background))))
+      (dolist (param face-params)
+        (let* ((param-name (nth 0 param))
+           (value (cdr (assq param-name parameters))))
+      (if value
+          (set-face-attribute (nth 1 param) frame
+                              (nth 2 param) value))))))
 
-     (defun my/exwm-floating--set-floating (id)
-       "Make window ID floating."
-       (let ((window (get-buffer-window (exwm--id->buffer id))))
-         (when window
-           ;; Hide the non-floating X window first.
-           (set-window-buffer window (other-buffer nil t))))
-       (let* ((original-frame (buffer-local-value 'exwm--frame
-                                                  (exwm--id->buffer id)))
-              ;; Create new frame
-              (frame (with-current-buffer
-                         (or (get-buffer "*scratch*")
-                             (progn
-                               (set-buffer-major-mode
-                                (get-buffer-create "*scratch*"))
-                               (get-buffer "*scratch*")))
-                       (prog2
-                           (advice-add 'face-set-after-frame-default :override 'my/frame-dont-copy-faces)
-                           (make-frame
-                            `((minibuffer . ,(minibuffer-window exwm--frame))
-                              (left . ,(* window-min-width -100))
-                              (top . ,(* window-min-height -100))
-                              (width . ,window-min-width)
-                              (height . ,window-min-height)
-                              (unsplittable . t)))
-                         (advice-remove 'face-set-after-frame-default 'my/frame-dont-copy-faces)))) ;and fix the size later
-              (outer-id (string-to-number (frame-parameter frame 'outer-window-id)))
-              (window-id (string-to-number (frame-parameter frame 'window-id)))
-              (frame-container (xcb:generate-id exwm--connection))
-              (window (frame-first-window frame)) ;and it's the only window
-              (x (slot-value exwm--geometry 'x))
-              (y (slot-value exwm--geometry 'y))
-              (width (slot-value exwm--geometry 'width))
-              (height (slot-value exwm--geometry 'height)))
-         (exwm--log "Floating geometry (original): %dx%d%+d%+d" width height x y)
-         ;; Save frame parameters.
-         (set-frame-parameter frame 'exwm-outer-id outer-id)
-         (set-frame-parameter frame 'exwm-id window-id)
-         (set-frame-parameter frame 'exwm-container frame-container)
-         ;; Fix illegal parameters
-         ;; FIXME: check normal hints restrictions
-         (let* ((workarea (elt exwm-workspace--workareas
-                               (exwm-workspace--position original-frame)))
-                (x* (aref workarea 0))
-                (y* (aref workarea 1))
-                (width* (aref workarea 2))
-                (height* (aref workarea 3)))
-           ;; Center floating windows
-           (when (and (or (= x 0) (= x x*))
-                      (or (= y 0) (= y y*)))
-             (let ((buffer (exwm--id->buffer exwm-transient-for))
-                   window edges)
-               (when (and buffer (setq window (get-buffer-window buffer)))
-                 (setq edges (window-inside-absolute-pixel-edges window))
-                 (unless (and (<= width (- (elt edges 2) (elt edges 0)))
-                              (<= height (- (elt edges 3) (elt edges 1))))
-                   (setq edges nil)))
-               (if edges
-                   ;; Put at the center of leading window
-                   (setq x (+ x* (/ (- (elt edges 2) (elt edges 0) width) 2))
-                         y (+ y* (/ (- (elt edges 3) (elt edges 1) height) 2)))
-                 ;; Put at the center of screen
-                 (setq x (/ (- width* width) 2)
-                       y (/ (- height* height) 2)))))
-           (if (> width width*)
-               ;; Too wide
-               (progn (setq x x*
-                            width width*))
-             ;; Invalid width
-             (when (= 0 width) (setq width (/ width* 2)))
-             ;; Make sure at least half of the window is visible
-             (unless (< x* (+ x (/ width 2)) (+ x* width*))
-               (setq x (+ x* (/ (- width* width) 2)))))
-           (if (> height height*)
-               ;; Too tall
-               (setq y y*
-                     height height*)
-             ;; Invalid height
-             (when (= 0 height) (setq height (/ height* 2)))
-             ;; Make sure at least half of the window is visible
-             (unless (< y* (+ y (/ height 2)) (+ y* height*))
-               (setq y (+ y* (/ (- height* height) 2)))))
-           ;; The geometry can be overridden by user options.
-           (let ((x** (plist-get exwm--configurations 'x))
-                 (y** (plist-get exwm--configurations 'y))
-                 (width** (plist-get exwm--configurations 'width))
-                 (height** (plist-get exwm--configurations 'height)))
-             (if (integerp x**)
-                 (setq x (+ x* x**))
-               (when (and (floatp x**)
-                          (>= 1 x** 0))
-                 (setq x (+ x* (round (* x** width*))))))
-             (if (integerp y**)
-                 (setq y (+ y* y**))
-               (when (and (floatp y**)
-                          (>= 1 y** 0))
-                 (setq y (+ y* (round (* y** height*))))))
-             (if (integerp width**)
-                 (setq width width**)
-               (when (and (floatp width**)
-                          (> 1 width** 0))
-                 (setq width (max 1 (round (* width** width*))))))
-             (if (integerp height**)
-                 (setq height height**)
-               (when (and (floatp height**)
-                          (> 1 height** 0))
-                 (setq height (max 1 (round (* height** height*))))))))
-         (exwm--set-geometry id x y nil nil)
-         (xcb:flush exwm--connection)
-         (exwm--log "Floating geometry (corrected): %dx%d%+d%+d" width height x y)
-         ;; Fit frame to client
-         ;; It seems we have to make the frame invisible in order to resize it
-         ;; timely.
-         ;; The frame will be made visible by `select-frame-set-input-focus'.
-         (make-frame-invisible frame)
-         (let* ((edges (window-inside-pixel-edges window))
-                (frame-width (+ width (- (frame-pixel-width frame)
-                                         (- (elt edges 2) (elt edges 0)))))
-                (frame-height (+ height (- (frame-pixel-height frame)
-                                           (- (elt edges 3) (elt edges 1)))))
-                (floating-mode-line (plist-get exwm--configurations
-                                               'floating-mode-line))
-                (floating-header-line (plist-get exwm--configurations
-                                                 'floating-header-line)))
-           (if floating-mode-line
-               (setq exwm--mode-line-format (or exwm--mode-line-format
-                                                mode-line-format)
-                     mode-line-format floating-mode-line)
-             (if (and (not (plist-member exwm--configurations 'floating-mode-line))
-                      exwm--mwm-hints-decorations)
-                 (when exwm--mode-line-format
-                   (setq mode-line-format exwm--mode-line-format))
-               ;; The mode-line need to be hidden in floating mode.
-               (setq frame-height (- frame-height (window-mode-line-height
-                                                   (frame-root-window frame)))
-                     exwm--mode-line-format (or exwm--mode-line-format
-                                                mode-line-format)
-                     mode-line-format nil)))
-           (if floating-header-line
-               (setq header-line-format floating-header-line)
-             (if (and (not (plist-member exwm--configurations
-                                         'floating-header-line))
-                      exwm--mwm-hints-decorations)
-                 (setq header-line-format nil)
-               ;; The header-line need to be hidden in floating header.
-               (setq frame-height (- frame-height (window-header-line-height
-                                                   (frame-root-window frame)))
-                     header-line-format nil)))
-           (set-frame-size frame frame-width frame-height t)
-           ;; Create the frame container as the parent of the frame.
-           (xcb:+request exwm--connection
-               (make-instance 'xcb:CreateWindow
-                              :depth 0
-                              :wid frame-container
-                              :parent exwm--root
-                              :x (- x (elt edges 0))
-                              :y (- y (elt edges 1))
-                              :width width
-                              :height height
-                              :border-width
-                              (with-current-buffer (exwm--id->buffer id)
-                                (let ((border-witdh (plist-get exwm--configurations
-                                                               'border-width)))
-                                  (if (and (integerp border-witdh)
-                                           (>= border-witdh 0))
-                                      border-witdh
-                                    exwm-floating-border-width)))
-                              :class xcb:WindowClass:InputOutput
-                              :visual 0
-                              :value-mask (logior xcb:CW:BackPixmap
-                                                  (if exwm-floating--border-pixel
-                                                      xcb:CW:BorderPixel 0)
-                                                  xcb:CW:OverrideRedirect
-                                                  (if exwm-floating--border-colormap
-                                                      xcb:CW:Colormap 0))
-                              :background-pixmap xcb:BackPixmap:ParentRelative
-                              :border-pixel exwm-floating--border-pixel
-                              :override-redirect 1
-                              :colormap exwm-floating--border-colormap))
-           (xcb:+request exwm--connection
-               (make-instance 'xcb:ewmh:set-_NET_WM_NAME
-                              :window frame-container
-                              :data
-                              (format "EXWM floating frame container for 0x%x" id)))
-           ;; Map it.
-           (xcb:+request exwm--connection
-               (make-instance 'xcb:MapWindow :window frame-container))
-           ;; Put the X window right above this frame container.
-           (xcb:+request exwm--connection
-               (make-instance 'xcb:ConfigureWindow
-                              :window id
-                              :value-mask (logior xcb:ConfigWindow:Sibling
-                                                  xcb:ConfigWindow:StackMode)
-                              :sibling frame-container
-                              :stack-mode xcb:StackMode:Above)))
-         ;; Reparent this frame to its container.
-         (xcb:+request exwm--connection
-             (make-instance 'xcb:ReparentWindow
-                            :window outer-id :parent frame-container :x 0 :y 0))
-         (exwm-floating--set-allowed-actions id nil)
-         (xcb:flush exwm--connection)
-         ;; Set window/buffer
-         (with-current-buffer (exwm--id->buffer id)
-           (setq window-size-fixed exwm--fixed-size
-                 exwm--floating-frame frame)
-           ;; Do the refresh manually.
-           (remove-hook 'window-configuration-change-hook #'exwm-layout--refresh)
-           (set-window-buffer window (current-buffer)) ;this changes current buffer
-           (add-hook 'window-configuration-change-hook #'exwm-layout--refresh)
-           (set-window-dedicated-p window t)
-           (exwm-layout--show id window))
-         (with-current-buffer (exwm--id->buffer id)
-           (if (exwm-layout--iconic-state-p id)
-               ;; Hide iconic floating X windows.
-               (exwm-floating-hide)
-             (with-selected-frame exwm--frame
-               (exwm-layout--refresh)))
-           (select-frame-set-input-focus frame))
-         ;; FIXME: Strangely, the Emacs frame can move itself at this point
-         ;;        when there are left/top struts set.  Force resetting its
-         ;;        position seems working, but it'd better to figure out why.
-         ;; FIXME: This also happens in another case (#220) where the cause is
-         ;;        still unclear.
-         (exwm--set-geometry outer-id 0 0 nil nil)
-         (xcb:flush exwm--connection))
-       (with-current-buffer (exwm--id->buffer id)
-         (run-hooks 'exwm-floating-setup-hook))
-       ;; Redraw the frame.
-       (redisplay))
+  (defun my/exwm-floating--set-floating (id)
+    "Make window ID floating."
+    (let ((window (get-buffer-window (exwm--id->buffer id))))
+      (when window
+        ;; Hide the non-floating X window first.
+        (set-window-buffer window (other-buffer nil t))))
+    (let* ((original-frame (buffer-local-value 'exwm--frame
+                                               (exwm--id->buffer id)))
+           ;; Create new frame
+           (frame (with-current-buffer
+                      (or (get-buffer "*scratch*")
+                          (progn
+                            (set-buffer-major-mode
+                             (get-buffer-create "*scratch*"))
+                            (get-buffer "*scratch*")))
+                    (prog2
+                        (advice-add 'face-set-after-frame-default :override 'my/frame-dont-copy-faces)
+                        (make-frame
+                         `((minibuffer . ,(minibuffer-window exwm--frame))
+                           (left . ,(* window-min-width -100))
+                           (top . ,(* window-min-height -100))
+                           (width . ,window-min-width)
+                           (height . ,window-min-height)
+                           (unsplittable . t)))
+                      (advice-remove 'face-set-after-frame-default 'my/frame-dont-copy-faces)))) ;and fix the size later
+           (outer-id (string-to-number (frame-parameter frame 'outer-window-id)))
+           (window-id (string-to-number (frame-parameter frame 'window-id)))
+           (frame-container (xcb:generate-id exwm--connection))
+           (window (frame-first-window frame)) ;and it's the only window
+           (x (slot-value exwm--geometry 'x))
+           (y (slot-value exwm--geometry 'y))
+           (width (slot-value exwm--geometry 'width))
+           (height (slot-value exwm--geometry 'height)))
+      (exwm--log "Floating geometry (original): %dx%d%+d%+d" width height x y)
+      ;; Save frame parameters.
+      (set-frame-parameter frame 'exwm-outer-id outer-id)
+      (set-frame-parameter frame 'exwm-id window-id)
+      (set-frame-parameter frame 'exwm-container frame-container)
+      ;; Fix illegal parameters
+      ;; FIXME: check normal hints restrictions
+      (let* ((workarea (elt exwm-workspace--workareas
+                            (exwm-workspace--position original-frame)))
+             (x* (aref workarea 0))
+             (y* (aref workarea 1))
+             (width* (aref workarea 2))
+             (height* (aref workarea 3)))
+        ;; Center floating windows
+        (when (and (or (= x 0) (= x x*))
+                   (or (= y 0) (= y y*)))
+          (let ((buffer (exwm--id->buffer exwm-transient-for))
+                window edges)
+            (when (and buffer (setq window (get-buffer-window buffer)))
+              (setq edges (window-inside-absolute-pixel-edges window))
+              (unless (and (<= width (- (elt edges 2) (elt edges 0)))
+                           (<= height (- (elt edges 3) (elt edges 1))))
+                (setq edges nil)))
+            (if edges
+                ;; Put at the center of leading window
+                (setq x (+ x* (/ (- (elt edges 2) (elt edges 0) width) 2))
+                      y (+ y* (/ (- (elt edges 3) (elt edges 1) height) 2)))
+              ;; Put at the center of screen
+              (setq x (/ (- width* width) 2)
+                    y (/ (- height* height) 2)))))
+        (if (> width width*)
+            ;; Too wide
+            (progn (setq x x*
+                         width width*))
+          ;; Invalid width
+          (when (= 0 width) (setq width (/ width* 2)))
+          ;; Make sure at least half of the window is visible
+          (unless (< x* (+ x (/ width 2)) (+ x* width*))
+            (setq x (+ x* (/ (- width* width) 2)))))
+        (if (> height height*)
+            ;; Too tall
+            (setq y y*
+                  height height*)
+          ;; Invalid height
+          (when (= 0 height) (setq height (/ height* 2)))
+          ;; Make sure at least half of the window is visible
+          (unless (< y* (+ y (/ height 2)) (+ y* height*))
+            (setq y (+ y* (/ (- height* height) 2)))))
+        ;; The geometry can be overridden by user options.
+        (let ((x** (plist-get exwm--configurations 'x))
+              (y** (plist-get exwm--configurations 'y))
+              (width** (plist-get exwm--configurations 'width))
+              (height** (plist-get exwm--configurations 'height)))
+          (if (integerp x**)
+              (setq x (+ x* x**))
+            (when (and (floatp x**)
+                       (>= 1 x** 0))
+              (setq x (+ x* (round (* x** width*))))))
+          (if (integerp y**)
+              (setq y (+ y* y**))
+            (when (and (floatp y**)
+                       (>= 1 y** 0))
+              (setq y (+ y* (round (* y** height*))))))
+          (if (integerp width**)
+              (setq width width**)
+            (when (and (floatp width**)
+                       (> 1 width** 0))
+              (setq width (max 1 (round (* width** width*))))))
+          (if (integerp height**)
+              (setq height height**)
+            (when (and (floatp height**)
+                       (> 1 height** 0))
+              (setq height (max 1 (round (* height** height*))))))))
+      (exwm--set-geometry id x y nil nil)
+      (xcb:flush exwm--connection)
+      (exwm--log "Floating geometry (corrected): %dx%d%+d%+d" width height x y)
+      ;; Fit frame to client
+      ;; It seems we have to make the frame invisible in order to resize it
+      ;; timely.
+      ;; The frame will be made visible by `select-frame-set-input-focus'.
+      (make-frame-invisible frame)
+      (let* ((edges (window-inside-pixel-edges window))
+             (frame-width (+ width (- (frame-pixel-width frame)
+                                      (- (elt edges 2) (elt edges 0)))))
+             (frame-height (+ height (- (frame-pixel-height frame)
+                                        (- (elt edges 3) (elt edges 1)))))
+             (floating-mode-line (plist-get exwm--configurations
+                                            'floating-mode-line))
+             (floating-header-line (plist-get exwm--configurations
+                                              'floating-header-line)))
+        (if floating-mode-line
+            (setq exwm--mode-line-format (or exwm--mode-line-format
+                                             mode-line-format)
+                  mode-line-format floating-mode-line)
+          (if (and (not (plist-member exwm--configurations 'floating-mode-line))
+                   exwm--mwm-hints-decorations)
+              (when exwm--mode-line-format
+                (setq mode-line-format exwm--mode-line-format))
+            ;; The mode-line need to be hidden in floating mode.
+            (setq frame-height (- frame-height (window-mode-line-height
+                                                (frame-root-window frame)))
+                  exwm--mode-line-format (or exwm--mode-line-format
+                                             mode-line-format)
+                  mode-line-format nil)))
+        (if floating-header-line
+            (setq header-line-format floating-header-line)
+          (if (and (not (plist-member exwm--configurations
+                                      'floating-header-line))
+                   exwm--mwm-hints-decorations)
+              (setq header-line-format nil)
+            ;; The header-line need to be hidden in floating header.
+            (setq frame-height (- frame-height (window-header-line-height
+                                                (frame-root-window frame)))
+                  header-line-format nil)))
+        (set-frame-size frame frame-width frame-height t)
+        ;; Create the frame container as the parent of the frame.
+        (xcb:+request exwm--connection
+            (make-instance 'xcb:CreateWindow
+                           :depth 0
+                           :wid frame-container
+                           :parent exwm--root
+                           :x (- x (elt edges 0))
+                           :y (- y (elt edges 1))
+                           :width width
+                           :height height
+                           :border-width
+                           (with-current-buffer (exwm--id->buffer id)
+                             (let ((border-witdh (plist-get exwm--configurations
+                                                            'border-width)))
+                               (if (and (integerp border-witdh)
+                                        (>= border-witdh 0))
+                                   border-witdh
+                                 exwm-floating-border-width)))
+                           :class xcb:WindowClass:InputOutput
+                           :visual 0
+                           :value-mask (logior xcb:CW:BackPixmap
+                                               (if exwm-floating--border-pixel
+                                                   xcb:CW:BorderPixel 0)
+                                               xcb:CW:OverrideRedirect
+                                               (if exwm-floating--border-colormap
+                                                   xcb:CW:Colormap 0))
+                           :background-pixmap xcb:BackPixmap:ParentRelative
+                           :border-pixel exwm-floating--border-pixel
+                           :override-redirect 1
+                           :colormap exwm-floating--border-colormap))
+        (xcb:+request exwm--connection
+            (make-instance 'xcb:ewmh:set-_NET_WM_NAME
+                           :window frame-container
+                           :data
+                           (format "EXWM floating frame container for 0x%x" id)))
+        ;; Map it.
+        (xcb:+request exwm--connection
+            (make-instance 'xcb:MapWindow :window frame-container))
+        ;; Put the X window right above this frame container.
+        (xcb:+request exwm--connection
+            (make-instance 'xcb:ConfigureWindow
+                           :window id
+                           :value-mask (logior xcb:ConfigWindow:Sibling
+                                               xcb:ConfigWindow:StackMode)
+                           :sibling frame-container
+                           :stack-mode xcb:StackMode:Above)))
+      ;; Reparent this frame to its container.
+      (xcb:+request exwm--connection
+          (make-instance 'xcb:ReparentWindow
+                         :window outer-id :parent frame-container :x 0 :y 0))
+      (exwm-floating--set-allowed-actions id nil)
+      (xcb:flush exwm--connection)
+      ;; Set window/buffer
+      (with-current-buffer (exwm--id->buffer id)
+        (setq window-size-fixed exwm--fixed-size
+              exwm--floating-frame frame)
+        ;; Do the refresh manually.
+        (remove-hook 'window-configuration-change-hook #'exwm-layout--refresh)
+        (set-window-buffer window (current-buffer)) ;this changes current buffer
+        (add-hook 'window-configuration-change-hook #'exwm-layout--refresh)
+        (set-window-dedicated-p window t)
+        (exwm-layout--show id window))
+      (with-current-buffer (exwm--id->buffer id)
+        (if (exwm-layout--iconic-state-p id)
+            ;; Hide iconic floating X windows.
+            (exwm-floating-hide)
+          (with-selected-frame exwm--frame
+            (exwm-layout--refresh)))
+        (select-frame-set-input-focus frame))
+      ;; FIXME: Strangely, the Emacs frame can move itself at this point
+      ;;        when there are left/top struts set.  Force resetting its
+      ;;        position seems working, but it'd better to figure out why.
+      ;; FIXME: This also happens in another case (#220) where the cause is
+      ;;        still unclear.
+      (exwm--set-geometry outer-id 0 0 nil nil)
+      (xcb:flush exwm--connection))
+    (with-current-buffer (exwm--id->buffer id)
+      (run-hooks 'exwm-floating-setup-hook))
+    ;; Redraw the frame.
+    (redisplay))
 
-     (advice-add #'exwm-floating--set-floating :override #'my/exwm-floating--set-floating)
-   #+end_src
+  (advice-add #'exwm-floating--set-floating :override #'my/exwm-floating--set-floating)
+#+end_src
 * Emacs
 ** Reload Config
- #+BEGIN_SRC emacs-lisp
- (defun reload-config () (interactive) (load-file "~/.emacs.d/init.el"))
- #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (defun reload-config () (interactive) (load-file "~/.emacs.d/init.el"))
+#+END_SRC
 ** Select Help Window
- #+BEGIN_SRC emacs-lisp
- (setq help-window-select t)
- #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (setq help-window-select t)
+#+END_SRC
 ** Multi-term
- #+BEGIN_SRC emacs-lisp
-   (use-package multi-term)
-   (define-key term-mode-map (kbd "M-'") 'scroll-down)
-   (unbind-key (kbd "C-t") term-mode-map)
-   (add-hook 'term-mode-hook
-	     (lambda ()
-	       (add-to-list 'term-bind-key-alist '("M-[" . multi-term-prev))
-	       (add-to-list 'term-bind-key-alist '("M-]" . multi-term-next))
-	       (add-to-list 'term-bind-key-alist '("M-'" . scroll-down))
-	       (add-to-list 'term-bind-key-alist '("C-t" . *root-map*))))
- #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package multi-term)
+  (define-key term-mode-map (kbd "M-'") 'scroll-down)
+  (unbind-key (kbd "C-t") term-mode-map)
+  (add-hook 'term-mode-hook
+        (lambda ()
+          (add-to-list 'term-bind-key-alist '("M-[" . multi-term-prev))
+          (add-to-list 'term-bind-key-alist '("M-]" . multi-term-next))
+          (add-to-list 'term-bind-key-alist '("M-'" . scroll-down))
+          (add-to-list 'term-bind-key-alist '("C-t" . *root-map*))))
+#+END_SRC
 ** resize-window
 #+BEGIN_SRC emacs-lisp
-(use-package resize-window)
-(global-set-key (kbd "M-1") 'resize-window)
+  (use-package resize-window)
+  (global-set-key (kbd "M-1") 'resize-window)
 #+END_SRC
 ** which-key
 #+BEGIN_SRC emacs-lisp
@@ -1040,96 +1039,96 @@
   (which-key-mode)
 #+END_SRC
 ** beacon
-   #+BEGIN_SRC emacs-lisp
-     (use-package beacon)
-     (beacon-mode 1)
-     (setq beacon-blink-delay 0.1)
-     (setq beacon-color "#006400")
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package beacon)
+  (beacon-mode 1)
+  (setq beacon-blink-delay 0.1)
+  (setq beacon-color "#006400")
+#+END_SRC
 ** Dashboard
-   #+BEGIN_SRC emacs-lisp
-   (use-package dashboard)
-   ;(dashboard-setup-startup-hook)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package dashboard)
+  ;(dashboard-setup-startup-hook)
+#+END_SRC
 ** undo-tree
 #+BEGIN_SRC emacs-lisp
-(use-package undo-tree)
+  (use-package undo-tree)
 #+END_SRC
 ** advice for shell-command
-   #+begin_src emacs-lisp
-     (defun my/shell-command-advice (&rest args)
-       (switch-to-buffer "*Shell Command Output*"))
+#+begin_src emacs-lisp
+  (defun my/shell-command-advice (&rest args)
+    (switch-to-buffer "*Shell Command Output*"))
 
-     ;;(advice-add #'shell-command :after #'my/shell-command-advice)
-   #+end_src
+  ;;(advice-add #'shell-command :after #'my/shell-command-advice)
+#+end_src
 ** eval and replace
-   #+begin_src emacs-lisp
-     (defun my/eval-and-replace ()
-       "Replace the preceding sexp with its value."
-       (interactive)
-       (backward-kill-sexp)
-       (condition-case nil
-           (prin1 (eval (read (current-kill 0)))
-                  (current-buffer))
-         (error (message "Invalid expression")
-                (insert (current-kill 0)))))
+#+begin_src emacs-lisp
+  (defun my/eval-and-replace ()
+    "Replace the preceding sexp with its value."
+    (interactive)
+    (backward-kill-sexp)
+    (condition-case nil
+        (prin1 (eval (read (current-kill 0)))
+               (current-buffer))
+      (error (message "Invalid expression")
+             (insert (current-kill 0)))))
 
-     (global-set-key (kbd "C-c C-e") 'my/eval-and-replace)
-   #+end_src
+  (global-set-key (kbd "C-c C-e") 'my/eval-and-replace)
+#+end_src
 ** New Scratch buffer
-   #+begin_src emacs-lisp
-     (defun scratch-buffer ()
-       (interactive)
-       (let ((count 0))
-         (while (get-buffer (format "*scratch%d*" count))
-           (incf count))
-         (switch-to-buffer (get-buffer-create (format "*scratch%d*" count)))
-         (lisp-interaction-mode)
-         (insert (substitute-command-keys initial-scratch-message))))
-   #+end_src
+#+begin_src emacs-lisp
+  (defun scratch-buffer ()
+    (interactive)
+    (let ((count 0))
+      (while (get-buffer (format "*scratch%d*" count))
+        (incf count))
+      (switch-to-buffer (get-buffer-create (format "*scratch%d*" count)))
+      (lisp-interaction-mode)
+      (insert (substitute-command-keys initial-scratch-message))))
+#+end_src
 ** uniq emacs
-    #+begin_src emacs-lisp
-      (defun case-fold-string= (a b)
-        (eq t (compare-strings a nil nil b nil nil t)))
-      (defun case-fold-string-hash (a)
-        (sxhash (upcase a)))
+#+begin_src emacs-lisp
+  (defun case-fold-string= (a b)
+    (eq t (compare-strings a nil nil b nil nil t)))
+  (defun case-fold-string-hash (a)
+    (sxhash (upcase a)))
 
-      (define-hash-table-test 'case-fold
-        'case-fold-string= 'case-fold-string-hash)
+  (define-hash-table-test 'case-fold
+    'case-fold-string= 'case-fold-string-hash)
 
-      (defun uniq (beg end)
-        "Print counts of strings in region."
-        (interactive "r")
-        (let ((h (make-hash-table :test 'case-fold))
-              (lst (split-string (buffer-substring-no-properties beg end) "\n"
-                                 'omit-nulls " "))
-              (output-func (if current-prefix-arg 'insert 'princ)))
-          (dolist (str lst)
-            (puthash str (1+ (gethash str h 0)) h))
-          (maphash (lambda (key val)
-                     (apply output-func (list (format "%d: %s\n" val key))))
-                   h)))
-    #+end_src
+  (defun uniq (beg end)
+    "Print counts of strings in region."
+    (interactive "r")
+    (let ((h (make-hash-table :test 'case-fold))
+          (lst (split-string (buffer-substring-no-properties beg end) "\n"
+                             'omit-nulls " "))
+          (output-func (if current-prefix-arg 'insert 'princ)))
+      (dolist (str lst)
+        (puthash str (1+ (gethash str h 0)) h))
+      (maphash (lambda (key val)
+                 (apply output-func (list (format "%d: %s\n" val key))))
+               h)))
+#+end_src
 * Look and feel
 ** Theme
- #+BEGIN_SRC emacs-lisp
- (use-package color-theme-modern)
- (load-theme 'calm-forest t)
- #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package color-theme-modern)
+  (load-theme 'calm-forest t)
+#+END_SRC
 ** mode-line
 *** Smart Mode Line
-    #+BEGIN_SRC emacs-lisp
-      (use-package smart-mode-line-powerline-theme)
-      (use-package smart-mode-line)
-      (setq sml/theme 'powerline)
-      ;; (add-to-list 
-      ;;  'after-make-frame-functions
-      ;;  (lambda (&optional x)
-      ;;    (require 'smart-mode-line-powerline-theme)
-      ;;    (require 'smart-mode-line)
-      ;;    (setq sml/theme 'powerline)
-      ;;    (sml/setup)))
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package smart-mode-line-powerline-theme)
+  (use-package smart-mode-line)
+  (setq sml/theme 'powerline)
+  ;; (add-to-list 
+  ;;  'after-make-frame-functions
+  ;;  (lambda (&optional x)
+  ;;    (require 'smart-mode-line-powerline-theme)
+  ;;    (require 'smart-mode-line)
+  ;;    (setq sml/theme 'powerline)
+  ;;    (sml/setup)))
+#+END_SRC
 *** Powerline
 **** Test new mode-line
 #+BEGIN_SRC emacs-lisp#
@@ -1512,7 +1511,7 @@
     (kill-local-variable 'mode-line-format))
 #+END_SRC
 **** Config
- #+BEGIN_SRC emacs-lisp#
+#+BEGIN_SRC emacs-lisp#
  (use-package powerline)
  (use-package airline-themes)
 
@@ -1520,102 +1519,102 @@
  (load-theme 'airline-powerlineish)
  (my-airline-theme)
  (setq battery-mode-line-format "[%b%p%%%%]")
- #+END_SRC
+#+END_SRC
 *** Ocodo
-    #+BEGIN_SRC emacs-lisp#
+#+BEGIN_SRC emacs-lisp#
     (use-package ocodo-svg-modelines)
-    #+END_SRC
+#+END_SRC
 ** Font
- #+BEGIN_SRC emacs-lisp
-   ;;(set-face-attribute 'default t :font "Dotsies Training Wheels-20")
-   ;;(add-to-list 'default-frame-alist '(font . "Dotsies Training Wheels-20"))
-   ;; (set-default-font "LinuxLibertine")
-   ;; (set-default-font "Hack 10")
-   ;; (set-default-font "UbuntuMono 11")
-   ;; (set-default-font "OfficeCodePro 11")
-   (if (eq system-type 'windows-nt)
-       (set-frame-font "Roboto Mono 10")
-     (set-frame-font "RobotoMono 11")
-     (let ((font
-	    (format "%s"
-		    "RobotoMono-11"
-		    ;; "Tamzen"
-		    ;; "SourceCodePro"
-		    ;; "Gohu Gohufont"
-		    )))
-       (add-to-list 'default-frame-alist `(font . ,font))))
-   ;; (set-frame-font "Menlo")
-   (defun reading-buffer ()
-     (interactive)
-      (setq buffer-face-mode-face '(:family "LinuxLibertine" :height 200))
-      (buffer-face-mode))
- #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  ;;(set-face-attribute 'default t :font "Dotsies Training Wheels-20")
+  ;;(add-to-list 'default-frame-alist '(font . "Dotsies Training Wheels-20"))
+  ;; (set-default-font "LinuxLibertine")
+  ;; (set-default-font "Hack 10")
+  ;; (set-default-font "UbuntuMono 11")
+  ;; (set-default-font "OfficeCodePro 11")
+  (if (eq system-type 'windows-nt)
+      (set-frame-font "Roboto Mono 10")
+    (set-frame-font "RobotoMono 11")
+    (let ((font
+       (format "%s"
+           "RobotoMono-11"
+           ;; "Tamzen"
+           ;; "SourceCodePro"
+           ;; "Gohu Gohufont"
+           )))
+      (add-to-list 'default-frame-alist `(font . ,font))))
+  ;; (set-frame-font "Menlo")
+  (defun reading-buffer ()
+    (interactive)
+     (setq buffer-face-mode-face '(:family "LinuxLibertine" :height 200))
+     (buffer-face-mode))
+#+END_SRC
 ** Splash image
-   #+BEGIN_SRC emacs-lisp
-   (setq fancy-splash-image "~/.emacs.d/res/icon.png")
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (setq fancy-splash-image "~/.emacs.d/res/icon.png")
+#+END_SRC
 ** new-text-color
-   #+begin_src emacs-lisp
-     (set-face-attribute 'default nil :background "gray8" :foreground "#70FF00")
-   #+end_src
+#+begin_src emacs-lisp
+  (set-face-attribute 'default nil :background "gray8" :foreground "#70FF00")
+#+end_src
 ** sml faces
-   #+begin_src emacs-lisp
-     ;; (set-face-attribute 'sml/line-number t :inherit sml/global :background "#5f00af" :foreground "light gray" :weight normal)
-     ;; (set-face-attribute 'sml/time        t :inherit sml/global :background "#5f00af" :foreground "light gray" :weight normal)
-     ;; (set-face-attribute 'sml/charging    t :inherit sml/global :background "#5f00af" :foreground "#00FF00" :weight normal)
-     ;; (set-face-attribute 'sml/discharging t :inherit sml/global :background "#5f00af" :foreground "deep pink" :weight normal)
-     (set-face-attribute 'sml/charging t :inherit 'sml/global :foreground "forest green")
-   #+end_src
+#+begin_src emacs-lisp
+  ;; (set-face-attribute 'sml/line-number t :inherit sml/global :background "#5f00af" :foreground "light gray" :weight normal)
+  ;; (set-face-attribute 'sml/time        t :inherit sml/global :background "#5f00af" :foreground "light gray" :weight normal)
+  ;; (set-face-attribute 'sml/charging    t :inherit sml/global :background "#5f00af" :foreground "#00FF00" :weight normal)
+  ;; (set-face-attribute 'sml/discharging t :inherit sml/global :background "#5f00af" :foreground "deep pink" :weight normal)
+  (set-face-attribute 'sml/charging t :inherit 'sml/global :foreground "forest green")
+#+end_src
 ** term faces
-   #+begin_src emacs-lisp
-     (set-face-attribute 'term-bold       t :weight 'bold)
-     (set-face-attribute 'term-color-blue t :background "dodger blue" :foreground "dodger blue")
-   #+end_src
+#+begin_src emacs-lisp
+  (set-face-attribute 'term-bold       t :weight 'bold)
+  (set-face-attribute 'term-color-blue t :background "dodger blue" :foreground "dodger blue")
+#+end_src
 * Navigation
 ** IDO
- #+BEGIN_SRC emacs-lisp
- (use-package ido)
- (ido-mode t)
- #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package ido)
+  (ido-mode t)
+#+END_SRC
 ** Helm & counsel/ivy
- #+BEGIN_SRC emacs-lisp
-   (use-package helm)
-   (require 'helm-config)
-   ;(helm-mode 1)
-   ;(setq ivy-initial-inputs-alist nil)
-   (use-package ivy)
-   (use-package smex)
-   (use-package counsel)
-   (ivy-mode 1)
+#+BEGIN_SRC emacs-lisp
+  (use-package helm)
+  (require 'helm-config)
+  ;(helm-mode 1)
+  ;(setq ivy-initial-inputs-alist nil)
+  (use-package ivy)
+  (use-package smex)
+  (use-package counsel)
+  (ivy-mode 1)
 
-   ;(advice-add 'ivy-completion-in-region :before (lambda (start end collection &optional predicate) (insert " ")))
+  ;(advice-add 'ivy-completion-in-region :before (lambda (start end collection &optional predicate) (insert " ")))
 
-   (add-to-list 'ivy-initial-inputs-alist '(org-refile . ""))
-   (add-to-list 'ivy-initial-inputs-alist '(org-agenda-refile . ""))
-   (add-to-list 'ivy-initial-inputs-alist '(org-capture-refile . ""))
-   (add-to-list 'ivy-initial-inputs-alist '(counsel-M-x . ""))
+  (add-to-list 'ivy-initial-inputs-alist '(org-refile . ""))
+  (add-to-list 'ivy-initial-inputs-alist '(org-agenda-refile . ""))
+  (add-to-list 'ivy-initial-inputs-alist '(org-capture-refile . ""))
+  (add-to-list 'ivy-initial-inputs-alist '(counsel-M-x . ""))
 
-   (define-key ivy-minibuffer-map (kbd "<return>") 'ivy-alt-done)
-   (define-key ivy-minibuffer-map (kbd "C-<return>") 'ivy-done)
-   (global-set-key (kbd "C-h M-x") 'helm-M-x)
-   (global-set-key (kbd "M-x") 'counsel-M-x)
-   (global-set-key (kbd "C-c C-r") 'ivy-resume)
-   ;;   (global-set-key (kbd "C-x b") 'counsel-switch-buffer)
- #+END_SRC
+  (define-key ivy-minibuffer-map (kbd "<return>") 'ivy-alt-done)
+  (define-key ivy-minibuffer-map (kbd "C-<return>") 'ivy-done)
+  (global-set-key (kbd "C-h M-x") 'helm-M-x)
+  (global-set-key (kbd "M-x") 'counsel-M-x)
+  (global-set-key (kbd "C-c C-r") 'ivy-resume)
+  ;;   (global-set-key (kbd "C-x b") 'counsel-switch-buffer)
+#+END_SRC
 *** f3 helm
-    #+begin_src emacs-lisp
-    (use-package f3)
-    #+end_src
+#+begin_src emacs-lisp
+  (use-package f3)
+#+end_src
 ** Swiper or counsel-grep
-   #+BEGIN_SRC emacs-lisp
-     (global-set-key (kbd "C-S-s") 'counsel-grep-or-swiper)
-     ;;(global-set-key (kbd "C-s") 'isearch-forward)
-     (setq counsel-grep-base-command "grep --ignore-case -E -n -e %s %s")
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-S-s") 'counsel-grep-or-swiper)
+  ;;(global-set-key (kbd "C-s") 'isearch-forward)
+  (setq counsel-grep-base-command "grep --ignore-case -E -n -e %s %s")
+#+END_SRC
 ** help should still use regular search
-   #+begin_src emacs-lisp
-     (define-key Info-mode-map (kbd "C-s") 'isearch-forward)
-   #+end_src
+#+begin_src emacs-lisp
+  (define-key Info-mode-map (kbd "C-s") 'isearch-forward)
+#+end_src
 ** transpose-frame
 #+BEGIN_SRC emacs-lisp
 
@@ -1633,21 +1632,21 @@
 #+END_SRC
 ** Ace window
 #+BEGIN_SRC emacs-lisp
-(use-package switch-window)
-(global-set-key (kbd "C-x o") 'switch-window)
-(setq switch-window-shortcut-style 'qwerty)
-(setq switch-window-qwerty-shortcuts
-      '("a" "o" "e" "u" "i" "d" "h" "t" "n" "s"))
+  (use-package switch-window)
+  (global-set-key (kbd "C-x o") 'switch-window)
+  (setq switch-window-shortcut-style 'qwerty)
+  (setq switch-window-qwerty-shortcuts
+        '("a" "o" "e" "u" "i" "d" "h" "t" "n" "s"))
 #+END_SRC
 ** iy-go-to-char
-   #+begin_src emacs-lisp
-   (use-package iy-go-to-char)
-   (global-set-key (kbd "M-m") 'iy-go-to-char)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package iy-go-to-char)
+  (global-set-key (kbd "M-m") 'iy-go-to-char)
+#+end_src
 ** ibuffer
 *** Keybindings
 #+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-x C-b") 'ibuffer)
+  (global-set-key (kbd "C-x C-b") 'ibuffer)
 #+END_SRC
 *** Config
 #+BEGIN_SRC emacs-lisp
@@ -1723,31 +1722,31 @@
   ;(add-hook 'exwm-workspace-switch-hook 'ibuffer)
 #+END_SRC
 *** view-mode
-    #+begin_src emacs-lisp
-      (defun my/ibuffer-view ()
-        (interactive)
-        (ibuffer-visit-buffer)
-        (when (null exwm--id)
-          (view-mode)))
-      (define-key ibuffer-mode-map (kbd "v") #'my/ibuffer-view)
-    #+end_src
+#+begin_src emacs-lisp
+  (defun my/ibuffer-view ()
+    (interactive)
+    (ibuffer-visit-buffer)
+    (when (null exwm--id)
+      (view-mode)))
+  (define-key ibuffer-mode-map (kbd "v") #'my/ibuffer-view)
+#+end_src
 ** Ace jump
 #+BEGIN_SRC emacs-lisp
-(use-package ace-jump-mode)
-(global-set-key (kbd "C-c SPC") 'ace-jump-mode)
-(global-set-key (kbd "C-c j") 'ace-jump-line-mode)
+  (use-package ace-jump-mode)
+  (global-set-key (kbd "C-c SPC") 'ace-jump-mode)
+  (global-set-key (kbd "C-c j") 'ace-jump-line-mode)
 #+END_SRC
 ** Word traversal
-   #+begin_src emacs-lisp
-   (global-set-key (kbd "M-f") 'forward-to-word)
-   (global-set-key (kbd "M-F") 'forward-word)
-   #+end_src
+#+begin_src emacs-lisp
+  (global-set-key (kbd "M-f") 'forward-to-word)
+  (global-set-key (kbd "M-F") 'forward-word)
+#+end_src
 * org-mode in separate file
-  #+begin_src emacs-lisp
-    (org-babel-load-file
-     (expand-file-name "config-org-new.org"
-                       user-emacs-directory))
-  #+end_src
+#+begin_src emacs-lisp
+  (org-babel-load-file
+   (expand-file-name "config-org-new.org"
+                     user-emacs-directory))
+#+end_src
 * Tools
 ** Encryption
 #+BEGIN_SRC emacs-lisp
@@ -1769,580 +1768,580 @@
 #+END_SRC
 ** dired
 *** Dired+, for formatting
-    #+BEGIN_SRC emacs-lisp
-      (add-to-list 'load-path
-                   "~/.emacs.d/custom/dired-plus")
-      (require 'dired+)
-      (setq dired-listing-switches "-al  --group-directories-first --sort=extension")
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'load-path
+               "~/.emacs.d/custom/dired-plus")
+  (require 'dired+)
+  (setq dired-listing-switches "-al  --group-directories-first --sort=extension")
 
-      (setq diredp-hide-details-initially-flag nil)
-      (setq diredp-hide-details-propagate-flag nil)
-      (require 'dired-x)
-      (setq-default dired-omit-files-p t)
-      (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
-    #+END_SRC
+  (setq diredp-hide-details-initially-flag nil)
+  (setq diredp-hide-details-propagate-flag nil)
+  (require 'dired-x)
+  (setq-default dired-omit-files-p t)
+  (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
+#+END_SRC
 *** dired-hacks
-    #+begin_src emacs-lisp
-      (use-package dired-filter)
-      (use-package dired-narrow)
-      (define-key dired-filter-map (kbd "F") 'dired-narrow-fuzzy)
-      (setq dired-filter-group-saved-groups
-            '(("default"
-               ("PDF"
-                (extension . "pdf"))
-               ("LaTeX"
-                (extension "tex" "bib"))
-               ("Org"
-                (extension . "org"))
-               ("Archives"
-                (extension "zip" "rar" "gz" "bz2" "tar")))))
+#+begin_src emacs-lisp
+  (use-package dired-filter)
+  (use-package dired-narrow)
+  (define-key dired-filter-map (kbd "F") 'dired-narrow-fuzzy)
+  (setq dired-filter-group-saved-groups
+        '(("default"
+           ("PDF"
+            (extension . "pdf"))
+           ("LaTeX"
+            (extension "tex" "bib"))
+           ("Org"
+            (extension . "org"))
+           ("Archives"
+            (extension "zip" "rar" "gz" "bz2" "tar")))))
 
-      (use-package dired-subtree)
+  (use-package dired-subtree)
 
-      (define-key dired-mode-map (kbd "i") 'dired-subtree-insert)
-      (define-key dired-mode-map (kbd "I") 'dired-subtree-remove)
+  (define-key dired-mode-map (kbd "i") 'dired-subtree-insert)
+  (define-key dired-mode-map (kbd "I") 'dired-subtree-remove)
 
-      (use-package dired-collapse)
-    #+end_src
+  (use-package dired-collapse)
+#+end_src
 *** dired-du
-    #+begin_src emacs-lisp
-    (use-package dired-du)
-    #+end_src
+#+begin_src emacs-lisp
+  (use-package dired-du)
+#+end_src
 *** youtube-dl
-    #+begin_src emacs-lisp
-      (require 'dired-aux)
+#+begin_src emacs-lisp
+  (require 'dired-aux)
 
-      (defvar dired-filelist-cmd
-        '(("vlc" "-L")))
+  (defvar dired-filelist-cmd
+    '(("vlc" "-L")))
 
-      (defun dired-start-process (cmd &optional file-list)
-        (interactive
-         (let ((files (dired-get-marked-files
-                       t current-prefix-arg)))
-           (list
-            (dired-read-shell-command "& on %s: "
-                                      current-prefix-arg files)
-            files)))
-        (let (list-switch)
-          (start-process
-           cmd nil shell-file-name
-           shell-command-switch
-           (format
-            "nohup 1>/dev/null 2>/dev/null %s \"%s\""
-            (if (and (> (length file-list) 1)
-                     (setq list-switch
-                           (cadr (assoc cmd dired-filelist-cmd))))
-                (format "%s %s" cmd list-switch)
-              cmd)
-            (mapconcat #'expand-file-name file-list "\" \"")))))
+  (defun dired-start-process (cmd &optional file-list)
+    (interactive
+     (let ((files (dired-get-marked-files
+                   t current-prefix-arg)))
+       (list
+        (dired-read-shell-command "& on %s: "
+                                  current-prefix-arg files)
+        files)))
+    (let (list-switch)
+      (start-process
+       cmd nil shell-file-name
+       shell-command-switch
+       (format
+        "nohup 1>/dev/null 2>/dev/null %s \"%s\""
+        (if (and (> (length file-list) 1)
+                 (setq list-switch
+                       (cadr (assoc cmd dired-filelist-cmd))))
+            (format "%s %s" cmd list-switch)
+          cmd)
+        (mapconcat #'expand-file-name file-list "\" \"")))))
 
-      (define-key dired-mode-map "r" 'dired-start-process)
+  (define-key dired-mode-map "r" 'dired-start-process)
 
-      (defun watch-youtube ()
-        (interactive)
-        (dired "~/big_files/Videos/youtube-dl")
-        (local-set-key (kbd "RET") 'dired-start-process))
+  (defun watch-youtube ()
+    (interactive)
+    (dired "~/big_files/Videos/youtube-dl")
+    (local-set-key (kbd "RET") 'dired-start-process))
 
-    #+end_src
+#+end_src
 *** async-command
-    #+begin_src emacs-lisp
-      ;; (defun my/async-shell-command (command &optional output-buffer error-buffer)
-      ;;   (interactive
-      ;;    (list
-      ;;     (read-shell-command "Async shell command: " nil nil
-      ;;                         (let ((filename
-      ;;                                (cond
-      ;;                                 (buffer-file-name)
-      ;;                                 ((eq major-mode 'dired-mode)
-      ;;                                  (dired-get-filename nil t)))))
-      ;;                           (and filename (file-relative-name filename))))
-      ;;     current-prefix-arg
-      ;;     shell-command-default-error-buffer))
-      ;;   (unless (string-match "&[ \t]*\\'" command)
-      ;;     (setq command (concat command " &")))
-      ;;   (shell-command command output-buffer error-buffer))
+#+begin_src emacs-lisp
+  ;; (defun my/async-shell-command (command &optional output-buffer error-buffer)
+  ;;   (interactive
+  ;;    (list
+  ;;     (read-shell-command "Async shell command: " nil nil
+  ;;                         (let ((filename
+  ;;                                (cond
+  ;;                                 (buffer-file-name)
+  ;;                                 ((eq major-mode 'dired-mode)
+  ;;                                  (dired-get-filename nil t)))))
+  ;;                           (and filename (file-relative-name filename))))
+  ;;     current-prefix-arg
+  ;;     shell-command-default-error-buffer))
+  ;;   (unless (string-match "&[ \t]*\\'" command)
+  ;;     (setq command (concat command " &")))
+  ;;   (shell-command command output-buffer error-buffer))
 
-      ;; (add-to-list 'display-buffer-alist
-      ;;              (cons "\\*Async Shell Command\\*.*" (cons #'display-buffer nil)))
+  ;; (add-to-list 'display-buffer-alist
+  ;;              (cons "\\*Async Shell Command\\*.*" (cons #'display-buffer nil)))
 
-      ;; (setq display-buffer-alist (remove-if (lambda (a) (string= (car a) "\\*Async Shell Command\\*.*")) display-buffer-alist)
-    #+end_src
+  ;; (setq display-buffer-alist (remove-if (lambda (a) (string= (car a) "\\*Async Shell Command\\*.*")) display-buffer-alist)
+#+end_src
 ** Elfeed
 *** Setup feeds
- #+BEGIN_SRC emacs-lisp
-   ;; Load elfeed-org
-   (use-package elfeed)
-   (use-package elfeed-org)
+#+BEGIN_SRC emacs-lisp
+  ;; Load elfeed-org
+  (use-package elfeed)
+  (use-package elfeed-org)
 
-   (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org"))
-   (elfeed-org)
-   (setq-default elfeed-search-filter "@1-week-ago +unread -youtube")
-   (define-key elfeed-search-mode-map "U" 'elfeed-search-fetch-visible)
-   (define-key elfeed-search-mode-map "Y" (lambda ()
-                                            (interactive)
-                                            (elfeed-search-set-filter "+youtube +unread")))
-   (define-key elfeed-search-mode-map "N" (lambda ()
-                                            (interactive)
-                                            (elfeed-search-set-filter "@1-day-ago +unread -youtube")))
-   (define-key elfeed-search-mode-map "h" (lambda ()
-                                            (interactive)
-                                            (elfeed-search-set-filter nil)))
- #+END_SRC
+  (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org"))
+  (elfeed-org)
+  (setq-default elfeed-search-filter "@1-week-ago +unread -youtube")
+  (define-key elfeed-search-mode-map "U" 'elfeed-search-fetch-visible)
+  (define-key elfeed-search-mode-map "Y" (lambda ()
+                                           (interactive)
+                                           (elfeed-search-set-filter "+youtube +unread")))
+  (define-key elfeed-search-mode-map "N" (lambda ()
+                                           (interactive)
+                                           (elfeed-search-set-filter "@1-day-ago +unread -youtube")))
+  (define-key elfeed-search-mode-map "h" (lambda ()
+                                           (interactive)
+                                           (elfeed-search-set-filter nil)))
+#+END_SRC
 *** youtube-dl
-  #+begin_src emacs-lisp
+#+begin_src emacs-lisp
 
-    (defun elfeed-show-youtube-dl ()
-      "Download the current entry with youtube-dl."
-      (interactive)
-      (pop-to-buffer (youtube-dl (elfeed-entry-link elfeed-show-entry))))
+  (defun elfeed-show-youtube-dl ()
+    "Download the current entry with youtube-dl."
+    (interactive)
+    (pop-to-buffer (youtube-dl (elfeed-entry-link elfeed-show-entry))))
 
-    (cl-defun elfeed-search-youtube-dl (&key slow)
-      "Download the current entry with youtube-dl."
-      (interactive)
-      (let ((entries (elfeed-search-selected)))
-        (dolist (entry entries)
-          (if (null (youtube-dl (elfeed-entry-link entry)
-                                :title (elfeed-entry-title entry)
-                                :slow slow))
-              (message "Entry is not a YouTube link!")
-            (message "Downloading %s" (elfeed-entry-title entry)))
-          (elfeed-untag entry 'unread)
-          (elfeed-search-update-entry entry)
-          (unless (use-region-p) (forward-line)))))
+  (cl-defun elfeed-search-youtube-dl (&key slow)
+    "Download the current entry with youtube-dl."
+    (interactive)
+    (let ((entries (elfeed-search-selected)))
+      (dolist (entry entries)
+        (if (null (youtube-dl (elfeed-entry-link entry)
+                              :title (elfeed-entry-title entry)
+                              :slow slow))
+            (message "Entry is not a YouTube link!")
+          (message "Downloading %s" (elfeed-entry-title entry)))
+        (elfeed-untag entry 'unread)
+        (elfeed-search-update-entry entry)
+        (unless (use-region-p) (forward-line)))))
 
-    (define-key elfeed-search-mode-map "d" 'elfeed-search-youtube-dl)
-    (setq youtube-dl-directory "~/big_files/Videos/youtube-dl")
-  #+end_src
+  (define-key elfeed-search-mode-map "d" 'elfeed-search-youtube-dl)
+  (setq youtube-dl-directory "~/big_files/Videos/youtube-dl")
+#+end_src
 *** Youtube show thumbnail
-  #+begin_src emacs-lisp
-    (use-package dash)
-    (defun elfeed-entries-from-atom (url xml)
-      "Turn parsed Atom content into a list of elfeed-entry structs."
-      (let* ((feed-id url)
-             (protocol (url-type (url-generic-parse-url url)))
-             (namespace (elfeed-url-to-namespace url))
-             (feed (elfeed-db-get-feed feed-id))
-             (title (elfeed-cleanup (xml-query* (feed title *) xml)))
-             (author (elfeed-cleanup (xml-query* (feed author name *) xml)))
-             (xml-base (or (xml-query* (feed :base) xml) url))
-             (autotags (elfeed-feed-autotags url)))
-        (setf (elfeed-feed-url feed) url
-              (elfeed-feed-title feed) title
-              (elfeed-feed-author feed) author)
-        (cl-loop for entry in (xml-query-all* (feed entry) xml) collect
-                 (let* ((title (or (xml-query* (title *) entry) ""))
-                        (xml-base (elfeed-update-location
-                                   xml-base (xml-query* (:base) (list entry))))
-                        (anylink (xml-query* (link :href) entry))
-                        (altlink (xml-query* (link [rel "alternate"] :href) entry))
-                        (link (elfeed--fixup-protocol
-                               protocol
-                               (elfeed-update-location xml-base
-                                                       (or altlink anylink))))
-                        (date (or (xml-query* (published *) entry)
-                                  (xml-query* (updated *) entry)
-                                  (xml-query* (date *) entry)
-                                  (xml-query* (modified *) entry) ; Atom 0.3
-                                  (xml-query* (issued *) entry))) ; Atom 0.3
-                        (author-name (or (xml-query* (author name *) entry)
-                                         ;; Dublin Core
-                                         (xml-query* (creator *) entry)))
-                        (author-email (xml-query* (author email *) entry))
-                        (author (cond ((and author-name author-email)
-                                       (format "%s <%s>" author-name author-email))
-                                      (author-name)))
-                        (categories (xml-query-all* (category :term) entry))
-                        (content (elfeed--atom-content entry))
-                        (id (or (xml-query* (id *) entry) link
-                                (elfeed-generate-id content)))
-                        (type (or (xml-query* (content :type) entry)
-                                  (xml-query* (summary :type) entry)
-                                  ""))
-                        (tags (elfeed-normalize-tags autotags elfeed-initial-tags))
-                        (content-type (if (string-match-p "html" type) 'html nil))
-                        (etags (xml-query-all* (link [rel "enclosure"]) entry))
-                        (thumb (xml-query* (group thumbnail :url) entry))
-                        (enclosures
-                         (cl-loop for enclosure in etags
-                                  for wrap = (list enclosure)
-                                  for href = (xml-query* (:href) wrap)
-                                  for type = (xml-query* (:type) wrap)
-                                  for length = (xml-query* (:length) wrap)
-                                  collect (list href type length)))
-                        (db-entry (elfeed-entry--create
-                                   :title (elfeed-cleanup title)
-                                   :feed-id feed-id
-                                   :id (cons namespace (elfeed-cleanup id))
-                                   :link (elfeed-cleanup link)
-                                   :tags tags
-                                   :date (or (elfeed-float-time date) (float-time))
-                                   :content content
-                                   :enclosures enclosures
-                                   :content-type content-type
-                                   :meta `(,@(when author
-                                               (list :author author))
-                                           ,@(when categories
-                                               (list :categories categories))
-                                           ,@(when thumb
-                                               (list :thumbnail (elfeed-get-thumbnail thumb)))))))
-                   (setq debug/entry db-entry)
-                   (dolist (hook elfeed-new-entry-parse-hook)
-                     (funcall hook :atom entry db-entry))
-                   db-entry))))
+#+begin_src emacs-lisp
+  (use-package dash)
+  (defun elfeed-entries-from-atom (url xml)
+    "Turn parsed Atom content into a list of elfeed-entry structs."
+    (let* ((feed-id url)
+           (protocol (url-type (url-generic-parse-url url)))
+           (namespace (elfeed-url-to-namespace url))
+           (feed (elfeed-db-get-feed feed-id))
+           (title (elfeed-cleanup (xml-query* (feed title *) xml)))
+           (author (elfeed-cleanup (xml-query* (feed author name *) xml)))
+           (xml-base (or (xml-query* (feed :base) xml) url))
+           (autotags (elfeed-feed-autotags url)))
+      (setf (elfeed-feed-url feed) url
+            (elfeed-feed-title feed) title
+            (elfeed-feed-author feed) author)
+      (cl-loop for entry in (xml-query-all* (feed entry) xml) collect
+               (let* ((title (or (xml-query* (title *) entry) ""))
+                      (xml-base (elfeed-update-location
+                                 xml-base (xml-query* (:base) (list entry))))
+                      (anylink (xml-query* (link :href) entry))
+                      (altlink (xml-query* (link [rel "alternate"] :href) entry))
+                      (link (elfeed--fixup-protocol
+                             protocol
+                             (elfeed-update-location xml-base
+                                                     (or altlink anylink))))
+                      (date (or (xml-query* (published *) entry)
+                                (xml-query* (updated *) entry)
+                                (xml-query* (date *) entry)
+                                (xml-query* (modified *) entry) ; Atom 0.3
+                                (xml-query* (issued *) entry))) ; Atom 0.3
+                      (author-name (or (xml-query* (author name *) entry)
+                                       ;; Dublin Core
+                                       (xml-query* (creator *) entry)))
+                      (author-email (xml-query* (author email *) entry))
+                      (author (cond ((and author-name author-email)
+                                     (format "%s <%s>" author-name author-email))
+                                    (author-name)))
+                      (categories (xml-query-all* (category :term) entry))
+                      (content (elfeed--atom-content entry))
+                      (id (or (xml-query* (id *) entry) link
+                              (elfeed-generate-id content)))
+                      (type (or (xml-query* (content :type) entry)
+                                (xml-query* (summary :type) entry)
+                                ""))
+                      (tags (elfeed-normalize-tags autotags elfeed-initial-tags))
+                      (content-type (if (string-match-p "html" type) 'html nil))
+                      (etags (xml-query-all* (link [rel "enclosure"]) entry))
+                      (thumb (xml-query* (group thumbnail :url) entry))
+                      (enclosures
+                       (cl-loop for enclosure in etags
+                                for wrap = (list enclosure)
+                                for href = (xml-query* (:href) wrap)
+                                for type = (xml-query* (:type) wrap)
+                                for length = (xml-query* (:length) wrap)
+                                collect (list href type length)))
+                      (db-entry (elfeed-entry--create
+                                 :title (elfeed-cleanup title)
+                                 :feed-id feed-id
+                                 :id (cons namespace (elfeed-cleanup id))
+                                 :link (elfeed-cleanup link)
+                                 :tags tags
+                                 :date (or (elfeed-float-time date) (float-time))
+                                 :content content
+                                 :enclosures enclosures
+                                 :content-type content-type
+                                 :meta `(,@(when author
+                                             (list :author author))
+                                         ,@(when categories
+                                             (list :categories categories))
+                                         ,@(when thumb
+                                             (list :thumbnail (elfeed-get-thumbnail thumb)))))))
+                 (setq debug/entry db-entry)
+                 (dolist (hook elfeed-new-entry-parse-hook)
+                   (funcall hook :atom entry db-entry))
+                 db-entry))))
 
-    (defun elfeed-insert-sliced-thumbnail (orig-fun entry)
-      (let ((thumbnail (elfeed-meta entry :thumbnail)))
-        (if (null thumbnail)
-            (funcall orig-fun entry)
-          (insert-sliced-image (create-image thumbnail 'imagemagick nil :height 150) nil nil 4)
-          (delete-backward-char 1)
-          (previous-line)
-          (previous-line)
-          (end-of-line)
-          (let* ((date (elfeed-search-format-date (elfeed-entry-date entry)))
-                 (title (or (elfeed-meta entry :title) (elfeed-entry-title entry) ""))
-                 (title-faces (elfeed-search--faces (elfeed-entry-tags entry)))
-                 (feed (elfeed-entry-feed entry))
-                 (feed-title
-                  (when feed
-                    (or (elfeed-meta feed :title) (elfeed-feed-title feed))))
-                 (tags (mapcar #'symbol-name (elfeed-entry-tags entry)))
-                 (tags-str (mapconcat
-                            (lambda (s) (propertize s 'face 'elfeed-search-tag-face))
-                            tags ","))
-                 (title-width (- (window-width) 10 elfeed-search-trailing-width))
-                 (title-column (elfeed-format-column
-                                title (elfeed-clamp
-                                       elfeed-search-title-min-width
-                                       title-width
-                                       elfeed-search-title-max-width)
-                                :left)))
-            (insert " " (propertize title-column 'face title-faces 'kbd-help title) " ")
-            (next-line)
-            (insert " " (propertize date 'face 'elfeed-search-date-face) " ")
-            (when feed-title
-              (insert (propertize feed-title 'face 'elfeed-search-feed-face) " "))
-            (when tags
-              (insert "(" tags-str ")")))
+  (defun elfeed-insert-sliced-thumbnail (orig-fun entry)
+    (let ((thumbnail (elfeed-meta entry :thumbnail)))
+      (if (null thumbnail)
+          (funcall orig-fun entry)
+        (insert-sliced-image (create-image thumbnail 'imagemagick nil :height 150) nil nil 4)
+        (delete-backward-char 1)
+        (previous-line)
+        (previous-line)
+        (end-of-line)
+        (let* ((date (elfeed-search-format-date (elfeed-entry-date entry)))
+               (title (or (elfeed-meta entry :title) (elfeed-entry-title entry) ""))
+               (title-faces (elfeed-search--faces (elfeed-entry-tags entry)))
+               (feed (elfeed-entry-feed entry))
+               (feed-title
+                (when feed
+                  (or (elfeed-meta feed :title) (elfeed-feed-title feed))))
+               (tags (mapcar #'symbol-name (elfeed-entry-tags entry)))
+               (tags-str (mapconcat
+                          (lambda (s) (propertize s 'face 'elfeed-search-tag-face))
+                          tags ","))
+               (title-width (- (window-width) 10 elfeed-search-trailing-width))
+               (title-column (elfeed-format-column
+                              title (elfeed-clamp
+                                     elfeed-search-title-min-width
+                                     title-width
+                                     elfeed-search-title-max-width)
+                              :left)))
+          (insert " " (propertize title-column 'face title-faces 'kbd-help title) " ")
           (next-line)
-          (end-of-line))))
+          (insert " " (propertize date 'face 'elfeed-search-date-face) " ")
+          (when feed-title
+            (insert (propertize feed-title 'face 'elfeed-search-feed-face) " "))
+          (when tags
+            (insert "(" tags-str ")")))
+        (next-line)
+        (end-of-line))))
 
-    (defun elfeed-insert-sliced-thumbnail (orig-fun entry)
-      (let ((thumbnail (elfeed-meta entry :thumbnail)))
-        (if (null thumbnail)
-            (funcall orig-fun entry)
-          (insert-sliced-image (create-image thumbnail 'imagemagick nil :height 150) nil nil 4)
-          (delete-backward-char 1)
-          (previous-line)
-          (previous-line)
-          (end-of-line)
-          (let* ((date (elfeed-search-format-date (elfeed-entry-date entry)))
-                 (title (or (elfeed-meta entry :title) (elfeed-entry-title entry) ""))
-                 (title-faces (elfeed-search--faces (elfeed-entry-tags entry)))
-                 (feed (elfeed-entry-feed entry))
-                 (feed-title
-                  (when feed
-                    (or (elfeed-meta feed :title) (elfeed-feed-title feed))))
-                 (tags (mapcar #'symbol-name (elfeed-entry-tags entry)))
-                 (tags-str (mapconcat
-                            (lambda (s) (propertize s 'face 'elfeed-search-tag-face))
-                            tags ","))
-                 (title-width (- (window-width) 10 elfeed-search-trailing-width))
-                 (title-column (elfeed-format-column
-                                title (elfeed-clamp
-                                       elfeed-search-title-min-width
-                                       title-width
-                                       elfeed-search-title-max-width)
-                                :left)))
-            (insert " " (propertize title-column 'face title-faces 'kbd-help title) " ")
-            (next-line)
-            (insert " " (propertize date 'face 'elfeed-search-date-face) " ")
-            (when feed-title
-              (insert (propertize feed-title 'face 'elfeed-search-feed-face) " "))
-            (when tags
-              (insert "(" tags-str ")")))
+  (defun elfeed-insert-sliced-thumbnail (orig-fun entry)
+    (let ((thumbnail (elfeed-meta entry :thumbnail)))
+      (if (null thumbnail)
+          (funcall orig-fun entry)
+        (insert-sliced-image (create-image thumbnail 'imagemagick nil :height 150) nil nil 4)
+        (delete-backward-char 1)
+        (previous-line)
+        (previous-line)
+        (end-of-line)
+        (let* ((date (elfeed-search-format-date (elfeed-entry-date entry)))
+               (title (or (elfeed-meta entry :title) (elfeed-entry-title entry) ""))
+               (title-faces (elfeed-search--faces (elfeed-entry-tags entry)))
+               (feed (elfeed-entry-feed entry))
+               (feed-title
+                (when feed
+                  (or (elfeed-meta feed :title) (elfeed-feed-title feed))))
+               (tags (mapcar #'symbol-name (elfeed-entry-tags entry)))
+               (tags-str (mapconcat
+                          (lambda (s) (propertize s 'face 'elfeed-search-tag-face))
+                          tags ","))
+               (title-width (- (window-width) 10 elfeed-search-trailing-width))
+               (title-column (elfeed-format-column
+                              title (elfeed-clamp
+                                     elfeed-search-title-min-width
+                                     title-width
+                                     elfeed-search-title-max-width)
+                              :left)))
+          (insert " " (propertize title-column 'face title-faces 'kbd-help title) " ")
           (next-line)
-          (end-of-line))))
+          (insert " " (propertize date 'face 'elfeed-search-date-face) " ")
+          (when feed-title
+            (insert (propertize feed-title 'face 'elfeed-search-feed-face) " "))
+          (when tags
+            (insert "(" tags-str ")")))
+        (next-line)
+        (end-of-line))))
 
-    (defun elfeed-insert-thumbnail (entry)
-      (let ((thumbnail (elfeed-meta entry :thumbnail)))
-        (if (null thumbnail)
-            (insert "")
-          (insert " ")
-          (insert-image (create-image thumbnail 'imagemagick nil :height 150))
-          (insert " "))))
+  (defun elfeed-insert-thumbnail (entry)
+    (let ((thumbnail (elfeed-meta entry :thumbnail)))
+      (if (null thumbnail)
+          (insert "")
+        (insert " ")
+        (insert-image (create-image thumbnail 'imagemagick nil :height 150))
+        (insert " "))))
 
-    (advice-add 'elfeed-search-print-entry--default :before #'elfeed-insert-thumbnail)
+  (advice-add 'elfeed-search-print-entry--default :before #'elfeed-insert-thumbnail)
 
-    (defvar elfeed-link-org-capture nil)
-    (defun elfeed-show-insert-thumbnail ()
-      (let ((inhibit-read-only t)
-            (thumbnail (elfeed-meta elfeed-show-entry :thumbnail)))
-        (if (null thumbnail)
-            (insert "")
-          (insert-image (create-image thumbnail 'imagemagick nil :height 150))
-          (insert "\n"))
-        (goto-char (point-min))
-        (setq elfeed-link-org-capture
-              (format "[[%s][%s]] :%s:%s:"
-                      (elfeed-entry-link elfeed-show-entry)
-                      (elfeed-entry-title elfeed-show-entry)
-                      (elfeed-meta elfeed-show-entry :author)
-                      (string-join (mapcar #'symbol-name (elfeed-entry-tags elfeed-show-entry)) ":")))))
+  (defvar elfeed-link-org-capture nil)
+  (defun elfeed-show-insert-thumbnail ()
+    (let ((inhibit-read-only t)
+          (thumbnail (elfeed-meta elfeed-show-entry :thumbnail)))
+      (if (null thumbnail)
+          (insert "")
+        (insert-image (create-image thumbnail 'imagemagick nil :height 150))
+        (insert "\n"))
+      (goto-char (point-min))
+      (setq elfeed-link-org-capture
+            (format "[[%s][%s]] :%s:%s:"
+                    (elfeed-entry-link elfeed-show-entry)
+                    (elfeed-entry-title elfeed-show-entry)
+                    (elfeed-meta elfeed-show-entry :author)
+                    (string-join (mapcar #'symbol-name (elfeed-entry-tags elfeed-show-entry)) ":")))))
 
-    (advice-add 'elfeed-show-refresh--mail-style :after #'elfeed-show-insert-thumbnail)
+  (advice-add 'elfeed-show-refresh--mail-style :after #'elfeed-show-insert-thumbnail)
 
-    (defun elfeed-get-thumbnail (url)
-      (let* ((file (--> url
-                        (split-string it "/")
-                        (nth 4 it)
-                        (concat it ".jpg")))
-             (img-url (replace-regexp-in-string "/hqdefault.jpg$" "/mqdefault.jpg" url))
-             (img-folder (--> "images"
-                              (expand-file-name it elfeed-db-directory)
-                              (file-name-as-directory it)))
-             (filepath (concat img-folder file)))
-        (unless (file-directory-p img-folder)
-          (make-directory img-folder))
-        (unless (file-exists-p filepath)
-          (start-process-shell-command "wget" nil (format "wget %s -O %s" img-url filepath)))
-        filepath))
-  #+end_src
+  (defun elfeed-get-thumbnail (url)
+    (let* ((file (--> url
+                      (split-string it "/")
+                      (nth 4 it)
+                      (concat it ".jpg")))
+           (img-url (replace-regexp-in-string "/hqdefault.jpg$" "/mqdefault.jpg" url))
+           (img-folder (--> "images"
+                            (expand-file-name it elfeed-db-directory)
+                            (file-name-as-directory it)))
+           (filepath (concat img-folder file)))
+      (unless (file-directory-p img-folder)
+        (make-directory img-folder))
+      (unless (file-exists-p filepath)
+        (start-process-shell-command "wget" nil (format "wget %s -O %s" img-url filepath)))
+      filepath))
+#+end_src
 ** Freekeys
-   #+BEGIN_SRC emacs-lisp#
+#+BEGIN_SRC emacs-lisp#
    (use-package free-keys)
    (bind-key "C-h C-k" 'free-keys)
-   #+END_SRC 
+#+END_SRC 
 ** Eww
-   #+BEGIN_SRC emacs-lisp
-     (global-set-key (kbd "C-c g")
-             (lambda ()
-               (interactive)
-               (w3m-goto-url "https://google.com")))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "C-c g")
+          (lambda ()
+            (interactive)
+            (w3m-goto-url "https://google.com")))
+#+END_SRC
 ** eshell
-   #+begin_src emacs-lisp
-   ;; (push "watch" eshell-visual-command)
-   #+end_src
+#+begin_src emacs-lisp
+  ;; (push "watch" eshell-visual-command)
+#+end_src
 ** Ledger mode
-   #+BEGIN_SRC emacs-lisp
-     (use-package ledger-mode
-       :mode "\\.dat\\'")
-     (setq ledger-reports
-           '(("expmonth" "%(binary) -f %(ledger-file) -M reg Expenses")
-             ("owedmom" "%(binary) -f %(ledger-file) reg Liabilities")
-             ("progress" "%(binary) -f %(ledger-file) reg Assets Equity Liabilities")
-             ("cleared" "%(binary) -f %(ledger-file) cleared")
-             ("food" "%(binary) -f %(ledger-file) --add-budget reg Assets")
-             (#("bal" 0 1
-                (idx 1))
-              "%(binary) -f %(ledger-file) bal")
-             (#("reg" 0 1
-                (idx 4))
-              "%(binary) -f %(ledger-file) reg")
-             (#("payee" 0 1
-                (idx 3))
-              "%(binary) -f %(ledger-file) reg @%(payee)")
-             (#("account" 0 1
-                (idx 0))
-              "%(binary) -f %(ledger-file) reg %(account)")))
+#+BEGIN_SRC emacs-lisp
+  (use-package ledger-mode
+    :mode "\\.dat\\'")
+  (setq ledger-reports
+        '(("expmonth" "%(binary) -f %(ledger-file) -M reg Expenses")
+          ("owedmom" "%(binary) -f %(ledger-file) reg Liabilities")
+          ("progress" "%(binary) -f %(ledger-file) reg Assets Equity Liabilities")
+          ("cleared" "%(binary) -f %(ledger-file) cleared")
+          ("food" "%(binary) -f %(ledger-file) --add-budget reg Assets")
+          (#("bal" 0 1
+             (idx 1))
+           "%(binary) -f %(ledger-file) bal")
+          (#("reg" 0 1
+             (idx 4))
+           "%(binary) -f %(ledger-file) reg")
+          (#("payee" 0 1
+             (idx 3))
+           "%(binary) -f %(ledger-file) reg @%(payee)")
+          (#("account" 0 1
+             (idx 0))
+           "%(binary) -f %(ledger-file) reg %(account)")))
 
-     (setq dynamic-reports
-           '(("budgetcal" "%(binary) -f ~/MEGA/org/entries/food.ledger --daily --add-budget reg Expenses")))
+  (setq dynamic-reports
+        '(("budgetcal" "%(binary) -f ~/MEGA/org/entries/food.ledger --daily --add-budget reg Expenses")))
 
-     (defun ledger-dynamic-report ()
-       (interactive)
-       (let* ((ledger-reports dynamic-reports)
-              (report-name (ledger-report-read-name)))
-         (ledger-report report-name nil)))
-   #+END_SRC
+  (defun ledger-dynamic-report ()
+    (interactive)
+    (let* ((ledger-reports dynamic-reports)
+           (report-name (ledger-report-read-name)))
+      (ledger-report report-name nil)))
+#+END_SRC
 * Email
 ** general-options
-   #+begin_src emacs-lisp
-     (setq user-mail-address "bensonchu457@gmail.com"
-           user-full-name "Benson Chu")
+#+begin_src emacs-lisp
+  (setq user-mail-address "bensonchu457@gmail.com"
+        user-full-name "Benson Chu")
 
-     (setq smtpmail-smtp-server "smtp.gmail.com"
-           smtpmail-smtp-service 587
-           send-mail-function 'smtpmail-send-it
-           message-send-mail-function 'smtpmail-send-it)
+  (setq smtpmail-smtp-server "smtp.gmail.com"
+        smtpmail-smtp-service 587
+        send-mail-function 'smtpmail-send-it
+        message-send-mail-function 'smtpmail-send-it)
 
-     ;; (setq smtpmail-smtp-server "smtp.office365.com"
-     ;;       smtpmail-smtp-service 587
-     ;;       smtpmail-local-domain nil)
-   #+end_src
+  ;; (setq smtpmail-smtp-server "smtp.office365.com"
+  ;;       smtpmail-smtp-service 587
+  ;;       smtpmail-local-domain nil)
+#+end_src
 ** Gnus
-   #+BEGIN_SRC emacs-lisp
-     (add-hook 'gnus-group-mode-hook 'gnus-topic-mode)
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'gnus-group-mode-hook 'gnus-topic-mode)
 
-     (setq user-mail-address "bensonchu457@gmail.com"
-           user-full-name "Benson Chu")
+  (setq user-mail-address "bensonchu457@gmail.com"
+        user-full-name "Benson Chu")
 
-     (setq gnus-select-method 
-           '(nnmaildir "gmail" 
-                       (directory "~/.offlineimap_mail/personal")
-                       (directory-files nnheader-directory-files-safe) 
-                       (get-new-mail nil)))
+  (setq gnus-select-method 
+        '(nnmaildir "gmail" 
+                    (directory "~/.offlineimap_mail/personal")
+                    (directory-files nnheader-directory-files-safe) 
+                    (get-new-mail nil)))
 
-     (setq gnus-secondary-select-methods
-           '((nnmaildir "work" 
-                        (directory "~/.offlineimap_mail/work")
-                        (directory-files nnheader-directory-files-safe) 
-                        (get-new-mail nil))))
+  (setq gnus-secondary-select-methods
+        '((nnmaildir "work" 
+                     (directory "~/.offlineimap_mail/work")
+                     (directory-files nnheader-directory-files-safe) 
+                     (get-new-mail nil))))
 
-     ;; (setq gnus-select-method
-     ;;       '(nnimap "Local"
-     ;;                (nnimap-address "localhost")
-     ;;                (nnimap-stream network)
-     ;;                (nnimap-server-port 143)))
+  ;; (setq gnus-select-method
+  ;;       '(nnimap "Local"
+  ;;                (nnimap-address "localhost")
+  ;;                (nnimap-stream network)
+  ;;                (nnimap-server-port 143)))
 
-     ;; (setq gnus-select-method
-     ;;       '(nnimap "gmail"
-     ;;                (nnimap-address "imap.gmail.com")
-     ;;                (nnimap-server-port "imaps")
-     ;;                (nnimap-stream ssl)
-     ;;                (nnimap-authinfo-file "~/.emacs.d/secrets/.authinfo.gpg")))
+  ;; (setq gnus-select-method
+  ;;       '(nnimap "gmail"
+  ;;                (nnimap-address "imap.gmail.com")
+  ;;                (nnimap-server-port "imaps")
+  ;;                (nnimap-stream ssl)
+  ;;                (nnimap-authinfo-file "~/.emacs.d/secrets/.authinfo.gpg")))
 
-     (setq gnus-mark-article-hook nil)
+  (setq gnus-mark-article-hook nil)
 
-     (gnus-add-configuration
-      '(article
-        (horizontal 1.0
-                    (vertical 25
-                              (group 1.0))
-                    (vertical 1.0
-                              (summary 0.25 point)
-                              (article 1.0)))))
+  (gnus-add-configuration
+   '(article
+     (horizontal 1.0
+                 (vertical 25
+                           (group 1.0))
+                 (vertical 1.0
+                           (summary 0.25 point)
+                           (article 1.0)))))
 
-     (gnus-add-configuration
-      '(summary
-        (horizontal 1.0
-                    (vertical 25
-                              (group 1.0))
-                    (vertical 1.0
-                              (summary 1.0 point)))))
+  (gnus-add-configuration
+   '(summary
+     (horizontal 1.0
+                 (vertical 25
+                           (group 1.0))
+                 (vertical 1.0
+                           (summary 1.0 point)))))
 
 
-     ;;(setq gnus-summary-line-format "%U%R%z%I%(%[%4L: %-23,23f%]%) %s\n")
-     (setq gnus-summary-line-format "%d %U%R%z%I%(%[%4L: %-23,23f%]%) %s\n")
-   #+END_SRC
+  ;;(setq gnus-summary-line-format "%U%R%z%I%(%[%4L: %-23,23f%]%) %s\n")
+  (setq gnus-summary-line-format "%d %U%R%z%I%(%[%4L: %-23,23f%]%) %s\n")
+#+END_SRC
 ** notmuch
-   #+begin_src emacs-lisp
-     (use-package notmuch)
+#+begin_src emacs-lisp
+  (use-package notmuch)
 
-     (set-face-attribute 'notmuch-search-unread-face nil :foreground "white")
-     (set-face-attribute 'notmuch-message-summary-face nil :background "steel blue" :foreground "snow")
+  (set-face-attribute 'notmuch-search-unread-face nil :foreground "white")
+  (set-face-attribute 'notmuch-message-summary-face nil :background "steel blue" :foreground "snow")
 
-     (setq notmuch-search-oldest-first nil
-           notmuch-saved-searches
-           '((:name "inbox" :query "tag:inbox" :key "i")
-             (:name "inbox today" :query "date:7d.. tag:inbox" :key "t")
-             (:name "work" :query "tag:work" :key "w")
-             (:name "mailing lists" :query "tag:mlist" :key "m")
-             (:name "recruiting" :query "tag:recruiting" :key "r")
-             (:name "unread" :query "tag:unread" :key "u")
-             (:name "flagged" :query "tag:flagged" :key "f")
-             ;; (:name "sent" :query "tag:sent" :key "s")
-             ;; (:name "drafts" :query "tag:draft" :key "d")
-             (:name "all mail" :query "*" :key "a")))
+  (setq notmuch-search-oldest-first nil
+        notmuch-saved-searches
+        '((:name "inbox" :query "tag:inbox" :key "i")
+          (:name "inbox today" :query "date:7d.. tag:inbox" :key "t")
+          (:name "work" :query "tag:work" :key "w")
+          (:name "mailing lists" :query "tag:mlist" :key "m")
+          (:name "recruiting" :query "tag:recruiting" :key "r")
+          (:name "unread" :query "tag:unread" :key "u")
+          (:name "flagged" :query "tag:flagged" :key "f")
+          ;; (:name "sent" :query "tag:sent" :key "s")
+          ;; (:name "drafts" :query "tag:draft" :key "d")
+          (:name "all mail" :query "*" :key "a")))
 
-     (setq mail-specify-envelope-from t
-           message-sendmail-envelope-from 'header
-           mail-envelope-from 'header)
+  (setq mail-specify-envelope-from t
+        message-sendmail-envelope-from 'header
+        mail-envelope-from 'header)
 
-     (defun my/choose-email-address-and-send ()
-       (interactive)
-       (let ((resp (completing-read "Which email? " '("bchu3@cougarnet.uh.edu" "bensonchu457@gmail.com") nil t "^")))
-         (setq smtpmail-smtp-server
-               (if (string= resp "bensonchu457@gmail.com")
-                   "smtp.gmail.com"
-                 "smtp.office365.com"))
-         (notmuch-mua-send-and-exit)))
+  (defun my/choose-email-address-and-send ()
+    (interactive)
+    (let ((resp (completing-read "Which email? " '("bchu3@cougarnet.uh.edu" "bensonchu457@gmail.com") nil t "^")))
+      (setq smtpmail-smtp-server
+            (if (string= resp "bensonchu457@gmail.com")
+                "smtp.gmail.com"
+              "smtp.office365.com"))
+      (notmuch-mua-send-and-exit)))
 
-     (define-key notmuch-message-mode-map (kbd "C-c C-c") #'my/choose-email-address-and-send)
+  (define-key notmuch-message-mode-map (kbd "C-c C-c") #'my/choose-email-address-and-send)
 
-     (defun my/notmuch-delete-mail ()
-       (interactive)
-       (notmuch-search-tag '("+deleted"))
-       (notmuch-search-next-thread))
+  (defun my/notmuch-delete-mail ()
+    (interactive)
+    (notmuch-search-tag '("+deleted"))
+    (notmuch-search-next-thread))
 
-     (defun my/undelete-mail ()
-       (interactive)
-       (notmuch-search-tag '("-deleted")))
+  (defun my/undelete-mail ()
+    (interactive)
+    (notmuch-search-tag '("-deleted")))
 
-     (defun my/recruiting-mail ()
-       (interactive)
-       (notmuch-search-tag '("-inbox" "+recruiting"))
-       (notmuch-search-next-thread))
+  (defun my/recruiting-mail ()
+    (interactive)
+    (notmuch-search-tag '("-inbox" "+recruiting"))
+    (notmuch-search-next-thread))
 
-     (define-key 'notmuch-search-mode-map (kbd "d") #'my/notmuch-delete-mail)
-     (define-key 'notmuch-search-mode-map (kbd "u") #'my/undelete-mail)
-     (define-key 'notmuch-search-mode-map (kbd "f") #'my/recruiting-mail)
-     (define-key 'notmuch-search-mode-map (kbd "<mouse-1>") nil)
+  (define-key 'notmuch-search-mode-map (kbd "d") #'my/notmuch-delete-mail)
+  (define-key 'notmuch-search-mode-map (kbd "u") #'my/undelete-mail)
+  (define-key 'notmuch-search-mode-map (kbd "f") #'my/recruiting-mail)
+  (define-key 'notmuch-search-mode-map (kbd "<mouse-1>") nil)
 
-     (add-to-list 'notmuch-tagging-keys
-                  '("r" ("-inbox" "+recruiting") "Recruiting"))
-   #+end_src
+  (add-to-list 'notmuch-tagging-keys
+               '("r" ("-inbox" "+recruiting") "Recruiting"))
+#+end_src
 ** mu4e
-   #+BEGIN_SRC emacs-lisp
-     (unless (eq system-type 'windows-nt)
-       (require 'mu4e)
+#+BEGIN_SRC emacs-lisp
+  (unless (eq system-type 'windows-nt)
+    (require 'mu4e)
 
-       (add-to-list 'mu4e-view-actions
-		    '("ViewInBrowser" . mu4e-action-view-in-browser) t)
+    (add-to-list 'mu4e-view-actions
+         '("ViewInBrowser" . mu4e-action-view-in-browser) t)
 
-       ;; (global-set-key (kbd "<f8>") 'mu4e)
+    ;; (global-set-key (kbd "<f8>") 'mu4e)
 
-       (setq mu4e-maildir "~/.offlineimap_mail"
-	     mu4e-sent-folder   "/personal/[Gmail].Sent Mail"
-	     mu4e-drafts-folder "/personal/[Gmail].Drafts"
-	     mu4e-refile-folder "/personal/[Gmail].Archive")
+    (setq mu4e-maildir "~/.offlineimap_mail"
+      mu4e-sent-folder   "/personal/[Gmail].Sent Mail"
+      mu4e-drafts-folder "/personal/[Gmail].Drafts"
+      mu4e-refile-folder "/personal/[Gmail].Archive")
 
-       (defvar my-mu4e-account-alist
-	 '(("Gmail"
-	    (mu4e-sent-folder "/work/Sent Mail")
-	    (mu4e-drafts-folder "/Gmail/[Gmail].Drafts")
-	    (mu4e-refile-folder "/Gmail/[Gmail].Archive")
-	    (user-mail-address "bensonchu457@gmail.com")
-	    (smtpmail-default-smtp-server "smtp.gmail.com")
-	    (smtpmail-smtp-user "bensonchu457")
-	    (smtpmail-smtp-server "smtp.gmail.com"))
-	   ("work"
-	    (mu4e-sent-folder "/work/Sent")
-	    (mu4e-drafts-folder "/work/Drafts")
-	    (mu4e-refile-folder "/work/Archive")
-	    (user-mail-address "bchu3@uh.edu")
-	    (smtpmail-default-smtp-server "smtp.account2.example.com")
-	    (smtpmail-smtp-user "bchu3")
-	    (smtpmail-smtp-server "smtp.account2.example.com")))))
+    (defvar my-mu4e-account-alist
+  '(("Gmail"
+     (mu4e-sent-folder "/work/Sent Mail")
+     (mu4e-drafts-folder "/Gmail/[Gmail].Drafts")
+     (mu4e-refile-folder "/Gmail/[Gmail].Archive")
+     (user-mail-address "bensonchu457@gmail.com")
+     (smtpmail-default-smtp-server "smtp.gmail.com")
+     (smtpmail-smtp-user "bensonchu457")
+     (smtpmail-smtp-server "smtp.gmail.com"))
+    ("work"
+     (mu4e-sent-folder "/work/Sent")
+     (mu4e-drafts-folder "/work/Drafts")
+     (mu4e-refile-folder "/work/Archive")
+     (user-mail-address "bchu3@uh.edu")
+     (smtpmail-default-smtp-server "smtp.account2.example.com")
+     (smtpmail-smtp-user "bchu3")
+     (smtpmail-smtp-server "smtp.account2.example.com")))))
 
-       ;;(defun my-mu4e-set-account ()
-       ;;  "Set the account for composing a message."
-       ;;  (let* ((account
-       ;;    (if mu4e-compose-parent-message
-       ;;        (let ((maildir (mu4e-message-field mu4e-compose-parent-message :maildir)))
-       ;;      (string-match "/\\(.*?\\)/" maildir)
-       ;;      (match-string 1 maildir))
-       ;;      (completing-read (format "Compose with account: (%s) "
-       ;;                   (mapconcat #'(lambda (var) (car var))
-       ;;                      my-mu4e-account-alist "/"))
-       ;;               (mapcar #'(lambda (var) (car var)) my-mu4e-account-alist)
-       ;;               nil t nil nil (caar my-mu4e-account-alist))))
-       ;;   (account-vars (cdr (assoc account my-mu4e-account-alist))))
-       ;;    (if account-vars
-       ;;        (mapc #'(lambda (var)
-       ;;        (set (car var) (cadr var)))
-       ;;        account-vars)
-       ;;      (error "No email account found"))))
+    ;;(defun my-mu4e-set-account ()
+    ;;  "Set the account for composing a message."
+    ;;  (let* ((account
+    ;;    (if mu4e-compose-parent-message
+    ;;        (let ((maildir (mu4e-message-field mu4e-compose-parent-message :maildir)))
+    ;;      (string-match "/\\(.*?\\)/" maildir)
+    ;;      (match-string 1 maildir))
+    ;;      (completing-read (format "Compose with account: (%s) "
+    ;;                   (mapconcat #'(lambda (var) (car var))
+    ;;                      my-mu4e-account-alist "/"))
+    ;;               (mapcar #'(lambda (var) (car var)) my-mu4e-account-alist)
+    ;;               nil t nil nil (caar my-mu4e-account-alist))))
+    ;;   (account-vars (cdr (assoc account my-mu4e-account-alist))))
+    ;;    (if account-vars
+    ;;        (mapc #'(lambda (var)
+    ;;        (set (car var) (cadr var)))
+    ;;        account-vars)
+    ;;      (error "No email account found"))))
 
-       ;;  (add-hook 'mu4e~headers-jump-to-maildir 'my-mu4e-set-account)
+    ;;  (add-hook 'mu4e~headers-jump-to-maildir 'my-mu4e-set-account)
 
 
-   #+END_SRC
+#+END_SRC
 ** html view firefox no copiousoutput
-   #+begin_src emacs-lisp
-     (mailcap-add "text/html" "/usr/bin/xdg-open %s ")
-   #+end_src
+#+begin_src emacs-lisp
+  (mailcap-add "text/html" "/usr/bin/xdg-open %s ")
+#+end_src
 * Programming
 ** Autocompletion
 #+BEGIN_SRC emacs-lisp
@@ -2352,23 +2351,23 @@
             'company-mode)
 #+END_SRC
 ** irony
-   #+begin_src emacs-lisp
-     (use-package irony)
-     (add-hook 'c++-mode-hook 'irony-mode)
-     (add-hook 'c-mode-hook 'irony-mode)
-     (add-hook 'objc-mode-hook 'irony-mode)
+#+begin_src emacs-lisp
+  (use-package irony)
+  (add-hook 'c++-mode-hook 'irony-mode)
+  (add-hook 'c-mode-hook 'irony-mode)
+  (add-hook 'objc-mode-hook 'irony-mode)
 
-     (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
 
-     (global-company-mode)
-   #+end_src
+  (global-company-mode)
+#+end_src
 ** Yasnippets
-   #+BEGIN_SRC emacs-lisp
-   (use-package yasnippet)
-   (use-package java-snippets)
-   (define-key yas/keymap (kbd "<backtab>") 'yas-expand)
-   (yas-global-mode 0)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package yasnippet)
+  (use-package java-snippets)
+  (define-key yas/keymap (kbd "<backtab>") 'yas-expand)
+  (yas-global-mode 0)
+#+END_SRC
 ** Projectile and dumb-jump
 #+BEGIN_SRC emacs-lisp
   (use-package projectile)
@@ -2391,7 +2390,7 @@
   (counsel-projectile-mode)
 
   (ivy-set-occur 'counsel-projectile-switch-to-buffer 'ivy-switch-buffer-occur)
-  
+
   (cons 'projectile-root-bottom-up
         (remove 'projectile-root-bottom-up
                 projectile-project-root-files-functions))
@@ -2442,209 +2441,209 @@
   (add-hook 'sh-mode-hook         'hs-minor-mode)
 #+END_SRC
 ** Ensime (scala)
-   #+BEGIN_SRC emacs-lisp
-   (use-package ensime)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package ensime)
+#+END_SRC
 ** Magit
-   #+BEGIN_SRC emacs-lisp
-     (use-package magit)
-     (global-set-key (kbd "C-x g") 'magit-status)
-     (global-set-key (kbd "C-x M-g") 'magit-dispatch-popup)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package magit)
+  (global-set-key (kbd "C-x g") 'magit-status)
+  (global-set-key (kbd "C-x M-g") 'magit-dispatch-popup)
+#+END_SRC
 ** SPACES
-   #+BEGIN_SRC emacs-lisp
-     (setq TeX-auto-untabify 't)
-     (setq indent-tabs-mode nil)
-     (add-hook 'java-mode-hook
-               (lambda () 
-                 (setq indent-tabs-mode nil)))
-     (add-hook 'clojure-mode
-                (lambda ()
-                 (setq indent-tabs-mode nil)))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (setq TeX-auto-untabify 't)
+  (setq indent-tabs-mode nil)
+  (add-hook 'java-mode-hook
+            (lambda () 
+              (setq indent-tabs-mode nil)))
+  (add-hook 'clojure-mode
+             (lambda ()
+              (setq indent-tabs-mode nil)))
+#+END_SRC
 ** Geiser
-   #+BEGIN_SRC emacs-lisp
-   (use-package geiser)
-   (setq geiser-default-implementation 'chez)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package geiser)
+  (setq geiser-default-implementation 'chez)
+#+END_SRC
 ** Paredit
-   #+BEGIN_SRC emacs-lisp
-   (use-package paredit)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package paredit)
+#+END_SRC
 ** Cider
-   #+BEGIN_SRC emacs-lisp
-   (use-package clj-refactor)
-   (use-package cider)
-   (use-package clojure-mode)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package clj-refactor)
+  (use-package cider)
+  (use-package clojure-mode)
+#+END_SRC
 ** YAML
-   #+BEGIN_SRC emacs-lisp
-   (use-package yaml-mode)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package yaml-mode)
+#+END_SRC
 ** show parens
-   #+BEGIN_SRC emacs-lisp
-     (show-paren-mode t)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (show-paren-mode t)
+#+END_SRC
 ** lsp-mode
-   #+begin_src emacs-lisp
-     (use-package flycheck)
-     (global-flycheck-mode)
+#+begin_src emacs-lisp
+  (use-package flycheck)
+  (global-flycheck-mode)
 
-     (add-to-list 'display-buffer-alist
-                  `(,(rx bos "*Flycheck errors*" eos)
-                    (display-buffer-reuse-window
-                     display-buffer-in-side-window)
-                    (side            . bottom)
-                    (reusable-frames . visible)
-                    (window-height   . 0.10)))
+  (add-to-list 'display-buffer-alist
+               `(,(rx bos "*Flycheck errors*" eos)
+                 (display-buffer-reuse-window
+                  display-buffer-in-side-window)
+                 (side            . bottom)
+                 (reusable-frames . visible)
+                 (window-height   . 0.10)))
 
-     (require 'ansi-color)
-     (defun colorize-compilation-buffer ()
-       (let ((buffer-read-only nil))
-         (ansi-color-apply-on-region (point-min) (point-max))))
-       ;; (ansi-color-apply-on-region compilation-filter-start (point)))
-     (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
+  (require 'ansi-color)
+  (defun colorize-compilation-buffer ()
+    (let ((buffer-read-only nil))
+      (ansi-color-apply-on-region (point-min) (point-max))))
+    ;; (ansi-color-apply-on-region compilation-filter-start (point)))
+  (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
 
-     (use-package lsp-mode)
-     (use-package lsp-ui)
+  (use-package lsp-mode)
+  (use-package lsp-ui)
 
-     (add-hook 'java-mode-hook
-               'lsp)
+  (add-hook 'java-mode-hook
+            'lsp)
 
-     (define-key lsp-mode-map (kbd "M-.") 'lsp-ui-peek-find-definitions)
-     (define-key lsp-mode-map (kbd "M-?") 'lsp-ui-peek-find-references)
-     (define-key lsp-mode-map (kbd "M-,") 'lsp-ui-peek-jump-backward)
-     (define-key lsp-mode-map (kbd "M-p") 'lsp-ui-peek-jump-forward)
+  (define-key lsp-mode-map (kbd "M-.") 'lsp-ui-peek-find-definitions)
+  (define-key lsp-mode-map (kbd "M-?") 'lsp-ui-peek-find-references)
+  (define-key lsp-mode-map (kbd "M-,") 'lsp-ui-peek-jump-backward)
+  (define-key lsp-mode-map (kbd "M-p") 'lsp-ui-peek-jump-forward)
 
-     (setq lsp-ui-flycheck-enable t)
-     (setq lsp-ui-flycheck-live-reporting t)
-     (use-package dap-mode
-       :config
-       (add-hook 'java-mode-hook
-                 'dap-mode)
-       (add-hook 'java-mode-hook
-                 'dap-ui-mode)
-       (define-key dap-mode-map (kbd "C-c h") 'dap-hydra)
-       (define-key dap-mode-map (kbd "C-c b") 'dap-breakpoint-toggle)
-       (define-key dap-mode-map (kbd "C-c d r") 'dap-java-debug)
-       (define-key dap-mode-map (kbd "C-c d m") 'dap-java-debug-test-class)
-       (define-key dap-mode-map (kbd "C-c r t") 'mvn-test))
+  (setq lsp-ui-flycheck-enable t)
+  (setq lsp-ui-flycheck-live-reporting t)
+  (use-package dap-mode
+    :config
+    (add-hook 'java-mode-hook
+              'dap-mode)
+    (add-hook 'java-mode-hook
+              'dap-ui-mode)
+    (define-key dap-mode-map (kbd "C-c h") 'dap-hydra)
+    (define-key dap-mode-map (kbd "C-c b") 'dap-breakpoint-toggle)
+    (define-key dap-mode-map (kbd "C-c d r") 'dap-java-debug)
+    (define-key dap-mode-map (kbd "C-c d m") 'dap-java-debug-test-class)
+    (define-key dap-mode-map (kbd "C-c r t") 'mvn-test))
 
-     ;; (defhydra dap-hydra (:color pink :hint nil :foreign-keys run)
-     ;;   ;;   "
-     ;;   ;; ^Stepping^          ^Switch^                 ^Breakpoints^           ^Eval
-     ;;   ;; ^^^^^^^^-----------------------------------------------------------------------------------------
-     ;;   ;; _n_: Next           _ss_: Session            _bt_: Toggle            _ee_: Eval
-     ;;   ;; _i_: Step in        _st_: Thread             _bd_: Delete            _er_: Eval region
-     ;;   ;; _o_: Step out       _sf_: Stack frame        _ba_: Add               _es_: Eval thing at point
-     ;;   ;; _c_: Continue       _sl_: List locals        _bc_: Set condition     _eii_: Inspect
-     ;;   ;; _r_: Restart frame  _sb_: List breakpoints   _bh_: Set hit count     _eir_: Inspect region
-     ;;   ;; _Q_: Disconnect     _sS_: List sessions      _bl_: Set log message   _eis_: Inspect thing at point
-     ;;   ;; "
-     ;;   ("n" dap-next)
-     ;;   ("i" dap-step-in)
-     ;;   ("o" dap-step-out)
-     ;;   ("c" dap-continue)
-     ;;   ("r" dap-restart-frame)
-     ;;   ("ss" dap-switch-session)
-     ;;   ("st" dap-switch-thread)
-     ;;   ("sf" dap-switch-stack-frame)
-     ;;   ("sl" dap-ui-locals)
-     ;;   ("sb" dap-ui-breakpoints)
-     ;;   ("sS" dap-ui-sessions)
-     ;;   ("bt" dap-breakpoint-toggle)
-     ;;   ("ba" dap-breakpoint-add)
-     ;;   ("bd" dap-breakpoint-delete)
-     ;;   ("bc" dap-breakpoint-condition)
-     ;;   ("bh" dap-breakpoint-hit-condition)
-     ;;   ("bl" dap-breakpoint-log-message)
-     ;;   ("ee" dap-eval) 
-     ;;   ("er" dap-eval-region)
-     ;;   ("es" dap-eval-thing-at-point)
-     ;;   ("eii" dap-ui-inspect)
-     ;;   ("eir" dap-ui-inspect-region)
-     ;;   ("eis" dap-ui-inspect-thing-at-point)
-     ;;   ("q" nil "quit" :color blue)
-     ;;   ("Q" dap-disconnect :color red))
-     ;(use-package lsp-python)
-   #+end_src
+  ;; (defhydra dap-hydra (:color pink :hint nil :foreign-keys run)
+  ;;   ;;   "
+  ;;   ;; ^Stepping^          ^Switch^                 ^Breakpoints^           ^Eval
+  ;;   ;; ^^^^^^^^-----------------------------------------------------------------------------------------
+  ;;   ;; _n_: Next           _ss_: Session            _bt_: Toggle            _ee_: Eval
+  ;;   ;; _i_: Step in        _st_: Thread             _bd_: Delete            _er_: Eval region
+  ;;   ;; _o_: Step out       _sf_: Stack frame        _ba_: Add               _es_: Eval thing at point
+  ;;   ;; _c_: Continue       _sl_: List locals        _bc_: Set condition     _eii_: Inspect
+  ;;   ;; _r_: Restart frame  _sb_: List breakpoints   _bh_: Set hit count     _eir_: Inspect region
+  ;;   ;; _Q_: Disconnect     _sS_: List sessions      _bl_: Set log message   _eis_: Inspect thing at point
+  ;;   ;; "
+  ;;   ("n" dap-next)
+  ;;   ("i" dap-step-in)
+  ;;   ("o" dap-step-out)
+  ;;   ("c" dap-continue)
+  ;;   ("r" dap-restart-frame)
+  ;;   ("ss" dap-switch-session)
+  ;;   ("st" dap-switch-thread)
+  ;;   ("sf" dap-switch-stack-frame)
+  ;;   ("sl" dap-ui-locals)
+  ;;   ("sb" dap-ui-breakpoints)
+  ;;   ("sS" dap-ui-sessions)
+  ;;   ("bt" dap-breakpoint-toggle)
+  ;;   ("ba" dap-breakpoint-add)
+  ;;   ("bd" dap-breakpoint-delete)
+  ;;   ("bc" dap-breakpoint-condition)
+  ;;   ("bh" dap-breakpoint-hit-condition)
+  ;;   ("bl" dap-breakpoint-log-message)
+  ;;   ("ee" dap-eval) 
+  ;;   ("er" dap-eval-region)
+  ;;   ("es" dap-eval-thing-at-point)
+  ;;   ("eii" dap-ui-inspect)
+  ;;   ("eir" dap-ui-inspect-region)
+  ;;   ("eis" dap-ui-inspect-thing-at-point)
+  ;;   ("q" nil "quit" :color blue)
+  ;;   ("Q" dap-disconnect :color red))
+  ;(use-package lsp-python)
+#+end_src
 *** Java
-    #+begin_src emacs-lisp
-     (use-package lsp-java)
-     (require 'dap-java)
-    #+end_src
+#+begin_src emacs-lisp
+  (use-package lsp-java)
+  (require 'dap-java)
+#+end_src
 *** ccls
-    #+begin_src emacs-lisp
-      (use-package ccls)
-      (require 'ccls)
-    #+end_src
+#+begin_src emacs-lisp
+  (use-package ccls)
+  (require 'ccls)
+#+end_src
 ** Rainbow delimiters
-   #+begin_src emacs-lisp
-     (use-package rainbow-delimiters)
-     (rainbow-delimiters-mode)
-     (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
-     (add-hook 'org-mode-hook #'rainbow-delimiters-mode)
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters)
+  (rainbow-delimiters-mode)
+  (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
+  (add-hook 'org-mode-hook #'rainbow-delimiters-mode)
 
-     (let ((rainbow-purple  "#9E1CB2")
-           (rainbow-blue  "#1194f6")
-           (rainbow-green  "#47B04B")
-           (rainbow-yellow  "#FFED18")
-           (rainbow-orange  "#E7B500")
-           (rainbow-red  "#C90067")
-           (rainbow-7  "#00AA5D")
-           (rainbow-8  "#FE7380"))
-       (set-face-attribute 'rainbow-delimiters-depth-1-face  t :foreground rainbow-purple)
-       (set-face-attribute 'rainbow-delimiters-depth-2-face  t :foreground rainbow-green)
-       (set-face-attribute 'rainbow-delimiters-depth-3-face  t :foreground rainbow-blue)
-       (set-face-attribute 'rainbow-delimiters-depth-4-face  t :foreground rainbow-red)
-       (set-face-attribute 'rainbow-delimiters-depth-5-face  t :foreground rainbow-yellow)
-       (set-face-attribute 'rainbow-delimiters-depth-6-face  t :foreground rainbow-blue)
-       (set-face-attribute 'rainbow-delimiters-depth-7-face  t :foreground rainbow-red)
-       (set-face-attribute 'rainbow-delimiters-depth-8-face  t :foreground rainbow-8)
-       (set-face-attribute 'rainbow-delimiters-depth-9-face  t :foreground rainbow-purple))
-   #+end_src
+  (let ((rainbow-purple  "#9E1CB2")
+        (rainbow-blue  "#1194f6")
+        (rainbow-green  "#47B04B")
+        (rainbow-yellow  "#FFED18")
+        (rainbow-orange  "#E7B500")
+        (rainbow-red  "#C90067")
+        (rainbow-7  "#00AA5D")
+        (rainbow-8  "#FE7380"))
+    (set-face-attribute 'rainbow-delimiters-depth-1-face  t :foreground rainbow-purple)
+    (set-face-attribute 'rainbow-delimiters-depth-2-face  t :foreground rainbow-green)
+    (set-face-attribute 'rainbow-delimiters-depth-3-face  t :foreground rainbow-blue)
+    (set-face-attribute 'rainbow-delimiters-depth-4-face  t :foreground rainbow-red)
+    (set-face-attribute 'rainbow-delimiters-depth-5-face  t :foreground rainbow-yellow)
+    (set-face-attribute 'rainbow-delimiters-depth-6-face  t :foreground rainbow-blue)
+    (set-face-attribute 'rainbow-delimiters-depth-7-face  t :foreground rainbow-red)
+    (set-face-attribute 'rainbow-delimiters-depth-8-face  t :foreground rainbow-8)
+    (set-face-attribute 'rainbow-delimiters-depth-9-face  t :foreground rainbow-purple))
+#+end_src
 ** elisp
 *** pp-macros
-    #+begin_src emacs-lisp
-    (define-key emacs-lisp-mode-map (kbd "C-c e") 'pp-macroexpand-last-sexp)
-    #+end_src
+#+begin_src emacs-lisp
+  (define-key emacs-lisp-mode-map (kbd "C-c e") 'pp-macroexpand-last-sexp)
+#+end_src
 *** auto-highlight-symbol
-    #+begin_src emacs-lisp
-      (use-package auto-highlight-symbol)
-      (add-hook 'emacs-lisp-mode-hook
-                'auto-highlight-symbol-mode)
-    #+end_src
+#+begin_src emacs-lisp
+  (use-package auto-highlight-symbol)
+  (add-hook 'emacs-lisp-mode-hook
+            'auto-highlight-symbol-mode)
+#+end_src
 ** C#
-   #+BEGIN_SRC emacs-lisp
-   (use-package csharp-mode)
-   (use-package dotnet)
-   (use-package omnisharp
-     :bind (:map omnisharp-mode-map
-             ([remap xref-find-definitions] . omnisharp-go-to-definition)
-             ([remap xref-find-references] . omnisharp-find-usages)))
-   (add-hook 'csharp-mode-hook 'omnisharp-mode)
-   (add-hook 'csharp-mode-hook 'company-mode)
-   (add-hook 'csharp-mode-hook 'flycheck-mode)
-   (add-hook 'csharp-mode-hook 'auto-highlight-symbol-mode)
-   (add-hook 'csharp-mode-hook 'dotnet-mode)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package csharp-mode)
+  (use-package dotnet)
+  (use-package omnisharp
+    :bind (:map omnisharp-mode-map
+            ([remap xref-find-definitions] . omnisharp-go-to-definition)
+            ([remap xref-find-references] . omnisharp-find-usages)))
+  (add-hook 'csharp-mode-hook 'omnisharp-mode)
+  (add-hook 'csharp-mode-hook 'company-mode)
+  (add-hook 'csharp-mode-hook 'flycheck-mode)
+  (add-hook 'csharp-mode-hook 'auto-highlight-symbol-mode)
+  (add-hook 'csharp-mode-hook 'dotnet-mode)
+#+END_SRC
 ** React js
-   #+BEGIN_SRC emacs-lisp
-   (use-package rjsx-mode)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package rjsx-mode)
+#+END_SRC
 ** Golang
-   #+BEGIN_SRC emacs-lisp
-   (use-package go-mode)
-   (add-hook 'go-mode-hook
-          (lambda ()
-            (add-hook 'before-save-hook 'gofmt-before-save)
-            (setq indent-tabs-mode nil)))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package go-mode)
+  (add-hook 'go-mode-hook
+         (lambda ()
+           (add-hook 'before-save-hook 'gofmt-before-save)
+           (setq indent-tabs-mode nil)))
+#+END_SRC
 ** Elpy
-   #+BEGIN_SRC emacs-lisp
-   (use-package elpy)
-   (elpy-enable)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package elpy)
+  (elpy-enable)
+#+END_SRC
 ** EIN
 #+BEGIN_SRC emacs-lisp
   (use-package ein)
@@ -2652,438 +2651,438 @@
                "/home/benson/anaconda3/bin/")
 #+END_SRC
 ** Web-mode
-   #+BEGIN_SRC emacs-lisp
-     (use-package web-mode)
-     (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-     (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
-     (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
-     (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-     (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-     (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
-     (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-     (add-to-list 'auto-mode-alist '("\\.cshtml\\'" . web-mode))
+#+BEGIN_SRC emacs-lisp
+  (use-package web-mode)
+  (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.cshtml\\'" . web-mode))
 
-     (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-     (setq web-mode-auto-close-style 2)
-   #+END_SRC
+  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+  (setq web-mode-auto-close-style 2)
+#+END_SRC
 ** Processing
 #+BEGIN_SRC emacs-lisp
-(use-package processing-mode)
+  (use-package processing-mode)
 
-(setq processing-location "/usr/bin/processing-java")
+  (setq processing-location "/usr/bin/processing-java")
 #+END_SRC
 ** Treemacs
-   #+BEGIN_SRC emacs-lisp
-   (use-package treemacs)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package treemacs)
+#+END_SRC
 ** Hy-mode
-   #+begin_src emacs-lisp
-   (use-package hy-mode)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package hy-mode)
+#+end_src
 ** glsl-mode
-   #+BEGIN_SRC emacs-lisp
-     (autoload 'glsl-mode "glsl-mode" nil t)
-     (add-to-list 'auto-mode-alist '("\\.glsl\\'" . glsl-mode))
-     (add-to-list 'auto-mode-alist '("\\.vert\\'" . glsl-mode))
-     (add-to-list 'auto-mode-alist '("\\.frag\\'" . glsl-mode))
-     (add-to-list 'auto-mode-alist '("\\.geom\\'" . glsl-mode))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (autoload 'glsl-mode "glsl-mode" nil t)
+  (add-to-list 'auto-mode-alist '("\\.glsl\\'" . glsl-mode))
+  (add-to-list 'auto-mode-alist '("\\.vert\\'" . glsl-mode))
+  (add-to-list 'auto-mode-alist '("\\.frag\\'" . glsl-mode))
+  (add-to-list 'auto-mode-alist '("\\.geom\\'" . glsl-mode))
+#+END_SRC
 ** indent-guide 
-   #+begin_src emacs-lisp
-   (use-package indent-guide)
-   ;(indent-guide-global-mode)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package indent-guide)
+  ;(indent-guide-global-mode)
+#+end_src
 ** rust cargo
-   #+begin_src emacs-lisp
-   (use-package cargo)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package cargo)
+#+end_src
 ** maven support
-   #+begin_src emacs-lisp
-   (use-package mvn)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package mvn)
+#+end_src
 ** multiple-cursors
-   #+begin_src emacs-lisp
-     (use-package multiple-cursors)
+#+begin_src emacs-lisp
+  (use-package multiple-cursors)
 
-     (define-prefix-command '*multiple-cursors-map*)
-     (define-key *multiple-cursors-map* (kbd "a") 'mc/mark-all-like-this)
-     (define-key *multiple-cursors-map* (kbd "A") 'mc/vertical-align)
-     (define-key *multiple-cursors-map* (kbd " ") 'mc/vertical-align-with-space)
+  (define-prefix-command '*multiple-cursors-map*)
+  (define-key *multiple-cursors-map* (kbd "a") 'mc/mark-all-like-this)
+  (define-key *multiple-cursors-map* (kbd "A") 'mc/vertical-align)
+  (define-key *multiple-cursors-map* (kbd " ") 'mc/vertical-align-with-space)
 
-     (defhydra mc-interactive (*multiple-cursors-map* "i")
-       "For those looping commands"
-       ("n" mc/mark-next-like-this)
-       ("p" mc/mark-previous-like-this)
-       ("s" mc/skip-to-next-like-this)
-       ("S" mc/skip-to-previous-like-this)
-       ("q" nil))
+  (defhydra mc-interactive (*multiple-cursors-map* "i")
+    "For those looping commands"
+    ("n" mc/mark-next-like-this)
+    ("p" mc/mark-previous-like-this)
+    ("s" mc/skip-to-next-like-this)
+    ("S" mc/skip-to-previous-like-this)
+    ("q" nil))
 
-     (global-set-key (kbd "C-c m") '*multiple-cursors-map*)
-   #+end_src
+  (global-set-key (kbd "C-c m") '*multiple-cursors-map*)
+#+end_src
 ** Setup-dev-environment
-   #+begin_src emacs-lisp
-     (defun setup-devenv ()
-       (interactive)
-       (flycheck-list-errors)
-       (treemacs)
-       (dap-ui-locals)
-       (when (y-or-n-p "Enter lsp? ")
-         (lsp)))
-   #+end_src
+#+begin_src emacs-lisp
+  (defun setup-devenv ()
+    (interactive)
+    (flycheck-list-errors)
+    (treemacs)
+    (dap-ui-locals)
+    (when (y-or-n-p "Enter lsp? ")
+      (lsp)))
+#+end_src
 ** skeletor project templates
-   #+begin_src emacs-lisp
-     (use-package skeletor)
+#+begin_src emacs-lisp
+  (use-package skeletor)
 
-     (skeletor-define-template "java-maven"
-       :title "Java with Maven")
-   #+end_src
+  (skeletor-define-template "java-maven"
+    :title "Java with Maven")
+#+end_src
 ** Spaces
-   #+BEGIN_SRC emacs-lisp
-     (setq default-tab-width 4)
-     (setq-default indent-tabs-mode nil)
-     (setq-default tab-width 4)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (setq default-tab-width 4)
+  (setq-default indent-tabs-mode nil)
+  (setq-default tab-width 4)
+#+END_SRC
 * New
 ** Youtube-dl
-   #+BEGIN_SRC emacs-lisp
-     (add-to-list 'load-path "~/.emacs.d/custom/youtube-dl-emacs/")
-     (require 'youtube-dl)
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'load-path "~/.emacs.d/custom/youtube-dl-emacs/")
+  (require 'youtube-dl)
 
-     (defun youtube-dl-song (url)
-       (interactive
-        (list (read-from-minibuffer
-               "URL: " (or (thing-at-point 'url)
-                           (when interprogram-paste-function
-                             (funcall interprogram-paste-function))))))
-       (async-shell-command (format "youtube-dl --audio-format mp3 --extract-audio \"%s\"" url)))
-   #+END_SRC
+  (defun youtube-dl-song (url)
+    (interactive
+     (list (read-from-minibuffer
+            "URL: " (or (thing-at-point 'url)
+                        (when interprogram-paste-function
+                          (funcall interprogram-paste-function))))))
+    (async-shell-command (format "youtube-dl --audio-format mp3 --extract-audio \"%s\"" url)))
+#+END_SRC
 ** pdf-tools use isearch
-   #+BEGIN_SRC emacs-lisp
-     (use-package pdf-tools)
-     (pdf-tools-install)
-     (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
-     (define-key pdf-view-mode-map (kbd "d") (lambda () (interactive) (pdf-view-next-line-or-next-page 8)))
-     (define-key pdf-view-mode-map (kbd "u") (lambda () (interactive) (pdf-view-previous-line-or-previous-page 8)))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package pdf-tools)
+  (pdf-tools-install)
+  (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
+  (define-key pdf-view-mode-map (kbd "d") (lambda () (interactive) (pdf-view-next-line-or-next-page 8)))
+  (define-key pdf-view-mode-map (kbd "u") (lambda () (interactive) (pdf-view-previous-line-or-previous-page 8)))
+#+END_SRC
 ** Time to game!
-   #+BEGIN_SRC emacs-lisp
-     (defvar my/games '("desmume" "mednaffe" "dolphin-emu" "m64py" "citra-qt" "steam " "th12"))
+#+BEGIN_SRC emacs-lisp
+  (defvar my/games '("desmume" "mednaffe" "dolphin-emu" "m64py" "citra-qt" "steam " "th12"))
 
-     (defun time-to-game ()
-       (interactive)
-       (let ((selection (completing-read "What would you like to play? "
-                                         my/games)))
-         (launch-program selection)))
-   #+END_SRC
+  (defun time-to-game ()
+    (interactive)
+    (let ((selection (completing-read "What would you like to play? "
+                                      my/games)))
+      (launch-program selection)))
+#+END_SRC
 ** Winner Mode
-   #+BEGIN_SRC emacs-lisp
-   (require 'winner)
-   (winner-mode)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (require 'winner)
+  (winner-mode)
+#+END_SRC
 ** Skewer Mode (web development)
-   #+BEGIN_SRC emacs-lisp
-   (use-package js2-mode)
-   (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
-   (use-package skewer-mode)
-   (add-hook 'js2-mode-hook 'skewer-mode)
-   (add-hook 'css-mode-hook 'skewer-css-mode)
-   (add-hook 'html-mode-hook 'skewer-html-mode)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package js2-mode)
+  (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+  (use-package skewer-mode)
+  (add-hook 'js2-mode-hook 'skewer-mode)
+  (add-hook 'css-mode-hook 'skewer-css-mode)
+  (add-hook 'html-mode-hook 'skewer-html-mode)
+#+END_SRC
 ** ediff
-   #+BEGIN_SRC emacs-lisp
-   (setq ediff-window-setup-function 'ediff-setup-windows-plain)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain)
+#+END_SRC
 ** Scroll interval
-   #+BEGIN_SRC emacs-lisp
-     (setq scroll-margin 1
-           hscroll-margin 2
-           hscroll-step 1
-           scroll-conservatively 101
-           scroll-preserve-screen-position t
-           mouse-wheel-scroll-amount '(3)
-           mouse-wheel-progressive-speed nil)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (setq scroll-margin 1
+        hscroll-margin 2
+        hscroll-step 1
+        scroll-conservatively 101
+        scroll-preserve-screen-position t
+        mouse-wheel-scroll-amount '(3)
+        mouse-wheel-progressive-speed nil)
+#+END_SRC
 ** AUR PKGBUILD
-   #+BEGIN_SRC emacs-lisp
-   (use-package pkgbuild-mode)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package pkgbuild-mode)
+#+END_SRC
 ** Eyebrowse
-   #+BEGIN_SRC emacs-lisp
-     (use-package eyebrowse
-       :init (setq eyebrowse-keymap-prefix (kbd "C-c w"))
-       :config
-       (eyebrowse-mode)
-       (global-set-key (kbd "C->") 'eyebrowse-next-window-config)
-       (global-set-key (kbd "C-<") 'eyebrowse-prev-window-config))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package eyebrowse
+    :init (setq eyebrowse-keymap-prefix (kbd "C-c w"))
+    :config
+    (eyebrowse-mode)
+    (global-set-key (kbd "C->") 'eyebrowse-next-window-config)
+    (global-set-key (kbd "C-<") 'eyebrowse-prev-window-config))
+#+END_SRC
 ** Writing mode
-   #+BEGIN_SRC emacs-lisp
-     (defun org-writing-mode ()
-       (interactive)
-       (setq org-bullets-bullet-list (quote ("  ")))
-       (buffer-face-set '(:family "ETBookOT")))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (defun org-writing-mode ()
+    (interactive)
+    (setq org-bullets-bullet-list (quote ("  ")))
+    (buffer-face-set '(:family "ETBookOT")))
+#+END_SRC
 ** re-builder specify read method
-   #+begin_src emacs-lisp
-   (require 're-builder)
-   (setq reb-re-syntax 'string)
-   #+end_src
+#+begin_src emacs-lisp
+  (require 're-builder)
+  (setq reb-re-syntax 'string)
+#+end_src
 ** scrollkeeper
-   #+begin_src emacs-lisp
-   (use-package scrollkeeper)
-   (global-set-key (kbd "C-v") 'scrollkeeper-down)
-   (global-set-key (kbd "M-v") 'scrollkeeper-up)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package scrollkeeper)
+  (global-set-key (kbd "C-v") 'scrollkeeper-down)
+  (global-set-key (kbd "M-v") 'scrollkeeper-up)
+#+end_src
 ** set-default-directory
-   #+begin_src emacs-lisp
-     (defun set-default-directory (dir)
-       (interactive "f")
-       (setq default-directory dir))
-   #+end_src
+#+begin_src emacs-lisp
+  (defun set-default-directory (dir)
+    (interactive "f")
+    (setq default-directory dir))
+#+end_src
 ** World time include Taiwan
-   #+begin_src emacs-lisp
-     ;; (("America/Los_Angeles" "Seattle")
-     ;;  ("America/New_York" "New York")
-     ;;  ("Europe/London" "London")
-     ;;  ("Europe/Paris" "Paris")
-     ;;  ("Asia/Calcutta" "Bangalore")
-     ;;  ("Asia/Tokyo" "Tokyo"))
-     (setq display-time-world-list
-           '(("Asia/Taipei" "Taiwan")))
-   #+end_src
+#+begin_src emacs-lisp
+  ;; (("America/Los_Angeles" "Seattle")
+  ;;  ("America/New_York" "New York")
+  ;;  ("Europe/London" "London")
+  ;;  ("Europe/Paris" "Paris")
+  ;;  ("Asia/Calcutta" "Bangalore")
+  ;;  ("Asia/Tokyo" "Tokyo"))
+  (setq display-time-world-list
+        '(("Asia/Taipei" "Taiwan")))
+#+end_src
 ** arch-linux
-   #+begin_src emacs-lisp
-   (use-package arch-packer)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package arch-packer)
+#+end_src
 ** Compile java run test
-   #+begin_src emacs-lisp
-     (defun compile-java ()
-       (interactive)
-       (let ((fname (file-name-nondirectory buffer-file-name)))
-       (shell-command (format "javac %s" fname))
-       (message (shell-command-to-string (format "java %s" (substring fname 0 (- (length fname) 5)))))))
+#+begin_src emacs-lisp
+  (defun compile-java ()
+    (interactive)
+    (let ((fname (file-name-nondirectory buffer-file-name)))
+    (shell-command (format "javac %s" fname))
+    (message (shell-command-to-string (format "java %s" (substring fname 0 (- (length fname) 5)))))))
 
-     (global-set-key (kbd "C-<f1>") 'compile-java)
-   #+end_src
+  (global-set-key (kbd "C-<f1>") 'compile-java)
+#+end_src
 ** ansi-term colors
-   #+begin_src emacs-lisp
-   (setq ansi-color-names-vector
-   ["black" "red3" "green3" "yellow3" "DodgerBlue2" "magenta3" "cyan3" "gray90"])
-   #+end_src
+#+begin_src emacs-lisp
+  (setq ansi-color-names-vector
+  ["black" "red3" "green3" "yellow3" "DodgerBlue2" "magenta3" "cyan3" "gray90"])
+#+end_src
 ** expand-region
-   #+begin_src emacs-lisp
-   (use-package expand-region)
-   (global-set-key (kbd "C-'") 'er/expand-region)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package expand-region)
+  (global-set-key (kbd "C-'") 'er/expand-region)
+#+end_src
 ** wtf
-   #+begin_src emacs-lisp
-   (use-package wtf)
-   
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package wtf)
+
+#+end_src
 ** buffer-time-tracking
-   #+begin_src emacs-lisp
-     (use-package switch-buffer-functions)
-     ;;(load "switch-buffer-functions-autoloads.el")
-     (defun my/insert-into-buffers-csv (str str2 symb str3)
-       (let* ((buffer (find-file-noselect "~/MEGA/org/agenda/buffer_times.csv"))
-             (inhibit-message t))
-         (with-current-buffer buffer
-           (goto-char (point-max))
-           (insert (format-time-string "%Y-%m-%d %H:%M:%S" (current-time)))
-           (insert "," str "," (if str2 str2 "") "," str3 "," (if symb (symbol-name symb) ""))
-           (insert "\n")
-           (save-buffer))))
+#+begin_src emacs-lisp
+  (use-package switch-buffer-functions)
+  ;;(load "switch-buffer-functions-autoloads.el")
+  (defun my/insert-into-buffers-csv (str str2 symb str3)
+    (let* ((buffer (find-file-noselect "~/MEGA/org/agenda/buffer_times.csv"))
+          (inhibit-message t))
+      (with-current-buffer buffer
+        (goto-char (point-max))
+        (insert (format-time-string "%Y-%m-%d %H:%M:%S" (current-time)))
+        (insert "," str "," (if str2 str2 "") "," str3 "," (if symb (symbol-name symb) ""))
+        (insert "\n")
+        (save-buffer))))
 
-     (defun my/record-buffer-switch (prev cur)
-       (let* (obuffer-name buffer-name buffer-fname buffer-mode buffer-def-dir)
-         (with-current-buffer cur
-           (setq buffer-name (buffer-name)
-                 buffer-fname (buffer-file-name)
-                 buffer-mode major-mode
-                 buffer-def-dir default-directory))
-         (when (buffer-live-p prev)
-           (with-current-buffer prev
-             (setq obuffer-name (buffer-name))))
-         (when (and (not (string= buffer-name " *Minibuf-1*"))
-                    ;; (or (not obuffer-name) (not (string= obuffer-name " *Minibuf-1*")))
-                    )
-           (my/insert-into-buffers-csv buffer-name buffer-fname buffer-mode buffer-def-dir))))
+  (defun my/record-buffer-switch (prev cur)
+    (let* (obuffer-name buffer-name buffer-fname buffer-mode buffer-def-dir)
+      (with-current-buffer cur
+        (setq buffer-name (buffer-name)
+              buffer-fname (buffer-file-name)
+              buffer-mode major-mode
+              buffer-def-dir default-directory))
+      (when (buffer-live-p prev)
+        (with-current-buffer prev
+          (setq obuffer-name (buffer-name))))
+      (when (and (not (string= buffer-name " *Minibuf-1*"))
+                 ;; (or (not obuffer-name) (not (string= obuffer-name " *Minibuf-1*")))
+                 )
+        (my/insert-into-buffers-csv buffer-name buffer-fname buffer-mode buffer-def-dir))))
 
-     ;; (add-hook 'switch-buffer-functions
-     ;;           'my/record-buffer-switch)
+  ;; (add-hook 'switch-buffer-functions
+  ;;           'my/record-buffer-switch)
 
-     (defun leaving-computer ()
-       (interactive)
-       (my/insert-into-buffers-csv "Inactive" "" nil "")
-       (org-clock-out nil t)
-       (message "Computer is now inactive!"))
+  (defun leaving-computer ()
+    (interactive)
+    (my/insert-into-buffers-csv "Inactive" "" nil "")
+    (org-clock-out nil t)
+    (message "Computer is now inactive!"))
 
-   #+end_src
+#+end_src
 ** auto-save files in same directory
-   #+begin_src emacs-lisp
-     (setq backup-directory-alist `(("." . "~/.emacs.d/backups/")))
-     (setq backup-by-copying t)
-   #+end_src
+#+begin_src emacs-lisp
+  (setq backup-directory-alist `(("." . "~/.emacs.d/backups/")))
+  (setq backup-by-copying t)
+#+end_src
 ** csv-mode
-   #+begin_src emacs-lisp
-   (use-package csv-mode)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package csv-mode)
+#+end_src
 ** kdeconnect
-   #+begin_src emacs-lisp
-   (use-package kdeconnect)
-   (setq kdeconnect-devices "ddcc003536dcf16d")
-   (setq kdeconnect-active-device "ddcc003536dcf16d")
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package kdeconnect)
+  (setq kdeconnect-devices "ddcc003536dcf16d")
+  (setq kdeconnect-active-device "ddcc003536dcf16d")
+#+end_src
 ** Purpose-mode
-   #+begin_src emacs-lisp#
+#+begin_src emacs-lisp#
    (use-package window-purpose)
    (add-to-list 'purpose-user-mode-purposes '(exwm-mode . research))
    (add-to-list 'purpose-user-mode-purposes '(js2-mode . dev))
    (purpose-compile-user-configuration)
    (purpose-mode)
-   #+end_src
+#+end_src
 ** erc
-   #+begin_src emacs-lisp
-     (use-package erc)
-     (use-package erc-hl-nicks)
-     (use-package erc-colorize)
-     (require 'netrc)
-     (erc-hl-nicks-mode)
-     (erc-colorize-mode)
-     (setq erc-user-full-name "Benson Chu")
-     (setq erc-kill-buffer-on-part t)
-     (setq erc-autojoin-channels-alist
-           '(("freenode.net" "#emacs" "#org-mode"
-              "##linux" "#compilers" "#pltclub" 
-              "##cs" "##computerscience" "##programming" "#lisp" "##lisp"
-              "#sbcl" "#ecl")))
+#+begin_src emacs-lisp
+  (use-package erc)
+  (use-package erc-hl-nicks)
+  (use-package erc-colorize)
+  (require 'netrc)
+  (erc-hl-nicks-mode)
+  (erc-colorize-mode)
+  (setq erc-user-full-name "Benson Chu")
+  (setq erc-kill-buffer-on-part t)
+  (setq erc-autojoin-channels-alist
+        '(("freenode.net" "#emacs" "#org-mode"
+           "##linux" "#compilers" "#pltclub" 
+           "##cs" "##computerscience" "##programming" "#lisp" "##lisp"
+           "#sbcl" "#ecl")))
 
-     (defun get-authinfo (host port)
-       (let* ((netrc (netrc-parse (expand-file-name "~/.emacs.d/secrets/.authinfo.gpg")))
-              (hostentry (netrc-machine netrc host port)))
-         (when hostentry (netrc-get hostentry "password"))))
+  (defun get-authinfo (host port)
+    (let* ((netrc (netrc-parse (expand-file-name "~/.emacs.d/secrets/.authinfo.gpg")))
+           (hostentry (netrc-machine netrc host port)))
+      (when hostentry (netrc-get hostentry "password"))))
 
-     (defun freenode-connect (nick password)
-       (erc :server "irc.freenode.net" :port 6667
-            :password password :nick nick))
+  (defun freenode-connect (nick password)
+    (erc :server "irc.freenode.net" :port 6667
+         :password password :nick nick))
 
-     (defun irc-connect ()
-       (interactive)
-       (when (y-or-n-p "Connect to IRC? ")
-         (freenode-connect "pest-ctrl" (get-authinfo "irc.freenode.net" "6667"))))
-   #+end_src
+  (defun irc-connect ()
+    (interactive)
+    (when (y-or-n-p "Connect to IRC? ")
+      (freenode-connect "pest-ctrl" (get-authinfo "irc.freenode.net" "6667"))))
+#+end_src
 ** posting sourc code
-   #+begin_src emacs-lisp
-     (use-package webpaste)
+#+begin_src emacs-lisp
+  (use-package webpaste)
 
-     (setq webpaste-paste-confirmation t)
-     (setq webpaste-provider-priority '("ix.io"))
-   #+end_src
+  (setq webpaste-paste-confirmation t)
+  (setq webpaste-provider-priority '("ix.io"))
+#+end_src
 ** eosd
-   #+begin_src emacs-lisp
-     ;; (add-to-list 'load-path 
-     ;;              "~/.emacs.d/custom/eosd")
-     ;; (require 'eosd)
-   #+end_src
+#+begin_src emacs-lisp
+  ;; (add-to-list 'load-path 
+  ;;              "~/.emacs.d/custom/eosd")
+  ;; (require 'eosd)
+#+end_src
 ** helpful
-   #+begin_src emacs-lisp
-   (use-package helpful)
-   (global-set-key (kbd "C-h f") #'helpful-function)
-   (global-set-key (kbd "C-h v") #'helpful-variable)
-   (global-set-key (kbd "C-h k") #'helpful-key)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package helpful)
+  (global-set-key (kbd "C-h f") #'helpful-function)
+  (global-set-key (kbd "C-h v") #'helpful-variable)
+  (global-set-key (kbd "C-h k") #'helpful-key)
+#+end_src
 ** ediff snippet 
-   #+begin_src emacs-lisp
-     (defun ediff-copy-both-to-C ()
-       (interactive)
-       (ediff-copy-diff ediff-current-difference nil 'C nil
-                        (concat
-                         (ediff-get-region-contents ediff-current-difference 'A ediff-control-buffer)
-                         (ediff-get-region-contents ediff-current-difference 'B ediff-control-buffer))))
-     (defun add-d-to-ediff-mode-map () (define-key ediff-mode-map "d" 'ediff-copy-both-to-C))
-     (add-hook 'ediff-keymap-setup-hook 'add-d-to-ediff-mode-map)
-   #+end_src
+#+begin_src emacs-lisp
+  (defun ediff-copy-both-to-C ()
+    (interactive)
+    (ediff-copy-diff ediff-current-difference nil 'C nil
+                     (concat
+                      (ediff-get-region-contents ediff-current-difference 'A ediff-control-buffer)
+                      (ediff-get-region-contents ediff-current-difference 'B ediff-control-buffer))))
+  (defun add-d-to-ediff-mode-map () (define-key ediff-mode-map "d" 'ediff-copy-both-to-C))
+  (add-hook 'ediff-keymap-setup-hook 'add-d-to-ediff-mode-map)
+#+end_src
 ** leetcode
-   #+begin_src emacs-lisp
-     (use-package ctable)
-     (use-package names)
-     (add-to-list 'load-path
-                  "~/.emacs.d/custom/leetcode-emacs")
+#+begin_src emacs-lisp
+  (use-package ctable)
+  (use-package names)
+  (add-to-list 'load-path
+               "~/.emacs.d/custom/leetcode-emacs")
 
-     (require 'leetcode)
+  (require 'leetcode)
 
-     (setq leetcode-path "~/MEGA/Leetcode/"
-          leetcode-language "java")
-   #+end_src
+  (setq leetcode-path "~/MEGA/Leetcode/"
+       leetcode-language "java")
+#+end_src
 ** freezing time
-   #+begin_src emacs-lisp
-     (defvar my/frozen-time nil)
+#+begin_src emacs-lisp
+  (defvar my/frozen-time nil)
 
-     (defun my/current-time ()
-       my/frozen-time)
+  (defun my/current-time ()
+    my/frozen-time)
 
-     ;; Change and freeze time
-     (defun za-warudo ()
-       "Freeze `current-time' at the current active or inactive timestamp. If point
-     is not on a timestamp, the function prompts for one. If time is not specified,
-     either by the timstamp under point or prompt, the time defaults to the
-     current HH:MM of today at the selected date."
-       (interactive)
-       (let ((time (org-read-date t nil nil "Input freeze time:")))
-         (setq my/frozen-time (append (org-read-date nil t time) '(0 0)))
-         (advice-add #'current-time :override #'my/current-time)
-         (set-face-background 'fringe "firebrick2")
-         (message "Toki yo tomare")))
+  ;; Change and freeze time
+  (defun za-warudo ()
+    "Freeze `current-time' at the current active or inactive timestamp. If point
+  is not on a timestamp, the function prompts for one. If time is not specified,
+  either by the timstamp under point or prompt, the time defaults to the
+  current HH:MM of today at the selected date."
+    (interactive)
+    (let ((time (org-read-date t nil nil "Input freeze time:")))
+      (setq my/frozen-time (append (org-read-date nil t time) '(0 0)))
+      (advice-add #'current-time :override #'my/current-time)
+      (set-face-background 'fringe "firebrick2")
+      (message "Toki yo tomare")))
 
-     (define-key *root-map* (kbd "C-z") 'za-warudo)
+  (define-key *root-map* (kbd "C-z") 'za-warudo)
 
-     ;; Release changed / frozen time
-     (defun un-za-warudo ()
-       "Release the time frozen by `freeze-time'."
-       (interactive)
-       (advice-remove #'current-time #'my/current-time)
-       (setq my/frozen-time nil)
-       (set-face-background 'fringe nil)
-       (message "Soshite, toki wa ugoki dasu"))
+  ;; Release changed / frozen time
+  (defun un-za-warudo ()
+    "Release the time frozen by `freeze-time'."
+    (interactive)
+    (advice-remove #'current-time #'my/current-time)
+    (setq my/frozen-time nil)
+    (set-face-background 'fringe nil)
+    (message "Soshite, toki wa ugoki dasu"))
 
-     (define-key *root-map* (kbd "C-r") 'un-za-warudo)
-   #+end_src
+  (define-key *root-map* (kbd "C-r") 'un-za-warudo)
+#+end_src
 ** Ace-window
-   #+begin_src emacs-lisp
-     (use-package ace-window)
-     (defhydra window-management-hydra (*root-map* "C-w")
-       "Manage window splits"
-       ("2" split-window-below)
-       ("3" split-window-right)
-       ("h" windmove-left)
-       ("j" windmove-down)
-       ("k" windmove-up)
-       ("l" windmove-right)
-       ("+" enlarge-window-horizontally)
-       ("-" shrink-window-horizontally)
-       ("M-+" enlarge-window)
-       ("M--" shrink-window)
-       ("x" delete-window)
-       ("q" nil))
+#+begin_src emacs-lisp
+  (use-package ace-window)
+  (defhydra window-management-hydra (*root-map* "C-w")
+    "Manage window splits"
+    ("2" split-window-below)
+    ("3" split-window-right)
+    ("h" windmove-left)
+    ("j" windmove-down)
+    ("k" windmove-up)
+    ("l" windmove-right)
+    ("+" enlarge-window-horizontally)
+    ("-" shrink-window-horizontally)
+    ("M-+" enlarge-window)
+    ("M--" shrink-window)
+    ("x" delete-window)
+    ("q" nil))
 
-   #+end_src
+#+end_src
 ** function to set tabwith
-   #+begin_src emacs-lisp
-     (defun my/TABS (num)
-       (interactive "p")
-       (setq tab-width (if (= num 1)
-                           8
-                         num)))
-   #+end_src
+#+begin_src emacs-lisp
+  (defun my/TABS (num)
+    (interactive "p")
+    (setq tab-width (if (= num 1)
+                        8
+                      num)))
+#+end_src
 ** bookmark+
-   #+begin_src emacs-lisp
-     (add-to-list 'load-path
-                  "~/.emacs.d/custom/bookmark-plus")
+#+begin_src emacs-lisp
+  (add-to-list 'load-path
+               "~/.emacs.d/custom/bookmark-plus")
 
-     (require 'bookmark+)
-   #+end_src
+  (require 'bookmark+)
+#+end_src
 ** Custom bookmarks location 
-    #+begin_src emacs-lisp#
+#+begin_src emacs-lisp#
       (bookmark-load "~/.emacs.d/my-bookmarks")
 
       (defun my/bookmark-set (&optional name no-overwrite)
@@ -3105,66 +3104,66 @@
               (kill-buffer)))))
 
       ;; (global-set-key (kbd "C-x r m") #'my/bookmark-set)
-    #+end_src
+#+end_src
 ** Subtitles editing 
-    #+begin_src emacs-lisp
-      (add-to-list 'load-path "~/.emacs.d/custom/subed/subed")
+#+begin_src emacs-lisp
+  (add-to-list 'load-path "~/.emacs.d/custom/subed/subed")
 
-      (require 'subed)
+  (require 'subed)
 
-      ;; Disable automatic movement of point by default
-      (add-hook 'subed-mode-hook 'subed-disable-sync-point-to-player)
-      ;; Break lines automatically while typing
-      (add-hook 'subed-mode-hook 'turn-on-auto-fill)
-      ;; Break lines at 50 characters
-      (add-hook 'subed-mode-hook (lambda () (setq-local fill-column 50)))
-    #+end_src
+  ;; Disable automatic movement of point by default
+  (add-hook 'subed-mode-hook 'subed-disable-sync-point-to-player)
+  ;; Break lines automatically while typing
+  (add-hook 'subed-mode-hook 'turn-on-auto-fill)
+  ;; Break lines at 50 characters
+  (add-hook 'subed-mode-hook (lambda () (setq-local fill-column 50)))
+#+end_src
 ** docker
-    #+begin_src emacs-lisp
-    (use-package docker)
-    (global-set-key (kbd "C-x C-d") #'docker)
-    #+end_src
+#+begin_src emacs-lisp
+  (use-package docker)
+  (global-set-key (kbd "C-x C-d") #'docker)
+#+end_src
 ** compilation buffer in same window
-    #+begin_src emacs-lisp
-      ;; (add-to-list 'display-buffer-alist
-      ;;              '("\\*compilation\\*" (display-buffer-reuse-window . display-buffer-same-window) ))
+#+begin_src emacs-lisp
+  ;; (add-to-list 'display-buffer-alist
+  ;;              '("\\*compilation\\*" (display-buffer-reuse-window . display-buffer-same-window) ))
 
-      (add-to-list 'same-window-buffer-names "*compilation*")
+  (add-to-list 'same-window-buffer-names "*compilation*")
 
-      ;; (setq display-buffer-alist (remove-if (lambda (x) (string= "\\*compilation\\*" (car x))) display-buffer-alist))
-    #+end_src
+  ;; (setq display-buffer-alist (remove-if (lambda (x) (string= "\\*compilation\\*" (car x))) display-buffer-alist))
+#+end_src
 ** compilation scroll
-   #+begin_src emacs-lisp
-     (setq compilation-scroll-output t)
-   #+end_src
+#+begin_src emacs-lisp
+  (setq compilation-scroll-output t)
+#+end_src
 ** google-it with qutebrowser
-   #+begin_src emacs-lisp
-     (require 'url-util)
+#+begin_src emacs-lisp
+  (require 'url-util)
 
-     (defun my/google-it ()
-       (interactive)
-       (let* ((resp (read-from-minibuffer "What is your query? "))
-              (cleaned-resp (url-hexify-string resp)))
-         (launch-program (format "qutebrowser \"https://google.com/search?q=%s\"" cleaned-resp))))
+  (defun my/google-it ()
+    (interactive)
+    (let* ((resp (read-from-minibuffer "What is your query? "))
+           (cleaned-resp (url-hexify-string resp)))
+      (launch-program (format "qutebrowser \"https://google.com/search?q=%s\"" cleaned-resp))))
 
-     (define-key *root-map* (kbd "g") #'my/google-it)
-   #+end_src
+  (define-key *root-map* (kbd "g") #'my/google-it)
+#+end_src
 ** 256-color
-   #+begin_src emacs-lisp
-     (use-package eterm-256color)
-     (add-hook 'term-mode-hook #'eterm-256color-mode)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package eterm-256color)
+  (add-hook 'term-mode-hook #'eterm-256color-mode)
+#+end_src
 ** read only buffers in view-mode
-    #+begin_src emacs-lisp
-      (setq view-read-only t)
-    #+end_src
+#+begin_src emacs-lisp
+  (setq view-read-only t)
+#+end_src
 ** hyperbole
 #+begin_src emacs-lisp
   (use-package hyperbole)
 #+end_src
 * Broken
 ** Wunderlist
-   #+BEGIN_SRC emacs-lisp#
+#+BEGIN_SRC emacs-lisp#
      (use-package org-wunderlist)
 
      (save-excursion
@@ -3179,51 +3178,51 @@
 
      (setq org-wunderlist-file  "~/MEGA/org/agenda/Wunderlist.org"
            org-wunderlist-dir "~/MEGA/org/agenda/org-wunderlist/")
-   #+END_SRC
+#+END_SRC
 ** poshint
-   #+begin_src emacs-lisp#
+#+begin_src emacs-lisp#
    (use-package pophint)
-   #+end_src
+#+end_src
 * Disabled
 ** nnreddit
- #+BEGIN_SRC emacs-lisp#
+#+BEGIN_SRC emacs-lisp#
  (use-package nnredit "~/.emacs.d/nnreddit/nnreddit.el")
  (add-to-list 'gnus-secondary-select-methods '(nnreddit ""))
- #+END_SRC
+#+END_SRC
 ** xwidget
-   #+BEGIN_SRC emacs-lisp#
+#+BEGIN_SRC emacs-lisp#
    (define-key xwidget-webkit-mode-map [mouse-4] 'xwidget-webkit-scroll-down)
    (define-key xwidget-webkit-mode-map [mouse-5] 'xwidget-webkit-scroll-up)
-   #+END_SRC 
+#+END_SRC 
 ** Slime mode
- #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
  (use-package slime)
  (add-hook 'lisp-mode-hook (lambda () (slime-mode t)))
  (add-hook 'inferior-lisp-mode-hook (lambda () (inferior-slime-mode t)))
  (setq inferior-lisp-program "/usr/bin/sbcl")
  (slime-setup '(slime-fancy slime-asdf))
- #+END_SRC
+#+END_SRC
 ** i3wm interaction
-  #+BEGIN_SRC emacs-lisp#
+#+BEGIN_SRC emacs-lisp#
   (use-package i3wm)
   (defun insert-mode ()
     (interactive)
     (i3wm-command "mode insert"))
   (global-set-key (kbd "M-\"") 'insert-mode)
-  #+END_SRC
+#+END_SRC
 ** Cyberpunk Theme
- #+BEGIN_SRC #emacs-lisp
+#+BEGIN_SRC #emacs-lisp
  (load-theme 'cyberpunk t)
 (use-package moe-theme)
 (moe-dark)
 (powerline-moe-theme)
- #+END_SRC
+#+END_SRC
 ** Wanderlust
 #+BEGIN_SRC emacs-lisp#
 (autoload 'wl "wl" "Wanderlust" t)
 #+END_SRC
 ** linum
- #+BEGIN_SRC emacs-lisp#
+#+BEGIN_SRC emacs-lisp#
  (use-package linum)
  (linum-relative-global-mode)
  (setq linum-relative-current-symbol "")
@@ -3237,11 +3236,11 @@
  ;      'linum)))
 
  ;(setq linum-relative-format "%3s\u2502 ")
- #+END_SRC
+#+END_SRC
  
 ** CTD Minor Mode
 *** Keybinding
-    #+BEGIN_SRC emacs-lisp#
+#+BEGIN_SRC emacs-lisp#
     (use-package multi-term)
     (define-minor-mode ctd-mode
     "This is the mode for the CoderTillDeath"
@@ -3254,9 +3253,9 @@
           (define-key map (kbd "M-1") 'windresize)
           map))
       (ctd-mode 1)
-    #+END_SRC
+#+END_SRC
 *** Precedence
- #+BEGIN_SRC emacs-lisp#
+#+BEGIN_SRC emacs-lisp#
  (add-hook 'after-load-functions 'ctd-mode-priority)
 
  (defun ctd-mode-priority (_file)
@@ -3267,12 +3266,12 @@
      (let ((mykeys (assq 'ctd-mode minor-mode-map-alist)))
        (assq-delete-all 'ctd-mode minor-mode-map-alist)
        (add-to-list 'minor-mode-map-alist mykeys))))
- #+END_SRC
+#+END_SRC
 ** Screw delete
-   #+BEGIN_SRC emacs-lisp#
+#+BEGIN_SRC emacs-lisp#
      (global-set-key (kbd "C-d") 'delete-backward-char)
      (global-set-key (kbd "M-d") 'backward-kill-word)
-   #+END_SRC
+#+END_SRC
    
 ** Custom Journal Attempt 1
 #+BEGIN_SRC emacs-lisp#
@@ -3448,7 +3447,7 @@
     (dired (format-time-string "~/MEGA/org/entries/review/%Y/")))
 #+END_SRC
 ** Norang Projects code
-   #+BEGIN_SRC emacs-lisp#
+#+BEGIN_SRC emacs-lisp#
      (require 'org-habit)
 
      (defun bh/find-project-task ()
@@ -3807,5 +3806,5 @@
              (when org-agenda-sticky
                (org-agenda-redo)))
          (widen)))
-   #+END_SRC
+#+END_SRC
    

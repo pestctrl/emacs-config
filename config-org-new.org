@@ -1331,7 +1331,11 @@
                 (org-agenda-start-with-log-mode '(closed clock))
                 (org-agenda-clockreport-mode t)))
               ("r" "Reviews" tags "+LEVEL=3+ITEM={Review}"
-               ((org-agenda-files '(,(my/org-file "entries/reviews.gpg"))))))))
+               ((org-agenda-files '(,(my/org-file "entries/reviews.gpg")))))
+              ("o" "Offline" tags-todo "offline"
+               ((org-tags-match-list-sublevels nil)))
+              ("b" "Bored" tags-todo "+short-grow"
+               ((org-tags-match-list-sublevels nil))))))
   #+end_src
 * Checkbox hack
   #+BEGIN_SRC emacs-lisp

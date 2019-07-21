@@ -1184,7 +1184,8 @@
                  (org-agenda-tag-filter-preset (quote (,tag)))
                  (org-agenda-skip-deadline-if-done t)
                  (org-agenda-skip-scheduled-if-done t)
-                 (org-super-agenda-groups '((:name "Overdue" :and (:deadline past :log nil))
+                 (org-super-agenda-groups '((:name "Dev things" :file-path "dev.org")
+                                            (:name "Overdue" :and (:deadline past :log nil))
                                             (:name "Upcoming" :deadline future)
                                             (:name "Should do" :and (:scheduled past :log nil))
                                             (:name "Today" :time-grid t

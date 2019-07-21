@@ -1169,7 +1169,7 @@
     (defun production-agenda (tag)
       `((tags-todo ,(concat tag "/STUFF")
                    ((org-agenda-overriding-header "Refile tasks")))
-        (tags-todo ,(concat tag (mapconcat #'identity my/active-projects-and-tasks "|"))
+        (tags-todo ,(concat tag "/" (mapconcat #'identity my/active-projects-and-tasks "|"))
                    ((org-agenda-overriding-header "Stuck Projects")
                     (org-agenda-skip-function 'my/show-stuck-projects)
                     (org-tags-match-list-sublevels 'indented)))

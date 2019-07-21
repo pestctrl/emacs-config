@@ -722,13 +722,19 @@ https://github.com/org-trello/org-trello/issues/258
   #+end_src
 * Auto commit when saving org files
 #+begin_src emacs-lisp
+  (defvar org-agenda-auto-commit nil)
   (defconst org-agenda-git-repo-path (expand-file-name "~/MEGA/org/2019-05-agenda"))
+
+  (defun my/toggle-auto-commit ()
+    (interactive)
+    (setq org-agenda-auto-commit (not org-agenda-auto-commit)))
 
   (defun auto-commit-agenda (&optional arg)
     (when-let (f (buffer-file-name))
       (let ((fname (expand-file-name f))
             (sfname (buffer-name)))
-        (when (and (string-prefix-p org-agenda-git-repo-path
+        (when (and org-agenda-auto-commit
+                   (string-prefix-p org-agenda-git-repo-path
                                     fname)
                    (magit-anything-modified-p t fname)
                    (not (magit-merge-in-progress-p))

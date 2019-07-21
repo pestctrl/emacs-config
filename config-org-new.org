@@ -1390,7 +1390,7 @@
   #+begin_src emacs-lisp
     (setq org-capture-templates
           `(("t" "Todo" entry (file ,(my/agenda-file "refile.org"))
-             "* STUFF %?\n  :PROPERTIES:\n  :CREATED: %U\n  :VIEWING: %a\n  :END:")
+             "* STUFF %?\n:PROPERTIES:\n:CREATED: %U\n:VIEWING: %a\n:END:")
             ("r" "Review" entry (file+function ,(my/org-file "entries/reviews.gpg") setup-automatic-review)
              (file ,(my/org-file "templates/weekly-review.org")))
             ("rt" "Review Task" entry (file+headline ,(my/org-file "entries/reviews.gpg") "Tasks")
@@ -1406,7 +1406,7 @@
             ("c" "Record Comms Message" entry (file+olp+datetree ,(my/agenda-file "datetree.org"))
              "* TODO %?")
             ("e" "Emacs config snippet" entry (file+headline "~/.emacs.d/config.org" "New")
-             "* %^{Title}\n   #+begin_src emacs-lisp\n   %?\n   #+end_src")
+             "* %^{Title}\n#+begin_src emacs-lisp\n %?\n#+end_src")
             ("j" "Journal")
             ("je" "Journal Entry" entry (file+olp+datetree ,(my/org-file "entries/journal.gpg"))
              "* %<%R> %?\n%U\n\n")
@@ -1423,9 +1423,9 @@
             ;; ("y" "Elfeed YouTube" entry (file+olp ,(my/agenda-file "dev.org") "rewards" "Videos")
             ;;  "* TODO %(identity elfeed-link-org-capture)")
             ("p" "Protocol" entry (file ,(my/agenda-file "refile.org"))
-             "* STUFF %^{Title}\n  :PROPERTIES:\n  :CREATED: %U\n  :URL: %:link\n  :END:\n#+begin_example\n%i\n#+end_example\n%?")
+             "* STUFF %^{Title}\n:PROPERTIES:\n:CREATED: %U\n:URL: %:link\n:END:\n#+begin_example\n%i\n#+end_example\n%?")
             ("L" "Protocol Link" entry (file ,(my/agenda-file "refile.org"))
-             "* STUFF %? [[%:link][%:description]]\n  :PROPERTIES:\n  :CREATED: %U\n  :URL: %:link\n  :END:")))
+             "* STUFF %? [[%:link][%:description]]\n:PROPERTIES:\n:CREATED: %U\n:URL: %:link\n:END:")))
   #+end_src
 * Custom Journal
 ** Attempt 3

@@ -2603,9 +2603,9 @@
     (set-face-attribute 'rainbow-delimiters-depth-9-face  t :foreground rainbow-purple))
 #+end_src
 ** elisp
-*** pp-macros
+*** Macroexpand
 #+begin_src emacs-lisp
-  (define-key emacs-lisp-mode-map (kbd "C-c e") 'pp-macroexpand-last-sexp)
+  (define-key emacs-lisp-mode-map (kbd "C-c e") 'macrostep-expand)
 #+end_src
 *** auto-highlight-symbol
 #+begin_src emacs-lisp

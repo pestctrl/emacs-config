@@ -925,7 +925,7 @@
       "Only show subtrees that are stuck projects"
       (save-restriction
         (widen)
-        (let ((subtree-end (save-excursion (org-end-of-subtree t)))
+        (let ((subtree-end (save-excursion (org-end-of-subtree t t)))
               (next-heading (save-excursion (outline-next-heading))))
           ;; (setq debug-p (point)
           ;;       debuf-f (buffer-file-name))
@@ -943,7 +943,7 @@
       "Only show subtrees that are stuck projects"
       (save-restriction
         (widen)
-        (let ((subtree-end (save-excursion (org-end-of-subtree t)))
+        (let ((subtree-end (save-excursion (org-end-of-subtree t t)))
               (next-heading (save-excursion (outline-next-heading))))
           (if (org-get-todo-state)
               (unless (or (and (my/is-a-task)

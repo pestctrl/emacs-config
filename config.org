@@ -3161,6 +3161,30 @@
 #+begin_src emacs-lisp
   (use-package hyperbole)
 #+end_src
+** Go to work
+#+begin_src emacs-lisp
+  (defvar my/working nil)
+
+  (defvar my/dev-agenda nil)
+
+  (defun toggle-working ()
+    (interactive)
+    (setq my/working (not my/working))
+    (cond (my/working
+           (define-key *firefox-map* (kbd "f") nil)
+           (setq my/dev-agenda (assoc "d" org-agenda-custom-commands))
+           (setq org-agenda-custom-commands
+                 (delq (assoc "d" org-agenda-custom-commands)
+                       org-agenda-custom-commands))
+           (message "Back to work!"))
+          ((not my/working)
+           (define-key *firefox-map* (kbd "f") (quickrun-lambda "firefox" "firefox"))
+           (add-to-list 'org-agenda-custom-commands my/dev-agenda)
+           (message "Break time!"))))
+
+
+  (global-set-key (kbd "s-w") #'toggle-working)
+#+end_src
 * Broken
 ** Wunderlist
 #+BEGIN_SRC emacs-lisp#

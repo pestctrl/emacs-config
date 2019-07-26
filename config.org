@@ -2742,6 +2742,20 @@
   (setq-default indent-tabs-mode nil)
   (setq-default tab-width 4)
 #+END_SRC
+** Erlang
+#+begin_src emacs-lisp
+  (use-package erlang)
+
+  (add-to-list 'load-path
+               "~/.emacs.d/custom/erlang_ls/")
+
+  (setq lsp-erlang-server-install-dir "~/.emacs.d/custom/erlang_ls")
+
+  (defun my/erlang-keymap-hook ()
+    (local-set-key (kbd "C-c C-c") 'erlang-compile))
+
+  (add-hook 'erlang-mode-hook 'my/erlang-keymap-hook)
+#+end_src
 * New
 ** Youtube-dl
 #+BEGIN_SRC emacs-lisp

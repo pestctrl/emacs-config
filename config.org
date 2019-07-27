@@ -3236,6 +3236,10 @@
 #+begin_src emacs-lisp
  (use-package magit-todos)
 #+end_src
+** wgrep
+#+begin_src emacs-lisp
+  (require 'wgrep)
+#+end_src
 * Broken
 ** Wunderlist
 #+BEGIN_SRC emacs-lisp#

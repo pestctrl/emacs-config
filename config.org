@@ -3238,7 +3238,8 @@
 #+end_src
 ** wgrep
 #+begin_src emacs-lisp
-  (require 'wgrep)
+  (use-package wgrep)
+#+end_src
 #+end_src
 * Broken
 ** Wunderlist

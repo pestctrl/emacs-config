@@ -1381,7 +1381,7 @@
                ((org-agenda-span 'day)
                 (org-agenda-start-with-log-mode '(closed clock))
                 (org-agenda-clockreport-mode t)))
-              ("r" "Reviews" tags "+LEVEL=3+ITEM={Review}"
+              ("r" "Reviews" tags "+LEVEL=3+ITEM={Review for}"
                ((org-agenda-files '(,(my/org-file "entries/reviews.gpg")))))
               ("o" "Offline" tags-todo "offline"
                ((org-tags-match-list-sublevels nil)))

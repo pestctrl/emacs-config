@@ -3195,6 +3195,17 @@
 ** hyperbole
 #+begin_src emacs-lisp
   (use-package hyperbole)
+
+  ;; I don't care about smart scrolling in org mode, unless I actually do
+
+  (defun my/smart-scroll-up (old)
+    (if (eq major-mode 'org-mode)
+        (org-meta-return)
+      (funcall old)))
+
+  (advice-add #'smart-scroll-up
+              :around
+              #'my/smart-scroll-up)
 #+end_src
 ** Go to work
 #+begin_src emacs-lisp

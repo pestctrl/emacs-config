@@ -1751,6 +1751,7 @@
      (use-package org-board)
      (add-to-list 'org-board-agent-header-alist
                   '("Linux" . "--user-agent=\"Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.6) Gecko/20070802 SeaMonkey/1.1.4\""))
+     (setq org-board-wget-show-buffer nil)
    #+end_src
 ** org-now
    #+begin_src emacs-lisp

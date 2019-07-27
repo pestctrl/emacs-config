@@ -353,7 +353,6 @@
     (define-key *org-agenda-follow-map* (kbd "p") 'my/org-agenda-project-follow)
     (define-key *org-agenda-follow-map* (kbd "r") 'my/org-agenda-review-follow)
 
-
     (defun advice-unadvice (sym)
       "Remove all advices from symbol SYM."
       (interactive "aFunction symbol: ")
@@ -1176,8 +1175,7 @@
         (tags-todo ,(concat tag "/WAIT")
                    ((org-agenda-overriding-header "Tasks in other courts")))
         (tags-todo ,(concat tag "/NEXT")
-                   ((org-agenda-overriding-header "Things to do")
-                   ))
+                   ((org-agenda-overriding-header "Things to do")))
         (agenda ""
                 ((org-agenda-skip-function 'my/agenda-custom-skip)
                  (org-agenda-span 'day)
@@ -1280,7 +1278,7 @@
               ;;               (org-agenda-skip-function 'my/dev-show-active-projects)
               ;;               (org-tags-match-list-sublevels 'indented)))
               ("T" "Test" tags-todo ,(concat dev-tag "&TODO=\"NEXT\"")
-                         ((org-agenda-overriding-header "Things to do")))
+               ((org-agenda-overriding-header "Things to do")))
               ("g" "General View"
                ((tags-todo "+sandbox+refile"
                            ((org-agenda-overriding-header "Refile tasks")))
@@ -1427,7 +1425,7 @@
             ("L" "Protocol Link" entry (file ,(my/agenda-file "refile.org"))
              "* STUFF %? [[%:link][%:description]]\n:PROPERTIES:\n:CREATED: %U\n:URL: %:link\n:END:")))
   #+end_src
-* Custom Journal
+* Weekly Reviews Implementation
 ** Attempt 3
 #+BEGIN_SRC emacs-lisp
   (defvar yearly-theme "Thought")
@@ -1561,8 +1559,6 @@
 
   (add-hook 'org-capture-mode-hook
             'my/review-set-visibility)
-
-
 #+END_SRC
 * prompt for automatic org-board
   #+begin_src emacs-lisp

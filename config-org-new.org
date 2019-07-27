@@ -566,7 +566,7 @@
     (setq org-todo-keywords
           '((sequence "STUFF(s)" "FUTURE(f)" "INACT(i)" "CLOCK(C)" "DEPEND(D)" "|")
             (sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
-            (sequence "CAT(>)" "ONE(o)" "META(m)" "META1(M)" "SEQ(S)" "EMPTY(e)" "ETERNAL(E)" "SPEC(:)" "|" "COMPLETE(c)")
+            (sequence "CAT(>)" "ONE(o)" "META(m)" "META1(M)" "SEQ(S)" "EMPTY(e)" "ETERNAL(E)" "SPEC(:)" "|" "COMPLETE(c!)")
             (sequence "WAIT(w@/!)" "HOLD(h)" "TICKLER(T)" "|" "ABANDON(a@/!)")
             (sequence "TTTT" "|")))
 

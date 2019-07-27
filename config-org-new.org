@@ -425,6 +425,18 @@
           (and org-agenda-show-outline-path
                (org-with-point-at m (org-display-outline-path t))))))
   #+end_src
+* count archive tree characters
+#+begin_src emacs-lisp
+  (defun my/org-count-subtree-characters ()
+    (interactive)
+    (save-window-excursion
+      (org-agenda-goto t)
+      (org-mark-subtree)
+      (message (format "This subtree has %d characters. " (- (region-end) (region-beginning))))))
+
+  (define-key org-agenda-mode-map (kbd "C") #'my/org-count-subtree-characters)
+
+#+end_src
 
 * My Template
   #+BEGIN_SRC emacs-lisp
@@ -1044,6 +1056,28 @@
           (unless (or (not (my/is-part-of-subtree))
                       (my/parent-is-eternal))
             next-headline))))
+
+    (defun my/show-big-top-levels ()
+      (save-restriction
+        (widen)
+        (let ((next-headline (save-excursion (or (outline-next-heading) (point-max))))
+              (size (- (save-excursion (org-end-of-subtree t t)) (point))))
+          (unless (and
+                   (or (not (my/is-part-of-subtree))
+                       (my/parent-is-eternal))
+                   (> size 50000))
+            next-headline))))
+
+    (defun my/show-small-top-levels ()
+      (save-restriction
+        (widen)
+        (let ((next-headline (save-excursion (or (outline-next-heading) (point-max))))
+              (size (- (save-excursion (org-end-of-subtree t t)) (point))))
+          (unless (and
+                   (or (not (my/is-part-of-subtree))
+                       (my/parent-is-eternal))
+                   (< size 50000))
+            next-headline))))
   #+end_src
 * Stuff                                                                 :FIX:
   #+begin_src emacs-lisp#
@@ -1309,10 +1343,18 @@
                ((org-agenda-overriding-header "Done Tasks")
                 (org-agenda-skip-function 'my/show-top-level)
                 (org-agenda-files ',(remove-if (lambda (x) (member x my/non-agenda-files)) org-agenda-files))))
-              ("A" "Archive trees" tags "ARCHIVE"
-               ((org-tags-match-list-sublevels nil)
-                (org-agenda-skip-archived-trees nil)
-                (org-agenda-skip-function 'my/show-top-level)))
+              ("A" "Archive trees"
+               ((tags "ARCHIVE"
+                      ((org-agenda-overriding-header "Big archive trees")
+                       (org-tags-match-list-sublevels nil)
+                       (org-agenda-skip-archived-trees nil)
+                       (org-agenda-skip-function 'my/show-big-top-levels)))
+                (tags "ARCHIVE"
+                      ((org-agenda-overriding-header "Small archive trees")
+                       (org-tags-match-list-sublevels nil)
+                       (org-agenda-skip-archived-trees nil)
+                       (org-agenda-skip-function 'my/show-small-top-levels))))
+               ((my/delete-blocks nil)))
               ("n" "Next Tasks List" tags-todo "-REFILE-HOLD-WAIT"
                ((org-agenda-skip-function 'my/show-next-tasks-and-standalone-tasks)
                 (org-agenda-overriding-header "Next Tasks list")

@@ -1878,30 +1878,34 @@
   #+end_src
 * Code for deleting empty blocks
   #+begin_src emacs-lisp
+    (defvar my/delete-blocks t)
+
     (defun org-agenda-delete-empty-compact-blocks ()
       "Function removes empty compact blocks. 
-                                  If two lines next to each other have the 
-                                  org-agenda-structure face, then delete the 
-                                  previous block."
+     If two lines next to each other have the 
+     org-agenda-structure face, then delete the 
+     previous block."
       (unless org-agenda-compact-blocks
         (user-error "Compact blocks must be on"))
-      (setq buffer-read-only nil)
-      (save-excursion
-        (goto-char (point-min))
-        (let ((start-pos (point))
-              (previous t))
-          (while (and (forward-line)
-                      (not (eobp)))
-            (cond
-             ((let ((face (get-char-property (point) 'face)))
-                (or (eq face 'org-agenda-structure)
-                    (eq face 'org-agenda-date-today)))
-              (if previous
-                  (delete-region start-pos
-                                 (point))
-                (setq start-pos (point)))
-              (setq previous t))
-             (t (setq previous nil)))))))
+      (when my/delete-blocks
+        (setq buffer-read-only nil)
+        (save-excursion
+          (goto-char (point-min))
+          (let ((start-pos (point))
+                (previous nil))
+            (while (not (eobp))
+              (cond
+               ((let ((face (get-char-property (point) 'face)))
+                  (or (eq face 'org-agenda-structure)
+                      (eq face 'org-agenda-date-today)))
+                (if previous
+                    (delete-region start-pos
+                                   (point))
+                  (setq start-pos (point)))
+                (unless (org-agenda-check-type nil 'agenda)
+                  (setq previous t)))
+               (t (setq previous nil)))
+              (forward-line))))))
 
     (add-hook 'org-agenda-finalize-hook #'org-agenda-delete-empty-compact-blocks)
   #+end_src

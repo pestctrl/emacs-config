@@ -1544,9 +1544,10 @@
 
   (defun output-date ()
     (let ((desc (plist-get org-capture-plist :description)))
-      (when (and (not org-note-abort)
-                 my/review-date-old
-                 (string= desc "Review"))
+      (when (and (string= desc "Review")
+                 (not org-note-abort)
+                 my/review-date-old)
+        (my/save-agenda-week my/review-date-old)
         (shell-command "rm ~/.emacs.d/review-incomplete.el")
         (save-window-excursion
           (switch-to-buffer (find-file "~/.emacs.d/last-review.el"))
@@ -1612,6 +1613,44 @@
   (add-hook 'org-capture-mode-hook
             'my/review-set-visibility)
 #+END_SRC
+** Make agenda from dates with archive
+#+begin_src emacs-lisp
+  (defconst my/org-agenda-snapshot-pdf-filename "~/MEGA/org/entries/review/%Y_%m_%d.pdf")
+  (defconst my/org-agenda-snapshot-html-filename "~/MEGA/org/entries/review/%Y_%m_%d.html")
+
+  (defun my/agenda-dates (start &optional end)
+    (interactive (list (let ((org-read-date-prefer-future nil))
+                         (org-read-date))))
+    (when-let (buf (get-buffer "*Org Agenda(a)*"))
+      (kill-buffer buf))
+    (or end (setq end (org-read-date nil nil ".")))
+    (let* ((span (- (org-time-string-to-absolute end)
+                   (org-time-string-to-absolute start)))
+           (org-agenda-archives-mode t)
+           (org-agenda-start-with-log-mode '(closed clock))
+           (org-agenda-start-on-weekday nil)
+           (org-agenda-start-day start)
+           (org-agenda-span span))
+      (org-agenda-list nil)
+      (put 'org-agenda-redo-command 'org-lprops
+           `((org-agenda-archives-mode t)
+             (org-agenda-start-with-log-mode '(closed clock))
+             (org-agenda-start-on-weekday nil)
+             (org-agenda-start-day ,start)
+             (org-agenda-span ,span)))))
+
+  ;; (my/agenda-dates "2019-07-14")
+
+  (defun my/save-agenda-week (start)
+    (interactive (list (let ((org-read-date-prefer-future nil))
+                         (org-read-date))))
+    (save-window-excursion
+      (my/agenda-dates start)
+      (org-agenda-write (format-time-string my/org-agenda-snapshot-pdf-filename))
+      (org-agenda-write (format-time-string my/org-agenda-snapshot-html-filename))))
+
+  ;; (my/save-agenda-week "2019-07-14")
+#+end_src
 * prompt for automatic org-board
   #+begin_src emacs-lisp
     (defun my/org-add-tag (tag)

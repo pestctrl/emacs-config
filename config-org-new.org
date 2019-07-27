@@ -1386,7 +1386,16 @@
               ("o" "Offline" tags-todo "offline"
                ((org-tags-match-list-sublevels nil)))
               ("b" "Bored" tags-todo "+short-grow"
-               ((org-tags-match-list-sublevels nil))))))
+               ((org-tags-match-list-sublevels nil)))
+              ("t" "today" agenda ""
+               ((org-agenda-overriding-arguments (list nil (my/this-or-last-saturday) 9)))))))
+
+
+    (defun my/this-or-last-saturday ()
+      (org-read-date nil nil
+                     (if (string= "6" (format-time-string "%u"))
+                         "."
+                       "-sat")))
   #+end_src
 * Checkbox hack
   #+BEGIN_SRC emacs-lisp

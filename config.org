@@ -3288,6 +3288,14 @@
 #+begin_src emacs-lisp
  (use-package solaire-mode)
 #+end_src
+** Hydra's don't show your faces
+#+begin_src emacs-lisp
+  (add-to-list 'hydra-props-alist
+               '(exwm-background/window-transparency-hydra :verbosity 0))
+
+  (add-to-list 'hydra-props-alist
+               '(clementime-colume-hydra :verbosity 0))
+#+end_src
 * Broken
 ** Wunderlist
 #+BEGIN_SRC emacs-lisp#

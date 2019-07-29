@@ -1866,6 +1866,17 @@
 
   ;; (setq display-buffer-alist (remove-if (lambda (a) (string= (car a) "\\*Async Shell Command\\*.*")) display-buffer-alist)
 #+end_src
+*** browse-url use w3m
+#+begin_src emacs-lisp
+  (defun dired-browse-with-w3m (arg)
+    (interactive "P")
+    (let ((browse-url-browser-function (if arg
+                                           #'browse-url-browser-function
+                                         #'browse-url-w3)))
+      (browse-url-of-dired-file)))
+
+  ;; (define-key dired-mode-map (kbd "W") 'dired-browse-with-w3m)
+#+end_src
 ** Elfeed
 *** Setup feeds
 #+BEGIN_SRC emacs-lisp

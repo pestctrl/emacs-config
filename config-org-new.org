@@ -652,6 +652,13 @@
                 (when (my/is-todo-task)
                   (setq has-children t))))))
 
+     (defun my/has-non-active-todo-child ()
+       "Check if there are any tasks that are TODO"
+       (save-excursion 
+         (orgc-loop/todo-children has-children
+           (when (and (my/is-todo-task)
+                      (not (org-get-scheduled-time (point))))
+             (setq has-children t)))))
 
      ;; Project Stuff
      (defconst my/project-keywords '("PROJECT" "META" "META1" "SEQ" "EMPTY" "ETERNAL" "SPEC" "HOLD"))
@@ -777,7 +784,7 @@
 ** Project show
    #+begin_src emacs-lisp
      (defun my/stuck-empty ()
-       (my/has-todo-child))
+       (my/has-non-active-todo-child))
 
      (defun my/stuck-meta (ambiguous-to-stuck)
        (let ((file (buffer-file-name))
@@ -1381,8 +1388,12 @@
                ((org-agenda-span 'day)
                 (org-agenda-start-with-log-mode '(closed clock))
                 (org-agenda-clockreport-mode t)))
-              ("r" "Reviews" tags "+LEVEL=3+ITEM={Review for}"
-               ((org-agenda-files '(,(my/org-file "entries/reviews.gpg")))))
+              ("j" "Reviews and Journals" tags "LEVEL=3&ITEM={Review for}|LEVEL=3&journal"
+               ((org-agenda-files '(,(my/org-file "entries/reviews.gpg") ,(my/org-file "entries/journal.gpg")))
+                (org-agenda-sorting-strategy '(tsia-down))))
+              ("r" "Reviews" tags "LEVEL=3&ITEM={Review for}"
+               ((org-agenda-files '(,(my/org-file "entries/reviews.gpg") ,(my/org-file "entries/journal.gpg")))
+                (org-agenda-sorting-strategy '(tsia-down))))
               ("o" "Offline" tags-todo "offline"
                ((org-tags-match-list-sublevels nil)))
               ("b" "Bored" tags-todo "+short-grow"

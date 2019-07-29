@@ -3280,6 +3280,14 @@
                    (end-of-defun)
                    (point)))))
 #+end_src
+** centaur tabs
+#+begin_src emacs-lisp
+ (use-package centaur-tabs)
+#+end_src
+** solaire-mode
+#+begin_src emacs-lisp
+ (use-package solaire-mode)
+#+end_src
 * Broken
 ** Wunderlist
 #+BEGIN_SRC emacs-lisp#

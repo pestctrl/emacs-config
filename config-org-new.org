@@ -851,7 +851,7 @@
                 (message "Warn : open org-agenda buffer first.")))
             ))))
   #+end_src
-** My own agenda renderer                                               :FIX:
+** NOT My own agenda renderer                                          :FIX:
    #+BEGIN_SRC emacs-lisp
      (add-to-list 'load-path 
                   "~/.emacs.d/custom/org-ql")

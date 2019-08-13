@@ -49,3 +49,6 @@
 [submodule "custom/sourcer"]
 	path = custom/sourcer
 	url = https://github.com/erlang/sourcer
+[submodule "custom/org-reveal"]
+	path = custom/org-reveal
+	url = https://github.com/yjwen/org-reveal

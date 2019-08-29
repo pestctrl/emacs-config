@@ -512,7 +512,6 @@
     (setq org-agenda-dim-blocked-tasks nil)
 
     (setq org-agenda-compact-blocks t)
-
   #+end_src
 * Tag hierarchy
   #+begin_src emacs-lisp
@@ -1424,7 +1423,9 @@
                                                                                   :not (:deadline today)))))))))))
               ("D" "Done Tasks" todo "DONE|CANCELLED|COMPLETE|ABANDON"
                ((org-agenda-overriding-header "Done Tasks")
-                (org-agenda-files ',(remove-if (lambda (x) (member x my/non-agenda-files)) org-agenda-files))
+                (org-agenda-files ',(remove-if (lambda (x) 
+                                                 (member (expand-file-name x) my/non-agenda-files)) 
+                                               my/all-agenda-files))
                 (org-agenda-skip-function 'my/skip-if-top-level-dev)))
               ("A" "Archive trees"
                ((tags "ARCHIVE"
@@ -1458,17 +1459,20 @@
                 (org-agenda-start-with-log-mode '(closed clock))
                 (org-agenda-clockreport-mode t)))
               ("j" "Reviews and Journals" tags "LEVEL=3&ITEM={Review for}|LEVEL=3&journal"
-               ((org-agenda-files '(,(my/org-file "entries/reviews.gpg") ,(my/org-file "entries/journal.gpg")))
+               ((org-agenda-files '(,(my/org-file "entries/reviews.gpg") 
+                                    ,(my/org-file "entries/journal.gpg")))
                 (org-agenda-sorting-strategy '(tsia-down))))
               ("r" "Reviews" tags "LEVEL=3&ITEM={Review for}"
-               ((org-agenda-files '(,(my/org-file "entries/reviews.gpg") ,(my/org-file "entries/journal.gpg")))
+               ((org-agenda-files '(,(my/org-file "entries/reviews.gpg") 
+                                    ,(my/org-file "entries/journal.gpg")))
                 (org-agenda-sorting-strategy '(tsia-down))))
               ("o" "Offline" tags-todo "offline"
                ((org-tags-match-list-sublevels nil)))
               ("b" "Bored" tags-todo "+short-grow"
                ((org-tags-match-list-sublevels nil)))
               ("t" "today" agenda ""
-               ((org-agenda-overriding-arguments (list nil (my/this-or-last-saturday) 9)))))))
+               ((org-agenda-overriding-arguments (list nil (my/this-or-last-saturday) 
+                                                       9)))))))
 
 
     (defun my/this-or-last-saturday ()

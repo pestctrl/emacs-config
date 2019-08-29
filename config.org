@@ -2350,6 +2350,7 @@
           (:name "unread" :query "tag:unread" :key "u")
           (:name "flagged" :query "tag:flagged" :key "f")
           (:name "cs" :query "tag:cs" :key "c")
+          (:name "receipts" :query "tag:receipts" :key "R")
           ;; (:name "sent" :query "tag:sent" :key "s")
           ;; (:name "drafts" :query "tag:draft" :key "d")
           (:name "all mail" :query "*" :key "a")))

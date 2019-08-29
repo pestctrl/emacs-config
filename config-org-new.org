@@ -817,6 +817,10 @@
      (defun my/active-seq (file point)
        (my/active-sequential-project file point))
 
+     (defun my/stuck-one ()
+       (and (my/has-todo-child)
+            (my/greedy-active-project (buffer-file-name) (point))))
+
      ;;(defun my/active-act)
 
      (defun my/get-project-type (file point &optional ambiguous-to-stuck)
@@ -846,7 +850,11 @@
                       'active 'stuck))
                  ("TODO"
                   (if (my/stuck-meta ambiguous-to-stuck)
-                      'stuck 'active))))))))
+                      'stuck 'active))
+                 ("ONE"
+                  (when (my/has-todo-child)
+                    (if (my/greedy-active-project (buffer-file-name) (point))
+                        'active 'stuck)))))))))
    #+end_src
 * More alternative views
   #+begin_src emacs-lisp

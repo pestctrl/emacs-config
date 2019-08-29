@@ -1557,6 +1557,8 @@
             ("e" "Emacs config snippet" entry (file+headline "~/.emacs.d/config.org" "New")
              "* %^{Title}\n#+begin_src emacs-lisp\n %?\n#+end_src")
             ("j" "Journal")
+            ("jd" "Decision template" entry (file+olp+datetree ,(my/org-file "entries/journal.gpg"))
+             (file ,(my/org-file "templates/decide.org")))
             ("je" "Journal Entry" entry (file+olp+datetree ,(my/org-file "entries/journal.gpg"))
              "* %<%R> %?\n%U\n\n")
             ("jp" "Plan your day" entry (file+olp+datetree ,(my/org-file "entries/journal.gpg"))

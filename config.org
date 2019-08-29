@@ -784,19 +784,19 @@
 
     ;; Apply attributes specified by frame parameters.
     (let ((face-params '((foreground-color default :foreground)
-                 (background-color default :background)
+                         (background-color default :background)
                          (font default :font)
-                 (border-color border :background)
-                 (cursor-color cursor :background)
-                 (scroll-bar-foreground scroll-bar :foreground)
-                 (scroll-bar-background scroll-bar :background)
-                 (mouse-color mouse :background))))
+                         (border-color border :background)
+                         (cursor-color cursor :background)
+                         (scroll-bar-foreground scroll-bar :foreground)
+                         (scroll-bar-background scroll-bar :background)
+                         (mouse-color mouse :background))))
       (dolist (param face-params)
         (let* ((param-name (nth 0 param))
-           (value (cdr (assq param-name parameters))))
-      (if value
-          (set-face-attribute (nth 1 param) frame
-                              (nth 2 param) value))))))
+               (value (cdr (assq param-name parameters))))
+          (if value
+              (set-face-attribute (nth 1 param) frame
+                                  (nth 2 param) value))))))
 
   (defun my/exwm-floating--advise-make-frame (orig id)
     (advice-add 'face-set-after-frame-default

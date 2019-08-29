@@ -75,9 +75,16 @@
            org-caldav-exclude-tags '("ARCHIVE" "ONLYEMACS"))
    #+END_SRC
 ** Reveal.js
+#+begin_src emacs-lisp#
+  (use-package org-re-reveal)
+  (setq org-re-reveal-root "file:///home/benson/.reveal.js")
+#+end_src
+*** Old ox-reveal package
    #+BEGIN_SRC emacs-lisp
-     (use-package ox-reveal)
-     (setq org-reveal-root "file:///home/benson/reveal.js")
+     (add-to-list 'load-path
+                  "~/.emacs.d/custom/org-reveal")
+     (require 'ox-reveal)
+     (setq org-reveal-root "file:///home/benson/.reveal.js")
      (setq org-structure-template-alist (remove-if (lambda (c) (string= (car c) "n")) org-structure-template-alist))
    #+END_SRC
 ** org-protocol

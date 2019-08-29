@@ -483,7 +483,7 @@
 
     ;; Targets include this file and any file contributing to the agenda - up to 9 levels deep
     (setq org-refile-targets `((nil :maxlevel . 9)
-                               (org-agenda-files :maxlevel . 9)
+                               (my/all-agenda-files :maxlevel . 9)
                                ("~/MEGA/org/entries/panic.org" :maxlevel . 9)))
 
     (setq org-refile-use-cache t)
@@ -1268,7 +1268,14 @@
                                                                      :not (:deadline today)))))))))))
 
     (defconst my/non-agenda-files
-      '("~/MEGA/org/entries/reviews.gpg" "~/MEGA/org/2019-05-agenda/datetree.org" "~/MEGA/org/2019-05-agenda/reference.org" "~/MEGA/org/entries/journal.gpg"))
+      `(,(my/org-file "entries/reviews.gpg") 
+        ,(my/agenda-file "datetree.org") 
+        ,(my/agenda-file "reference.org") 
+        ,(my/org-file "entries/journal.gpg")))
+
+    (defconst my/all-agenda-files
+      (cons (my/agenda-file "eternal.org")
+            org-agenda-files))
 
     (let* ((prod-tag "+time")
            (dev-tag "+dev")

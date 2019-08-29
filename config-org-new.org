@@ -1308,7 +1308,7 @@
               ("pw" "work" ,(production-agenda "+work"))
               ("ps" "school" ,(production-agenda "+school"))
               ("d" "dev"
-               ((tags-todo ,(concat dev-tag "&refile/STUFF")
+               ((tags-todo ,(concat dev-tag "+refile")
                            ((org-agenda-overriding-header "Refile tasks")))
                 (tags-todo ,(concat dev-tag "/!" (mapconcat #'identity my/active-projects-and-tasks "|"))
                            ((org-agenda-overriding-header "Stuck Projects")

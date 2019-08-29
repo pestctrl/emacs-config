@@ -473,13 +473,13 @@
   #+END_SRC
 * Variables
   #+begin_src emacs-lisp
-  (setq org-log-done 'time)
-  (setq org-agenda-window-setup 'current-window)
-  (setq org-agenda-restore-windows-after-quit t)
+    (setq org-log-done 'time)
+    (setq org-agenda-window-setup 'current-window)
+    (setq org-agenda-restore-windows-after-quit t)
 
-  (setq org-agenda-sticky t)
+    (setq org-agenda-sticky t)
 
-  ;;(org-agenda-load-file-list)
+    ;;(org-agenda-load-file-list)
 
     ;; Targets include this file and any file contributing to the agenda - up to 9 levels deep
     (setq org-refile-targets `((nil :maxlevel . 9)

@@ -1572,9 +1572,7 @@
   #+end_src
 * Weekly Reviews Implementation
 ** Attempt 3
-#+BEGIN_SRC emacs-lisp
-  (defvar yearly-theme "Thought")
-
+#+BEGIN_SRC emacs-lisp#
   (defun completed-tags-search (start-date end-date)
     (let ((org-agenda-overriding-header "* Log")
           (tag-search (concat (format "TODO=\"DONE\"&CLOSED>=\"<%s>\"&CLOSED<=\"<%s>\""
@@ -1591,25 +1589,6 @@
                                           (concat "***" a))
                                         (butlast (cdr (split-string (buffer-string) "\n")) 1)) 
                                 "\n"))
-        (kill-buffer))
-      string))
-
-  (defun get-journal-entries-from (start-date end-date)
-    (let ((string "")
-          match)
-      (save-window-excursion
-        (switch-to-buffer (find-file "~/MEGA/org/entries/journal.gpg"))
-        (goto-char (point-min))
-        (while (setq match 
-                     (re-search-forward
-                      "^\\*\\*\\* \\(2[0-9]\\{3\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\) \\w+$" nil t))
-          (let ((date (match-string 1)))
-            (when (and (org-time< start-date date)
-                       (or (not end-date) (org-time< date end-date)))
-              (org-narrow-to-subtree)
-              (setq string (concat string "\n" (buffer-string)))
-              (widen))))
-        (not-modified)
         (kill-buffer))
       string))
 
@@ -1635,38 +1614,6 @@
                 week
                 (format-time-string "%V"))))))
 
-  (defun output-date ()
-    (let ((desc (plist-get org-capture-plist :description)))
-      (when (and (string= desc "Review")
-                 (not org-note-abort)
-                 my/review-date-old)
-        (my/save-agenda-week my/review-date-old)
-        (shell-command "rm ~/.emacs.d/review-incomplete.el")
-        (save-window-excursion
-          (switch-to-buffer (find-file "~/.emacs.d/last-review.el"))
-          (erase-buffer)
-          (insert (org-read-date nil nil ""))
-          (save-buffer)
-          (kill-buffer)
-          "")
-        (setq my/review-date-old nil))))
-  (add-hook 'org-capture-after-finalize-hook 'output-date)
-
-  (defun output-incomplete-date ()
-    (save-window-excursion
-      (switch-to-buffer (find-file "~/.emacs.d/review-incomplete.el"))
-      (erase-buffer)
-      (insert (org-read-date nil nil ""))
-      (save-buffer)
-      (kill-buffer)))
-
-  (defun get-last-review-date ()
-    (save-window-excursion
-      (set-buffer (find-file "~/.emacs.d/last-review.el"))
-      (let ((res (buffer-string)))
-        (kill-buffer)
-        res)))
-
   (defun setup-make-up-review ()
     (let* ((date (org-read-date))
            (week (number-to-string
@@ -1675,6 +1622,56 @@
       (org-capture-put :start-date date)
       (org-capture-put :start-week week)))
 
+  (defvar my/review-visibility-level nil)
+
+  (defun my/review-set-visibility ()
+    (when my/review-visibility-level
+      (outline-hide-sublevels my/review-visibility-level)
+      (org-show-entry)
+      (setq my/review-visibility-level nil)))
+
+  (add-hook 'org-capture-mode-hook
+            'my/review-set-visibility)
+#+END_SRC
+** Attempt 4
+#+begin_src emacs-lisp
+  (defvar yearly-theme "Thought")
+
+  ;; Functions required by template
+  (defun get-journal-entries-from (start-date end-date)
+    (let ((string "")
+          match)
+      (save-window-excursion
+        (switch-to-buffer (find-file "~/MEGA/org/entries/journal.gpg"))
+        (goto-char (point-min))
+        (while (setq match 
+                     (re-search-forward
+                      "^\\*\\*\\* \\(2[0-9]\\{3\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\) \\w+$" nil t))
+          (let ((date (match-string 1)))
+            (when (and (org-time< start-date date)
+                       (or (not end-date) (org-time< date end-date)))
+              (org-narrow-to-subtree)
+              (setq string (concat string "\n" (buffer-string)))
+              (widen))))
+        (not-modified)
+        (kill-buffer))
+      string))
+
+  ;; Setup stuff, called by capture template
+  (defun get-last-review-date ()
+    (save-window-excursion
+      (set-buffer (find-file "~/.emacs.d/last-review.el"))
+      (let ((res (buffer-string)))
+        (kill-buffer)
+        res)))
+
+  (defun output-incomplete-date ()
+    (save-window-excursion
+      (switch-to-buffer (find-file "~/.emacs.d/review-incomplete.el"))
+      (erase-buffer)
+      (insert (org-read-date nil nil ""))
+      (save-buffer)
+      (kill-buffer)))
 
   (defvar my/review-date-old nil)
   (defun setup-automatic-review ()
@@ -1695,17 +1692,46 @@
       (goto-char (point-min))
       (re-search-forward "Reviews")))
 
-  (defvar my/review-visibility-level nil)
 
-  (defun my/review-set-visibility ()
-    (when my/review-visibility-level
-      (outline-hide-sublevels my/review-visibility-level)
-      (org-show-entry)
-      (setq my/review-visibility-level nil)))
+  (defun setup-manual-review ()
+    ;; Read the date manually, and setup review accordingly
+    (let* ((org-read-date-prefer-future nil)
+           (date (org-read-date))
+           (week (format "%02d" 
+                  (org-days-to-iso-week
+                   (org-time-string-to-absolute date)))))
+      (output-incomplete-date)
+      (setq my/review-date-old date)
+      (setq my/review-visibility-level 6)
+      (org-capture-put :start-date date)
+      (org-capture-put :start-week week)
+      (goto-char (point-min))
+      (re-search-forward "Reviews")))
 
-  (add-hook 'org-capture-mode-hook
-            'my/review-set-visibility)
-#+END_SRC
+  ;; Teardown stuff, called through hooks
+  (defun finalize-review ()
+    "Save a copy of the weekly agenda, and write the current date
+  as the most current weekly review."
+    (let ((desc (plist-get org-capture-current-plist :description)))
+      (when (and (string= desc "Review")
+                 my/review-date-old)
+        (my/save-agenda-week my/review-date-old)
+        (shell-command "rm ~/.emacs.d/review-incomplete.el")
+        (save-window-excursion
+          (switch-to-buffer (find-file "~/.emacs.d/last-review.el"))
+          (erase-buffer)
+          (insert (org-read-date nil nil ""))
+          (save-buffer)
+          (kill-buffer)
+          "")
+        (setq my/review-date-old nil))))
+  (add-hook 'org-capture-before-finalize-hook 'finalize-review)
+
+  (defun clear-out-review-files ()
+    (when (file-exists-p "~/.emacs.d/review-incomplete.el")
+      (shell-command "rm ~/.emacs.d/review-incomplete.el")))
+  (add-hook 'org-capture-after-finalize-hook #'clear-out-review-files)
+#+end_src
 ** Make agenda from dates with archive
 #+begin_src emacs-lisp
   (defconst my/org-agenda-snapshot-pdf-filename "~/MEGA/org/entries/review/%Y_%m_%d.pdf")

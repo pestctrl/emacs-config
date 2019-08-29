@@ -678,6 +678,25 @@
                 2 ,my/monitor-secondary
                 3 ,my/monitor-secondary)))
     (exwm-randr-refresh))
+
+  (defvar my/in-presentation-mode? nil)
+
+  (defun my/enter-presentation-mode ()
+    (let ((primary (shell-command-to-string "xrandr --query | grep ' connected' | grep eDP | cut -d ' ' -f 1 | tr -d '\n'"))
+          (secondary (shell-command-to-string "xrandr --query | grep ' connected' | grep -v eDP | cut -d ' ' -f 1 | tr -d '\n'")))
+      (shell-command
+       (format "xrandr --output %s --mode 1920x1080 --same-as %s"
+               secondary
+               primary))
+      (setq exwm-randr-workspace-output-plist nil)
+      (exwm-randr-refresh)))
+
+  (defun my/toggle-presentation-mode ()
+    (interactive)
+    (if my/in-presentation-mode?
+        (my/setup-screens)
+      (my/enter-presentation-mode))
+    (setq my/in-presentation-mode? (not my/in-presentation-mode?)))
 #+END_SRC
 
 *** System tray, display time, display battery, display hard-drive-space

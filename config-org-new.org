@@ -1339,6 +1339,39 @@
                                                     (:name "Today" :time-grid t
                                                            :and (:not (:and (:not (:scheduled today)
                                                                                   :not (:deadline today)))))))))))
+              ("f" "fastdev?"
+               ((org-ql-block '(tags "refile")
+                              ((org-agenda-overriding-header "Refile tasks")))
+                (tags-todo ,(concat dev-tag "/!" (mapconcat #'identity my/active-projects-and-tasks "|"))
+                           ((org-agenda-overriding-header "Stuck Projects")
+                            (org-agenda-skip-function 'my/dev-show-stuck-projects)
+                            (org-tags-match-list-sublevels 'indented)
+                            (org-agenda-sorting-strategy
+                             '((agenda category-keep)))))
+                (tags-todo ,(concat dev-tag "-short" "/!" (mapconcat #'identity my/active-projects-and-tasks "|"))
+                           ((org-agenda-overriding-header "Active Projects")
+                            (org-agenda-skip-function 'my/dev-show-active-projects)
+                            (org-tags-match-list-sublevels 'indented)
+                            (org-agenda-sorting-strategy
+                             '((agenda category-keep)))))
+                (org-ql-block '(and (tags "dev")
+                                    (todo "WAIT"))
+                              ((org-agenda-overriding-header "Waiting tasks")))
+                (org-ql-block '(and (tags "dev")
+                                    (todo "NEXT"))
+                              ((org-agenda-overriding-header "Things to do")))
+                (agenda ""
+                        ((org-agenda-skip-function 'my/agenda-custom-skip)
+                         (org-agenda-span 'day)
+                         (org-agenda-tag-filter-preset (quote (,dev-tag)))
+                         (org-agenda-skip-deadline-if-done t)
+                         (org-agenda-skip-scheduled-if-done t)
+                         (org-super-agenda-groups '((:name "Overdue" :and (:deadline past :log nil))
+                                                    (:name "Upcoming" :deadline future)
+                                                    (:name "Should do" :and (:scheduled past :log nil))
+                                                    (:name "Today" :time-grid t
+                                                           :and (:not (:and (:not (:scheduled today)
+                                                                                  :not (:deadline today)))))))))))
               ("v" . "View just the agenda's")
               ("vd" "Dev agenda"
                ((agenda ""

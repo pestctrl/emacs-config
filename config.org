@@ -152,7 +152,7 @@
           (with-current-buffer buffer
             (when (and (or class instance title)
                        (exwmx--string-match-p (or class ".*") exwm-class-name)
-                       (exwmx--string-match-p (or instance ".*") exwm-instance-name)
+                       (exwmx--string-match-p (or (concat instance "$") ".*") exwm-instance-name)
                        (exwmx--string-match-p (or title ".*") exwm-title))
               (push buffer result)))))
       (setq result (reverse result))

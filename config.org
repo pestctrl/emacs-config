@@ -3240,7 +3240,6 @@
            (add-to-list 'org-agenda-custom-commands my/dev-agenda)
            (message "Break time!"))))
 
-
   (global-set-key (kbd "s-w") #'toggle-working)
 #+end_src
 ** magit-todos

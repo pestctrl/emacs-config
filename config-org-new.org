@@ -365,37 +365,38 @@
   #+end_src
 * Different kinds of follow
   #+begin_src emacs-lisp
-    (define-prefix-command '*org-agenda-follow-map*)
+    (advice-add #'org-agenda-follow-mode
+                :before
+                #'my/org-agenda-follow-mode)
 
-    (define-key org-agenda-mode-map (kbd "F") '*org-agenda-follow-map*)
+    (defun my/org-agenda-get-name ()
+      (-> (rx "*Org Agenda("
+              (group (+? anything))
+              (optional
+               (zero-or-one ":")
+               (one-or-more anything))
+              ")*")
+          (s-match-strings-all (buffer-name))
+          (cadar)
+          (assoc org-agenda-custom-commands)
+          (cadr)))
 
-    (define-key *org-agenda-follow-map* (kbd "SPC") 'my/org-agenda-default-follow)
-    (define-key *org-agenda-follow-map* (kbd "p") 'my/org-agenda-project-follow)
-    (define-key *org-agenda-follow-map* (kbd "r") 'my/org-agenda-review-follow)
+    (defun my/org-agenda-follow-mode ()
+      (if org-agenda-follow-mode
+          (advice-unadvice #'org-agenda-do-context-action)
+        (pcase (my/org-agenda-get-name)
+          ("Reviews" (advice-add #'org-agenda-do-context-action
+                                 :override
+                                 #'my/org-agenda-do-context-action-for-review))
+          ("dev" (advice-add #'org-agenda-do-context-action
+                             :override
+                             #'my/org-agenda-do-context-action-for-project))
+          (_ (advice-unadvice #'org-agenda-do-context-action)))))
 
     (defun advice-unadvice (sym)
       "Remove all advices from symbol SYM."
       (interactive "aFunction symbol: ")
       (advice-mapc (lambda (advice _props) (advice-remove sym advice)) sym))
-
-    (defun my/org-agenda-default-follow ()
-      (interactive)
-      (advice-unadvice 'org-agenda-do-context-action)
-      (org-agenda-follow-mode))
-
-    (defun my/org-agenda-project-follow ()
-      (interactive)
-      (advice-add 'org-agenda-do-context-action
-                  :override
-                  'my/org-agenda-do-context-action-for-project)
-      (org-agenda-follow-mode))
-
-    (defun my/org-agenda-review-follow ()
-      (interactive)
-      (advice-add 'org-agenda-do-context-action
-                  :override
-                  'my/org-agenda-do-context-action-for-review)
-      (org-agenda-follow-mode))
 
     (defun my/org-agenda-show-project (&optional full-entry)
       "Display the Org file which contains the item at point.

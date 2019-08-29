@@ -1760,13 +1760,15 @@
 
   ;; (my/agenda-dates "2019-07-14")
 
-  (defun my/save-agenda-week (start)
+  (defun my/save-agenda-week (start &optional end)
     (interactive (list (let ((org-read-date-prefer-future nil))
                          (org-read-date))))
     (save-window-excursion
-      (my/agenda-dates start)
-      (org-agenda-write (format-time-string my/org-agenda-snapshot-pdf-filename))
-      (org-agenda-write (format-time-string my/org-agenda-snapshot-html-filename))))
+      (my/agenda-dates start end)
+      (org-agenda-write (format-time-string my/org-agenda-snapshot-pdf-filename (org-time-string-to-time end)))
+      (org-agenda-write (format-time-string my/org-agenda-snapshot-html-filename (org-time-string-to-time end)))))
+
+  ;; (my/save-agenda-week "2019-06-03" "2019-08-18")
 
   ;; (my/save-agenda-week "2019-07-14")
 #+end_src
@@ -1776,7 +1778,7 @@
       (org-set-tags (cons tag (org-get-tags nil t))))
 
     (defun my/org-board-prompt ()
-      (let ((desc (plist-get org-capture-plist :description)))
+      (let ((desc (plist-get org-capture-current-plist :description)))
         (when (and (not org-note-abort)
                    (string= desc "Protocol Link")
                    (y-or-n-p "Do you want to archive the page? "))

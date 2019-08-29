@@ -2056,6 +2056,10 @@
         (org-refile-goto-last-stored)
         (my/org-remove-inherited-tag-strings)))
 
+    (defun my/org-refile-preserve-tags (orig &rest args)
+      (let ((tags (org-get-tags)))
+        (apply orig args)))
+
     (add-hook 'org-after-refile-insert-hook 'my/org-clean-tags)
   #+end_src
 * archive sibling remove sub archive sibling

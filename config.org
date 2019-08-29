@@ -3392,7 +3392,38 @@
                '(exwm-background/window-transparency-hydra :verbosity 0))
 
   (add-to-list 'hydra-props-alist
-               '(clementime-colume-hydra :verbosity 0))
+               '(clementine-volume-hydra :verbosity 0))
+#+end_src
+** tramp things
+#+begin_src emacs-lisp
+  (use-package docker-tramp)
+  (use-package tramp-hdfs)
+#+end_src
+** CASA Schedule
+#+begin_src emacs-lisp
+  (defvar my/schedule "https://uofh-my.sharepoint.com/:x:/g/personal/nsingh29_cougarnet_uh_edu/ERfp7g_6FbFAsxIlV0YP1goB9iXnUcTm__kTvakvXmvcvQ?rtime=-JcPFVIj10g")
+
+  (defun my/view-casa-schedule ()
+    (interactive)
+    (funcall browse-url-browser-function my/schedule))
+#+end_src
+** Credit Card Statement Macro
+#+begin_src emacs-lisp
+  (fset 'credit_card_statement
+     [?\M-x ?o ?r ?g ?- ?m ?o ?d ?e return ?\M-x ?q backspace ?r ?e ?p ?l ?a ?c ?e ?- ?r ?e ?g ?e ?x ?p return ?^ ?\C-q tab return ?  ?  ?  ?  return ?\M-< ?\C-  ?\C-f ?\C-f ?\C-f ?\C-f ?\C-c ?m ?a ?\C-w ?- ?  ?\[ ?  ?\] ?  ?\C-e ?\C-k ?\C-c ?m ?  ?\C-q tab ?\C-q tab ?\C-e ?\C-j ?y ?\C-a ?_ ?_ ?_ ?_ backspace backspace backspace backspace ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?\C-p ?\C-p ?\C-k ?\C-c ?m ?  ?\C-q tab ?\C-q tab ?\C-d ?\C-d return ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n])
+#+end_src
+** Vivaldi
+#+begin_src emacs-lisp
+  (defun browse-url-vivaldi (url &optional new-window)
+    (interactive (browse-url-interactive-arg "URL: "))
+    (setq url (browse-url-encode-url url))
+    (let* ((process-environment (browse-url-process-environment)))
+      (apply 'start-process
+             (concat "vivaldi " url) nil
+             "vivaldi-stable"
+             (list url))))
+
+  (setq browse-url-browser-function #'browse-url-vivaldi)
 #+end_src
 * Broken
 ** Wunderlist

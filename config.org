@@ -2719,7 +2719,7 @@
   (define-prefix-command '*multiple-cursors-map*)
   (define-key *multiple-cursors-map* (kbd "a") 'mc/mark-all-like-this)
   (define-key *multiple-cursors-map* (kbd "A") 'mc/vertical-align)
-  (define-key *multiple-cursors-map* (kbd " ") 'mc/vertical-align-with-space)
+  (define-key *multiple-cursors-map* (kbd "SPC") 'mc/vertical-align-with-space)
 
   (defhydra mc-interactive (*multiple-cursors-map* "i")
     "For those looping commands"

@@ -164,6 +164,7 @@
              ,@body))))
 
     (defmacro org-loop!/descendants (&rest body)
+      "This version of org loop will account for if the tree has been editted while looping"
       (declare (indent defun))
       ;; (let ((subtree-symbol (make-symbol "subtree-end")))
       ;;   `(let ((,subtree-symbol (save-excursion (org-end-of-subtree t))))

@@ -3213,6 +3213,20 @@
 
   (setq browse-url-browser-function #'browse-url-vivaldi)
 #+end_src
+** Magit Push All
+#+begin_src emacs-lisp
+  (defun my/magit-push-all ()
+    "Push all branches."
+    (interactive)
+    (magit-run-git-async "push" "-v"
+                         (magit-read-remote "Remote")
+                         "--all"))
+
+  (transient-append-suffix 'magit-push "m"
+    '("a" "all remotes" my/magit-push-all))
+  ;; (transient-remove-suffix 'magit-push '(1 1))
+  ;; (transient-get-suffix 'magit-push "m")
+#+end_src
 * Broken
 ** Wunderlist
 #+BEGIN_SRC emacs-lisp#

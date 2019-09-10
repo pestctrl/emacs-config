@@ -1771,10 +1771,11 @@
   (defun my/save-agenda-week (start &optional end)
     (interactive (list (let ((org-read-date-prefer-future nil))
                          (org-read-date))))
-    (save-window-excursion
-      (my/agenda-dates start end)
-      (org-agenda-write (format-time-string my/org-agenda-snapshot-pdf-filename (org-time-string-to-time end)))
-      (org-agenda-write (format-time-string my/org-agenda-snapshot-html-filename (org-time-string-to-time end)))))
+    (let ((end (or end (org-read-date nil nil "."))))
+      (save-window-excursion
+        (my/agenda-dates start end)
+        (org-agenda-write (format-time-string my/org-agenda-snapshot-pdf-filename (org-time-string-to-time end)))
+        (org-agenda-write (format-time-string my/org-agenda-snapshot-html-filename (org-time-string-to-time end))))))
 
   ;; (my/save-agenda-week "2019-06-03" "2019-08-18")
 

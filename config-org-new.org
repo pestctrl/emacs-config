@@ -1721,7 +1721,7 @@
     "Save a copy of the weekly agenda, and write the current date
   as the most current weekly review."
     (let ((desc (plist-get org-capture-current-plist :description)))
-      (when (and (string= desc "Review")
+      (when (and (string= desc "Automatic Review")
                  my/review-date-old)
         (my/save-agenda-week my/review-date-old)
         (shell-command "rm ~/.emacs.d/review-incomplete.el")

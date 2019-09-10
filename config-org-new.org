@@ -2108,3 +2108,40 @@
     (add-hook 'org-mode-hook #'auto-fill-mode))
  #+end_src
 
+* Refile sorter
+#+begin_src emacs-lisp
+  (defun get-random-uuid ()
+    (replace-regexp-in-string "\n$" ""
+                              (shell-command-to-string "uuidgen")))
+
+  (defun my/refile-to-location (file headline)
+    (let ((pos (save-excursion
+                 (find-file file)
+                 (org-find-exact-headline-in-buffer headline))))
+      (org-refile nil nil (list headline file nil pos))))
+
+  (defun my/refile-quick-sort ()
+    (interactive)
+    (if (not (string= (buffer-name) "refile.org"))
+        (message "Switch to refile buffer")
+      (goto-char (point-min))
+      (outline-next-heading)
+      (let* ((youtube-uuid (get-random-uuid))
+             (reddit-uuid (get-random-uuid))
+             (youtube-tree-name (concat "Youtube Videos: " youtube-uuid))
+             (reddit-tree-name (concat "Reddit Things: " reddit-uuid)))
+        (insert "* " youtube-tree-name "\n")
+        (insert "* " reddit-tree-name "\n")
+        (while
+            (progn
+              (org-copy-subtree)
+              (let ((tree-string (current-kill 0)))
+                (cond ((or (string-match-p "Watch \"" tree-string)
+                           (string-match-p "youtube\.com/" tree-string)
+                           (string-match-p "youtu\.be/" tree-string))
+                       (my/refile-to-location (my/agenda-file "refile.org") youtube-tree-name))
+                      ((or (string-match-p "reddit\.com" tree-string)
+                           (string-match-p "redd\.it" tree-string))
+                       (my/refile-to-location (my/agenda-file "refile.org") reddit-tree-name))
+                      (t (outline-next-heading)))))))))
+#+end_src

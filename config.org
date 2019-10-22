@@ -2923,8 +2923,8 @@
 
   (require 'leetcode)
 
-  (setq leetcode-path "~/MEGA/Leetcode/"
-       leetcode-language "java")
+  (setq leetcode-path "~/MEGA/personal/programming_problems/Leetcode"
+        leetcode-language "java")
 #+end_src
 ** freezing time
 #+begin_src emacs-lisp

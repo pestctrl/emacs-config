@@ -3211,7 +3211,7 @@
              "vivaldi-stable"
              (list url))))
 
-  (setq browse-url-browser-function #'browse-url-vivaldi)
+  (setq browse-url-browser-function #'browse-url-firefox)
 #+end_src
 ** Magit Push All
 #+begin_src emacs-lisp

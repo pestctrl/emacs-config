@@ -3261,14 +3261,6 @@
    (define-key xwidget-webkit-mode-map [mouse-4] 'xwidget-webkit-scroll-down)
    (define-key xwidget-webkit-mode-map [mouse-5] 'xwidget-webkit-scroll-up)
 #+END_SRC 
-** Slime mode
-#+BEGIN_SRC emacs-lisp
- (use-package slime)
- (add-hook 'lisp-mode-hook (lambda () (slime-mode t)))
- (add-hook 'inferior-lisp-mode-hook (lambda () (inferior-slime-mode t)))
- (setq inferior-lisp-program "/usr/bin/sbcl")
- (slime-setup '(slime-fancy slime-asdf))
-#+END_SRC
 ** i3wm interaction
 #+BEGIN_SRC emacs-lisp#
   (use-package i3wm)

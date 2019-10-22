@@ -737,70 +737,70 @@
                    (org-get-deadline-time (point)))))))
    #+end_src
 ** Old meta project code
-   #+begin_src emacs-lisp
-     (defun my/active-sequential-project (file point)
-       (save-excursion
-         (let ((subtree-end (save-excursion (org-end-of-subtree t)))
-               has-next-task has-active-project)
-           (outline-next-heading)
-           (while (and (not (or has-next-task
-                                has-active-project))
-                       (< (point) subtree-end))
-             (cond ((and (my/is-a-task)
-                         (my/is-next-task))
-                    (setq has-next-task t))
-                   ((and (my/is-a-project)
-                         (eq (my/get-project-type file (point) t)
-                             'active))
-                    (setq has-active-project t)))
-             (org-end-of-subtree t t))
-           (or has-next-task
-               has-active-project))))
+#+begin_src emacs-lisp
+  (defun my/active-sequential-project (file point)
+    (save-excursion
+      (let ((subtree-end (save-excursion (org-end-of-subtree t)))
+            has-next-task has-active-project)
+        (outline-next-heading)
+        (while (and (not (or has-next-task
+                             has-active-project))
+                    (< (point) subtree-end))
+          (cond ((and (my/is-a-task)
+                      (my/is-next-task))
+                 (setq has-next-task t))
+                ((and (my/is-a-project)
+                      (eq (my/get-project-type file (point) t)
+                          'active))
+                 (setq has-active-project t)))
+          (org-end-of-subtree t t))
+        (or has-next-task
+            has-active-project))))
 
-     (defun my/greedy-active-project (file point)
-       (save-excursion
-         (let ((subtree-end (save-excursion (org-end-of-subtree t)))
-               has-next-task has-active-project)
-           (outline-next-heading)
-           (while (and (not (and has-next-task
-                                 has-active-project))
-                       (< (point) subtree-end))
-             (while (string= "CAT" (org-get-todo-state))
-               (outline-next-heading))
-             (cond ((or (and (my/is-a-task)
-                             (my/is-next-task))
-                        (string= "WAIT" (org-get-todo-state)))
-                    (setq has-next-task t))
-                   ((and (my/is-a-project)
-                         (eq (my/get-project-type file (point) nil)
-                             'active))
-                    (setq has-active-project t)))
-             (org-end-of-subtree t t))
-           (or has-next-task
-               has-active-project))))
+  (defun my/greedy-active-project (file point)
+    (save-excursion
+      (let ((subtree-end (save-excursion (org-end-of-subtree t)))
+            has-next-task has-active-project)
+        (outline-next-heading)
+        (while (and (not (and has-next-task
+                              has-active-project))
+                    (< (point) subtree-end))
+          (while (string= "CAT" (org-get-todo-state))
+            (outline-next-heading))
+          (cond ((or (and (my/is-a-task)
+                          (my/is-next-task))
+                     (string= "WAIT" (org-get-todo-state)))
+                 (setq has-next-task t))
+                ((and (my/is-a-project)
+                      (eq (my/get-project-type file (point) nil)
+                          'active))
+                 (setq has-active-project t)))
+          (org-end-of-subtree t t))
+        (or has-next-task
+            has-active-project))))
 
-     (defun my/generous-active-project (file point)
-       (save-excursion
-         (let (has-task has-next-task has-project has-stuck-project)
-           (orgc-loop/todo-children-cat custom-condition
-             (if (and has-next-task has-stuck-project)
-                 (setq custom-condition t)
-               (cond ((my/is-a-project)
-                      (setq has-project t)
-                      (when (eq (my/get-project-type file (point) t)
-                                'stuck)
-                        (setq has-stuck-project t)))
-                     ((my/is-non-done-task)
-                      (setq has-task t)
-                      (when (or (my/is-next-task)
-                                (equal (org-get-todo-state) "WAIT")) ;; Ew
-                        (setq has-next-task t))))))
-           (or (and has-next-task 
-                    (not has-stuck-project))
-               (and (not has-task) 
-                    has-project
-                    (not has-stuck-project))))))
-   #+end_src
+  (defun my/generous-active-project (file point)
+    (save-excursion
+      (let (has-task has-next-task has-project has-stuck-project)
+        (orgc-loop/todo-children-cat custom-condition
+          (if (and has-next-task has-stuck-project)
+              (setq custom-condition t)
+            (cond ((my/is-a-project)
+                   (setq has-project t)
+                   (when (eq (my/get-project-type file (point) t)
+                             'stuck)
+                     (setq has-stuck-project t)))
+                  ((my/is-non-done-task)
+                   (setq has-task t)
+                   (when (or (my/is-next-task)
+                             (equal (org-get-todo-state) "WAIT")) ;; Ew
+                     (setq has-next-task t))))))
+        (or (and has-next-task 
+                 (not has-stuck-project))
+            (and (not has-task) 
+                 has-project
+                 (not has-stuck-project))))))
+#+end_src
 ** Project show
    #+begin_src emacs-lisp
      (defun my/stuck-empty ()
@@ -884,7 +884,6 @@
      (add-to-list 'load-path 
                   "~/.emacs.d/custom/org-ql")
      (require 'org-ql)
-     (require 'org-ql-agenda)
      (require 'org-habit)
 
      ;; (org-ql-agenda '("~/MEGA/org/agenda/agenda.org") (or (and (todo "HABIT") (deadline <= today)) (todo "WAIT")) :super-groups ((:name "Tasks in other courts" :todo "WAIT") (:name "Incomplete Habits" :todo "HABIT")))
@@ -997,7 +996,7 @@
                                (not (org-get-scheduled-time (point)))
                                (not (org-get-deadline-time (point))))
                           (eq (my/get-project-type buffer-file-name (point) t)
-                              'stuck))
+                                  'stuck))
                 subtree-end)
             next-heading))))
 
@@ -1121,6 +1120,7 @@
           (save-excursion
             (outline-next-heading)))))
   #+end_src
+* 
 * Stuff                                                                 :FIX:
   #+begin_src emacs-lisp#
     (setq org-agenda-tags-todo-honor-ignore-options t)
@@ -1310,7 +1310,7 @@
               ("d" "dev"
                ((tags-todo ,(concat dev-tag "+refile")
                            ((org-agenda-overriding-header "Refile tasks")))
-                (tags-todo ,(concat dev-tag "/!" (mapconcat #'identity my/active-projects-and-tasks "|"))
+                (tags-todo ,(concat dev-tag "/!" (mapconcat #'identity (cons "HOLD" my/active-projects-and-tasks) "|"))
                            ((org-agenda-overriding-header "Stuck Projects")
                             (org-agenda-skip-function 'my/dev-show-stuck-projects)
                             (org-tags-match-list-sublevels 'indented)
@@ -1338,6 +1338,7 @@
                                                     (:name "Today" :time-grid t
                                                            :and (:not (:and (:not (:scheduled today)
                                                                                   :not (:deadline today)))))))))))
+              ("h" "Dev Hold Projects" tags-todo "dev/!HOLD")
               ("f" "fastdev?"
                ((org-ql-block '(tags "refile")
                               ((org-agenda-overriding-header "Refile tasks")))
@@ -1561,8 +1562,10 @@
              (file ,(my/org-file "templates/decide.org")))
             ("je" "Journal Entry" entry (file+olp+datetree ,(my/org-file "entries/journal.gpg"))
              "* %<%R> %?\n%U\n\n")
-            ("jp" "Plan your day" entry (file+olp+datetree ,(my/org-file "entries/journal.gpg"))
-             (file ,(my/org-file "templates/daily-plan.org")))
+            ;; ("jp" "Plan your day" entry (file+olp+datetree ,(my/org-file "entries/journal.gpg"))
+            ;;  (file ,(my/org-file "templates/daily-plan.org")))
+            ("jp" "Programming Interview Prep Journal" entry (file+olp+datetree ,(my/org-file "entries/journal.gpg"))
+             "* ")
             ("C" "Create checklist")
             ("Cc" "Conference Via Bus" entry (file ,(my/agenda-file "dev.org"))
              (file ,(my/org-file "checklists/conference.org"))
@@ -1576,7 +1579,11 @@
             ("p" "Protocol" entry (file ,(my/agenda-file "refile.org"))
              "* STUFF %^{Title}\n:PROPERTIES:\n:CREATED: %U\n:URL: %:link\n:END:\n#+begin_example\n%i\n#+end_example\n%?")
             ("L" "Protocol Link" entry (file ,(my/agenda-file "refile.org"))
-             "* STUFF %? [[%:link][%:description]]\n:PROPERTIES:\n:CREATED: %U\n:URL: %:link\n:END:")))
+             "* STUFF %? [[%:link][%:description]]\n:PROPERTIES:\n:CREATED: %U\n:URL: %:link\n:END:")
+            ("l" "Add to lists conveniently")
+            ("lc" "Cringe" entry (file ,(my/org-file "entries/cringe.gpg")) "* %?")
+            ("lm" "Mental Model" entry (file ,(my/org-file "entries/mental_models.gpg")) "* %?")
+            ("li" "Important Information" entry (file ,(my/org-file "entries/important.gpg")) "* %?")))
   #+end_src
 * Weekly Reviews Implementation
 ** Attempt 3
@@ -1786,17 +1793,25 @@
     (defun my/org-add-tag (tag)
       (org-set-tags (cons tag (org-get-tags nil t))))
 
+    (defun org-board-add-offline-tag (&rest args)
+      (my/org-add-tag "offline"))
+
+    (advice-add #'org-board-archive :after
+                #'org-board-add-offline-tag)
+
     (defun my/org-board-prompt ()
       (let ((desc (plist-get org-capture-current-plist :description)))
         (when (and (not org-note-abort)
                    (string= desc "Protocol Link")
                    (y-or-n-p "Do you want to archive the page? "))
-          (my/org-add-tag "offline")
           (call-interactively #'org-board-archive))))
 
     (add-hook 'org-capture-before-finalize-hook 'my/org-board-prompt)
   #+end_src
 * Parallel org-tags-views
+#+begin_src emacs-lisp
+;; TODO
+#+end_src
 * empty lines
   #+begin_src emacs-lisp
   (setq org-cycle-separator-lines 0)
@@ -1806,10 +1821,10 @@
     (setq org-catch-invisible-edits 'show-and-error)
   #+end_src
 * link abbreviation
-  #+begin_src emacs-lisp
-    (setq org-link-abbrev-alist 
-          '(("youtube" . "https://youtube.com/watch?v=")))
-  #+end_src
+#+begin_src emacs-lisp
+  (setq org-link-abbrev-alist 
+        '(("youtube" . "https://youtube.com/watch?v=")))
+#+end_src
 * refile to datetree
   #+begin_src emacs-lisp
     (defun my/org-read-datetree-date (d)
@@ -2144,4 +2159,30 @@
                            (string-match-p "redd\.it" tree-string))
                        (my/refile-to-location (my/agenda-file "refile.org") reddit-tree-name))
                       (t (outline-next-heading)))))))))
+#+end_src
+
+* Learning chinese, setup org-drill
+#+begin_src emacs-lisp
+  (use-package org-drill)
+
+  (defun org-drill-present-one-side-always (session)
+    (org-drill-with-hidden-comments
+     (org-drill-with-hidden-cloze-hints
+      (org-drill-with-hidden-cloze-text
+       (let ((drill-sections (org-drill-hide-all-subheadings-except nil)))
+         (when drill-sections
+           (save-excursion
+             (goto-char (nth 0 drill-sections))
+             (org-show-subtree)))
+         (org-drill--show-latex-fragments)
+         (ignore-errors
+           (org-display-inline-images t))
+         (org-cycle-hide-drawers 'all)
+         (prog1 (org-drill-presentation-prompt session)
+           (org-drill-hide-subheadings-if 'org-drill-entry-p)))))))
+
+  (add-to-list 'org-drill-card-type-alist
+               '("oneside" org-drill-present-one-side-always nil t))
+
+  ;; (pop org-drill-card-type-alist)
 #+end_src

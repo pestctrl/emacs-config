@@ -152,7 +152,7 @@
           (with-current-buffer buffer
             (when (and (or class instance title)
                        (exwmx--string-match-p (or class ".*") exwm-class-name)
-                       (exwmx--string-match-p (or (concat instance "$") ".*") exwm-instance-name)
+                       (exwmx--string-match-p (or (concat "^" instance "$") ".*") exwm-instance-name)
                        (exwmx--string-match-p (or title ".*") exwm-title))
               (push buffer result)))))
       (setq result (reverse result))
@@ -289,6 +289,9 @@
     (if (eq major-mode 'exwm-mode)
         (exwm-input--fake-key ?\C-t)
       (transpose-chars arg)))
+  (use-package zeal-at-point)
+  (define-key *root-map* (kbd "C-d") (quickrun-lambda "zeal" "zeal"))
+  (define-key *root-map* (kbd "d") #'zeal-at-point)
   (define-key *root-map* (kbd "C-b") (lambda () (interactive) (switch-to-buffer (other-buffer (current-buffer) 1))))
   (define-key *root-map* (kbd "C-t") 'simulate-C-t)
   (define-key *root-map* (kbd "c") 'multi-term)
@@ -306,7 +309,7 @@
   (define-key *root-map* (kbd "j") 'org-clock-goto)
   (define-key *root-map* (kbd "o") 'switch-window)
   (define-key *root-map* (kbd "n") 'toggle-notifications)
-  (define-key *root-map* (kbd "C-d") 'dired-jump)
+  (define-key *root-map* (kbd "RET") 'dired-jump)
 
   (define-prefix-command '*window-map*)
   (define-key *root-map* (kbd "w") '*window-map*)
@@ -318,6 +321,7 @@
   (define-key *window-map* (kbd "d") 'window-toggle-side-windows)
 
   (define-prefix-command '*firefox-map*)
+  (define-key *firefox-map* (kbd "c") (quickrun-lambda "google-chrome-stable" "chrome"))
   (define-key *firefox-map* (kbd "f") (quickrun-lambda "firefox" "firefox"))
   (define-key *firefox-map* (kbd "1") (quickrun-lambda "firefox" "firefox1"))
   (define-key *firefox-map* (kbd "2") (quickrun-lambda "firefox" "firefox2"))
@@ -426,7 +430,7 @@
           (,(kbd "s-b") . ivy-switch-buffer)
           (,(kbd "s-c") . org-capture)
           (,(kbd "s-n") . switch-window)
-          (,(kbd "s-k") . ido-kill-buffer)
+          (,(kbd "s-k") . kill-this-buffer)
           (,(kbd "s-z") . resize-window)
           (,(kbd "s-s") . youtube-split)
           (,(kbd "s-n") . switch-to-next-buffer)
@@ -523,7 +527,7 @@
 
   (defun lock-screen ()
     (interactive)
-    (shell-command "i3lock-fancy & disown"))
+    (shell-command "~/Github/my-projects/i3lock-fancy/i3lock-fancy & disown"))
 
   (setq enable-recursive-minibuffers t)
   (defun counsel-shell-command ()
@@ -670,7 +674,8 @@
     (shell-command (format "xrandr --output %s --off" my/monitor-secondary))
     (setq exwm-randr-workspace-monitor-plist nil)
     (setq my/monitor-secondary nil)
-    (exwm-randr-refresh))
+    (exwm-randr-refresh)
+    (setup-wallpaper))
 
   (add-hook 'exwm-init-hook 'my/setup-screens)
 
@@ -2050,6 +2055,9 @@
     (let* ((ledger-reports dynamic-reports)
            (report-name (ledger-report-read-name)))
       (ledger-report report-name nil)))
+
+  (setq ledger-reconcile-buffer-line-format
+        "%(date)s %-4(code)s %-30(payee)s %-30(account)s %15(amount)s\n")
 #+END_SRC
 * Email
 ** general-options
@@ -2666,7 +2674,7 @@
             "URL: " (or (thing-at-point 'url)
                         (when interprogram-paste-function
                           (funcall interprogram-paste-function))))))
-    (async-shell-command (format "youtube-dl --audio-format mp3 --extract-audio \"%s\"" url)))
+    (async-shell-command (format "youtube-dl -x -f \"bestaudio[ext=m4a]\" \"%s\"; tageditor -s album=\"youtube-dl\" -f *.m4a" url)))
 #+END_SRC
 ** pdf-tools use isearch
 #+BEGIN_SRC emacs-lisp
@@ -2753,15 +2761,15 @@
 #+end_src
 ** World time include Taiwan
 #+begin_src emacs-lisp
-    ;; (("America/Los_Angeles" "Seattle")
-    ;;  ("America/New_York" "New York")
-    ;;  ("Europe/London" "London")
-    ;;  ("Europe/Paris" "Paris")
-    ;;  ("Asia/Calcutta" "Bangalore")
-    ;;  ("Asia/Tokyo" "Tokyo"))
-    (setq display-time-world-list
-          '(("America/Chicago" "Houston")
-            ("Asia/Taipei" "Taiwan")))
+  ;; (("America/Los_Angeles" "Seattle")
+  ;;  ("America/New_York" "New York")
+  ;;  ("Europe/London" "London")
+  ;;  ("Europe/Paris" "Paris")
+  ;;  ("Asia/Calcutta" "Bangalore")
+  ;;  ("Asia/Tokyo" "Tokyo"))
+  (setq display-time-world-list
+        '(("America/Chicago" "Houston")
+          ("Asia/Taipei" "Taiwan")))
 #+end_src
 ** arch-linux
 #+begin_src emacs-lisp
@@ -2790,45 +2798,6 @@
 ** wtf
 #+begin_src emacs-lisp
   (use-package wtf)
-
-#+end_src
-** buffer-time-tracking
-#+begin_src emacs-lisp
-  (use-package switch-buffer-functions)
-  ;;(load "switch-buffer-functions-autoloads.el")
-  (defun my/insert-into-buffers-csv (str str2 symb str3)
-    (let* ((buffer (find-file-noselect "~/MEGA/org/agenda/buffer_times.csv"))
-          (inhibit-message t))
-      (with-current-buffer buffer
-        (goto-char (point-max))
-        (insert (format-time-string "%Y-%m-%d %H:%M:%S" (current-time)))
-        (insert "," str "," (if str2 str2 "") "," str3 "," (if symb (symbol-name symb) ""))
-        (insert "\n")
-        (save-buffer))))
-
-  (defun my/record-buffer-switch (prev cur)
-    (let* (obuffer-name buffer-name buffer-fname buffer-mode buffer-def-dir)
-      (with-current-buffer cur
-        (setq buffer-name (buffer-name)
-              buffer-fname (buffer-file-name)
-              buffer-mode major-mode
-              buffer-def-dir default-directory))
-      (when (buffer-live-p prev)
-        (with-current-buffer prev
-          (setq obuffer-name (buffer-name))))
-      (when (and (not (string= buffer-name " *Minibuf-1*"))
-                 ;; (or (not obuffer-name) (not (string= obuffer-name " *Minibuf-1*")))
-                 )
-        (my/insert-into-buffers-csv buffer-name buffer-fname buffer-mode buffer-def-dir))))
-
-  ;; (add-hook 'switch-buffer-functions
-  ;;           'my/record-buffer-switch)
-
-  (defun leaving-computer ()
-    (interactive)
-    (my/insert-into-buffers-csv "Inactive" "" nil "")
-    (org-clock-out nil t)
-    (message "Computer is now inactive!"))
 
 #+end_src
 ** auto-save files in same directory
@@ -3228,6 +3197,195 @@
   ;; (transient-remove-suffix 'magit-push '(1 1))
   ;; (transient-get-suffix 'magit-push "m")
 #+end_src
+** New stuff, lost to git stupidity
+#+begin_src emacs-lisp
+
+  (defun my/query-replace-rx (&rest _)
+    "Call `query-replace-regexp', reading regexp in `rx' syntax.
+  Automatically wraps in parens and adds `seq' to the beginning of
+  the form."
+    (interactive)
+    (cl-letf (((symbol-function #'query-replace-read-from) (lambda (&rest _)
+                                                             (--> (read-string "rx form: ")
+                                                                  (concat "'(seq " it ")")
+                                                                  (read it)
+                                                                  (cadr it)
+                                                                  (rx-to-string it)))))
+      (call-interactively #'query-replace-regexp)))
+
+  (define-prefix-command '*profiler-map*)
+
+  (define-key *profiler-map* (kbd "s") #'profiler-start)
+  (define-key *profiler-map* (kbd "r") #'profiler-report)
+  (define-key *profiler-map* (kbd "S") #'profiler-stop)
+
+  (define-key *root-map* (kbd "p") '*profiler-map*)
+
+  ;; (defvar my/ignore-focus-buffer nil)
+  ;; (defvar my/ignore-focus-window nil)
+
+  ;; (defun my/ignore-focus-advice (orig buffer &optional norecord)
+  ;;   (when (not (eq my/ignore-focus-buffer buffer))
+  ;;     (funcall orig buffer norecord)))
+
+  ;; (defun my/ignore-set-window (orig window buffer-or-name &optional keep-margins)
+  ;;   (when (not (eq my/ignore-focus-buffer buffer-or-name))
+  ;;     (funcall orig window buffer-or-name keep-margins)))
+
+  ;; (defun my/ignore-select (orig window &optional norecord)
+  ;;   (when (not (eq my/ignore-focus-window window))
+  ;;     (funcall orig window norecord)))
+
+  ;; (defun my/ignore-focus (buffer window)
+  ;;   (setq my/ignore-focus-buffer buffer)
+  ;;   (advice-add #'pop-to-buffer-same-window :around
+  ;;               #'my/ignore-focus-advice)
+  ;;   (advice-add #'set-window-buffer :around
+  ;;               #'my/ignore-set-window)
+  ;;   (when window
+  ;;     (advice-add #'select-window :around
+  ;;                 #'my/ignore-select)))
+
+  ;; (defun my/unignore-focus (buffer)
+  ;;   (setq my/ignore-focus-buffer nil)
+  ;;   (setq my/ignore-focus-window nil)
+  ;;   (advice-remove #'pop-to-buffer-same-window
+  ;;                  #'my/ignore-focus-advice)
+  ;;   (advice-remove #'set-window-buffer
+  ;;                  #'my/ignore-set-window)
+  ;;   (advice-remove #'select-window
+  ;;                  #'my/ignore-select))
+
+  (defun my/make-refile-window ()
+    (interactive)
+    (exwmx-quickrun "firefox -P youtube"
+                    nil
+                    (quote (:class ".*" :instance "refirefox"))))
+
+  (defun my/lenient-y-or-n-p (prompt)
+    (save-excursion
+      (let ((query-replace-map (copy-keymap query-replace-map)))
+        (define-key query-replace-map [t] 'skip)
+        (y-or-n-p prompt))))
+
+  (defun my/youtube-loop ()
+    (interactive)
+    (switch-to-buffer (or (get-buffer "refile.org")
+                          (find-file (my/agenda-file "refile.org"))))
+    (beginning-of-buffer)
+    (search-forward "Youtube Videos: ")
+    (org-back-to-heading)
+    (delete-other-windows)
+    (let* ((ff-buffer (or (get-buffer "refirefox")
+                         (ivy-read "Firefox Buffer: " #'internal-complete-buffer
+                                   :keymap ivy-switch-buffer-map
+                                   :preselect (buffer-name (other-buffer (current-buffer)))
+                                   :matcher #'ivy--switch-buffer-matcher)))
+          (id (with-current-buffer ff-buffer exwm--id))
+          (width (1+ (org-outline-level))))
+      (split-window-horizontally)
+      (switch-window)
+      (switch-to-buffer ff-buffer)
+      (switch-window)
+      (outline-next-heading)
+      (while (<= width (org-outline-level))
+        (let ((url (->> (org-offer-links-in-entry (current-buffer) (point) 0)
+                        (car)
+                        (get-text-property 0 'htmlize-link)
+                        (cadr))))
+          (start-process-shell-command "refile-open" nil (format "firefox -P youtube \"%s\"" url))
+          (switch-window)
+          (if (not (prog1 (my/lenient-y-or-n-p "Refile this one?")
+                     (switch-window)))
+              (org-end-of-subtree t t)
+            (process-youtube-headline))
+          (exwm-background/exwm-input--fake-key-to-window id ?\C-w)))))
+
+  (defun process-youtube-headline ()
+    (interactive)
+    (my/org-add-tag "watch")
+    (save-window-excursion
+      (save-excursion
+        (if (my/lenient-y-or-n-p "Educational?")
+            (progn (org-todo)
+                   (my/org-add-tag
+                    (if (my/lenient-y-or-n-p "short?")
+                        "short"
+                      "long"))
+                   (my/org-add-tag "grow")
+                   (my/refile-to-location (my/agenda-file "sandbox.org")
+                                          "Educational Youtube Videos"))
+          (org-todo "TODO")
+          (my/org-add-tag "rest")
+          (my/refile-to-location (my/agenda-file "eternal.org")
+                                 "Entertaining YouTube Videos")))))
+
+  (defun my/get-rid-of-entertaining-youtube-videos ()
+    (interactive)
+    (switch-to-buffer (or (get-buffer "refile.org")
+                          (find-file (my/agenda-file "refile.org"))))
+    (beginning-of-buffer)
+    (search-forward "Youtube Videos: ")
+    (org-back-to-heading)
+    (delete-other-windows)
+    (let* ((ff-buffer (or (get-buffer "refirefox")
+                         (ivy-read "Firefox Buffer: " #'internal-complete-buffer
+                                   :keymap ivy-switch-buffer-map
+                                   :preselect (buffer-name (other-buffer (current-buffer)))
+                                   :matcher #'ivy--switch-buffer-matcher)))
+           (id (with-current-buffer ff-buffer exwm--id))
+           (width (1+ (org-outline-level))))
+      (split-window-horizontally)
+      (switch-window)
+      (switch-to-buffer ff-buffer)
+      (switch-window)
+      (outline-next-heading)
+      (while (<= width (org-outline-level))
+        (let ((url (->> (org-offer-links-in-entry (current-buffer) (point) 0)
+                        (car)
+                        (get-text-property 0 'htmlize-link)
+                        (cadr))))
+          (start-process-shell-command "refile-open" nil (format "firefox -P youtube \"%s\"" url))
+          (switch-window)
+          (if (prog1 (my/lenient-y-or-n-p "Educational?") (switch-window))
+              (org-end-of-subtree t t)
+            (save-excursion
+              (save-window-excursion
+                (my/org-add-tag "watch")
+                (org-todo "TODO")
+                (my/org-add-tag "rest")
+                (my/refile-to-location (my/agenda-file "eternal.org")
+                                       "Entertaining YouTube Videos"))))
+          (exwm-background/exwm-input--fake-key-to-window id ?\C-w)))))
+
+  (defun my/open-loop ()
+    (interactive)
+    (let* ((ff-buffer (or (get-buffer "refirefox")
+                          (ivy-read "Firefox Buffer: " #'internal-complete-buffer
+                                    :keymap ivy-switch-buffer-map
+                                    :preselect (buffer-name (other-buffer (current-buffer)))
+                                    :matcher #'ivy--switch-buffer-matcher)))
+           (id (with-current-buffer ff-buffer exwm--id)))
+      (while t
+        (let ((url (->> (org-offer-links-in-entry (current-buffer) (point) 0)
+                        (car)
+                        (get-text-property 0 'htmlize-link)
+                        (cadr))))
+          (start-process-shell-command "refile-open" nil (format "firefox -P youtube \"%s\"" url))
+          (switch-window)
+          (my/lenient-y-or-n-p "Next")
+          (switch-window))
+        (org-end-of-subtree t t)
+        (exwm-background/exwm-input--fake-key-to-window id ?\C-w))))
+#+end_src
+** Slime mode
+#+BEGIN_SRC emacs-lisp
+ (use-package slime)
+ (add-hook 'lisp-mode-hook (lambda () (slime-mode t)))
+ (add-hook 'inferior-lisp-mode-hook (lambda () (inferior-slime-mode t)))
+ (setq inferior-lisp-program "/usr/bin/sbcl")
+ (slime-setup '(slime-fancy slime-asdf))
+#+END_SRC
 * Broken
 ** Wunderlist
 #+BEGIN_SRC emacs-lisp#
@@ -3249,6 +3407,45 @@
 ** poshint
 #+begin_src emacs-lisp#
    (use-package pophint)
+#+end_src
+** buffer-time-tracking                                                :fix:
+#+begin_src emacs-lisp#
+  (use-package switch-buffer-functions)
+  ;;(load "switch-buffer-functions-autoloads.el")
+  (defun my/insert-into-buffers-csv (str str2 symb str3)
+    (let* ((buffer (find-file-noselect "~/MEGA/org/agenda/buffer_times.csv"))
+          (inhibit-message t))
+      (with-current-buffer buffer
+        (goto-char (point-max))
+        (insert (format-time-string "%Y-%m-%d %H:%M:%S" (current-time)))
+        (insert "," str "," (if str2 str2 "") "," str3 "," (if symb (symbol-name symb) ""))
+        (insert "\n")
+        (save-buffer))))
+
+  (defun my/record-buffer-switch (prev cur)
+    (let* (obuffer-name buffer-name buffer-fname buffer-mode buffer-def-dir)
+      (with-current-buffer cur
+        (setq buffer-name (buffer-name)
+              buffer-fname (buffer-file-name)
+              buffer-mode major-mode
+              buffer-def-dir default-directory))
+      (when (buffer-live-p prev)
+        (with-current-buffer prev
+          (setq obuffer-name (buffer-name))))
+      (when (and (not (string= buffer-name " *Minibuf-1*"))
+                 ;; (or (not obuffer-name) (not (string= obuffer-name " *Minibuf-1*")))
+                 )
+        (my/insert-into-buffers-csv buffer-name buffer-fname buffer-mode buffer-def-dir))))
+
+  ;; (add-hook 'switch-buffer-functions
+  ;;           'my/record-buffer-switch)
+
+  (defun leaving-computer ()
+    (interactive)
+    (my/insert-into-buffers-csv "Inactive" "" nil "")
+    (org-clock-out nil t)
+    (message "Computer is now inactive!"))
+
 #+end_src
 * Disabled
 ** nnreddit

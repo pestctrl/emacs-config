@@ -2753,14 +2753,15 @@
 #+end_src
 ** World time include Taiwan
 #+begin_src emacs-lisp
-  ;; (("America/Los_Angeles" "Seattle")
-  ;;  ("America/New_York" "New York")
-  ;;  ("Europe/London" "London")
-  ;;  ("Europe/Paris" "Paris")
-  ;;  ("Asia/Calcutta" "Bangalore")
-  ;;  ("Asia/Tokyo" "Tokyo"))
-  (setq display-time-world-list
-        '(("Asia/Taipei" "Taiwan")))
+    ;; (("America/Los_Angeles" "Seattle")
+    ;;  ("America/New_York" "New York")
+    ;;  ("Europe/London" "London")
+    ;;  ("Europe/Paris" "Paris")
+    ;;  ("Asia/Calcutta" "Bangalore")
+    ;;  ("Asia/Tokyo" "Tokyo"))
+    (setq display-time-world-list
+          '(("America/Chicago" "Houston")
+            ("Asia/Taipei" "Taiwan")))
 #+end_src
 ** arch-linux
 #+begin_src emacs-lisp

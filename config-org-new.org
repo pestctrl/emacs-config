@@ -1120,7 +1120,6 @@
           (save-excursion
             (outline-next-heading)))))
   #+end_src
-* 
 * Stuff                                                                 :FIX:
   #+begin_src emacs-lisp#
     (setq org-agenda-tags-todo-honor-ignore-options t)

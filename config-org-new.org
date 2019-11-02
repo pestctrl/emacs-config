@@ -536,6 +536,7 @@
             ("sandbox" . ?3)
             (:grouptags)
             ("dev" . ?2)
+            ("people" . nil)
             (:endgrouptag)
             (:startgroup . nil)
             ("short" . ?s)
@@ -567,6 +568,11 @@
             ("active")
             (:grouptags)
             ("prog")
+            (:endgrouptag)
+            (:startgrouptag)
+            ("people" . nil)
+            (:grouptags)
+            ("family" . nil)
             (:endgrouptag)
             ))
 
@@ -1480,6 +1486,40 @@
                      (if (string= "6" (format-time-string "%u"))
                          "."
                        "-sat")))
+    (progn
+      (pop org-agenda-custom-commands)
+    (add-to-list 'org-agenda-custom-commands
+                 `("m" "People"
+                   ((tags-todo ,(concat "+people" "/!" (mapconcat #'identity (cons "HOLD" my/active-projects-and-tasks) "|"))
+                               ((org-agenda-overriding-header "Stuck Projects")
+                                (org-agenda-skip-function 'my/show-stuck-projects)
+                                (org-tags-match-list-sublevels 'indented)
+                                (org-agenda-sorting-strategy
+                                 '((agenda category-keep)))))
+                    (tags-todo ,(concat "+people" "-short" "/!" (mapconcat #'identity my/active-projects-and-tasks "|"))
+                               ((org-agenda-overriding-header "Active Projects")
+                                (org-agenda-skip-function 'my/show-active-projects)
+                                (org-tags-match-list-sublevels 'indented)
+                                (org-agenda-sorting-strategy
+                                 '((agenda category-keep)))))
+                    (tags-todo ,(concat "+people" "/WAIT")
+                               ((org-agenda-overriding-header "Waiting tasks")))
+                    (tags-todo ,(concat "+people" "/NEXT")
+                               ((org-agenda-overriding-header "Things to do")))
+                    (agenda ""
+                            ((org-agenda-skip-function 'my/agenda-custom-skip)
+                             (org-agenda-span 'day)
+                             (org-agenda-tag-filter-preset (quote ("+people")))
+                             (org-agenda-skip-deadline-if-done t)
+                             (org-agenda-skip-scheduled-if-done t)
+                             (org-super-agenda-groups '((:name "Overdue" :and (:deadline past :log nil))
+                                                        (:name "Upcoming" :deadline future)
+                                                        (:name "Should do" :and (:scheduled past :log nil))
+                                                        (:name "Today" :time-grid t
+                                                               :and (:not (:and (:not (:scheduled today)
+                                                                                      :not (:deadline today)))))))))))))
+
+    ;; (pop org-agenda-custom-commands)
   #+end_src
 * Checkbox hack
   #+BEGIN_SRC emacs-lisp

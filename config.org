@@ -3212,7 +3212,9 @@
                                                                   (cadr it)
                                                                   (rx-to-string it)))))
       (call-interactively #'query-replace-regexp)))
-
+#+end_src
+** Profiler Keymap
+#+begin_src emacs-lisp
   (define-prefix-command '*profiler-map*)
 
   (define-key *profiler-map* (kbd "s") #'profiler-start)
@@ -3220,7 +3222,9 @@
   (define-key *profiler-map* (kbd "S") #'profiler-stop)
 
   (define-key *root-map* (kbd "p") '*profiler-map*)
-
+#+end_src
+** Processing org-mode stuff
+#+begin_src emacs-lisp
   ;; (defvar my/ignore-focus-buffer nil)
   ;; (defvar my/ignore-focus-window nil)
 

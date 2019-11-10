@@ -647,15 +647,23 @@
 
   ; Reminder: Hooks execute in order. Make sure megasync launches after systemtray is enabled
   (add-hook 'exwm-init-hook 'call-startup-programs)
-  (add-hook 'exwm-init-hook 'setup-wallpaper)
 
   (defvar my/monitor-primary "eDP1")
   (defvar my/monitor-secondary nil)
 
+  (defun my/get-screens ()
+    (-> "xrandr --listmonitors | grep -v Monitors | cut -d ' ' -f 6"
+        (shell-command-to-string)
+        (split-string "\n")
+        (reverse)
+        (cdr)
+        (reverse)))
+
   (defun my/setup-screens ()
     (interactive)
-    (let ((primary (shell-command-to-string "xrandr --listmonitors | grep eDP | cut -d ' ' -f 6 | tr -d '\n'"))
-          (secondary (shell-command-to-string "xrandr --query | grep ' connected' | grep -v eDP | cut -d ' ' -f 1 | tr -d '\n'")))
+    (let* ((monitors (my/get-screens))
+           (primary (car monitors))
+           (secondary (or (cadr monitors) "")))
       (setq exwm-randr-workspace-monitor-plist `(0 ,primary 1 ,primary 2 ,secondary 3 ,secondary))
       (setq my/monitor-primary primary
             my/monitor-secondary secondary)

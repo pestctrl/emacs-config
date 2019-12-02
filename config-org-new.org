@@ -2210,7 +2210,7 @@
     (setq org-startup-indented t) ; Enable `org-indent-mode' by default
     (add-hook 'org-mode-hook #'visual-line-mode)
     (add-hook 'org-mode-hook #'auto-fill-mode))
- #+end_src
+#+end_src
 
 * Refile sorter
 #+begin_src emacs-lisp

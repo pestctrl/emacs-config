@@ -574,53 +574,45 @@
   ;;; Workspace naming
   (setq exwm-workspace-number 2)
 
-  (defvar workspace-list '((scratch0 . 0)
+  (defvar my/workspace-list '((scratch0 . 0)
                (scratch1 . 1))
     "My custom workspace list")
 
-  (defun delete-frame-cleanup-workspace-monitor ()
-    (let ((wnumber exwm-workspace-current-index))
-      (setq workspace-list
-        (remove-if (lambda (cell) (= wnumber (cdr cell)))
-               workspace-list))
-      (assq-delete-all wnumber monitor-list)
-      (unless (= (1+ wnumber) (exwm-workspace--count))
-    (setq workspace-list
-          (mapcar (lambda (cell)
-            (if (< (cdr cell) wnumber)
-                cell
-              (cons (car cell) (1- (cdr cell)))))
-              workspace-list))
-    (setq monitor-list
-          (mapcar (lambda (cell)
-            (if (< (car cell) wnumber)
-                cell
-              (cons (1- (car cell)) (cdr cell))))
-              monitor-list))
-    (push wnumber free-workspaces))))
-
-  (advice-add #'delete-frame
-          :before
-          #'delete-frame-cleanup-workspace-monitor)
+  (defun delete-frame-cleanup-workspace-monitor (&rest args)
+    (unless exwm--floating-frame
+      (let ((wnumber exwm-workspace-current-index))
+        (setq my/workspace-list
+              (remove-if (lambda (cell) (= wnumber (cdr cell)))
+                         my/workspace-list))
+        (assq-delete-all wnumber my/monitor-list)
+        (unless (= (1+ wnumber) (exwm-workspace--count))
+          (setq my/workspace-list
+                (mapcar (lambda (cell)
+                          (if (< (cdr cell) wnumber)
+                              cell
+                            (cons (car cell) (1- (cdr cell)))))
+                        my/workspace-list))
+          (setq my/monitor-list
+                (mapcar (lambda (cell)
+                          (if (< (car cell) wnumber)
+                              cell
+                            (cons (1- (car cell)) (cdr cell))))
+                        my/monitor-list))))))
 
   (defun my/get-current-workspace ()
     (car (remove-if-not (lambda (cell)
               (= (cdr cell)
                  exwm-workspace-current-index))
-            workspace-list)))
+            my/workspace-list)))
 
   (defun workspace-switch-record-last (&rest args)
     (setq my/last-workspace (car (my/get-current-workspace))))
 
-  (advice-add #'exwm-workspace-switch
-          :before
-          #'workspace-switch-record-last)
-
   (defun my/switch-workspace (name)
     (interactive (list (completing-read "Workspace name? "
-                    (mapcar #'car workspace-list))))
+                    (mapcar #'car my/workspace-list))))
     (let* ((key (intern name))
-       (workspace-number (cdr (assoc key workspace-list))))
+       (workspace-number (cdr (assoc key my/workspace-list))))
       (if workspace-number
       (exwm-workspace-switch workspace-number)
     (my/make-new-workspace name))))
@@ -628,57 +620,63 @@
   (defun my/get-empty-workspace ()
     (exwm-workspace--count))
 
-  (defun my/make-new-workspace (name)
+  (defun my/make-new-workspace (name &optional no-switch)
     (let ((workspace-number (my/get-empty-workspace)))
-      (add-to-list 'workspace-list
+      (add-to-list 'my/workspace-list
            `(,(intern name) . ,workspace-number))
-      (add-to-list 'monitor-list
-           `(,workspace-number . (car (my/get-screens))))
+      (add-to-list 'my/monitor-list
+           `(,workspace-number . ,(car (my/get-screens))))
       (my/update-workspace-monitors)
-      (exwm-workspace-switch-create workspace-number)))
+      (exwm-workspace-switch-create workspace-number)
+      (when no-switch
+        (my/switch-to-last-workspace))
+      workspace-number))
 
   (defun my/rename-workspace (name)
     (interactive (list (intern (read-from-minibuffer "What name? "))))
     (cl-flet ((current-workspace-p (cell) (= (cdr cell) exwm-workspace-current-index)))
       (let* ((results (remove-if-not #'current-workspace-p
-                     workspace-list))
+                     my/workspace-list))
          (res-count (length results)))
     (when (not (= 0 res-count))
-      (setq workspace-list
+      (setq my/workspace-list
         (remove-if #'current-workspace-p
-               workspace-list)))
-    (add-to-list 'workspace-list
+               my/workspace-list)))
+    (add-to-list 'my/workspace-list
              `(,name . ,exwm-workspace-current-index)))))
 
   (defun my/move-window-to-workspace ()
     (interactive)
     (let* ((key (completing-read "Move to which workspace? "
-                 (mapcar #'car workspace-list)))
-       (workspace-number (cdr (assoc (intern key) workspace-list))))
+                                 (mapcar #'car my/workspace-list)))
+           (workspace-number (or (cdr (assoc (intern key) my/workspace-list))
+                                 (my/make-new-workspace key t))))
       (exwm-workspace-move-window workspace-number)))
 
   (defvar my/last-workspace nil)
 
   (defun my/switch-to-last-workspace ()
     (interactive)
-    (-> my/last-workspace
-    (assoc workspace-list)
-    (car)
-    (symbol-name)
-    (my/switch-workspace)))
+    (when-let (cell (assoc my/last-workspace my/workspace-list))
+      (exwm-workspace-switch (cdr cell))
+      (message (format "Switched to workspace: \"%S\"" (car cell)))))
 
   (defun my/current-workspace ()
     (interactive)
-    (let* ((results (remove-if-not (lambda (cell) (= (cdr cell) exwm-workspace-current-index)) workspace-list))
+    (let* ((results (remove-if-not (lambda (cell) (= (cdr cell) exwm-workspace-current-index)) my/workspace-list))
        (res-count (length results)))
       (if (= res-count 0)
       (message "No name for current workspace")
-    (message (format "Current Workspace: #%d \"%s\" on %s" exwm-workspace-current-index (car (car results)))))))
+    (message (format "Current Workspace: #%d \"%s\" on %s"
+             exwm-workspace-current-index
+             (car (car results)))))))
 
   (defun my/workspace-report ()
     (interactive)
-    (loop for i in workspace-list
-      do (message "Workspace #%d: \"%s\" on \"%s\"" (cdr i) (car i) (cdr (assoc (cdr i) monitor-list)))))
+    (loop for i in my/workspace-list
+      do (message "Workspace #%d: \"%s\" on \"%s\""
+              (cdr i) (car i)
+              (cdr (assoc (cdr i) my/monitor-list)))))
 
   ;; Handle deleting if frame was destroyed
 
@@ -692,18 +690,17 @@
   ;; (define-key *window-map* (kbd "s") #'my/switch-workspace)
 
   ;;; Workspace positioning
-  (defvar monitor-list '((0 . "eDP1") 
-                         (1 . "eDP1")))
-
-  (add-hook 'exwm-init-hook 'my/setup-workspace-monitors)
+  (defvar my/monitor-list '((0 . "eDP1") 
+                            (1 . "eDP1")))
 
   (defun my/setup-workspace-monitors ()
     (let* ((monitors (my/get-screens))
        (primary (car monitors))
        (secondary (or (cadr monitors) primary)))
-      (setq monitor-list
+      (setq my/monitor-list
         `((0 . ,primary)
-          (1 . ,secondary)))))
+          (1 . ,secondary)))
+      (my/update-workspace-monitors t)))
 
   (defun flatten-list (list)
     (let ((f (car list)))
@@ -714,41 +711,34 @@
         (t
          (cons f (flatten-list (cdr list)))))))
 
-  (defun my/update-workspace-monitors ()
-    (->> (loop for j in (cl-sort (copy-seq workspace-list) #'< :key 'cdr)
-          collect (list (cdr j) (cdr (assoc (cdr j) monitor-list))))
-    (flatten-list)
-    (setq exwm-randr-workspace-monitor-plist))
-    (exwm-randr-refresh))
+  (defun my/update-workspace-monitors (&optional no-refresh)
+    (->> (loop for j in (cl-sort (copy-seq my/workspace-list) #'< :key 'cdr)
+               collect (list (cdr j) (cdr (assoc (cdr j) my/monitor-list))))
+         (flatten-list)
+         (setq exwm-randr-workspace-monitor-plist))
+    (unless no-refresh
+      (exwm-randr-refresh)))
 
   (defun my/move-to-monitor (monitor)
     (interactive (list (let ((monitors (my/get-screens)))
              (if (= (length monitors) 2)
                  (if (string= (car monitors)
-                      (cdr (assoc exwm-workspace-current-index monitor-list)))
+                      (cdr (assoc exwm-workspace-current-index my/monitor-list)))
                  (cadr monitors)
                    (car monitors))
                (completing-read "Which Monitor? "
                         monitors)))))
-    (setf (alist-get exwm-workspace-current-index monitor-list)
+    (setf (alist-get exwm-workspace-current-index my/monitor-list)
       monitor)
     (my/update-workspace-monitors))
 
-  ;; ;; Switch monitor
+  ;; Switch monitor
   (defvar monitor-active-list '())
 
   (defun workspace-switch-record-monitor (&rest args)
     (setf (alist-get (intern (frame-parameter exwm-workspace--current 'exwm-randr-monitor))
-                     monitor-active-list)
-          exwm-workspace--current))
-
-  (add-to-list 'exwm-init-hook
-               (lambda ()
-                 (advice-add #'exwm-workspace-switch
-                             :after
-                             #'workspace-switch-record-monitor)))
-
-
+             monitor-active-list)
+      exwm-workspace--current))
 
   (defun my/switch-monitor ()
     (interactive)
@@ -765,7 +755,36 @@
 
   (define-key *root-map* (kbd "%") #'my/move-to-monitor)
   (add-to-list 'exwm-input-global-keys
-               `(,(kbd "<s-iso-lefttab>") . my/switch-monitor)) 
+           `(,(kbd "<s-iso-lefttab>") . my/switch-monitor)) 
+
+
+  (defun my/init-workspace-module ()
+    (my/setup-workspace-monitors)
+    (advice-add #'delete-frame
+        :before
+        #'delete-frame-cleanup-workspace-monitor)
+    (advice-add #'exwm-workspace-switch
+        :before
+        #'workspace-switch-record-last))
+
+
+  (add-hook 'exwm-init-hook 'my/init-workspace-module)
+
+  (defun my/flip-screens ()
+    (interactive)
+    (let* ((screens (my/get-screens))
+           (primary (car screens))
+           (secondary (cadr screens)))
+      (setq my/monitor-list
+            (mapcar (lambda (a)
+                      (cons (car a)
+                            (if (string= (cdr a)
+                                         primary)
+                                secondary
+                              primary)))
+                    my/monitor-list)))
+    (my/update-workspace-monitors))
+
 #+end_src
 ** Simulation keys
 #+BEGIN_SRC emacs-lisp
@@ -815,7 +834,11 @@
         (split-string "\n")
         (reverse)
         (cdr)
-        (reverse)))
+        (reverse)
+        (cl-sort (lambda (a b)
+                   (cond ((string-match-p "^eDP" a) a)
+                         ((string-match-p "^eDP" b) b)
+                         (t a))))))
 
   (defun my/setup-screens ()
     (interactive)
@@ -844,22 +867,6 @@
     (setup-wallpaper))
 
   (add-hook 'exwm-init-hook 'my/setup-screens)
-
-  (defun my/flip-screens ()
-    (interactive)
-    (if (string= my/monitor-primary
-                 (cadr exwm-randr-workspace-monitor-plist))
-        (setq exwm-randr-workspace-monitor-plist
-              `(0 ,my/monitor-secondary
-                  1 ,my/monitor-secondary
-                  2 ,my/monitor-primary
-                  3 ,my/monitor-primary))
-      (setq exwm-randr-workspace-monitor-plist
-            `(0 ,my/monitor-primary
-                1 ,my/monitor-primary
-                2 ,my/monitor-secondary
-                3 ,my/monitor-secondary)))
-    (exwm-randr-refresh))
 
   (defvar my/in-presentation-mode? nil)
 
@@ -1823,7 +1830,6 @@
     (interactive)
     (dired "~/big_files/Videos/youtube-dl")
     (local-set-key (kbd "RET") 'dired-start-process))
-
 #+end_src
 *** async-command
 #+begin_src emacs-lisp

@@ -1,11 +1,11 @@
 
 * Plugins
 ** fstree
-   #+BEGIN_SRC emacs-lisp
-     (add-to-list 'load-path
-                  "~/.emacs.d/custom/org-fstree")
-     (require 'org-fstree)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'load-path
+               "~/.emacs.d/custom/org-fstree")
+  (require 'org-fstree)
+#+END_SRC
 ** org-bullets
 #+BEGIN_SRC emacs-lisp#
 (use-package org-bullets)
@@ -13,335 +13,335 @@
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 #+END_SRC
 ** calfw-org
- #+BEGIN_SRC emacs-lisp
- (use-package calfw)
- (use-package calfw-ical)
- (use-package calfw-gcal)
- (use-package calfw-org)
- (global-set-key (kbd "C-c A") 'cfw:open-org-calendar)
- (setq cfw:org-overwrite-default-keybinding t)
- #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package calfw)
+  (use-package calfw-ical)
+  (use-package calfw-gcal)
+  (use-package calfw-org)
+  (global-set-key (kbd "C-c A") 'cfw:open-org-calendar)
+  (setq cfw:org-overwrite-default-keybinding t)
+#+END_SRC
 ** sync with google calendar
-   #+BEGIN_SRC emacs-lisp
-     (defvar url-http-method)
-     (defvar url-http-data)
-     (defvar url-http-extra-headers)
-     (defvar oauth--token-data)
-     (defvar url-callback-function)
+#+BEGIN_SRC emacs-lisp
+  (defvar url-http-method)
+  (defvar url-http-data)
+  (defvar url-http-extra-headers)
+  (defvar oauth--token-data)
+  (defvar url-callback-function)
 
-     (require 'url-http)
-     (unless (package-installed-p 'org-caldav)
-       (use-package oauth2)
-       (use-package org-caldav))
-     (setq epa-pinentry-mode 'loopback)
-     (setq plstore-cache-passphrase-for-symmetric-encryption t)
+  (require 'url-http)
+  (unless (package-installed-p 'org-caldav)
+    (use-package oauth2)
+    (use-package org-caldav))
+  (setq epa-pinentry-mode 'loopback)
+  (setq plstore-cache-passphrase-for-symmetric-encryption t)
 
-     (save-excursion
-       (let ((filename "~/.emacs.d/google-calendar-secret.el"))
-         (when (file-exists-p filename)
-           (set-buffer (find-file-noselect filename))
-           (let ((var (eval (read (buffer-string)))))
-             (setq org-caldav-oauth2-client-id (car var)
-                   org-caldav-oauth2-client-secret (cadr var)))
-           (kill-buffer))))
+  (save-excursion
+    (let ((filename "~/.emacs.d/google-calendar-secret.el"))
+      (when (file-exists-p filename)
+        (set-buffer (find-file-noselect filename))
+        (let ((var (eval (read (buffer-string)))))
+          (setq org-caldav-oauth2-client-id (car var)
+                org-caldav-oauth2-client-secret (cadr var)))
+        (kill-buffer))))
 
-     ;; (setq org-caldav-url 'google
-     ;;       org-caldav-calendar-id "jqeua8pamjrclakq3bg8mpnlis@group.calendar.google.com"
-     ;;       org-caldav-inbox "~/MEGA/org/agenda/test.org"
-     ;;       org-caldav-files '("~/MEGA/org/agenda/agenda.org")
-     ;;       org-icalendar-include-todo nil
-     ;;       org-icalendar-include-sexps t
-     ;;       org-icalendar-categories '(all-tags category)
-     ;;       org-icalendar-use-deadline '(event-if-todo event-if-not-todo todo-due)
-     ;;       org-icalendar-use-scheduled '(event-if-todo event-if-not-todo todo-start)
-     ;;       org-icalendar-with-timestamps nil
-     ;;       org-caldav-delete-org-entries 'never)
+  ;; (setq org-caldav-url 'google
+  ;;       org-caldav-calendar-id "jqeua8pamjrclakq3bg8mpnlis@group.calendar.google.com"
+  ;;       org-caldav-inbox "~/MEGA/org/agenda/test.org"
+  ;;       org-caldav-files '("~/MEGA/org/agenda/agenda.org")
+  ;;       org-icalendar-include-todo nil
+  ;;       org-icalendar-include-sexps t
+  ;;       org-icalendar-categories '(all-tags category)
+  ;;       org-icalendar-use-deadline '(event-if-todo event-if-not-todo todo-due)
+  ;;       org-icalendar-use-scheduled '(event-if-todo event-if-not-todo todo-start)
+  ;;       org-icalendar-with-timestamps nil
+  ;;       org-caldav-delete-org-entries 'never)
 
-     (setq org-caldav-url "https://99.57.234.31/remote.php/dav/calendars/bchu"
-           org-caldav-calendar-id "orgmode"
-           org-caldav-inbox "~/MEGA/org/agenda/test.org"
-           org-caldav-files '("~/MEGA/org/agenda/agenda.org" "~/MEGA/org/agenda/classes_caldav_workaround.org"))
+  (setq org-caldav-url "https://99.57.234.31/remote.php/dav/calendars/bchu"
+        org-caldav-calendar-id "orgmode"
+        org-caldav-inbox "~/MEGA/org/agenda/test.org"
+        org-caldav-files '("~/MEGA/org/agenda/agenda.org" "~/MEGA/org/agenda/classes_caldav_workaround.org"))
 
-     (setq org-icalendar-alarm-time 30
-           org-icalendar-include-todo nil
-           org-icalendar-include-sexps t
-           org-icalendar-categories '(all-tags category)
-           org-icalendar-use-deadline '(event-if-todo event-if-not-todo todo-due)
-           org-icalendar-use-scheduled '(todo-start event-if-todo)
-           org-icalendar-with-timestamps nil
-           org-caldav-delete-org-entries 'never)
+  (setq org-icalendar-alarm-time 30
+        org-icalendar-include-todo nil
+        org-icalendar-include-sexps t
+        org-icalendar-categories '(all-tags category)
+        org-icalendar-use-deadline '(event-if-todo event-if-not-todo todo-due)
+        org-icalendar-use-scheduled '(todo-start event-if-todo)
+        org-icalendar-with-timestamps nil
+        org-caldav-delete-org-entries 'never)
 
-     (setq org-caldav-skip-conditions '(nottodo ("TODO" "NEXT"))
-           org-caldav-exclude-tags '("ARCHIVE" "ONLYEMACS"))
-   #+END_SRC
+  (setq org-caldav-skip-conditions '(nottodo ("TODO" "NEXT"))
+        org-caldav-exclude-tags '("ARCHIVE" "ONLYEMACS"))
+#+END_SRC
 ** Reveal.js
 #+begin_src emacs-lisp#
   (use-package org-re-reveal)
   (setq org-re-reveal-root "file:///home/benson/.reveal.js")
 #+end_src
 *** Old ox-reveal package
-   #+BEGIN_SRC emacs-lisp
-     (add-to-list 'load-path
-                  "~/.emacs.d/custom/org-reveal")
-     (require 'ox-reveal)
-     (setq org-reveal-root "file:///home/benson/.reveal.js")
-     (setq org-structure-template-alist (remove-if (lambda (c) (string= (car c) "n")) org-structure-template-alist))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'load-path
+               "~/.emacs.d/custom/org-reveal")
+  (require 'ox-reveal)
+  (setq org-reveal-root "file:///home/benson/.reveal.js")
+  (setq org-structure-template-alist (remove-if (lambda (c) (string= (car c) "n")) org-structure-template-alist))
+#+END_SRC
 ** org-protocol
-   #+BEGIN_SRC emacs-lisp
-   (require 'org-protocol)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (require 'org-protocol)
+#+END_SRC
 ** org-timeline
-   #+BEGIN_SRC emacs-lisp
-   (use-package org-timeline)
-   (remove-hook 'org-agenda-finalize-hook 'org-timeline-insert-timeline)
-     
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package org-timeline)
+  (remove-hook 'org-agenda-finalize-hook 'org-timeline-insert-timeline)
+
+#+END_SRC
 ** Code-blocks
-  #+BEGIN_SRC emacs-lisp
-    (require 'ob-core)
-    (require 'ob-clojure)
-    (require 'ob-plantuml)
-    (use-package plantuml-mode)
+#+BEGIN_SRC emacs-lisp
+  (require 'ob-core)
+  (require 'ob-clojure)
+  (require 'ob-plantuml)
+  (use-package plantuml-mode)
 
-    (setq org-babel-clojure-backend 'cider)
-    (org-babel-do-load-languages
-     'org-babel-load-languages
-     '((clojure . t)
-       (plantuml . t)))
+  (setq org-babel-clojure-backend 'cider)
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((clojure . t)
+     (plantuml . t)))
 
-    (defun my-org-confirm-babel-evaluate (lang body)
-      (not (member lang '("plantuml"))))
+  (defun my-org-confirm-babel-evaluate (lang body)
+    (not (member lang '("plantuml"))))
 
-    (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
-    (setq org-plantuml-jar-path "/usr/share/java/plantuml/plantuml.jar")
-  #+END_SRC
+  (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
+  (setq org-plantuml-jar-path "/usr/share/java/plantuml/plantuml.jar")
+#+END_SRC
 ** org-super-agenda
-   #+begin_src emacs-lisp
-   (use-package org-super-agenda)
-   (org-super-agenda-mode)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package org-super-agenda)
+  (org-super-agenda-mode)
+#+end_src
 ** helm-org-rifle
-   #+begin_src emacs-lisp
-     (use-package helm-org-rifle)
-     (global-set-key (kbd "C-c o r") 'helm-org-rifle)
-     (setq helm-org-rifle-test-against-path t)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package helm-org-rifle)
+  (global-set-key (kbd "C-c o r") 'helm-org-rifle)
+  (setq helm-org-rifle-test-against-path t)
+#+end_src
 * My org traversal functions
-  #+begin_src emacs-lisp
-    (defun get-variables (l)
-      (cond ((null l) nil)
-            ((consp (car l))
-             (append (extract-variables (car l)) 
-                     (get-variables (cdr l))))
-            (t (cons (car l)
-                     (get-variables (cdr l))))))
+#+begin_src emacs-lisp
+  (defun get-variables (l)
+    (cond ((null l) nil)
+          ((consp (car l))
+           (append (extract-variables (car l)) 
+                   (get-variables (cdr l))))
+          (t (cons (car l)
+                   (get-variables (cdr l))))))
 
-    (defun extract-variables (l)
-      (if (not (consp l))
-          l
-        (get-variables (cdr l))))
+  (defun extract-variables (l)
+    (if (not (consp l))
+        l
+      (get-variables (cdr l))))
 
-    (defmacro org-loop/descendants (&rest body)
-      (let ((subtree-symbol (make-symbol "subtree-end")))
-        `(let ((,subtree-symbol (save-excursion (org-end-of-subtree t))))
-           (cl-loop for p = (point)
-                    while (< p ,subtree-symbol)
-                    do (progn ,@body)))))
+  (defmacro org-loop/descendants (&rest body)
+    (let ((subtree-symbol (make-symbol "subtree-end")))
+      `(let ((,subtree-symbol (save-excursion (org-end-of-subtree t))))
+         (cl-loop for p = (point)
+                  while (< p ,subtree-symbol)
+                  do (progn ,@body)))))
 
-    (defun test ()
-      (interactive)
-      (org-loop/descendants
-        (message (format "%s" (org-get-todo-state)))))
+  (defun test ()
+    (interactive)
+    (org-loop/descendants
+      (message (format "%s" (org-get-todo-state)))))
 
-    ;; Descendants
-    (defmacro org-loop/descendants (&rest body)
-      (declare (indent defun))
-      (let ((subtree-symbol (make-symbol "subtree-end")))
-        `(let ((,subtree-symbol (save-excursion (org-end-of-subtree t))))
-           (while (and (outline-next-heading)
-                       (< (point) ,subtree-symbol))
-             ,@body))))
+  ;; Descendants
+  (defmacro org-loop/descendants (&rest body)
+    (declare (indent defun))
+    (let ((subtree-symbol (make-symbol "subtree-end")))
+      `(let ((,subtree-symbol (save-excursion (org-end-of-subtree t))))
+         (while (and (outline-next-heading)
+                     (< (point) ,subtree-symbol))
+           ,@body))))
 
-    (defmacro org-loop!/descendants (&rest body)
-      "This version of org loop will account for if the tree has been editted while looping"
-      (declare (indent defun))
-      ;; (let ((subtree-symbol (make-symbol "subtree-end")))
-      ;;   `(let ((,subtree-symbol (save-excursion (org-end-of-subtree t))))
-      ;;      (while (and (outline-next-heading)
-      ;;                  (< (point) ,subtree-symbol))
-      ;;        ,@body)))
-      )
+  (defmacro org-loop!/descendants (&rest body)
+    "This version of org loop will account for if the tree has been editted while looping"
+    (declare (indent defun))
+    ;; (let ((subtree-symbol (make-symbol "subtree-end")))
+    ;;   `(let ((,subtree-symbol (save-excursion (org-end-of-subtree t))))
+    ;;      (while (and (outline-next-heading)
+    ;;                  (< (point) ,subtree-symbol))
+    ;;        ,@body)))
+    )
 
-    (defmacro orgc-loop/descendants (condition &rest body)
-      (declare (indent defun))
-      (let ((subtree-symbol (make-symbol "subtree-end")))
-        `(let ((,subtree-symbol (save-excursion (org-end-of-subtree t)))
-               (,condition nil))
-           (while (and (not ,condition)
-                       (outline-next-heading)
-                       (< (point) ,subtree-symbol))
-             ,@body)
-           ,condition)))
+  (defmacro orgc-loop/descendants (condition &rest body)
+    (declare (indent defun))
+    (let ((subtree-symbol (make-symbol "subtree-end")))
+      `(let ((,subtree-symbol (save-excursion (org-end-of-subtree t)))
+             (,condition nil))
+         (while (and (not ,condition)
+                     (outline-next-heading)
+                     (< (point) ,subtree-symbol))
+           ,@body)
+         ,condition)))
 
-    (defmacro orgb-loop/descendants (condition &rest body)
-      (declare (indent defun))
-      (let ((subtree-symbol (make-symbol "subtree-end"))
-            (vars (extract-variables condition)))
-        `(let ((,subtree-symbol (save-excursion (org-end-of-subtree t)))
-               ,@vars)
-           (while (and ,condition
-                       (outline-next-heading)
-                       (< (point) ,subtree-symbol))
-             ,@body)
-           ,condition)))
+  (defmacro orgb-loop/descendants (condition &rest body)
+    (declare (indent defun))
+    (let ((subtree-symbol (make-symbol "subtree-end"))
+          (vars (extract-variables condition)))
+      `(let ((,subtree-symbol (save-excursion (org-end-of-subtree t)))
+             ,@vars)
+         (while (and ,condition
+                     (outline-next-heading)
+                     (< (point) ,subtree-symbol))
+           ,@body)
+         ,condition)))
 
-    (defmacro orgc-loop/todo-descendants (condition &rest body)
-      (declare (indent defun))
-      (let ((todo-state (make-symbol "todo-state"))
-            (tags (make-symbol "tags")))
-        `(orgc-loop/descendants ,condition
-           (let ((,todo-state (org-get-todo-state))
-                 (,tags (org-get-tags (point))))
-             (when ,todo-state
-               (if (member "ARCHIVE" ,tags)
-                   (org-end-of-subtree t)
-                 ,@body))))))
+  (defmacro orgc-loop/todo-descendants (condition &rest body)
+    (declare (indent defun))
+    (let ((todo-state (make-symbol "todo-state"))
+          (tags (make-symbol "tags")))
+      `(orgc-loop/descendants ,condition
+         (let ((,todo-state (org-get-todo-state))
+               (,tags (org-get-tags (point))))
+           (when ,todo-state
+             (if (member "ARCHIVE" ,tags)
+                 (org-end-of-subtree t)
+               ,@body))))))
 
-    (defmacro org-loop/todo-children (&rest body)
-      (declare (indent defun))
-      (let ((todo-state (make-symbol "todo-state"))
-            (tags (make-symbol "tags")))
-        `(org-loop/children 
-           (let ((,todo-state (org-get-todo-state))
-                 (,tags (org-get-tags (point))))
-             (when ,todo-state
-               (if (member "ARCHIVE" ,tags)
-                   (org-end-of-subtree t)
-                 ,@body))))))
+  (defmacro org-loop/todo-children (&rest body)
+    (declare (indent defun))
+    (let ((todo-state (make-symbol "todo-state"))
+          (tags (make-symbol "tags")))
+      `(org-loop/children 
+         (let ((,todo-state (org-get-todo-state))
+               (,tags (org-get-tags (point))))
+           (when ,todo-state
+             (if (member "ARCHIVE" ,tags)
+                 (org-end-of-subtree t)
+               ,@body))))))
 
-    (defmacro org-loop/children (&rest body)
-      (declare (indent defun))
-      (let ((level-symbol (make-symbol "level")))
-        `(progn
-           (let ((,level-symbol (org-current-level)))
-             (outline-next-heading)
-             (when (< ,level-symbol (org-current-level))
-               (while (progn 
-                        ,@body
-                        (outline-get-next-sibling))))))))
-
-    (defmacro orgc-loop/children (condition &rest body)
-      (declare (indent defun))
-      (let ((level-symbol (make-symbol "level")))
-        `(let ((,condition nil)
-               (,level-symbol (org-current-level)))
+  (defmacro org-loop/children (&rest body)
+    (declare (indent defun))
+    (let ((level-symbol (make-symbol "level")))
+      `(progn
+         (let ((,level-symbol (org-current-level)))
            (outline-next-heading)
            (when (< ,level-symbol (org-current-level))
-             (while (progn
+             (while (progn 
                       ,@body
-                      (and (not ,condition)
-                           (org-get-next-sibling))))
-             ,condition))))
+                      (outline-get-next-sibling))))))))
 
-    (defmacro orgc-loop/todo-children (condition &rest body)
-      (declare (indent defun))
-      (let ((todo-state (make-symbol "todo-state"))
-            (tags (make-symbol "tags")))
-        `(orgc-loop/children ,condition
-           (let ((,todo-state (org-get-todo-state))
-                 (,tags (org-get-tags (point))))
-             (when ,todo-state
-               (if (member "ARCHIVE" ,tags)
-                   (org-end-of-subtree t)
-                 ,@body))))))
+  (defmacro orgc-loop/children (condition &rest body)
+    (declare (indent defun))
+    (let ((level-symbol (make-symbol "level")))
+      `(let ((,condition nil)
+             (,level-symbol (org-current-level)))
+         (outline-next-heading)
+         (when (< ,level-symbol (org-current-level))
+           (while (progn
+                    ,@body
+                    (and (not ,condition)
+                         (org-get-next-sibling))))
+           ,condition))))
 
-    (defmacro orgc-loop/children-cat (condition &rest body)
-      (declare (indent defun))
-      (let ((level-symbol (make-symbol "level")))
-        `(let ((,condition nil)
-               (,level-symbol (org-current-level)))
-           (outline-next-heading)
-           (when (< ,level-symbol (org-current-level))
-             (while (progn
-                      (while (string= (org-get-todo-state) "CAT")
-                        (outline-next-heading))
-                      ,@body
-                      (and (not ,condition)
-                           (or (org-get-next-sibling)
-                               (and (not (eobp))
-                                    (< ,level-symbol (org-current-level)))))))
-             ,condition))))
+  (defmacro orgc-loop/todo-children (condition &rest body)
+    (declare (indent defun))
+    (let ((todo-state (make-symbol "todo-state"))
+          (tags (make-symbol "tags")))
+      `(orgc-loop/children ,condition
+         (let ((,todo-state (org-get-todo-state))
+               (,tags (org-get-tags (point))))
+           (when ,todo-state
+             (if (member "ARCHIVE" ,tags)
+                 (org-end-of-subtree t)
+               ,@body))))))
 
-    (defmacro orgc-loop/todo-children-cat (condition &rest body)
-      (declare (indent defun))
-      (let ((todo-state (make-symbol "todo-state"))
-            (tags (make-symbol "tags")))
-        `(orgc-loop/children-cat ,condition
-           (let ((,todo-state (org-get-todo-state))
-                 (,tags (org-get-tags (point))))
-             (when ,todo-state
-               (if (member "ARCHIVE" ,tags)
-                   (org-end-of-subtree t)
-                 ,@body))))))
+  (defmacro orgc-loop/children-cat (condition &rest body)
+    (declare (indent defun))
+    (let ((level-symbol (make-symbol "level")))
+      `(let ((,condition nil)
+             (,level-symbol (org-current-level)))
+         (outline-next-heading)
+         (when (< ,level-symbol (org-current-level))
+           (while (progn
+                    (while (string= (org-get-todo-state) "CAT")
+                      (outline-next-heading))
+                    ,@body
+                    (and (not ,condition)
+                         (or (org-get-next-sibling)
+                             (and (not (eobp))
+                                  (< ,level-symbol (org-current-level)))))))
+           ,condition))))
 
-    ;; (defmacro orgb-loop/todo-children (condition &rest body)
-    ;;   (declare (indent defun))
-    ;;   (let ((todo-state (make-symbol "todo-state"))
-    ;;         (tags (make-symbol "tags")))
-    ;;     `(orgb-loop/children ,condition
-    ;;        (let ((,todo-state (org-get-todo-state))
-    ;;              (,tags (org-get-tags (point))))
-    ;;          (when ,todo-state
-    ;;            (if (member "ARCHIVE" ,tags)
-    ;;                (org-end-of-subtree t)
-    ;;              ,@body))))))
+  (defmacro orgc-loop/todo-children-cat (condition &rest body)
+    (declare (indent defun))
+    (let ((todo-state (make-symbol "todo-state"))
+          (tags (make-symbol "tags")))
+      `(orgc-loop/children-cat ,condition
+         (let ((,todo-state (org-get-todo-state))
+               (,tags (org-get-tags (point))))
+           (when ,todo-state
+             (if (member "ARCHIVE" ,tags)
+                 (org-end-of-subtree t)
+               ,@body))))))
 
-    (defmacro org-loop/todo-children (condition &rest body)
-      (declare (indent defun))
-      (let ((todo-state (make-symbol "todo-state"))
-            (tags (make-symbol "tags")))
-        `(org-loop/children 
-           (let ((,todo-state (org-get-todo-state))
-                 (,tags (org-get-tags (point))))
-             (when (and ,todo-state
-                        (not (member "ARCHIVE") ,tags))
-               ,@body)))))
+  ;; (defmacro orgb-loop/todo-children (condition &rest body)
+  ;;   (declare (indent defun))
+  ;;   (let ((todo-state (make-symbol "todo-state"))
+  ;;         (tags (make-symbol "tags")))
+  ;;     `(orgb-loop/children ,condition
+  ;;        (let ((,todo-state (org-get-todo-state))
+  ;;              (,tags (org-get-tags (point))))
+  ;;          (when ,todo-state
+  ;;            (if (member "ARCHIVE" ,tags)
+  ;;                (org-end-of-subtree t)
+  ;;              ,@body))))))
+
+  (defmacro org-loop/todo-children (condition &rest body)
+    (declare (indent defun))
+    (let ((todo-state (make-symbol "todo-state"))
+          (tags (make-symbol "tags")))
+      `(org-loop/children 
+         (let ((,todo-state (org-get-todo-state))
+               (,tags (org-get-tags (point))))
+           (when (and ,todo-state
+                      (not (member "ARCHIVE") ,tags))
+             ,@body)))))
 
 
-    (defmacro traverse-org-headlines (headline &rest body)
-      (declare (indent defun))
-      (let ((buffer-symbol (make-symbol "buffer")))
-        `(let (,buffer-symbol)
-           (org-check-agenda-file ,(cadr headline))
-           (setq ,buffer-symbol (if (file-exists-p ,(cadr headline))
-                                    (org-get-agenda-file-buffer ,(cadr headline))
-                                  (error "No such file %s" ,(cadr headline))))
-           (with-current-buffer ,buffer-symbol
-             (while (and (not (eobp))
-                         (outline-next-heading))
-               ,@body)))))
+  (defmacro traverse-org-headlines (headline &rest body)
+    (declare (indent defun))
+    (let ((buffer-symbol (make-symbol "buffer")))
+      `(let (,buffer-symbol)
+         (org-check-agenda-file ,(cadr headline))
+         (setq ,buffer-symbol (if (file-exists-p ,(cadr headline))
+                                  (org-get-agenda-file-buffer ,(cadr headline))
+                                (error "No such file %s" ,(cadr headline))))
+         (with-current-buffer ,buffer-symbol
+           (while (and (not (eobp))
+                       (outline-next-heading))
+             ,@body)))))
 
-    (defmacro traverse-org-files (files &rest body)
-      (declare (indent defun))
-      (let ((file-symbol (make-symbol "file")))
-        `(dolist (,file-symbol ,(cadr files))
-           (traverse-org-headlines (,(car files) ,file-symbol)
-             ,@body))))
-  #+end_src
+  (defmacro traverse-org-files (files &rest body)
+    (declare (indent defun))
+    (let ((file-symbol (make-symbol "file")))
+      `(dolist (,file-symbol ,(cadr files))
+         (traverse-org-headlines (,(car files) ,file-symbol)
+           ,@body))))
+#+end_src
 
 * org-agenda base folder
-  #+begin_src emacs-lisp
-    (defvar my/org-folder "~/MEGA/org")
-    (defconst my/agenda-folder (expand-file-name "2019-05-agenda" my/org-folder))
+#+begin_src emacs-lisp
+  (defvar my/org-folder "~/MEGA/org")
+  (defconst my/agenda-folder (expand-file-name "2019-05-agenda" my/org-folder))
 
-    (defun my/org-file (str)
-      (expand-file-name str my/org-folder))
-    (defun my/agenda-file (str)
-      (expand-file-name str my/agenda-folder))
-  #+end_src
+  (defun my/org-file (str)
+    (expand-file-name str my/org-folder))
+  (defun my/agenda-file (str)
+    (expand-file-name str my/agenda-folder))
+#+end_src
 * Keybindings
-  #+begin_src emacs-lisp
+#+begin_src emacs-lisp
   (use-package org)
   (require 'org-agenda)
 
@@ -350,7 +350,7 @@
   (global-set-key (kbd "<f5>") 'org-agenda)
   (global-set-key (kbd "C-x C-o") 'org-agenda)
   (define-key org-agenda-mode-map (kbd "a") 'org-agenda)
-  
+
   (setq org-src-window-setup 'current-window)
 
   (setq org-list-allow-alphabetical t)  
@@ -362,90 +362,90 @@
       (if (string= "yes" (completing-read "Are you sure you want to use that keybinding? " '("yes" "no")))
           (kill-whole-line arg)
         (org-cut-subtree))))
-  #+end_src
+#+end_src
 * Different kinds of follow
-  #+begin_src emacs-lisp
-    (advice-add #'org-agenda-follow-mode
-                :before
-                #'my/org-agenda-follow-mode)
+#+begin_src emacs-lisp
+  (advice-add #'org-agenda-follow-mode
+              :before
+              #'my/org-agenda-follow-mode)
 
-    (defun my/org-agenda-get-name ()
-      (-> (rx "*Org Agenda("
-              (group (+? anything))
-              (optional
-               (zero-or-one ":")
-               (one-or-more anything))
-              ")*")
-          (s-match-strings-all (buffer-name))
-          (cadar)
-          (assoc org-agenda-custom-commands)
-          (cadr)))
+  (defun my/org-agenda-get-name ()
+    (-> (rx "*Org Agenda("
+            (group (+? anything))
+            (optional
+             (zero-or-one ":")
+             (one-or-more anything))
+            ")*")
+        (s-match-strings-all (buffer-name))
+        (cadar)
+        (assoc org-agenda-custom-commands)
+        (cadr)))
 
-    (defun my/org-agenda-follow-mode ()
-      (if org-agenda-follow-mode
-          (advice-unadvice #'org-agenda-do-context-action)
-        (pcase (my/org-agenda-get-name)
-          ("Reviews" (advice-add #'org-agenda-do-context-action
-                                 :override
-                                 #'my/org-agenda-do-context-action-for-review))
-          ("dev" (advice-add #'org-agenda-do-context-action
-                             :override
-                             #'my/org-agenda-do-context-action-for-project))
-          (_ (advice-unadvice #'org-agenda-do-context-action)))))
+  (defun my/org-agenda-follow-mode ()
+    (if org-agenda-follow-mode
+        (advice-unadvice #'org-agenda-do-context-action)
+      (pcase (my/org-agenda-get-name)
+        ("Reviews" (advice-add #'org-agenda-do-context-action
+                               :override
+                               #'my/org-agenda-do-context-action-for-review))
+        ("dev" (advice-add #'org-agenda-do-context-action
+                           :override
+                           #'my/org-agenda-do-context-action-for-project))
+        (_ (advice-unadvice #'org-agenda-do-context-action)))))
 
-    (defun advice-unadvice (sym)
-      "Remove all advices from symbol SYM."
-      (interactive "aFunction symbol: ")
-      (advice-mapc (lambda (advice _props) (advice-remove sym advice)) sym))
+  (defun advice-unadvice (sym)
+    "Remove all advices from symbol SYM."
+    (interactive "aFunction symbol: ")
+    (advice-mapc (lambda (advice _props) (advice-remove sym advice)) sym))
 
-    (defun my/org-agenda-show-project (&optional full-entry)
-      "Display the Org file which contains the item at point.
-        With prefix argument FULL-ENTRY, make the entire entry visible
-        if it was hidden in the outline."
-      (interactive "P")
-      (let ((win (selected-window)))
-        (org-agenda-goto t)
-        (org-narrow-to-subtree)
-        (org-flag-subtree t)
-        (call-interactively 'outline-show-branches)
-        (org-hide-archived-subtrees (point-min) (point-max))
-        (select-window win)))
+  (defun my/org-agenda-show-project (&optional full-entry)
+    "Display the Org file which contains the item at point.
+      With prefix argument FULL-ENTRY, make the entire entry visible
+      if it was hidden in the outline."
+    (interactive "P")
+    (let ((win (selected-window)))
+      (org-agenda-goto t)
+      (org-narrow-to-subtree)
+      (org-flag-subtree t)
+      (call-interactively 'outline-show-branches)
+      (org-hide-archived-subtrees (point-min) (point-max))
+      (select-window win)))
 
-    (defun my/org-agenda-do-context-action-for-project ()
-      "Show outline path and, maybe, follow mode window."
-      (let ((m (org-get-at-bol 'org-marker)))
-        (when (and (markerp m) (marker-buffer m))
-          (and org-agenda-follow-mode
-               (if org-agenda-follow-indirect
-                   (org-agenda-tree-to-indirect-buffer nil)
-                 (my/org-agenda-show-project)))
-          (and org-agenda-show-outline-path
-               (org-with-point-at m (org-display-outline-path t))))))
+  (defun my/org-agenda-do-context-action-for-project ()
+    "Show outline path and, maybe, follow mode window."
+    (let ((m (org-get-at-bol 'org-marker)))
+      (when (and (markerp m) (marker-buffer m))
+        (and org-agenda-follow-mode
+             (if org-agenda-follow-indirect
+                 (org-agenda-tree-to-indirect-buffer nil)
+               (my/org-agenda-show-project)))
+        (and org-agenda-show-outline-path
+             (org-with-point-at m (org-display-outline-path t))))))
 
-    (defun my/org-agenda-show-review (&optional full-entry)
-      "Display the Org file which contains the item at point.
-        With prefix argument FULL-ENTRY, make the entire entry visible
-        if it was hidden in the outline."
-      (interactive "P")
-      (let ((win (selected-window)))
-        (org-agenda-goto t)
-        (org-narrow-to-subtree)
-        (org-flag-subtree t)
-        (call-interactively 'org-show-entry)
-        (org-hide-archived-subtrees (point-min) (point-max))
-        (select-window win)))
+  (defun my/org-agenda-show-review (&optional full-entry)
+    "Display the Org file which contains the item at point.
+      With prefix argument FULL-ENTRY, make the entire entry visible
+      if it was hidden in the outline."
+    (interactive "P")
+    (let ((win (selected-window)))
+      (org-agenda-goto t)
+      (org-narrow-to-subtree)
+      (org-flag-subtree t)
+      (call-interactively 'org-show-entry)
+      (org-hide-archived-subtrees (point-min) (point-max))
+      (select-window win)))
 
-    (defun my/org-agenda-do-context-action-for-review ()
-      "Show outline path and, maybe, follow mode window."
-      (let ((m (org-get-at-bol 'org-marker)))
-        (when (and (markerp m) (marker-buffer m))
-          (and org-agenda-follow-mode
-               (if org-agenda-follow-indirect
-                   (org-agenda-tree-to-indirect-buffer nil)
-                 (my/org-agenda-show-review)))
-          (and org-agenda-show-outline-path
-               (org-with-point-at m (org-display-outline-path t))))))
-  #+end_src
+  (defun my/org-agenda-do-context-action-for-review ()
+    "Show outline path and, maybe, follow mode window."
+    (let ((m (org-get-at-bol 'org-marker)))
+      (when (and (markerp m) (marker-buffer m))
+        (and org-agenda-follow-mode
+             (if org-agenda-follow-indirect
+                 (org-agenda-tree-to-indirect-buffer nil)
+               (my/org-agenda-show-review)))
+        (and org-agenda-show-outline-path
+             (org-with-point-at m (org-display-outline-path t))))))
+#+end_src
 * count archive tree characters
 #+begin_src emacs-lisp
   (defun my/org-count-subtree-characters ()
@@ -460,288 +460,288 @@
 #+end_src
 
 * My Template
-  #+BEGIN_SRC emacs-lisp
-    (add-to-list 'org-structure-template-alist
-     '("sv" . "src :results value"))
-    (add-to-list 'org-structure-template-alist
-     '("so" . "src :results output"))
-  #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'org-structure-template-alist
+               '("sv" . "src :results value"))
+  (add-to-list 'org-structure-template-alist
+               '("so" . "src :results output"))
+#+END_SRC
 * Face
-  #+BEGIN_SRC emacs-lisp
-    (when (not (eq system-type 'windows-nt))
-      (setq org-ellipsis " "))
-  #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (when (not (eq system-type 'windows-nt))
+    (setq org-ellipsis " "))
+#+END_SRC
 * Variables
-  #+begin_src emacs-lisp
-    (setq org-log-done 'time)
-    (setq org-agenda-window-setup 'current-window)
-    (setq org-agenda-restore-windows-after-quit t)
+#+begin_src emacs-lisp
+  (setq org-log-done 'time)
+  (setq org-agenda-window-setup 'current-window)
+  (setq org-agenda-restore-windows-after-quit t)
 
-    (setq org-agenda-sticky t)
+  (setq org-agenda-sticky t)
 
-    ;;(org-agenda-load-file-list)
+  ;;(org-agenda-load-file-list)
 
-    ;; Targets include this file and any file contributing to the agenda - up to 9 levels deep
-    (setq org-refile-targets `((nil :maxlevel . 9)
-                               (my/all-agenda-files :maxlevel . 9)
-                               ("~/MEGA/org/entries/panic.org" :maxlevel . 9)))
+  ;; Targets include this file and any file contributing to the agenda - up to 9 levels deep
+  (setq org-refile-targets `((nil :maxlevel . 9)
+                             (my/all-agenda-files :maxlevel . 9)
+                             ("~/MEGA/org/entries/panic.org" :maxlevel . 9)))
 
-    (setq org-refile-use-cache t)
+  (setq org-refile-use-cache t)
 
-    (setq org-refile-target-verify-function
-          (lambda () 
-            (let ((tags (org-get-tags-at)))
-              (and (not (member "ARCHIVE" tags))
-                   (not (equal "DONE" (org-get-todo-state)))))))
+  (setq org-refile-target-verify-function
+        (lambda () 
+          (let ((tags (org-get-tags-at)))
+            (and (not (member "ARCHIVE" tags))
+                 (not (equal "DONE" (org-get-todo-state)))))))
 
-    (setq org-agenda-show-future-repeats nil)
+  (setq org-agenda-show-future-repeats nil)
 
-    ;; Use full outline paths for refile targets - we file directly with IDO
-    (setq org-refile-use-outline-path 'file)
+  ;; Use full outline paths for refile targets - we file directly with IDO
+  (setq org-refile-use-outline-path 'file)
 
-    ;; Targets complete directly with IDO
-    (setq org-outline-path-complete-in-steps nil)
+  ;; Targets complete directly with IDO
+  (setq org-outline-path-complete-in-steps nil)
 
-    ;; Allow refile to create parent tasks with confirmation
-    (setq org-refile-allow-creating-parent-nodes (quote confirm))
+  ;; Allow refile to create parent tasks with confirmation
+  (setq org-refile-allow-creating-parent-nodes (quote confirm))
 
-    ;; Use the current window for indirect buffer display
-    (setq org-indirect-buffer-display 'current-window)
+  ;; Use the current window for indirect buffer display
+  (setq org-indirect-buffer-display 'current-window)
 
-    ;; Do not dim blocked tasks
-    (setq org-agenda-dim-blocked-tasks nil)
+  ;; Do not dim blocked tasks
+  (setq org-agenda-dim-blocked-tasks nil)
 
-    (setq org-agenda-compact-blocks t)
-  #+end_src
+  (setq org-agenda-compact-blocks t)
+#+end_src
 * Tag hierarchy
-  #+begin_src emacs-lisp
-    (setq org-tag-alist
-          '((:startgrouptag)
-            ("all" . nil)
-            (:grouptags)
-            ("time" . nil)
-            ("nontime" . nil)
-            (:endgrouptag)
-            (:startgrouptag)
-            ("time" . nil)
-            (:grouptags)
-            ("prod" . ?1)
-            (:endgrouptag)
-            (:startgrouptag)
-            ("nontime" . nil)
-            (:grouptags)
-            ("sandbox" . ?3)
-            (:endgrouptag)
-            (:startgrouptag)
-            ("sandbox" . ?3)
-            (:grouptags)
-            ("dev" . ?2)
-            ("people" . nil)
-            (:endgrouptag)
-            (:startgroup . nil)
-            ("short" . ?s)
-            ("long" . ?l)
-            (:endgroup . nil)
-            (:startgroup . nil)
-            ("watch" . ?w)
-            ("read" . ?r)
-            (:endgroup . nil)
-            (:startgroup . nil)
-            ("grow" . ?g)
-            ("rest" . ?R)
-            (:endgroup . nil)
-            (:startgroup . nil)
-            ("active" . ?a)
-            ("idle" . ?i)
-            (:endgroup . nil)
-            ;; (:startgrouptag)
-            ;; ("online")
-            ;; (:grouptags)
-            ;; ("article")
-            ;; (:endgrouptag)
-            ;; (:startgrouptag)
-            ;; ("read")
-            ;; (:grouptags)
-            ;; ("article")
-            ;; (:endgrouptag)
-            (:startgrouptag)
-            ("active")
-            (:grouptags)
-            ("prog")
-            (:endgrouptag)
-            (:startgrouptag)
-            ("people" . nil)
-            (:grouptags)
-            ("family" . nil)
-            (:endgrouptag)
-            ))
+#+begin_src emacs-lisp
+  (setq org-tag-alist
+        '((:startgrouptag)
+          ("all" . nil)
+          (:grouptags)
+          ("time" . nil)
+          ("nontime" . nil)
+          (:endgrouptag)
+          (:startgrouptag)
+          ("time" . nil)
+          (:grouptags)
+          ("prod" . ?1)
+          (:endgrouptag)
+          (:startgrouptag)
+          ("nontime" . nil)
+          (:grouptags)
+          ("sandbox" . ?3)
+          (:endgrouptag)
+          (:startgrouptag)
+          ("sandbox" . ?3)
+          (:grouptags)
+          ("dev" . ?2)
+          ("people" . nil)
+          (:endgrouptag)
+          (:startgroup . nil)
+          ("short" . ?s)
+          ("long" . ?l)
+          (:endgroup . nil)
+          (:startgroup . nil)
+          ("watch" . ?w)
+          ("read" . ?r)
+          (:endgroup . nil)
+          (:startgroup . nil)
+          ("grow" . ?g)
+          ("rest" . ?R)
+          (:endgroup . nil)
+          (:startgroup . nil)
+          ("active" . ?a)
+          ("idle" . ?i)
+          (:endgroup . nil)
+          ;; (:startgrouptag)
+          ;; ("online")
+          ;; (:grouptags)
+          ;; ("article")
+          ;; (:endgrouptag)
+          ;; (:startgrouptag)
+          ;; ("read")
+          ;; (:grouptags)
+          ;; ("article")
+          ;; (:endgrouptag)
+          (:startgrouptag)
+          ("active")
+          (:grouptags)
+          ("prog")
+          (:endgrouptag)
+          (:startgrouptag)
+          ("people" . nil)
+          (:grouptags)
+          ("family" . nil)
+          (:endgrouptag)
+          ))
 
 
-    (setq org-agenda-hide-tags-regexp
-          (mapconcat #'identity (list "time" "nontime" "prod" "dev" "sandbox"
-                                      "refile"
-                                      "short" "long" "watch" "read" "grow" "rest" "active" "idle")
-                     "\\|"))
+  (setq org-agenda-hide-tags-regexp
+        (mapconcat #'identity (list "time" "nontime" "prod" "dev" "sandbox"
+                                    "refile"
+                                    "short" "long" "watch" "read" "grow" "rest" "active" "idle")
+                   "\\|"))
 
-    (defconst category-tags '("computers"))
-  #+end_src
+  (defconst category-tags '("computers"))
+#+end_src
 * org-todo-keywords
-  #+begin_src emacs-lisp
-    (setq org-use-fast-todo-selection t)
+#+begin_src emacs-lisp
+  (setq org-use-fast-todo-selection t)
 
-    (setq org-todo-keywords
-          '((sequence "STUFF(s)" "FUTURE(f)" "INACT(i)" "CLOCK(C)" "DEPEND(D)" "|")
-            (sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
-            (sequence "CAT(>)" "ONE(o)" "META(m)" "META1(M)" "SEQ(S)" "EMPTY(e)" "ETERNAL(E)" "SPEC(:)" "|" "COMPLETE(c!)")
-            (sequence "WAIT(w@/!)" "HOLD(h)" "TICKLER(T)" "|" "ABANDON(a@/!)")
-            (sequence "TTTT" "|")))
+  (setq org-todo-keywords
+        '((sequence "STUFF(s)" "FUTURE(f)" "INACT(i)" "CLOCK(C)" "DEPEND(D)" "|")
+          (sequence "TODO(t)" "NEXT(n)" "|" "DONE(d!)")
+          (sequence "CAT(>)" "ONE(o)" "META(m)" "META1(M)" "SEQ(S)" "EMPTY(e)" "ETERNAL(E)" "SPEC(:)" "|" "COMPLETE(c!)")
+          (sequence "WAIT(w@/!)" "HOLD(h)" "TICKLER(T)" "|" "ABANDON(a@/!)")
+          (sequence "TTTT" "|")))
 
-    (setq org-todo-keyword-faces 
-          '(("ONE" :foreground "royal blue" :weight bold)
-            ("STUFF" :foreground "goldenrod" :weight bold)
-            ("NEXT" :foreground "cyan" :weight bold)
-            ("WAIT" :foreground "yellow" :weight bold)
-            ("HOLD" :foreground "red" :weight bold)
-            ("META" :foreground "white" :weight bold)
-            ("META1" :foreground "white" :weight bold)
-            ("SEQ" :foreground "white" :weight bold)
-            ("EMPTY" :foreground "white" :weight bold)
-            ("ABANDON" :foreground "dark gray" :weight bold)
-            ("CLOCK" :foreground "dark gray" :weight bold)
-            ("TOP" :foreground "royal blue" :weight bold)
-            ("INACT" :foreground "dark gray" :weight bold)
-            ("FUTURE" :foreground "medium spring green" :weight bold)))
+  (setq org-todo-keyword-faces 
+        '(("ONE" :foreground "royal blue" :weight bold)
+          ("STUFF" :foreground "goldenrod" :weight bold)
+          ("NEXT" :foreground "cyan" :weight bold)
+          ("WAIT" :foreground "yellow" :weight bold)
+          ("HOLD" :foreground "red" :weight bold)
+          ("META" :foreground "white" :weight bold)
+          ("META1" :foreground "white" :weight bold)
+          ("SEQ" :foreground "white" :weight bold)
+          ("EMPTY" :foreground "white" :weight bold)
+          ("ABANDON" :foreground "dark gray" :weight bold)
+          ("CLOCK" :foreground "dark gray" :weight bold)
+          ("TOP" :foreground "royal blue" :weight bold)
+          ("INACT" :foreground "dark gray" :weight bold)
+          ("FUTURE" :foreground "medium spring green" :weight bold)))
 
-    ;; (setq org-todo-state-tags-triggers
-    ;;         (quote (("HOLD" ("HOLD" . t))
-    ;;                 ("WAIT" ("WAITING" . t))
-    ;;                 (todo ("HOLD") ("WAITING")))))
-  #+end_src
+  ;; (setq org-todo-state-tags-triggers
+  ;;         (quote (("HOLD" ("HOLD" . t))
+  ;;                 ("WAIT" ("WAITING" . t))
+  ;;                 (todo ("HOLD") ("WAITING")))))
+#+end_src
 * Project code 2.0
 ** Primitives
-   #+begin_src emacs-lisp
-     ;; Task definitions
-     (defconst not-tasks-tag "NOT_TASKS")
-     (defconst these-are-not-tasks '("TTTT" "INACT" "CLOCK" "FUTURE" "DEPEND" "CAT"))
+#+begin_src emacs-lisp
+  ;; Task definitions
+  (defconst not-tasks-tag "NOT_TASKS")
+  (defconst these-are-not-tasks '("TTTT" "INACT" "CLOCK" "FUTURE" "DEPEND" "CAT"))
 
-     (defun my/is-done-task ()
-       (member (org-get-todo-state) org-done-keywords))
+  (defun my/is-done-task ()
+    (member (org-get-todo-state) org-done-keywords))
 
-     (defun my/is-non-task ()
-       (member (org-get-todo-state) these-are-not-tasks))
+  (defun my/is-non-task ()
+    (member (org-get-todo-state) these-are-not-tasks))
 
-     (defun my/is-todo-task ()
-       (pcase (org-get-todo-state)
-         ("TODO" (my/no-children))
-         ("ONE"  (my/no-todo-children))
-         ("NEXT" t)))
+  (defun my/is-todo-task ()
+    (pcase (org-get-todo-state)
+      ("TODO" (my/no-children))
+      ("ONE"  (my/no-todo-children))
+      ("NEXT" t)))
 
-     ;; Standalone tasks
-     (defun my/is-part-of-subtree ()
-       (save-excursion
-         (and (not (= 1 (org-current-level)))
-              (let (has-parent-project)
-                (while (and (not has-parent-project)
-                            (org-up-heading-safe))
-                  (when (org-get-todo-state)
-                    (setq has-parent-project t)))
-                has-parent-project))))
+  ;; Standalone tasks
+  (defun my/is-part-of-subtree ()
+    (save-excursion
+      (and (not (= 1 (org-current-level)))
+           (let (has-parent-project)
+             (while (and (not has-parent-project)
+                         (org-up-heading-safe))
+               (when (org-get-todo-state)
+                 (setq has-parent-project t)))
+             has-parent-project))))
 
-     (defun my/is-standalone-task ()
-       (and (my/is-todo-task)
-            (not (my/is-part-of-subtree))))
+  (defun my/is-standalone-task ()
+    (and (my/is-todo-task)
+         (not (my/is-part-of-subtree))))
 
-     ;; Task predicates
-     (defun my/no-children ()
-       "Check if there are NO tasks that are TODO or DONE"
-       (save-excursion
-         (not (orgc-loop/todo-children has-children
-                (setq has-children t)))))
-
-     (defun my/has-children ()
-       "Check if there are tasks that are TODO or DONE"
-       (save-excursion
-         (orgc-loop/todo-children has-children
-           (setq has-children t))))
-
-     (defun my/has-todo-child ()
-       "Check if there are any tasks that are TODO"
-       (save-excursion 
-         (orgc-loop/todo-children has-children
-           (when (my/is-todo-task)
+  ;; Task predicates
+  (defun my/no-children ()
+    "Check if there are NO tasks that are TODO or DONE"
+    (save-excursion
+      (not (orgc-loop/todo-children has-children
              (setq has-children t)))))
 
-     (defun my/no-todo-children ()
-       "Check if there are NO tasks that are TODO"
-       (save-excursion
-         (not (orgc-loop/todo-children has-children
-                (when (my/is-todo-task)
-                  (setq has-children t))))))
+  (defun my/has-children ()
+    "Check if there are tasks that are TODO or DONE"
+    (save-excursion
+      (orgc-loop/todo-children has-children
+        (setq has-children t))))
 
-     (defun my/has-non-active-todo-child ()
-       "Check if there are any tasks that are TODO"
-       (save-excursion 
-         (orgc-loop/todo-children has-children
-           (when (and (my/is-todo-task)
-                      (not (org-get-scheduled-time (point))))
-             (setq has-children t)))))
+  (defun my/has-todo-child ()
+    "Check if there are any tasks that are TODO"
+    (save-excursion 
+      (orgc-loop/todo-children has-children
+        (when (my/is-todo-task)
+          (setq has-children t)))))
 
-     ;; Project Stuff
-     (defconst my/project-keywords '("PROJECT" "META" "META1" "SEQ" "EMPTY" "ETERNAL" "SPEC" "HOLD"))
-     (defconst my/active-projects-and-tasks '("PROJECT" "META" "META1" "SEQ" "EMPTY" "ONE" "TODO"))
+  (defun my/no-todo-children ()
+    "Check if there are NO tasks that are TODO"
+    (save-excursion
+      (not (orgc-loop/todo-children has-children
+             (when (my/is-todo-task)
+               (setq has-children t))))))
 
-     (defun my/is-a-project ()
-       (save-excursion
-         (let ((todo (org-get-todo-state)))
-           (when todo
-             (or (member todo my/project-keywords)
-                 (and (equal todo "ONE")
-                      (my/has-todo-child))
-                 (and (member todo '("TODO"))
-                      (my/has-children)))))))
+  (defun my/has-non-active-todo-child ()
+    "Check if there are any tasks that are TODO"
+    (save-excursion 
+      (orgc-loop/todo-children has-children
+        (when (and (my/is-todo-task)
+                   (not (org-get-scheduled-time (point))))
+          (setq has-children t)))))
 
-     (defun my/get-project-type ()
-       )
-   #+end_src
+  ;; Project Stuff
+  (defconst my/project-keywords '("PROJECT" "META" "META1" "SEQ" "EMPTY" "ETERNAL" "SPEC" "HOLD"))
+  (defconst my/active-projects-and-tasks '("PROJECT" "META" "META1" "SEQ" "EMPTY" "ONE" "TODO"))
+
+  (defun my/is-a-project ()
+    (save-excursion
+      (let ((todo (org-get-todo-state)))
+        (when todo
+          (or (member todo my/project-keywords)
+              (and (equal todo "ONE")
+                   (my/has-todo-child))
+              (and (member todo '("TODO"))
+                   (my/has-children)))))))
+
+  (defun my/get-project-type ()
+    )
+#+end_src
 ** Old primitives
-   #+begin_src emacs-lisp
-     (defun my/is-unactionable-task ()
-       (or (member "NOT_TASKS" (org-get-tags (point)))
-           (member (org-get-todo-state) (cons "INACT" org-done-keywords))))
+#+begin_src emacs-lisp
+  (defun my/is-unactionable-task ()
+    (or (member "NOT_TASKS" (org-get-tags (point)))
+        (member (org-get-todo-state) (cons "INACT" org-done-keywords))))
 
-     (defun my/is-non-done-task ()
-       (and (not (my/is-unactionable-task))
-            (not (member (org-get-todo-state)
-                         org-done-keywords))))
+  (defun my/is-non-done-task ()
+    (and (not (my/is-unactionable-task))
+         (not (member (org-get-todo-state)
+                      org-done-keywords))))
 
-     (defun my/has-non-done-task ()
-       (save-excursion
-         (orgc-loop/todo-children has-non-done-task
-           (when (my/is-non-done-task)
-             (setq has-non-done-task t)))))
+  (defun my/has-non-done-task ()
+    (save-excursion
+      (orgc-loop/todo-children has-non-done-task
+        (when (my/is-non-done-task)
+          (setq has-non-done-task t)))))
 
-     (defun my/is-a-task ()
-       (save-excursion
-         (and (not (member "NOT_TASKS" (org-get-tags (point))))
-              (or (and (equal "ONE" (org-get-todo-state))
-                       (not (my/has-non-done-task)))
-                  (and (org-get-todo-state)
-                       (not (member (org-get-todo-state) '("PROJECT" "SOMEDAY" "WAIT" "HOLD")))
-                       (my/no-children))))))
+  (defun my/is-a-task ()
+    (save-excursion
+      (and (not (member "NOT_TASKS" (org-get-tags (point))))
+           (or (and (equal "ONE" (org-get-todo-state))
+                    (not (my/has-non-done-task)))
+               (and (org-get-todo-state)
+                    (not (member (org-get-todo-state) '("PROJECT" "SOMEDAY" "WAIT" "HOLD")))
+                    (my/no-children))))))
 
-     (defun my/has-next-task ()
-       (save-excursion
-         (orgc-loop/todo-children has-next-task
-           (when (my/is-next-task)
-             (setq has-next-task t)))))
+  (defun my/has-next-task ()
+    (save-excursion
+      (orgc-loop/todo-children has-next-task
+        (when (my/is-next-task)
+          (setq has-next-task t)))))
 
-     (defun my/is-next-task ()
-       (let ((todo (org-get-todo-state)))
-         (or (equal todo "NEXT")
+  (defun my/is-next-task ()
+    (let ((todo (org-get-todo-state)))
+      (or (equal todo "NEXT")
           (and (member todo '("TODO" "ONE" "NEXT"))
                (or (org-get-scheduled-time (point))
                    (org-get-deadline-time (point)))))))
-   #+end_src
+#+end_src
 ** Old meta project code
 #+begin_src emacs-lisp
   (defun my/active-sequential-project (file point)
@@ -808,326 +808,326 @@
                  (not has-stuck-project))))))
 #+end_src
 ** Project show
-   #+begin_src emacs-lisp
-     (defun my/stuck-empty ()
-       (my/has-non-active-todo-child))
+#+begin_src emacs-lisp
+  (defun my/stuck-empty ()
+    (my/has-non-active-todo-child))
 
-     (defun my/stuck-meta (ambiguous-to-stuck)
-       (let ((file (buffer-file-name))
-             (point (point)))
-         (not (if ambiguous-to-stuck
-                  (my/generous-active-project file point)
-                (my/greedy-active-project file point)))))
+  (defun my/stuck-meta (ambiguous-to-stuck)
+    (let ((file (buffer-file-name))
+          (point (point)))
+      (not (if ambiguous-to-stuck
+               (my/generous-active-project file point)
+             (my/greedy-active-project file point)))))
 
-     (defun my/active-seq (file point)
-       (my/active-sequential-project file point))
+  (defun my/active-seq (file point)
+    (my/active-sequential-project file point))
 
-     (defun my/stuck-one ()
-       (and (my/has-todo-child)
-            (my/greedy-active-project (buffer-file-name) (point))))
+  (defun my/stuck-one ()
+    (and (my/has-todo-child)
+         (my/greedy-active-project (buffer-file-name) (point))))
 
-     ;;(defun my/active-act)
+  ;;(defun my/active-act)
 
-     (defun my/get-project-type (file point &optional ambiguous-to-stuck)
-       (save-excursion
-         (when (my/is-a-project)
-           (let ((todo (org-get-todo-state)))
-             (if (and (org-time> (org-entry-get (point) "SCHEDULED")
-                                 (org-matcher-time "<now>"))
-                      (or (member todo '("META" "EMPTY" "SEQ"))
-                          (member todo '("ONE" "TODO"))))
-                 'delayed
-               (pcase todo
-                 ("ETERNAL" 'eternal)
-                 ("FUTURE" 'someday)
-                 ("HOLD" 'hold)
-                 ("SEQ"
-                  (if (my/active-seq file point)
-                      'active 'stuck))
-                 ("EMPTY"
-                  (when (my/stuck-empty)
-                    'stuck))
-                 ("META"
-                  (if (my/stuck-meta ambiguous-to-stuck)
-                      'stuck 'active))
-                 ("META1"
-                  (if (my/greedy-active-project (buffer-file-name) (point))
-                      'active 'stuck))
-                 ("TODO"
-                  (if (my/stuck-meta ambiguous-to-stuck)
-                      'stuck 'active))
-                 ("ONE"
-                  (when (my/has-todo-child)
-                    (if (my/greedy-active-project (buffer-file-name) (point))
-                        'active 'stuck)))))))))
-   #+end_src
+  (defun my/get-project-type (file point &optional ambiguous-to-stuck)
+    (save-excursion
+      (when (my/is-a-project)
+        (let ((todo (org-get-todo-state)))
+          (if (and (org-time> (org-entry-get (point) "SCHEDULED")
+                              (org-matcher-time "<now>"))
+                   (or (member todo '("META" "EMPTY" "SEQ"))
+                       (member todo '("ONE" "TODO"))))
+              'delayed
+            (pcase todo
+              ("ETERNAL" 'eternal)
+              ("FUTURE" 'someday)
+              ("HOLD" 'hold)
+              ("SEQ"
+               (if (my/active-seq file point)
+                   'active 'stuck))
+              ("EMPTY"
+               (when (my/stuck-empty)
+                 'stuck))
+              ("META"
+               (if (my/stuck-meta ambiguous-to-stuck)
+                   'stuck 'active))
+              ("META1"
+               (if (my/greedy-active-project (buffer-file-name) (point))
+                   'active 'stuck))
+              ("TODO"
+               (if (my/stuck-meta ambiguous-to-stuck)
+                   'stuck 'active))
+              ("ONE"
+               (when (my/has-todo-child)
+                 (if (my/greedy-active-project (buffer-file-name) (point))
+                     'active 'stuck)))))))))
+#+end_src
 * More alternative views
-  #+begin_src emacs-lisp
-    (defun cfw:open-org-calendar-no-projects (&args)
-      "Open an org schedule calendar in the new buffer."
-      (interactive)
-      (save-excursion
-        (let ((buf (get-buffer "*cfw-calendar*")))
-          (if buf
-              (switch-to-buffer buf)
-            (let* ((org-agenda-skip-function 'my/agenda-custom-skip)
-                   (source1 (cfw:org-create-source))
-                   (curr-keymap (if cfw:org-overwrite-default-keybinding cfw:org-custom-map cfw:org-schedule-map))
-                   (cp (cfw:create-calendar-component-buffer
-                        :view 'two-weeks
-                        :contents-sources (list source1)
-                        :custom-map curr-keymap
-                        :sorter 'cfw:org-schedule-sorter)))
-              (switch-to-buffer (cfw:cp-get-buffer cp))
-              (set (make-variable-buffer-local 'org-agenda-skip-function)
-                   'my/agenda-custom-skip)
-              (when (not org-todo-keywords-for-agenda)
-                (message "Warn : open org-agenda buffer first.")))
-            ))))
-  #+end_src
+#+begin_src emacs-lisp
+  (defun cfw:open-org-calendar-no-projects (&args)
+    "Open an org schedule calendar in the new buffer."
+    (interactive)
+    (save-excursion
+      (let ((buf (get-buffer "*cfw-calendar*")))
+        (if buf
+            (switch-to-buffer buf)
+          (let* ((org-agenda-skip-function 'my/agenda-custom-skip)
+                 (source1 (cfw:org-create-source))
+                 (curr-keymap (if cfw:org-overwrite-default-keybinding cfw:org-custom-map cfw:org-schedule-map))
+                 (cp (cfw:create-calendar-component-buffer
+                      :view 'two-weeks
+                      :contents-sources (list source1)
+                      :custom-map curr-keymap
+                      :sorter 'cfw:org-schedule-sorter)))
+            (switch-to-buffer (cfw:cp-get-buffer cp))
+            (set (make-variable-buffer-local 'org-agenda-skip-function)
+                 'my/agenda-custom-skip)
+            (when (not org-todo-keywords-for-agenda)
+              (message "Warn : open org-agenda buffer first.")))
+          ))))
+#+end_src
 ** NOT My own agenda renderer                                          :FIX:
-   #+BEGIN_SRC emacs-lisp
-     (add-to-list 'load-path 
-                  "~/.emacs.d/custom/org-ql")
-     (require 'org-ql)
-     (require 'org-habit)
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'load-path 
+               "~/.emacs.d/custom/org-ql")
+  (require 'org-ql)
+  (require 'org-habit)
 
-     ;; (org-ql-agenda '("~/MEGA/org/agenda/agenda.org") (or (and (todo "HABIT") (deadline <= today)) (todo "WAIT")) :super-groups ((:name "Tasks in other courts" :todo "WAIT") (:name "Incomplete Habits" :todo "HABIT")))
+  ;; (org-ql-agenda '("~/MEGA/org/agenda/agenda.org") (or (and (todo "HABIT") (deadline <= today)) (todo "WAIT")) :super-groups ((:name "Tasks in other courts" :todo "WAIT") (:name "Incomplete Habits" :todo "HABIT")))
 
-     (defun org-ql-agenda-function (ignore)
-       (org-agenda-prepare "org-ql")
-       (insert
-        (save-window-excursion 
-          (org-ql-agenda org-agenda-files
-            (or (and (todo "HABIT")
-                     (deadline <= today))
-                (todo "WAIT")
-                ;; (and (todo "TODO")
-                ;;      (tags "REWARD")
-                ;;      (priority = "A"))
-                )
-            :super-groups ((:name "Waiting tasks" :todo "WAIT")
-                           (:name "Incomplete Habits" :todo "HABIT")
-                           ;; (:name "Rewards" :tag "REWARD")
-                           ))
-          (switch-to-buffer "*Org Agenda NG*")
-          (let ((res (buffer-string)))
-            (kill-buffer)
-            res))
-        "\n\n")
-       (org-agenda-finalize))
+  (defun org-ql-agenda-function (ignore)
+    (org-agenda-prepare "org-ql")
+    (insert
+     (save-window-excursion 
+       (org-ql-agenda org-agenda-files
+                      (or (and (todo "HABIT")
+                               (deadline <= today))
+                          (todo "WAIT")
+                          ;; (and (todo "TODO")
+                          ;;      (tags "REWARD")
+                          ;;      (priority = "A"))
+                          )
+                      :super-groups ((:name "Waiting tasks" :todo "WAIT")
+                                     (:name "Incomplete Habits" :todo "HABIT")
+                                     ;; (:name "Rewards" :tag "REWARD")
+                                     ))
+       (switch-to-buffer "*Org Agenda NG*")
+       (let ((res (buffer-string)))
+         (kill-buffer)
+         res))
+     "\n\n")
+    (org-agenda-finalize))
 
-     (defvar my/org-agenda-types nil)
+  (defvar my/org-agenda-types nil)
 
-     (defun test (throwaway)
-       (if (null my/org-agenda-types)
-           (error "Need to specify my/org-agenda-types")
-         (org-agenda-prepare "This is a test")
-         (org-agenda--insert-overriding-header
-           ;; This string will be inserted if there is no overriding header
-           "This is a test")
-         (insert throwaway "\n")
-         (org-agenda-finalize))
-       ;; (setq buffer-read-only t)
-       )
+  (defun test (throwaway)
+    (if (null my/org-agenda-types)
+        (error "Need to specify my/org-agenda-types")
+      (org-agenda-prepare "This is a test")
+      (org-agenda--insert-overriding-header
+        ;; This string will be inserted if there is no overriding header
+        "This is a test")
+      (insert throwaway "\n")
+      (org-agenda-finalize))
+    ;; (setq buffer-read-only t)
+    )
 
-     (add-to-list 'org-agenda-custom-commands
-                  '("E" "Experimental stuff"
-                    ((tags-todo "-REFILE/!"
-                                ((org-agenda-overriding-header "Stuck Projects")
-                                 (org-tags-match-list-sublevels 'indented)
-                                 (org-agenda-skip-function 'my/show-stuck-projects)
-                                 (org-agenda-sorting-strategy
-                                  '(category-keep))))
-                     (test "Hello"
-                           ((org-agenda-overriding-header "Hello World")
-                            (my/org-agenda-types t)))
-                     (org-ql-agenda-function ""))))
+  (add-to-list 'org-agenda-custom-commands
+               '("E" "Experimental stuff"
+                 ((tags-todo "-REFILE/!"
+                             ((org-agenda-overriding-header "Stuck Projects")
+                              (org-tags-match-list-sublevels 'indented)
+                              (org-agenda-skip-function 'my/show-stuck-projects)
+                              (org-agenda-sorting-strategy
+                               '(category-keep))))
+                  (test "Hello"
+                        ((org-agenda-overriding-header "Hello World")
+                         (my/org-agenda-types t)))
+                  (org-ql-agenda-function ""))))
 
-     ;; Helper function
-     ;; (setq org-agenda-custom-commands (remove-if (lambda (a) (string= (car a) "E")) org-agenda-custom-commands))
-   #+END_SRC
+  ;; Helper function
+  ;; (setq org-agenda-custom-commands (remove-if (lambda (a) (string= (car a) "E")) org-agenda-custom-commands))
+#+END_SRC
 * Agenda Project Filtering 
-  #+begin_src emacs-lisp
-    (defun my/show-active-projects ()
-      "Only show subtrees that are stuck projects"
+#+begin_src emacs-lisp
+  (defun my/show-active-projects ()
+    "Only show subtrees that are stuck projects"
+    (save-restriction
+      (widen)
+      (let ((subtree-end (save-excursion (org-end-of-subtree t))))
+        (unless (member (my/get-project-type buffer-file-name (point) nil)
+                        '(active))
+          subtree-end))))
+
+  (defun my/dev-show-active-projects ()
+    "Only show subtrees that are stuck projects"
+    (save-restriction
+      (widen)
+      (let ((subtree-end (save-excursion (org-end-of-subtree t))))
+        (unless (or (and (my/is-todo-task)
+                         (my/is-standalone-task)
+                         (or (string= (org-get-todo-state) "NEXT")
+                             (org-get-scheduled-time (point))
+                             (org-get-deadline-time (point))))
+                    (member (my/get-project-type buffer-file-name (point) nil)
+                            '(active)))
+          subtree-end))))
+
+  (defun my/show-stuck-projects ()
+    "Only show subtrees that are stuck projects"
+    (save-restriction
+      (widen)
+      (let ((subtree-end (save-excursion (org-end-of-subtree t t)))
+            (next-heading (save-excursion (outline-next-heading))))
+        ;; (setq debug-p (point)
+        ;;       debuf-f (buffer-file-name))
+        (if (org-get-todo-state)
+            (unless (or (and (my/is-a-task)
+                             (my/is-standalone-task)
+                             (not (org-get-scheduled-time (point)))
+                             (not (org-get-deadline-time (point))))
+                        (eq (my/get-project-type buffer-file-name (point) t)
+                            'stuck))
+              subtree-end)
+          next-heading))))
+
+  (defun my/dev-show-stuck-projects ()
+    "Only show subtrees that are stuck projects"
+    (save-restriction
+      (widen)
+      (let ((subtree-end (save-excursion (org-end-of-subtree t t)))
+            (next-heading (save-excursion (outline-next-heading))))
+        (if (org-get-todo-state)
+            (unless (or (and (my/is-a-task)
+                             (my/is-standalone-task)
+                             (not (org-get-scheduled-time (point)))
+                             (not (org-get-deadline-time (point))))
+                        (eq (my/get-project-type buffer-file-name (point) t)
+                            'stuck))
+              subtree-end)
+          next-heading))))
+
+  (defun my/show-delayed-projects ()
+    (save-restriction
+      (widen)
+      (let ((subtree-end (save-excursion (org-end-of-subtree t))))
+        (unless (eq (my/get-project-type buffer-file-name (point))
+                    'delayed)
+          subtree-end))))
+
+  (defun my/agenda-custom-skip ()
+    (let ((next-headline (save-excursion (or (outline-next-heading) (point-max))))
+          (current (point))
+          display)
       (save-restriction
         (widen)
-        (let ((subtree-end (save-excursion (org-end-of-subtree t))))
-          (unless (member (my/get-project-type buffer-file-name (point) nil)
-                          '(active))
-            subtree-end))))
+        (save-excursion
+          (when (or (my/is-a-project)
+                    (member (org-get-todo-state) '("FUTURE" "WAIT" "HABIT" nil)))
+            next-headline)))))
 
-    (defun my/dev-show-active-projects ()
-      "Only show subtrees that are stuck projects"
-      (save-restriction
-        (widen)
-        (let ((subtree-end (save-excursion (org-end-of-subtree t))))
-          (unless (or (and (my/is-todo-task)
-                           (my/is-standalone-task)
-                           (or (string= (org-get-todo-state) "NEXT")
-                               (org-get-scheduled-time (point))
-                               (org-get-deadline-time (point))))
-                      (member (my/get-project-type buffer-file-name (point) nil)
-                              '(active)))
-            subtree-end))))
+  (defun my/show-next-tasks-and-standalone-tasks ()
+    (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+      (unless (and (my/is-a-task)
+                   (or 
+                    (my/is-next-task)
+                    (my/is-standalone-task)))
+        next-headline)))
 
-    (defun my/show-stuck-projects ()
-      "Only show subtrees that are stuck projects"
-      (save-restriction
-        (widen)
-        (let ((subtree-end (save-excursion (org-end-of-subtree t t)))
-              (next-heading (save-excursion (outline-next-heading))))
-          ;; (setq debug-p (point)
-          ;;       debuf-f (buffer-file-name))
-          (if (org-get-todo-state)
-              (unless (or (and (my/is-a-task)
-                               (my/is-standalone-task)
-                               (not (org-get-scheduled-time (point)))
-                               (not (org-get-deadline-time (point))))
-                          (eq (my/get-project-type buffer-file-name (point) t)
-                              'stuck))
-                subtree-end)
-            next-heading))))
 
-    (defun my/dev-show-stuck-projects ()
-      "Only show subtrees that are stuck projects"
-      (save-restriction
-        (widen)
-        (let ((subtree-end (save-excursion (org-end-of-subtree t t)))
-              (next-heading (save-excursion (outline-next-heading))))
-          (if (org-get-todo-state)
-              (unless (or (and (my/is-a-task)
-                               (my/is-standalone-task)
-                               (not (org-get-scheduled-time (point)))
-                               (not (org-get-deadline-time (point))))
-                          (eq (my/get-project-type buffer-file-name (point) t)
-                                  'stuck))
-                subtree-end)
-            next-heading))))
+  (defun my/has-next-todo ()
+    (save-excursion
+      (let ((end-of-subtree (save-excursion (org-end-of-subtree t)))
+            flag)
+        (while (and (not flag)
+                    (outline-next-heading)
+                    (< (point) next-headline))
+          (when (string= (org-get-todo-state) "NEXT")
+            (setq flag (point))))
+        flag)))
 
-    (defun my/show-delayed-projects ()
-      (save-restriction
-        (widen)
-        (let ((subtree-end (save-excursion (org-end-of-subtree t))))
-          (unless (eq (my/get-project-type buffer-file-name (point))
-                      'delayed)
-            subtree-end))))
+  (defun my/show-leaf-tasks ()
+    (let ((next-headline (save-excursion (org-end-of-subtree t))))
+      (unless (or (string= "NEXT" (org-get-todo-state))
+                  (my/has-next-todo))
+        next-headline)))
 
-    (defun my/agenda-custom-skip ()
-      (let ((next-headline (save-excursion (or (outline-next-heading) (point-max))))
-            (current (point))
-            display)
-        (save-restriction
-          (widen)
-          (save-excursion
-            (when (or (my/is-a-project)
-                      (member (org-get-todo-state) '("FUTURE" "WAIT" "HABIT" nil)))
-              next-headline)))))
+  (defun my/skip-standalone-tasks ()
+    (when (my/is-standalone-task)
+      (org-end-of-subtree t t)))
 
-    (defun my/show-next-tasks-and-standalone-tasks ()
+
+  ;; (defvar my/done-projects-flag nil)
+
+  ;; (defun my/show-done-projects-and-tasks ()
+  ;;   "Show top level leaf of these todos: DONE|CANCELLED|COMPLETE"
+  ;;   (save-restriction
+  ;;     (widen)
+  ;;     (let ((subtree-end (save-excursion (org-end-of-subtree t)))
+  ;;           (next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+  ;;       (if my/done-projects-flag
+  ;;           (let ((ov my/done-projects-flag))
+  ;;             (setq my/done-projects-flag nil)
+  ;;             ov)
+  ;;         (if (member (org-get-todo-state) org-done-keywords)
+  ;;             (progn (setq my/done-projects-flag subtree-end)
+  ;;                    nil)
+  ;;           next-headline)))))
+
+  (defun my/show-done-projects-and-tasks ()
+    "Show top level leaf of these todos: DONE|CANCELLED|COMPLETE"
+    (save-restriction
+      (widen)
       (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
-        (unless (and (my/is-a-task)
-                     (or 
-                      (my/is-next-task)
-                      (my/is-standalone-task)))
-          next-headline)))
+        (unless (and (member (org-get-todo-state) org-done-keywords)
+                     (not (my/is-part-of-subtree)))
+          next-headline))))
 
+  (defun my/parent-is-eternal ()
+    (save-excursion
+      (and (not (= 1 (org-current-level)))
+           (progn
+             (org-up-heading-safe)
+             (string= (org-get-todo-state) "ETERNAL")))))
 
-    (defun my/has-next-todo ()
-      (save-excursion
-        (let ((end-of-subtree (save-excursion (org-end-of-subtree t)))
-              flag)
-          (while (and (not flag)
-                      (outline-next-heading)
-                      (< (point) next-headline))
-            (when (string= (org-get-todo-state) "NEXT")
-              (setq flag (point))))
-          flag)))
+  (defun my/show-top-level ()
+    (save-restriction
+      (widen)
+      (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+        (unless (or (not (my/is-part-of-subtree))
+                    (my/parent-is-eternal))
+          next-headline))))
 
-    (defun my/show-leaf-tasks ()
-      (let ((next-headline (save-excursion (org-end-of-subtree t))))
-        (unless (or (string= "NEXT" (org-get-todo-state))
-                    (my/has-next-todo))
-          next-headline)))
+  (defun my/show-big-top-levels ()
+    (save-restriction
+      (widen)
+      (let ((next-headline (save-excursion (or (outline-next-heading) (point-max))))
+            (size (- (save-excursion (org-end-of-subtree t t)) (point))))
+        (unless (and
+                 (or (not (my/is-part-of-subtree))
+                     (my/parent-is-eternal))
+                 (> size 50000))
+          next-headline))))
 
-    (defun my/skip-standalone-tasks ()
-      (when (my/is-standalone-task)
-        (org-end-of-subtree t t)))
+  (defun my/show-small-top-levels ()
+    (save-restriction
+      (widen)
+      (let ((next-headline (save-excursion (or (outline-next-heading) (point-max))))
+            (size (- (save-excursion (org-end-of-subtree t t)) (point))))
+        (unless (and
+                 (or (not (my/is-part-of-subtree))
+                     (my/parent-is-eternal))
+                 (< size 50000))
+          next-headline))))
 
-
-    ;; (defvar my/done-projects-flag nil)
-
-    ;; (defun my/show-done-projects-and-tasks ()
-    ;;   "Show top level leaf of these todos: DONE|CANCELLED|COMPLETE"
-    ;;   (save-restriction
-    ;;     (widen)
-    ;;     (let ((subtree-end (save-excursion (org-end-of-subtree t)))
-    ;;           (next-headline (save-excursion (or (outline-next-heading) (point-max)))))
-    ;;       (if my/done-projects-flag
-    ;;           (let ((ov my/done-projects-flag))
-    ;;             (setq my/done-projects-flag nil)
-    ;;             ov)
-    ;;         (if (member (org-get-todo-state) org-done-keywords)
-    ;;             (progn (setq my/done-projects-flag subtree-end)
-    ;;                    nil)
-    ;;           next-headline)))))
-
-    (defun my/show-done-projects-and-tasks ()
-      "Show top level leaf of these todos: DONE|CANCELLED|COMPLETE"
-      (save-restriction
-        (widen)
-        (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
-          (unless (and (member (org-get-todo-state) org-done-keywords)
-                       (not (my/is-part-of-subtree)))
-            next-headline))))
-
-    (defun my/parent-is-eternal ()
-      (save-excursion
-        (and (not (= 1 (org-current-level)))
-             (progn
-               (org-up-heading-safe)
-               (string= (org-get-todo-state) "ETERNAL")))))
-
-    (defun my/show-top-level ()
-      (save-restriction
-        (widen)
-        (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
-          (unless (or (not (my/is-part-of-subtree))
-                      (my/parent-is-eternal))
-            next-headline))))
-
-    (defun my/show-big-top-levels ()
-      (save-restriction
-        (widen)
-        (let ((next-headline (save-excursion (or (outline-next-heading) (point-max))))
-              (size (- (save-excursion (org-end-of-subtree t t)) (point))))
-          (unless (and
-                   (or (not (my/is-part-of-subtree))
-                       (my/parent-is-eternal))
-                   (> size 50000))
-            next-headline))))
-
-    (defun my/show-small-top-levels ()
-      (save-restriction
-        (widen)
-        (let ((next-headline (save-excursion (or (outline-next-heading) (point-max))))
-              (size (- (save-excursion (org-end-of-subtree t t)) (point))))
-          (unless (and
-                   (or (not (my/is-part-of-subtree))
-                       (my/parent-is-eternal))
-                   (< size 50000))
-            next-headline))))
-
-    (defun my/skip-if-top-level-dev ()
-      (let ((bname (file-name-nondirectory (buffer-file-name))))
-        (when (and (string= bname "dev.org")
-                   (not (my/is-part-of-subtree)))
-          (save-excursion
-            (outline-next-heading)))))
-  #+end_src
+  (defun my/skip-if-top-level-dev ()
+    (let ((bname (file-name-nondirectory (buffer-file-name))))
+      (when (and (string= bname "dev.org")
+                 (not (my/is-part-of-subtree)))
+        (save-excursion
+          (outline-next-heading)))))
+#+end_src
 * Stuff                                                                 :FIX:
-  #+begin_src emacs-lisp#
+#+begin_src emacs-lisp#
     (setq org-agenda-tags-todo-honor-ignore-options t)
 
     (defun bh/org-auto-exclude-function (tag)
@@ -1164,330 +1164,330 @@
     (use-package htmlize)
     (org-super-agenda-mode)
     (setq org-super-agenda-header-separator "")
-  #+end_src
+#+end_src
 * memoization attempt
-  #+begin_src emacs-lisp
+#+begin_src emacs-lisp
 
 
-     ;; (defmacro measure-time (&rest body)
-     ;;   "Measure the time it takes to evaluate BODY."
-     ;;   `(let ((time (current-time)))
-     ;;      ,@body
-     ;;      (message "%.06f" (float-time (time-since time)))))
+  ;; (defmacro measure-time (&rest body)
+  ;;   "Measure the time it takes to evaluate BODY."
+  ;;   `(let ((time (current-time)))
+  ;;      ,@body
+  ;;      (message "%.06f" (float-time (time-since time)))))
 
-     ;; (require 'memoize)
-     ;; (defun reset-memo-for-projects ()
-     ;;   (interactive)
-     ;;   (ignore-errors
-     ;;     (memoize-restore 'my/get-project-type))
-     ;;   (memoize 'my/get-project-type))
-     ;; (add-hook 'org-agenda-finalize-hook
-     ;;           #'reset-memo-for-projects)
+  ;; (require 'memoize)
+  ;; (defun reset-memo-for-projects ()
+  ;;   (interactive)
+  ;;   (ignore-errors
+  ;;     (memoize-restore 'my/get-project-type))
+  ;;   (memoize 'my/get-project-type))
+  ;; (add-hook 'org-agenda-finalize-hook
+  ;;           #'reset-memo-for-projects)
 
-    ;; (defvar my/stuck-projects-flag nil)
+  ;; (defvar my/stuck-projects-flag nil)
 
-    ;; (defvar my/stuck-projects-file nil)
+  ;; (defvar my/stuck-projects-file nil)
 
-    ;; (defun my/show-stuck-projects ()
-    ;;   "Only show subtrees that are stuck projects"
-    ;;   (setq stuck-here t)
-    ;;   (save-restriction
-    ;;     (widen)
-    ;;     (let ((subtree-end (save-excursion (org-end-of-subtree t))))
-    ;;       (if (and my/stuck-projects-flag
-    ;;                (string= my/stuck-projects-file
-    ;;                         (buffer-file-name))
-    ;;                (< (point) my/stuck-projects-flag))
-    ;;           (if (or (my/is-next-task)
-    ;;                   (my/is-unactionable-task)
-    ;;                   (and (not (my/is-a-task))
-    ;;                        (not (eq (my/get-project-type buffer-file-name (point) t)
-    ;;                            'stuck))))
-    ;;               subtree-end
-    ;;             nil)
-    ;;         (setq my/stuck-projects-flag nil
-    ;;               my/stuck-projects-file nil)
-    ;;         (cond ((and (my/is-a-task)
-    ;;                     (my/is-standalone-task)
-    ;;                     (not (org-get-scheduled-time (point)))
-    ;;                     (not (org-get-deadline-time (point))))
-    ;;                nil)
-    ;;               ((eq (my/get-project-type buffer-file-name
-    ;;                                         (point) t)
-    ;;                    'stuck)
-    ;;                (setq my/stuck-projects-flag subtree-end)
-    ;;                (setq my/stuck-projects-file (buffer-file-name))
-    ;;                nil)
-    ;;               (t subtree-end))))))
+  ;; (defun my/show-stuck-projects ()
+  ;;   "Only show subtrees that are stuck projects"
+  ;;   (setq stuck-here t)
+  ;;   (save-restriction
+  ;;     (widen)
+  ;;     (let ((subtree-end (save-excursion (org-end-of-subtree t))))
+  ;;       (if (and my/stuck-projects-flag
+  ;;                (string= my/stuck-projects-file
+  ;;                         (buffer-file-name))
+  ;;                (< (point) my/stuck-projects-flag))
+  ;;           (if (or (my/is-next-task)
+  ;;                   (my/is-unactionable-task)
+  ;;                   (and (not (my/is-a-task))
+  ;;                        (not (eq (my/get-project-type buffer-file-name (point) t)
+  ;;                            'stuck))))
+  ;;               subtree-end
+  ;;             nil)
+  ;;         (setq my/stuck-projects-flag nil
+  ;;               my/stuck-projects-file nil)
+  ;;         (cond ((and (my/is-a-task)
+  ;;                     (my/is-standalone-task)
+  ;;                     (not (org-get-scheduled-time (point)))
+  ;;                     (not (org-get-deadline-time (point))))
+  ;;                nil)
+  ;;               ((eq (my/get-project-type buffer-file-name
+  ;;                                         (point) t)
+  ;;                    'stuck)
+  ;;                (setq my/stuck-projects-flag subtree-end)
+  ;;                (setq my/stuck-projects-file (buffer-file-name))
+  ;;                nil)
+  ;;               (t subtree-end))))))
 
-    ;; (defvar my/done-projects-flag nil)
-    ;; (defvar my/next-task-flag nil)
+  ;; (defvar my/done-projects-flag nil)
+  ;; (defvar my/next-task-flag nil)
 
-    ;; (defun my/org-agenda-reset-vars ()
-    ;;   (interactive)
-    ;;   (setq my/stuck-projects-flag nil
-    ;;         my/done-projects-flag nil
-    ;;         my/next-task-flag nil))
+  ;; (defun my/org-agenda-reset-vars ()
+  ;;   (interactive)
+  ;;   (setq my/stuck-projects-flag nil
+  ;;         my/done-projects-flag nil
+  ;;         my/next-task-flag nil))
 
-    ;; (add-to-list 'org-agenda-finalize-hook
-    ;;              #'my/org-agenda-reset-vars)
-  #+end_src
+  ;; (add-to-list 'org-agenda-finalize-hook
+  ;;              #'my/org-agenda-reset-vars)
+#+end_src
 * Agenda custom commands
-  #+begin_src emacs-lisp
-    (defun org-agenda-add-separater-between-project ()
-      (setq buffer-read-only nil)
-      (save-excursion
-        (goto-char (point-min))
-        (let ((start-pos (point))
-              (previous t))
-          (re-search-forward " +agenda: +[^\\. ]" nil t)
-          (while (re-search-forward " +agenda: +[^\\. ]" nil t)
-            (beginning-of-line)
-            (insert "=============================================\n")
-            (forward-line)))))
+#+begin_src emacs-lisp
+  (defun org-agenda-add-separater-between-project ()
+    (setq buffer-read-only nil)
+    (save-excursion
+      (goto-char (point-min))
+      (let ((start-pos (point))
+            (previous t))
+        (re-search-forward " +agenda: +[^\\. ]" nil t)
+        (while (re-search-forward " +agenda: +[^\\. ]" nil t)
+          (beginning-of-line)
+          (insert "=============================================\n")
+          (forward-line)))))
 
-    (defun production-agenda (tag)
-      `((tags-todo ,(concat tag "/STUFF")
-                   ((org-agenda-overriding-header "Refile tasks")))
-        (tags-todo ,(concat tag "/" (mapconcat #'identity my/active-projects-and-tasks "|"))
-                   ((org-agenda-overriding-header "Stuck Projects")
-                    (org-agenda-skip-function 'my/show-stuck-projects)
-                    (org-tags-match-list-sublevels 'indented)))
-        (tags-todo ,(concat tag "/WAIT")
-                   ((org-agenda-overriding-header "Tasks in other courts")))
-        (tags-todo ,(concat tag "/NEXT")
-                   ((org-agenda-overriding-header "Things to do")))
-        (agenda ""
-                ((org-agenda-skip-function 'my/agenda-custom-skip)
-                 (org-agenda-span 'day)
-                 (org-agenda-tag-filter-preset (quote (,tag)))
-                 (org-agenda-skip-deadline-if-done t)
-                 (org-agenda-skip-scheduled-if-done t)
-                 (org-super-agenda-groups '((:name "Dev things" :file-path "dev.org")
-                                            (:name "Overdue" :and (:deadline past :log nil))
-                                            (:name "Upcoming" :deadline future)
-                                            (:name "Should do" :and (:scheduled past :log nil))
-                                            (:name "Today" :time-grid t
-                                                   :and (:not (:and (:not (:scheduled today)
-                                                                     :not (:deadline today)))))))))))
+  (defun production-agenda (tag)
+    `((tags-todo ,(concat tag "/STUFF")
+                 ((org-agenda-overriding-header "Refile tasks")))
+      (tags-todo ,(concat tag "/" (mapconcat #'identity my/active-projects-and-tasks "|"))
+                 ((org-agenda-overriding-header "Stuck Projects")
+                  (org-agenda-skip-function 'my/show-stuck-projects)
+                  (org-tags-match-list-sublevels 'indented)))
+      (tags-todo ,(concat tag "/WAIT")
+                 ((org-agenda-overriding-header "Tasks in other courts")))
+      (tags-todo ,(concat tag "/NEXT")
+                 ((org-agenda-overriding-header "Things to do")))
+      (agenda ""
+              ((org-agenda-skip-function 'my/agenda-custom-skip)
+               (org-agenda-span 'day)
+               (org-agenda-tag-filter-preset (quote (,tag)))
+               (org-agenda-skip-deadline-if-done t)
+               (org-agenda-skip-scheduled-if-done t)
+               (org-super-agenda-groups '((:name "Dev things" :file-path "dev.org")
+                                          (:name "Overdue" :and (:deadline past :log nil))
+                                          (:name "Upcoming" :deadline future)
+                                          (:name "Should do" :and (:scheduled past :log nil))
+                                          (:name "Today" :time-grid t
+                                                 :and (:not (:and (:not (:scheduled today)
+                                                                        :not (:deadline today)))))))))))
 
-    (defconst my/non-agenda-files
-      `(,(my/org-file "entries/reviews.gpg") 
-        ,(my/agenda-file "datetree.org") 
-        ,(my/agenda-file "reference.org") 
-        ,(my/org-file "entries/journal.gpg")))
+  (defconst my/non-agenda-files
+    `(,(my/org-file "entries/reviews.gpg") 
+      ,(my/agenda-file "datetree.org") 
+      ,(my/agenda-file "reference.org") 
+      ,(my/org-file "entries/journal.gpg")))
 
-    (defconst my/all-agenda-files
-      (cons (my/agenda-file "eternal.org")
-            org-agenda-files))
+  (defconst my/all-agenda-files
+    (cons (my/agenda-file "eternal.org")
+          org-agenda-files))
 
-    (let* ((prod-tag "+time")
-           (dev-tag "+dev")
-           (sandbox-tag "+sandbox"))
-      (setq org-agenda-custom-commands
-            `(("P" "Project View"
-               ((tags-todo ,sandbox-tag
-                           ((org-agenda-overriding-header "Active Projects")
-                            (org-agenda-skip-function 'my/show-active-projects)
-                            (org-tags-match-list-sublevels 'indented)))
-                (tags-todo ,sandbox-tag
-                           ((org-agenda-overriding-header "Stuck Projects")
-                            (org-tags-match-list-sublevels 'indented)
-                            (org-agenda-skip-function 'my/show-stuck-projects)
-                            (org-agenda-sorting-strategy
-                             '(category-keep))))
-                (tags-todo ,sandbox-tag
-                           ((org-agenda-overriding-header "Delayed projects")
-                            (org-agenda-skip-function 'my/show-delayed-projects)))
-                (tags-todo ,(concat sandbox-tag "-PEOPLE/!HOLD")
-                           ((org-agenda-overriding-header "Projects on hold")))
-                (tags-todo ,(concat sandbox-tag "+PEOPLE/!HOLD")
-                           ((org-agenda-overriding-header "People on hold")))
-                (tags-todo ,(concat sandbox-tag "/!FUTURE")
-                           ((org-agenda-overriding-header "Someday projects")
-                            (org-agenda-sorting-strategy '(tag-up))))
-                (tags-todo ,(concat sandbox-tag "/!ETERNAL")
-                           ((org-agenda-overriding-header "Eternal Projects")))))
-              ("p" . "Prod")
-              ("pa" "All" ,(production-agenda prod-tag))
-              ("pw" "work" ,(production-agenda "+work"))
-              ("ps" "school" ,(production-agenda "+school"))
-              ("d" "dev"
-               ((tags-todo ,(concat dev-tag "+refile")
-                           ((org-agenda-overriding-header "Refile tasks")))
-                (tags-todo ,(concat dev-tag "/!" (mapconcat #'identity (cons "HOLD" my/active-projects-and-tasks) "|"))
-                           ((org-agenda-overriding-header "Stuck Projects")
-                            (org-agenda-skip-function 'my/dev-show-stuck-projects)
-                            (org-tags-match-list-sublevels 'indented)
-                            (org-agenda-sorting-strategy
-                             '((agenda category-keep)))))
-                (tags-todo ,(concat dev-tag "-short" "/!" (mapconcat #'identity my/active-projects-and-tasks "|"))
-                           ((org-agenda-overriding-header "Active Projects")
-                            (org-agenda-skip-function 'my/dev-show-active-projects)
-                            (org-tags-match-list-sublevels 'indented)
-                            (org-agenda-sorting-strategy
-                             '((agenda category-keep)))))
-                (tags-todo ,(concat dev-tag "/WAIT")
-                           ((org-agenda-overriding-header "Waiting tasks")))
-                (tags-todo ,(concat dev-tag "/NEXT")
-                           ((org-agenda-overriding-header "Things to do")))
-                (agenda ""
-                        ((org-agenda-skip-function 'my/agenda-custom-skip)
-                         (org-agenda-span 'day)
-                         (org-agenda-tag-filter-preset (quote (,dev-tag)))
-                         (org-agenda-skip-deadline-if-done t)
-                         (org-agenda-skip-scheduled-if-done t)
-                         (org-super-agenda-groups '((:name "Overdue" :and (:deadline past :log nil))
-                                                    (:name "Upcoming" :deadline future)
-                                                    (:name "Should do" :and (:scheduled past :log nil))
-                                                    (:name "Today" :time-grid t
-                                                           :and (:not (:and (:not (:scheduled today)
-                                                                                  :not (:deadline today)))))))))))
-              ("h" "Dev Hold Projects" tags-todo "dev/!HOLD")
-              ("f" "fastdev?"
-               ((org-ql-block '(tags "refile")
-                              ((org-agenda-overriding-header "Refile tasks")))
-                (tags-todo ,(concat dev-tag "/!" (mapconcat #'identity my/active-projects-and-tasks "|"))
-                           ((org-agenda-overriding-header "Stuck Projects")
-                            (org-agenda-skip-function 'my/dev-show-stuck-projects)
-                            (org-tags-match-list-sublevels 'indented)
-                            (org-agenda-sorting-strategy
-                             '((agenda category-keep)))))
-                (tags-todo ,(concat dev-tag "-short" "/!" (mapconcat #'identity my/active-projects-and-tasks "|"))
-                           ((org-agenda-overriding-header "Active Projects")
-                            (org-agenda-skip-function 'my/dev-show-active-projects)
-                            (org-tags-match-list-sublevels 'indented)
-                            (org-agenda-sorting-strategy
-                             '((agenda category-keep)))))
-                (org-ql-block '(and (tags "dev")
-                                    (todo "WAIT"))
-                              ((org-agenda-overriding-header "Waiting tasks")))
-                (org-ql-block '(and (tags "dev")
-                                    (todo "NEXT"))
-                              ((org-agenda-overriding-header "Things to do")))
-                (agenda ""
-                        ((org-agenda-skip-function 'my/agenda-custom-skip)
-                         (org-agenda-span 'day)
-                         (org-agenda-tag-filter-preset (quote (,dev-tag)))
-                         (org-agenda-skip-deadline-if-done t)
-                         (org-agenda-skip-scheduled-if-done t)
-                         (org-super-agenda-groups '((:name "Overdue" :and (:deadline past :log nil))
-                                                    (:name "Upcoming" :deadline future)
-                                                    (:name "Should do" :and (:scheduled past :log nil))
-                                                    (:name "Today" :time-grid t
-                                                           :and (:not (:and (:not (:scheduled today)
-                                                                                  :not (:deadline today)))))))))))
-              ("v" . "View just the agenda's")
-              ("vd" "Dev agenda"
-               ((agenda ""
-                        ((org-agenda-skip-function 'my/agenda-custom-skip)
-                         (org-agenda-span 'day)
-                         (org-agenda-tag-filter-preset (quote (,dev-tag)))
-                         (org-agenda-skip-deadline-if-done t)
-                         (org-agenda-skip-scheduled-if-done t)
-                         (org-super-agenda-groups '((:name "Overdue" :and (:deadline past :log nil))
-                                                    (:name "Upcoming" :deadline future)
-                                                    (:name "Should do" :and (:scheduled past :log nil))
-                                                    (:name "Today" :time-grid t
-                                                           :and (:not (:and (:not (:scheduled today)
-                                                                                  :not (:deadline today)))))))))))
-              ;; ("t" "Todo" tags-todo ,dev-tag
-              ;;            ((org-agenda-overriding-header "Stuck Projects")
-              ;;             (org-agenda-skip-function 'my/dev-show-stuck-projects)
-              ;;             (org-tags-match-list-sublevels 'indented)))
-              ;; ("t" "Test "tags-todo (concat ,dev-tag "-PEOPLE")
-              ;;              ((org-agenda-overriding-header "Active Projects")
-              ;;               (org-agenda-skip-function 'my/dev-show-active-projects)
-              ;;               (org-tags-match-list-sublevels 'indented)))
-              ("T" "Test" tags-todo ,(concat dev-tag "&TODO=\"NEXT\"")
-               ((org-agenda-overriding-header "Things to do")))
-              ("g" "General View"
-               ((tags-todo "+sandbox+refile"
-                           ((org-agenda-overriding-header "Refile tasks")))
-                (tags-todo "+sandbox"
-                           ((org-agenda-overriding-header "Stuck Projects")
-                            (org-tags-match-list-sublevels 'indented)
-                            (org-agenda-skip-function 'my/show-stuck-projects)
-                            (org-agenda-sorting-strategy
-                             '(category-keep))))
-                (tags-todo "-REFILE-HOLD+TODO+sandbox/WAIT"
-                           (;(org-agenda-skip-function 'my/only-next-projects-and-tasks)
-                            (org-agenda-overriding-header "Tasks in other courts")
-                            (org-tags-match-list-sublevels t)))
-                ;;(org-ql-agenda-function "")
-                (agenda ""
-                        ((org-agenda-skip-function 'my/agenda-custom-skip)
-                         (org-agenda-span 'day)
-                         (org-agenda-tag-filter-preset (quote ("+sandbox")))
-                         (org-agenda-skip-deadline-if-done t)
-                         (org-agenda-skip-scheduled-if-done t)
-                         (org-super-agenda-groups '((:name "Overdue" :and (:deadline past :log nil ))
-                                                    (:name "Upcoming" :deadline future)
-                                                    (:name "Should do" :and (:scheduled past :log nil ))
-                                                    (:name "Today" :time-grid t
-                                                           :and (:not (:and (:not (:scheduled today)
-                                                                                  :not (:deadline today)))))))))))
-              ("D" "Done Tasks" todo "DONE|CANCELLED|COMPLETE|ABANDON"
-               ((org-agenda-overriding-header "Done Tasks")
-                (org-agenda-files ',(remove-if (lambda (x) 
-                                                 (member (expand-file-name x) my/non-agenda-files)) 
-                                               my/all-agenda-files))
-                (org-agenda-skip-function 'my/skip-if-top-level-dev)))
-              ("A" "Archive trees"
-               ((tags "ARCHIVE"
-                      ((org-agenda-overriding-header "Big archive trees")
-                       (org-tags-match-list-sublevels nil)
-                       (org-agenda-skip-archived-trees nil)
-                       (org-agenda-skip-function 'my/show-big-top-levels)))
-                (tags "ARCHIVE"
-                      ((org-agenda-overriding-header "Small archive trees")
-                       (org-tags-match-list-sublevels nil)
-                       (org-agenda-skip-archived-trees nil)
-                       (org-agenda-skip-function 'my/show-small-top-levels))))
-               ((my/delete-blocks nil)))
-              ("R" "Recategorize dev to sandbox" todo (mapconcat #'identity org-done-keywords-for-agenda "|")
-               ((org-agenda-skip-function 'my/show-top-level)
-                (org-agenda-files '(,(my/agenda-file "dev.org")))))
-              ("n" "Next Tasks List" tags-todo "-REFILE-HOLD-WAIT"
-               ((org-agenda-skip-function 'my/show-next-tasks-and-standalone-tasks)
-                (org-agenda-overriding-header "Next Tasks list")
-                (org-tags-match-list-sublevels t)
-                (org-agenda-sorting-strategy '(deadline-up))))
-              ("L" "Leaf Task List" tags-todo "-REFILE-HOLD-WAIT"
-               ((org-agenda-skip-function 'my/show-leaf-tasks)
-                (org-tags-match-list-sublevels 'indented)
-                (org-agenda-overriding-header "Next Tasks list")
-                (org-agenda-finalize-hook '(org-agenda-add-separater-between-project))))
-              ("c" "Comms" tags-todo "datetime"
-               ((org-agenda-overriding-header "Comms")))
-              ("C" "Look at clocking" agenda ""
-               ((org-agenda-span 'day)
-                (org-agenda-start-with-log-mode '(closed clock))
-                (org-agenda-clockreport-mode t)))
-              ("j" "Reviews and Journals" tags "LEVEL=3&ITEM={Review for}|LEVEL=3&journal"
-               ((org-agenda-files '(,(my/org-file "entries/reviews.gpg") 
-                                    ,(my/org-file "entries/journal.gpg")))
-                (org-agenda-sorting-strategy '(tsia-down))))
-              ("r" "Reviews" tags "LEVEL=3&ITEM={Review for}"
-               ((org-agenda-files '(,(my/org-file "entries/reviews.gpg") 
-                                    ,(my/org-file "entries/journal.gpg")))
-                (org-agenda-sorting-strategy '(tsia-down))))
-              ("o" "Offline" tags-todo "offline"
-               ((org-tags-match-list-sublevels nil)))
-              ("b" "Bored" tags-todo "+short-grow"
-               ((org-tags-match-list-sublevels nil)))
-              ("t" "today" agenda ""
-               ((org-agenda-overriding-arguments (list nil (my/this-or-last-saturday) 
-                                                       9)))))))
+  (let* ((prod-tag "+time")
+         (dev-tag "+dev")
+         (sandbox-tag "+sandbox"))
+    (setq org-agenda-custom-commands
+          `(("P" "Project View"
+             ((tags-todo ,sandbox-tag
+                         ((org-agenda-overriding-header "Active Projects")
+                          (org-agenda-skip-function 'my/show-active-projects)
+                          (org-tags-match-list-sublevels 'indented)))
+              (tags-todo ,sandbox-tag
+                         ((org-agenda-overriding-header "Stuck Projects")
+                          (org-tags-match-list-sublevels 'indented)
+                          (org-agenda-skip-function 'my/show-stuck-projects)
+                          (org-agenda-sorting-strategy
+                           '(category-keep))))
+              (tags-todo ,sandbox-tag
+                         ((org-agenda-overriding-header "Delayed projects")
+                          (org-agenda-skip-function 'my/show-delayed-projects)))
+              (tags-todo ,(concat sandbox-tag "-PEOPLE/!HOLD")
+                         ((org-agenda-overriding-header "Projects on hold")))
+              (tags-todo ,(concat sandbox-tag "+PEOPLE/!HOLD")
+                         ((org-agenda-overriding-header "People on hold")))
+              (tags-todo ,(concat sandbox-tag "/!FUTURE")
+                         ((org-agenda-overriding-header "Someday projects")
+                          (org-agenda-sorting-strategy '(tag-up))))
+              (tags-todo ,(concat sandbox-tag "/!ETERNAL")
+                         ((org-agenda-overriding-header "Eternal Projects")))))
+            ("p" . "Prod")
+            ("pa" "All" ,(production-agenda prod-tag))
+            ("pw" "work" ,(production-agenda "+work"))
+            ("ps" "school" ,(production-agenda "+school"))
+            ("d" "dev"
+             ((tags-todo ,(concat dev-tag "+refile")
+                         ((org-agenda-overriding-header "Refile tasks")))
+              (tags-todo ,(concat dev-tag "/!" (mapconcat #'identity (cons "HOLD" my/active-projects-and-tasks) "|"))
+                         ((org-agenda-overriding-header "Stuck Projects")
+                          (org-agenda-skip-function 'my/dev-show-stuck-projects)
+                          (org-tags-match-list-sublevels 'indented)
+                          (org-agenda-sorting-strategy
+                           '((agenda category-keep)))))
+              (tags-todo ,(concat dev-tag "-short" "/!" (mapconcat #'identity my/active-projects-and-tasks "|"))
+                         ((org-agenda-overriding-header "Active Projects")
+                          (org-agenda-skip-function 'my/dev-show-active-projects)
+                          (org-tags-match-list-sublevels 'indented)
+                          (org-agenda-sorting-strategy
+                           '((agenda category-keep)))))
+              (tags-todo ,(concat dev-tag "/WAIT")
+                         ((org-agenda-overriding-header "Waiting tasks")))
+              (tags-todo ,(concat dev-tag "/NEXT")
+                         ((org-agenda-overriding-header "Things to do")))
+              (agenda ""
+                      ((org-agenda-skip-function 'my/agenda-custom-skip)
+                       (org-agenda-span 'day)
+                       (org-agenda-tag-filter-preset (quote (,dev-tag)))
+                       (org-agenda-skip-deadline-if-done t)
+                       (org-agenda-skip-scheduled-if-done t)
+                       (org-super-agenda-groups '((:name "Overdue" :and (:deadline past :log nil))
+                                                  (:name "Upcoming" :deadline future)
+                                                  (:name "Should do" :and (:scheduled past :log nil))
+                                                  (:name "Today" :time-grid t
+                                                         :and (:not (:and (:not (:scheduled today)
+                                                                                :not (:deadline today)))))))))))
+            ("h" "Dev Hold Projects" tags-todo "dev/!HOLD")
+            ("f" "fastdev?"
+             ((org-ql-block '(tags "refile")
+                            ((org-agenda-overriding-header "Refile tasks")))
+              (tags-todo ,(concat dev-tag "/!" (mapconcat #'identity my/active-projects-and-tasks "|"))
+                         ((org-agenda-overriding-header "Stuck Projects")
+                          (org-agenda-skip-function 'my/dev-show-stuck-projects)
+                          (org-tags-match-list-sublevels 'indented)
+                          (org-agenda-sorting-strategy
+                           '((agenda category-keep)))))
+              (tags-todo ,(concat dev-tag "-short" "/!" (mapconcat #'identity my/active-projects-and-tasks "|"))
+                         ((org-agenda-overriding-header "Active Projects")
+                          (org-agenda-skip-function 'my/dev-show-active-projects)
+                          (org-tags-match-list-sublevels 'indented)
+                          (org-agenda-sorting-strategy
+                           '((agenda category-keep)))))
+              (org-ql-block '(and (tags "dev")
+                                  (todo "WAIT"))
+                            ((org-agenda-overriding-header "Waiting tasks")))
+              (org-ql-block '(and (tags "dev")
+                                  (todo "NEXT"))
+                            ((org-agenda-overriding-header "Things to do")))
+              (agenda ""
+                      ((org-agenda-skip-function 'my/agenda-custom-skip)
+                       (org-agenda-span 'day)
+                       (org-agenda-tag-filter-preset (quote (,dev-tag)))
+                       (org-agenda-skip-deadline-if-done t)
+                       (org-agenda-skip-scheduled-if-done t)
+                       (org-super-agenda-groups '((:name "Overdue" :and (:deadline past :log nil))
+                                                  (:name "Upcoming" :deadline future)
+                                                  (:name "Should do" :and (:scheduled past :log nil))
+                                                  (:name "Today" :time-grid t
+                                                         :and (:not (:and (:not (:scheduled today)
+                                                                                :not (:deadline today)))))))))))
+            ("v" . "View just the agenda's")
+            ("vd" "Dev agenda"
+             ((agenda ""
+                      ((org-agenda-skip-function 'my/agenda-custom-skip)
+                       (org-agenda-span 'day)
+                       (org-agenda-tag-filter-preset (quote (,dev-tag)))
+                       (org-agenda-skip-deadline-if-done t)
+                       (org-agenda-skip-scheduled-if-done t)
+                       (org-super-agenda-groups '((:name "Overdue" :and (:deadline past :log nil))
+                                                  (:name "Upcoming" :deadline future)
+                                                  (:name "Should do" :and (:scheduled past :log nil))
+                                                  (:name "Today" :time-grid t
+                                                         :and (:not (:and (:not (:scheduled today)
+                                                                                :not (:deadline today)))))))))))
+            ;; ("t" "Todo" tags-todo ,dev-tag
+            ;;            ((org-agenda-overriding-header "Stuck Projects")
+            ;;             (org-agenda-skip-function 'my/dev-show-stuck-projects)
+            ;;             (org-tags-match-list-sublevels 'indented)))
+            ;; ("t" "Test "tags-todo (concat ,dev-tag "-PEOPLE")
+            ;;              ((org-agenda-overriding-header "Active Projects")
+            ;;               (org-agenda-skip-function 'my/dev-show-active-projects)
+            ;;               (org-tags-match-list-sublevels 'indented)))
+            ("T" "Test" tags-todo ,(concat dev-tag "&TODO=\"NEXT\"")
+             ((org-agenda-overriding-header "Things to do")))
+            ("g" "General View"
+             ((tags-todo "+sandbox+refile"
+                         ((org-agenda-overriding-header "Refile tasks")))
+              (tags-todo "+sandbox"
+                         ((org-agenda-overriding-header "Stuck Projects")
+                          (org-tags-match-list-sublevels 'indented)
+                          (org-agenda-skip-function 'my/show-stuck-projects)
+                          (org-agenda-sorting-strategy
+                           '(category-keep))))
+              (tags-todo "-REFILE-HOLD+TODO+sandbox/WAIT"
+                         (;(org-agenda-skip-function 'my/only-next-projects-and-tasks)
+                          (org-agenda-overriding-header "Tasks in other courts")
+                          (org-tags-match-list-sublevels t)))
+              ;;(org-ql-agenda-function "")
+              (agenda ""
+                      ((org-agenda-skip-function 'my/agenda-custom-skip)
+                       (org-agenda-span 'day)
+                       (org-agenda-tag-filter-preset (quote ("+sandbox")))
+                       (org-agenda-skip-deadline-if-done t)
+                       (org-agenda-skip-scheduled-if-done t)
+                       (org-super-agenda-groups '((:name "Overdue" :and (:deadline past :log nil ))
+                                                  (:name "Upcoming" :deadline future)
+                                                  (:name "Should do" :and (:scheduled past :log nil ))
+                                                  (:name "Today" :time-grid t
+                                                         :and (:not (:and (:not (:scheduled today)
+                                                                                :not (:deadline today)))))))))))
+            ("D" "Done Tasks" todo "DONE|CANCELLED|COMPLETE|ABANDON"
+             ((org-agenda-overriding-header "Done Tasks")
+              (org-agenda-files ',(remove-if (lambda (x) 
+                                               (member (expand-file-name x) my/non-agenda-files)) 
+                                             my/all-agenda-files))
+              (org-agenda-skip-function 'my/skip-if-top-level-dev)))
+            ("A" "Archive trees"
+             ((tags "ARCHIVE"
+                    ((org-agenda-overriding-header "Big archive trees")
+                     (org-tags-match-list-sublevels nil)
+                     (org-agenda-skip-archived-trees nil)
+                     (org-agenda-skip-function 'my/show-big-top-levels)))
+              (tags "ARCHIVE"
+                    ((org-agenda-overriding-header "Small archive trees")
+                     (org-tags-match-list-sublevels nil)
+                     (org-agenda-skip-archived-trees nil)
+                     (org-agenda-skip-function 'my/show-small-top-levels))))
+             ((my/delete-blocks nil)))
+            ("R" "Recategorize dev to sandbox" todo (mapconcat #'identity org-done-keywords-for-agenda "|")
+             ((org-agenda-skip-function 'my/show-top-level)
+              (org-agenda-files '(,(my/agenda-file "dev.org")))))
+            ("n" "Next Tasks List" tags-todo "-REFILE-HOLD-WAIT"
+             ((org-agenda-skip-function 'my/show-next-tasks-and-standalone-tasks)
+              (org-agenda-overriding-header "Next Tasks list")
+              (org-tags-match-list-sublevels t)
+              (org-agenda-sorting-strategy '(deadline-up))))
+            ("L" "Leaf Task List" tags-todo "-REFILE-HOLD-WAIT"
+             ((org-agenda-skip-function 'my/show-leaf-tasks)
+              (org-tags-match-list-sublevels 'indented)
+              (org-agenda-overriding-header "Next Tasks list")
+              (org-agenda-finalize-hook '(org-agenda-add-separater-between-project))))
+            ("c" "Comms" tags-todo "datetime"
+             ((org-agenda-overriding-header "Comms")))
+            ("C" "Look at clocking" agenda ""
+             ((org-agenda-span 'day)
+              (org-agenda-start-with-log-mode '(closed clock))
+              (org-agenda-clockreport-mode t)))
+            ("j" "Reviews and Journals" tags "LEVEL=3&ITEM={Review for}|LEVEL=3&journal"
+             ((org-agenda-files '(,(my/org-file "entries/reviews.gpg") 
+                                  ,(my/org-file "entries/journal.gpg")))
+              (org-agenda-sorting-strategy '(tsia-down))))
+            ("r" "Reviews" tags "LEVEL=3&ITEM={Review for}"
+             ((org-agenda-files '(,(my/org-file "entries/reviews.gpg") 
+                                  ,(my/org-file "entries/journal.gpg")))
+              (org-agenda-sorting-strategy '(tsia-down))))
+            ("o" "Offline" tags-todo "offline"
+             ((org-tags-match-list-sublevels nil)))
+            ("b" "Bored" tags-todo "+short-grow"
+             ((org-tags-match-list-sublevels nil)))
+            ("t" "today" agenda ""
+             ((org-agenda-overriding-arguments (list nil (my/this-or-last-saturday) 
+                                                     9)))))))
 
 
-    (defun my/this-or-last-saturday ()
-      (org-read-date nil nil
-                     (if (string= "6" (format-time-string "%u"))
-                         "."
-                       "-sat")))
-    (progn
-      (pop org-agenda-custom-commands)
+  (defun my/this-or-last-saturday ()
+    (org-read-date nil nil
+                   (if (string= "6" (format-time-string "%u"))
+                       "."
+                     "-sat")))
+  (progn
+    (pop org-agenda-custom-commands)
     (add-to-list 'org-agenda-custom-commands
                  `("m" "People"
                    ((tags-todo ,(concat "+people" "/!" (mapconcat #'identity (cons "HOLD" my/active-projects-and-tasks) "|"))
@@ -1519,111 +1519,111 @@
                                                                :and (:not (:and (:not (:scheduled today)
                                                                                       :not (:deadline today)))))))))))))
 
-    ;; (pop org-agenda-custom-commands)
-  #+end_src
+  ;; (pop org-agenda-custom-commands)
+#+end_src
 * Checkbox hack
-  #+BEGIN_SRC emacs-lisp
-    (defun my/org-checkbox-todo ()
-      "Switch header TODO state to DONE when all checkboxes are ticked, to TODO otherwise"
-      (let ((todo-state (org-get-todo-state)) beg end)
-        (unless (not todo-state)
-          (save-excursion
-            (org-back-to-heading t)
-            (setq beg (point))
-            (end-of-line)
-            (setq end (point))
-            (goto-char beg)
-            (if (re-search-forward "\\[\\([0-9]*%\\)\\]\\|\\[\\([0-9]*\\)/\\([0-9]*\\)\\]"
-                                   end t)
-                (if (match-end 1)
-                    (if (equal (match-string 1) "100%")
-                        (unless (string-equal todo-state "DONE")
-                          (org-todo 'done))
-                      (unless (string-equal todo-state "TODO")
-                        (org-todo 'todo)))
-                  (if (and (> (match-end 2) (match-beginning 2))
-                           (equal (match-string 2) (match-string 3)))
+#+BEGIN_SRC emacs-lisp
+  (defun my/org-checkbox-todo ()
+    "Switch header TODO state to DONE when all checkboxes are ticked, to TODO otherwise"
+    (let ((todo-state (org-get-todo-state)) beg end)
+      (unless (not todo-state)
+        (save-excursion
+          (org-back-to-heading t)
+          (setq beg (point))
+          (end-of-line)
+          (setq end (point))
+          (goto-char beg)
+          (if (re-search-forward "\\[\\([0-9]*%\\)\\]\\|\\[\\([0-9]*\\)/\\([0-9]*\\)\\]"
+                                 end t)
+              (if (match-end 1)
+                  (if (equal (match-string 1) "100%")
                       (unless (string-equal todo-state "DONE")
                         (org-todo 'done))
                     (unless (string-equal todo-state "TODO")
-                      (org-todo 'todo)))))))))
+                      (org-todo 'todo)))
+                (if (and (> (match-end 2) (match-beginning 2))
+                         (equal (match-string 2) (match-string 3)))
+                    (unless (string-equal todo-state "DONE")
+                      (org-todo 'done))
+                  (unless (string-equal todo-state "TODO")
+                    (org-todo 'todo)))))))))
 
-    (add-hook 'org-checkbox-statistics-hook 'my/org-checkbox-todo)
-  #+END_SRC
+  (add-hook 'org-checkbox-statistics-hook 'my/org-checkbox-todo)
+#+END_SRC
 * View org files
 #+BEGIN_SRC emacs-lisp
-(defun make-org-file (filename)
-  "Make an org buffer in folder for all new incoming org files"
-  (interactive "MName: ")
-  (switch-to-buffer (find-file-noselect (concat "~/MEGA/org/random/" filename ".org"))))
-   
-(defun make-encrypted-org-file (filename) 
-  (interactive "MName: ")
-  (switch-to-buffer (find-file-noselect (concat "~/MEGA/org/random/" filename ".gpg")))
-  (insert "# -*- mode:org; epa-file-encrypt-to: (\"bensonchu457@gmail.com\") -*-\n\n")
-  (org-mode))
-   
+  (defun make-org-file (filename)
+    "Make an org buffer in folder for all new incoming org files"
+    (interactive "MName: ")
+    (switch-to-buffer (find-file-noselect (concat "~/MEGA/org/random/" filename ".org"))))
 
-(defun view-org-files ()
-  "Convenient way for openning up org folder in dired"
-  (interactive)
-  (dired "~/MEGA/org/"))
+  (defun make-encrypted-org-file (filename) 
+    (interactive "MName: ")
+    (switch-to-buffer (find-file-noselect (concat "~/MEGA/org/random/" filename ".gpg")))
+    (insert "# -*- mode:org; epa-file-encrypt-to: (\"bensonchu457@gmail.com\") -*-\n\n")
+    (org-mode))
+
+
+  (defun view-org-files ()
+    "Convenient way for openning up org folder in dired"
+    (interactive)
+    (dired "~/MEGA/org/"))
 #+END_SRC
 * Capture templates
-  #+begin_src emacs-lisp
-    (setq org-capture-templates
-          `(("t" "Todo" entry (file ,(my/agenda-file "refile.org"))
-             "* STUFF %?\n:PROPERTIES:\n:CREATED: %U\n:VIEWING: %a\n:END:")
-            ("r" "Reviews")
-            ("ra" "Automatic Review" entry (file+function ,(my/org-file "entries/reviews.gpg") setup-automatic-review)
-             (file ,(my/org-file "templates/weekly-review.org")))
-            ("rm" "Manual Review" entry (file+function ,(my/org-file "entries/reviews.gpg") setup-manual-review)
-             (file ,(my/org-file "templates/weekly-review.org")))
-            ;; ("rt" "Review Task" entry (file+headline ,(my/org-file "entries/reviews.gpg") "Tasks")
-            ;;  "* TODO %?")
-            ("d" "Dream" entry (file+olp+datetree ,(my/org-file "entries/dream.org"))
-             "* %?")
-            ("D" "Distracted" entry (file ,(my/agenda-file "dev.org"))
-             "* TODO %?" :clock-in t :clock-resume t)
-            ("T" "New Task" entry (file ,(my/agenda-file "dev.org"))
-             "* TODO %?" :clock-in t :clock-keep t)
-            ("m" "Money")
-            ("mc" "Credit Card" plain (file ,(my/org-file "entries/finances/ledger.ledger"))
-             (file ,(my/org-file "templates/credit.ledger")) :unnarrowed t :empty-lines 1)
-            ("mg" "General" plain (file ,(my/org-file "entries/finances/ledger.ledger"))
-             (file ,(my/org-file "templates/basic.ledger")) :unnarrowed t :empty-lines 1)
-            ("c" "Record Comms Message" entry (file+olp+datetree ,(my/agenda-file "datetree.org"))
-             "* TODO %?")
-            ("e" "Emacs config snippet" entry (file+headline "~/.emacs.d/config.org" "New")
-             "* %^{Title}\n#+begin_src emacs-lisp\n %?\n#+end_src")
-            ("j" "Journal")
-            ("jd" "Decision template" entry (file+olp+datetree ,(my/org-file "entries/journal.gpg"))
-             (file ,(my/org-file "templates/decide.org")))
-            ("je" "Journal Entry" entry (file+olp+datetree ,(my/org-file "entries/journal.gpg"))
-             "* %<%R> %?\n%U\n\n")
-            ;; ("jp" "Plan your day" entry (file+olp+datetree ,(my/org-file "entries/journal.gpg"))
-            ;;  (file ,(my/org-file "templates/daily-plan.org")))
-            ("jp" "Programming Interview Prep Journal" entry (file+olp+datetree ,(my/org-file "entries/journal.gpg"))
-             "* ")
-            ("C" "Create checklist")
-            ("Cc" "Conference Via Bus" entry (file ,(my/agenda-file "dev.org"))
-             (file ,(my/org-file "checklists/conference.org"))
-             :conference/airplane nil)
-            ("Cm" "Morning routine" entry (file ,(my/org-file "entries/routines.org"))
-             (file ,(my/org-file "checklists/mornings.org")))
-            ("Cn" "Nightly routine" entry (file ,(my/org-file "entries/routines.org"))
-             (file ,(my/org-file "checklists/nights.org")))
-            ;; ("y" "Elfeed YouTube" entry (file+olp ,(my/agenda-file "dev.org") "rewards" "Videos")
-            ;;  "* TODO %(identity elfeed-link-org-capture)")
-            ("p" "Protocol" entry (file ,(my/agenda-file "refile.org"))
-             "* STUFF %^{Title}\n:PROPERTIES:\n:CREATED: %U\n:URL: %:link\n:END:\n#+begin_example\n%i\n#+end_example\n%?")
-            ("L" "Protocol Link" entry (file ,(my/agenda-file "refile.org"))
-             "* STUFF %? [[%:link][%:description]]\n:PROPERTIES:\n:CREATED: %U\n:URL: %:link\n:END:")
-            ("l" "Add to lists conveniently")
-            ("lc" "Cringe" entry (file ,(my/org-file "entries/cringe.gpg")) "* %?")
-            ("lm" "Mental Model" entry (file ,(my/org-file "entries/mental_models.gpg")) "* %?")
-            ("li" "Important Information" entry (file ,(my/org-file "entries/important.gpg")) "* %?")))
-  #+end_src
+#+begin_src emacs-lisp
+  (setq org-capture-templates
+        `(("t" "Todo" entry (file ,(my/agenda-file "refile.org"))
+           "* STUFF %?\n:PROPERTIES:\n:CREATED: %U\n:VIEWING: %a\n:END:")
+          ("r" "Reviews")
+          ("ra" "Automatic Review" entry (file+function ,(my/org-file "entries/reviews.gpg") setup-automatic-review)
+           (file ,(my/org-file "templates/weekly-review.org")))
+          ("rm" "Manual Review" entry (file+function ,(my/org-file "entries/reviews.gpg") setup-manual-review)
+           (file ,(my/org-file "templates/weekly-review.org")))
+          ;; ("rt" "Review Task" entry (file+headline ,(my/org-file "entries/reviews.gpg") "Tasks")
+          ;;  "* TODO %?")
+          ("d" "Dream" entry (file+olp+datetree ,(my/org-file "entries/dream.org"))
+           "* %?")
+          ("D" "Distracted" entry (file ,(my/agenda-file "dev.org"))
+           "* TODO %?" :clock-in t :clock-resume t)
+          ("T" "New Task" entry (file ,(my/agenda-file "dev.org"))
+           "* TODO %?" :clock-in t :clock-keep t)
+          ("m" "Money")
+          ("mc" "Credit Card" plain (file ,(my/org-file "entries/finances/ledger.ledger"))
+           (file ,(my/org-file "templates/credit.ledger")) :unnarrowed t :empty-lines 1)
+          ("mg" "General" plain (file ,(my/org-file "entries/finances/ledger.ledger"))
+           (file ,(my/org-file "templates/basic.ledger")) :unnarrowed t :empty-lines 1)
+          ("c" "Record Comms Message" entry (file+olp+datetree ,(my/agenda-file "datetree.org"))
+           "* TODO %?")
+          ("e" "Emacs config snippet" entry (file+headline "~/.emacs.d/config.org" "New")
+           "* %^{Title}\n#+begin_src emacs-lisp\n %?\n#+end_src")
+          ("j" "Journal")
+          ("jd" "Decision template" entry (file+olp+datetree ,(my/org-file "entries/journal.gpg"))
+           (file ,(my/org-file "templates/decide.org")))
+          ("je" "Journal Entry" entry (file+olp+datetree ,(my/org-file "entries/journal.gpg"))
+           "* %<%R> %?\n%U\n\n")
+          ;; ("jp" "Plan your day" entry (file+olp+datetree ,(my/org-file "entries/journal.gpg"))
+          ;;  (file ,(my/org-file "templates/daily-plan.org")))
+          ("jp" "Programming Interview Prep Journal" entry (file+olp+datetree ,(my/org-file "entries/journal.gpg"))
+           "* ")
+          ("C" "Create checklist")
+          ("Cc" "Conference Via Bus" entry (file ,(my/agenda-file "dev.org"))
+           (file ,(my/org-file "checklists/conference.org"))
+           :conference/airplane nil)
+          ("Cm" "Morning routine" entry (file ,(my/org-file "entries/routines.org"))
+           (file ,(my/org-file "checklists/mornings.org")))
+          ("Cn" "Nightly routine" entry (file ,(my/org-file "entries/routines.org"))
+           (file ,(my/org-file "checklists/nights.org")))
+          ;; ("y" "Elfeed YouTube" entry (file+olp ,(my/agenda-file "dev.org") "rewards" "Videos")
+          ;;  "* TODO %(identity elfeed-link-org-capture)")
+          ("p" "Protocol" entry (file ,(my/agenda-file "refile.org"))
+           "* STUFF %^{Title}\n:PROPERTIES:\n:CREATED: %U\n:URL: %:link\n:END:\n#+begin_example\n%i\n#+end_example\n%?")
+          ("L" "Protocol Link" entry (file ,(my/agenda-file "refile.org"))
+           "* STUFF %? [[%:link][%:description]]\n:PROPERTIES:\n:CREATED: %U\n:URL: %:link\n:END:")
+          ("l" "Add to lists conveniently")
+          ("lc" "Cringe" entry (file ,(my/org-file "entries/cringe.gpg")) "* %?")
+          ("lm" "Mental Model" entry (file ,(my/org-file "entries/mental_models.gpg")) "* %?")
+          ("li" "Important Information" entry (file ,(my/org-file "entries/important.gpg")) "* %?")))
+#+end_src
 * Weekly Reviews Implementation
 ** Attempt 3
 #+BEGIN_SRC emacs-lisp#
@@ -1736,8 +1736,8 @@
     ;; Setup current review
     (let* ((date (org-read-date nil nil (get-last-review-date)))
            (week (format "%02d" 
-                  (org-days-to-iso-week
-                   (org-time-string-to-absolute date)))))
+                         (org-days-to-iso-week
+                          (org-time-string-to-absolute date)))))
       (output-incomplete-date)
       (setq my/review-date-old date)
       (setq my/review-visibility-level 6)
@@ -1752,8 +1752,8 @@
     (let* ((org-read-date-prefer-future nil)
            (date (org-read-date))
            (week (format "%02d" 
-                  (org-days-to-iso-week
-                   (org-time-string-to-absolute date)))))
+                         (org-days-to-iso-week
+                          (org-time-string-to-absolute date)))))
       (output-incomplete-date)
       (setq my/review-date-old date)
       (setq my/review-visibility-level 6)
@@ -1798,7 +1798,7 @@
       (kill-buffer buf))
     (or end (setq end (org-read-date nil nil ".")))
     (let* ((span (- (org-time-string-to-absolute end)
-                   (org-time-string-to-absolute start)))
+                    (org-time-string-to-absolute start)))
            (org-agenda-archives-mode t)
            (org-agenda-start-with-log-mode '(closed clock))
            (org-agenda-start-on-weekday nil)
@@ -1828,328 +1828,328 @@
   ;; (my/save-agenda-week "2019-07-14")
 #+end_src
 * prompt for automatic org-board
-  #+begin_src emacs-lisp
-    (defun my/org-add-tag (tag)
-      (org-set-tags (cons tag (org-get-tags nil t))))
+#+begin_src emacs-lisp
+  (defun my/org-add-tag (tag)
+    (org-set-tags (cons tag (org-get-tags nil t))))
 
-    (defun org-board-add-offline-tag (&rest args)
-      (my/org-add-tag "offline"))
+  (defun org-board-add-offline-tag (&rest args)
+    (my/org-add-tag "offline"))
 
-    (advice-add #'org-board-archive :after
-                #'org-board-add-offline-tag)
+  (advice-add #'org-board-archive :after
+              #'org-board-add-offline-tag)
 
-    (defun my/org-board-prompt ()
-      (let ((desc (plist-get org-capture-current-plist :description)))
-        (when (and (not org-note-abort)
-                   (string= desc "Protocol Link")
-                   (y-or-n-p "Do you want to archive the page? "))
-          (call-interactively #'org-board-archive))))
+  (defun my/org-board-prompt ()
+    (let ((desc (plist-get org-capture-current-plist :description)))
+      (when (and (not org-note-abort)
+                 (string= desc "Protocol Link")
+                 (y-or-n-p "Do you want to archive the page? "))
+        (call-interactively #'org-board-archive))))
 
-    (add-hook 'org-capture-before-finalize-hook 'my/org-board-prompt)
-  #+end_src
+  (add-hook 'org-capture-before-finalize-hook 'my/org-board-prompt)
+#+end_src
 * Parallel org-tags-views
 #+begin_src emacs-lisp
-;; TODO
+  ;; TODO
 #+end_src
 * empty lines
-  #+begin_src emacs-lisp
+#+begin_src emacs-lisp
   (setq org-cycle-separator-lines 0)
-  #+end_src
+#+end_src
 * invisibel
-  #+begin_src emacs-lisp
-    (setq org-catch-invisible-edits 'show-and-error)
-  #+end_src
+#+begin_src emacs-lisp
+  (setq org-catch-invisible-edits 'show-and-error)
+#+end_src
 * link abbreviation
 #+begin_src emacs-lisp
   (setq org-link-abbrev-alist 
         '(("youtube" . "https://youtube.com/watch?v=")))
 #+end_src
 * refile to datetree
-  #+begin_src emacs-lisp
-    (defun my/org-read-datetree-date (d)
-      "Parse a time string D and return a date to pass to the datetree functions."
-      (let ((dtmp (nthcdr 3 (parse-time-string d))))
-        (list (cadr dtmp) (car dtmp) (caddr dtmp))))
+#+begin_src emacs-lisp
+  (defun my/org-read-datetree-date (d)
+    "Parse a time string D and return a date to pass to the datetree functions."
+    (let ((dtmp (nthcdr 3 (parse-time-string d))))
+      (list (cadr dtmp) (car dtmp) (caddr dtmp))))
 
-    (defun my/org-refile-to-archive-datetree (&optional bfn)
-      "Refile an entry to a datetree under an archive."
-      (interactive)
-      (require 'org-datetree)
-      (let* ((org-read-date-prefer-future nil)
-             (bfn (or bfn (find-file-noselect (expand-file-name (my/agenda-file "datetree.org")))))
-             (datetree-date (my/org-read-datetree-date (org-read-date t nil))))
-        (org-refile nil nil (list nil (buffer-file-name bfn) nil
-                                  (with-current-buffer bfn
-                                    (save-excursion
-                                      (org-datetree-find-date-create datetree-date)
-                                      (point))))))
-      (setq this-command 'my/org-refile-to-journal))
-  #+end_src
+  (defun my/org-refile-to-archive-datetree (&optional bfn)
+    "Refile an entry to a datetree under an archive."
+    (interactive)
+    (require 'org-datetree)
+    (let* ((org-read-date-prefer-future nil)
+           (bfn (or bfn (find-file-noselect (expand-file-name (my/agenda-file "datetree.org")))))
+           (datetree-date (my/org-read-datetree-date (org-read-date t nil))))
+      (org-refile nil nil (list nil (buffer-file-name bfn) nil
+                                (with-current-buffer bfn
+                                  (save-excursion
+                                    (org-datetree-find-date-create datetree-date)
+                                    (point))))))
+    (setq this-command 'my/org-refile-to-journal))
+#+end_src
 * org-link use qutebrowser
-  #+begin_src emacs-lisp
-    (defun my/browse-url-qutebrowser (url &optional new-window)
-      (interactive)
-      (start-process (concat "qutebrowser " url)
-                     nil
-                     "qutebrowser"
-                     url))
+#+begin_src emacs-lisp
+  (defun my/browse-url-qutebrowser (url &optional new-window)
+    (interactive)
+    (start-process (concat "qutebrowser " url)
+                   nil
+                   "qutebrowser"
+                   url))
 
-    ;;(setq browse-url-browser-function #'my/browse-url-qutebrowser)
-    (setq browse-url-browser-function #'browse-url-firefox)
-  #+end_src
+  ;;(setq browse-url-browser-function #'my/browse-url-qutebrowser)
+  (setq browse-url-browser-function #'browse-url-firefox)
+#+end_src
 * convert orgzly scheduled timestamps to created
-  #+begin_src emacs-lisp
-    (defun my/scheduled-to-created ()
-      (when-let (time (org-get-scheduled-time (point)))
-        (let ((ts (format-time-string "[%Y-%m-%d %a]" time)))
-          (org-schedule '(4))
-          (org-set-property "CREATED" ts))))
+#+begin_src emacs-lisp
+  (defun my/scheduled-to-created ()
+    (when-let (time (org-get-scheduled-time (point)))
+      (let ((ts (format-time-string "[%Y-%m-%d %a]" time)))
+        (org-schedule '(4))
+        (org-set-property "CREATED" ts))))
 
 
-    (defun my/convert-orgzly-scheduled-to-created ()
-      (interactive)
-      (while (progn
-               (my/scheduled-to-created)
-               (outline-next-heading))))
-  #+end_src
+  (defun my/convert-orgzly-scheduled-to-created ()
+    (interactive)
+    (while (progn
+             (my/scheduled-to-created)
+             (outline-next-heading))))
+#+end_src
 * new stuff
 ** org-mru-clock
-   #+begin_src emacs-lisp
-     (use-package org-mru-clock)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package org-mru-clock)
+#+end_src
 ** org-clock-convenience
-   #+begin_src emacs-lisp
-     (defun my/org-clock-move-to-other ()
-       (interactive)
-       (forward-char 6)
-       (while (condition-case nil
-                  (progn 
-                    (previous-line)
-                    (org-clock-convenience-goto-ts)
-                    nil)
-                (error t))))
+#+begin_src emacs-lisp
+  (defun my/org-clock-move-to-other ()
+    (interactive)
+    (forward-char 6)
+    (while (condition-case nil
+               (progn 
+                 (previous-line)
+                 (org-clock-convenience-goto-ts)
+                 nil)
+             (error t))))
 
-     (defun my/org-clock-move-up ()
-       (interactive)
-       (org-clock-convenience-timestamp-up)
-       (my/org-clock-move-to-other)
-       (org-clock-convenience-timestamp-up))
+  (defun my/org-clock-move-up ()
+    (interactive)
+    (org-clock-convenience-timestamp-up)
+    (my/org-clock-move-to-other)
+    (org-clock-convenience-timestamp-up))
 
-     (use-package org-clock-convenience
-       :ensure t
-       :bind (:map org-agenda-mode-map
-                   ("<S-up>" . org-clock-convenience-timestamp-up)
-                   ("<S-down>" . org-clock-convenience-timestamp-down)
-                   ("<S-M-up>" . org-clock-convenience-timestamp-up)
-                   ("<S-M-down>" . org-clock-convenience-timestamp-down)
-                   ("ö" . org-clock-convenience-fill-gap)
-                   ("é" . org-clock-convenience-fill-gap-both)))
-   #+end_src
+  (use-package org-clock-convenience
+    :ensure t
+    :bind (:map org-agenda-mode-map
+                ("<S-up>" . org-clock-convenience-timestamp-up)
+                ("<S-down>" . org-clock-convenience-timestamp-down)
+                ("<S-M-up>" . org-clock-convenience-timestamp-up)
+                ("<S-M-down>" . org-clock-convenience-timestamp-down)
+                ("ö" . org-clock-convenience-fill-gap)
+                ("é" . org-clock-convenience-fill-gap-both)))
+#+end_src
 ** org-clock-consisitency
-   #+begin_src emacs-lisp
-     (setq org-agenda-clock-consistency-checks
-           '(:max-duration "10:00"
-             :min-duration 0
-             :max-gap 0
-             :gap-ok-around ("4:00")
-             ;; :default-face ((:background "DarkRed")
-             ;;                (:foreground "white"))
-             ;; :overlap-face nil
-             ;; :gap-face ((:background "DarkRed")
-             ;;            (:foreground "white"))
-             ;; :no-end-time-face nil
-             ;; :long-face nil
-             ;; :short-face nil
-             ))
-   #+end_src
+#+begin_src emacs-lisp
+  (setq org-agenda-clock-consistency-checks
+        '(:max-duration "10:00"
+                        :min-duration 0
+                        :max-gap 0
+                        :gap-ok-around ("4:00")
+                        ;; :default-face ((:background "DarkRed")
+                        ;;                (:foreground "white"))
+                        ;; :overlap-face nil
+                        ;; :gap-face ((:background "DarkRed")
+                        ;;            (:foreground "white"))
+                        ;; :no-end-time-face nil
+                        ;; :long-face nil
+                        ;; :short-face nil
+                        ))
+#+end_src
 ** org-clock stuff
-   #+begin_src emacs-lisp
-     (org-clock-persistence-insinuate)
-     (setq org-clock-in-resume t)
-     (setq org-clock-mode-line-total 'today)
-     (setq org-clock-persist t)
-     (org-clock-persistence-insinuate)
-     (setq org-clock-continuously t)
-   #+end_src
+#+begin_src emacs-lisp
+  (org-clock-persistence-insinuate)
+  (setq org-clock-in-resume t)
+  (setq org-clock-mode-line-total 'today)
+  (setq org-clock-persist t)
+  (org-clock-persistence-insinuate)
+  (setq org-clock-continuously t)
+#+end_src
 ** org-edna
-   #+begin_src emacs-lisp
-   (use-package org-edna)
-   (org-edna-load)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package org-edna)
+  (org-edna-load)
+#+end_src
 ** org agenda goto headline AND narrow
-   #+begin_src emacs-lisp
-     (defun my/org-agenda-narrow ()
-       (interactive)
-       (org-agenda-switch-to)
-       (org-narrow-to-subtree)
-       (outline-show-branches))
-     (define-key org-agenda-mode-map (kbd "S-<return>") 'my/org-agenda-narrow)
-   #+end_src
+#+begin_src emacs-lisp
+  (defun my/org-agenda-narrow ()
+    (interactive)
+    (org-agenda-switch-to)
+    (org-narrow-to-subtree)
+    (outline-show-branches))
+  (define-key org-agenda-mode-map (kbd "S-<return>") 'my/org-agenda-narrow)
+#+end_src
 
 
 ** org-brain
-   #+begin_src emacs-lisp
-     (use-package org-brain :ensure t
-       :init
-       (global-set-key (kbd "M-'") 'org-brain-visualize)
-       (setq org-brain-path "~/MEGA/org/brain/")
-       ;; For Evil users
-       (with-eval-after-load 'evil
-         (evil-set-initial-state 'org-brain-visualize-mode 'emacs))
-       :config
-       (setq org-id-track-globally t)
-       (setq org-id-locations-file "~/.emacs.d/.org-id-locations")
-       (push '("b" "Brain" plain (function org-brain-goto-end)
-               "* %i%?" :empty-lines 1)
-             org-capture-templates)
-       (setq org-brain-visualize-default-choices 'all)
-       (setq org-brain-title-max-length 0)
-       (define-key org-brain-visualize-mode-map (kbd "^") 'org-brain-visualize-back))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package org-brain :ensure t
+    :init
+    (global-set-key (kbd "M-'") 'org-brain-visualize)
+    (setq org-brain-path "~/MEGA/org/brain/")
+    ;; For Evil users
+    (with-eval-after-load 'evil
+      (evil-set-initial-state 'org-brain-visualize-mode 'emacs))
+    :config
+    (setq org-id-track-globally t)
+    (setq org-id-locations-file "~/.emacs.d/.org-id-locations")
+    (push '("b" "Brain" plain (function org-brain-goto-end)
+            "* %i%?" :empty-lines 1)
+          org-capture-templates)
+    (setq org-brain-visualize-default-choices 'all)
+    (setq org-brain-title-max-length 0)
+    (define-key org-brain-visualize-mode-map (kbd "^") 'org-brain-visualize-back))
+#+end_src
 ** Open links with firefox
-   #+begin_src emacs-lisp
-   (setq browse-url-browser-function 'browse-url-firefox)
-   #+end_src
+#+begin_src emacs-lisp
+  (setq browse-url-browser-function 'browse-url-firefox)
+#+end_src
 ** org-export
-   #+begin_src emacs-lisp
-   (require 'ox-latex)
-   (require 'ox-beamer)
-   #+end_src
+#+begin_src emacs-lisp
+  (require 'ox-latex)
+  (require 'ox-beamer)
+#+end_src
 
 ** org-jira
-   #+BEGIN_SRC emacs-lisp
-   (use-package org-jira)
-   (setq jiralib-url "https://wenningbai.atlassian.net/")
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package org-jira)
+  (setq jiralib-url "https://wenningbai.atlassian.net/")
+#+END_SRC
 ** org-board
-   #+begin_src emacs-lisp
-     (use-package org-board)
-     (add-to-list 'org-board-agent-header-alist
-                  '("Linux" . "--user-agent=\"Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.6) Gecko/20070802 SeaMonkey/1.1.4\""))
-     (setq org-board-wget-show-buffer nil)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package org-board)
+  (add-to-list 'org-board-agent-header-alist
+               '("Linux" . "--user-agent=\"Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.6) Gecko/20070802 SeaMonkey/1.1.4\""))
+  (setq org-board-wget-show-buffer nil)
+#+end_src
 ** org-now
-   #+begin_src emacs-lisp
-     (add-to-list 'load-path "~/.emacs.d/custom/org-now")
-     (require 'org-now)
-     (setq org-now-location
-           nil)
-   #+end_src
+#+begin_src emacs-lisp
+  (add-to-list 'load-path "~/.emacs.d/custom/org-now")
+  (require 'org-now)
+  (setq org-now-location
+        nil)
+#+end_src
 * org-use-speed-commands
-  #+begin_src emacs-lisp
-    (setq org-use-speed-commands t)
-  #+end_src
+#+begin_src emacs-lisp
+  (setq org-use-speed-commands t)
+#+end_src
 * new headline set property
-  #+begin_src emacs-lisp
-    (defun my/org-set-created-property (&rest args)
-      (let ((fname (expand-file-name (buffer-file-name))))
-        (when (remove-if-not (lambda (x) (string= fname (expand-file-name x))) org-agenda-files)
-          (let ((ts (format-time-string "[%Y-%m-%d %a %H:%M]")))
-            (org-set-property "CREATED" ts)))))
+#+begin_src emacs-lisp
+  (defun my/org-set-created-property (&rest args)
+    (let ((fname (expand-file-name (buffer-file-name))))
+      (when (remove-if-not (lambda (x) (string= fname (expand-file-name x))) org-agenda-files)
+        (let ((ts (format-time-string "[%Y-%m-%d %a %H:%M]")))
+          (org-set-property "CREATED" ts)))))
 
-    (advice-add #'org-insert-heading
-                :after
-                #'my/org-set-created-property)
-  #+end_src
+  (advice-add #'org-insert-heading
+              :after
+              #'my/org-set-created-property)
+#+end_src
 * Code for deleting empty blocks
-  #+begin_src emacs-lisp
-    (defvar my/delete-blocks t)
+#+begin_src emacs-lisp
+  (defvar my/delete-blocks t)
 
-    (defun org-agenda-delete-empty-compact-blocks ()
-      "Function removes empty compact blocks. 
-     If two lines next to each other have the 
-     org-agenda-structure face, then delete the 
-     previous block."
-      (unless org-agenda-compact-blocks
-        (user-error "Compact blocks must be on"))
-      (when my/delete-blocks
-        (setq buffer-read-only nil)
-        (save-excursion
-          (goto-char (point-min))
-          (let ((start-pos (point))
-                (previous nil))
-            (while (not (eobp))
-              (cond
-               ((let ((face (get-char-property (point) 'face)))
-                  (or (eq face 'org-agenda-structure)
-                      (eq face 'org-agenda-date-today)))
-                (if previous
-                    (delete-region start-pos
-                                   (point))
-                  (setq start-pos (point)))
-                (unless (org-agenda-check-type nil 'agenda)
-                  (setq previous t)))
-               (t (setq previous nil)))
-              (forward-line))))))
-
-    (add-hook 'org-agenda-finalize-hook #'org-agenda-delete-empty-compact-blocks)
-  #+end_src
-* org-mode faces
-  #+begin_src emacs-lisp
-    (set-face-attribute 'org-agenda-date-today t :inherit 'org-agenda-date :foreground "cyan" :slant 'italic :weight 'bold :height 1.1)
-    (set-face-attribute 'org-agenda-structure  t :foreground "LightSkyBlue" :box '(:line-width 1 :color "grey75" :style 'released-button))
-    (set-face-attribute 'org-ellipsis          t :foreground "turquoise" :underline nil)
-  #+end_src
-* org-notmuch
-  #+begin_src emacs-lisp
-    (require 'org-notmuch)
-  #+end_src
-* remove inherited tags
-  #+begin_src emacs-lisp
-    (defun my/org-remove-inherited-tag-strings ()
-      "Removes inherited tags from the headline-at-point's tag string.
-    Note this does not change the inherited tags for a headline,
-    just the tag string."
-      (interactive)
-      (org-set-tags (seq-remove (lambda (tag)
-                                  (get-text-property 0 'inherited tag))
-                                (org-get-tags))))
-
-    (defun my/org-clean-tags ()
-      "Visit last refiled headline and remove inherited tags from tag string."
-      (save-window-excursion
-        (org-refile-goto-last-stored)
-        (my/org-remove-inherited-tag-strings)))
-
-    (defun my/org-refile-preserve-tags (orig &rest args)
-      (let ((tags (org-get-tags)))
-        (apply orig args)))
-
-    (add-hook 'org-after-refile-insert-hook 'my/org-clean-tags)
-  #+end_src
-* archive sibling remove sub archive sibling
-  #+begin_src emacs-lisp
-    (defun my/org-un-project ()
-      (interactive)
-      (let ((level (org-current-level)))
-        (org-map-entries 'org-do-promote (format "LEVEL>%d" level) 'tree)
-        (org-cycle t)))
-
-    (defun my/org-delete-promote ()
-      (interactive)
-      (my/org-un-project)
-      (org-cut-subtree))
-
-    (defun my/is-archive-tree ()
-      (and (string= "Archive"
-                    (org-get-heading t t t t))
-           (member "ARCHIVE" (org-get-tags))))
-
-    (defun my/archive-remove-all-sibling (&rest args)
+  (defun org-agenda-delete-empty-compact-blocks ()
+    "Function removes empty compact blocks. 
+   If two lines next to each other have the 
+   org-agenda-structure face, then delete the 
+   previous block."
+    (unless org-agenda-compact-blocks
+      (user-error "Compact blocks must be on"))
+    (when my/delete-blocks
+      (setq buffer-read-only nil)
       (save-excursion
-        (let (points)
-          (org-loop/descendants
-            (when (my/is-archive-tree)
-              (push (point) points)))
-          (mapcar (lambda (p)
-                    (goto-char p)
-                    (my/org-delete-promote))
-                  points))))
+        (goto-char (point-min))
+        (let ((start-pos (point))
+              (previous nil))
+          (while (not (eobp))
+            (cond
+             ((let ((face (get-char-property (point) 'face)))
+                (or (eq face 'org-agenda-structure)
+                    (eq face 'org-agenda-date-today)))
+              (if previous
+                  (delete-region start-pos
+                                 (point))
+                (setq start-pos (point)))
+              (unless (org-agenda-check-type nil 'agenda)
+                (setq previous t)))
+             (t (setq previous nil)))
+            (forward-line))))))
 
-    (advice-add #'org-archive-to-archive-sibling
-                :before
-                #'my/archive-remove-all-sibling)
-  #+end_src
+  (add-hook 'org-agenda-finalize-hook #'org-agenda-delete-empty-compact-blocks)
+#+end_src
+* org-mode faces
+#+begin_src emacs-lisp
+  (set-face-attribute 'org-agenda-date-today t :inherit 'org-agenda-date :foreground "cyan" :slant 'italic :weight 'bold :height 1.1)
+  (set-face-attribute 'org-agenda-structure  t :foreground "LightSkyBlue" :box '(:line-width 1 :color "grey75" :style 'released-button))
+  (set-face-attribute 'org-ellipsis          t :foreground "turquoise" :underline nil)
+#+end_src
+* org-notmuch
+#+begin_src emacs-lisp
+  (require 'org-notmuch)
+#+end_src
+* remove inherited tags
+#+begin_src emacs-lisp
+  (defun my/org-remove-inherited-tag-strings ()
+    "Removes inherited tags from the headline-at-point's tag string.
+  Note this does not change the inherited tags for a headline,
+  just the tag string."
+    (interactive)
+    (org-set-tags (seq-remove (lambda (tag)
+                                (get-text-property 0 'inherited tag))
+                              (org-get-tags))))
+
+  (defun my/org-clean-tags ()
+    "Visit last refiled headline and remove inherited tags from tag string."
+    (save-window-excursion
+      (org-refile-goto-last-stored)
+      (my/org-remove-inherited-tag-strings)))
+
+  (defun my/org-refile-preserve-tags (orig &rest args)
+    (let ((tags (org-get-tags)))
+      (apply orig args)))
+
+  (add-hook 'org-after-refile-insert-hook 'my/org-clean-tags)
+#+end_src
+* archive sibling remove sub archive sibling
+#+begin_src emacs-lisp
+  (defun my/org-un-project ()
+    (interactive)
+    (let ((level (org-current-level)))
+      (org-map-entries 'org-do-promote (format "LEVEL>%d" level) 'tree)
+      (org-cycle t)))
+
+  (defun my/org-delete-promote ()
+    (interactive)
+    (my/org-un-project)
+    (org-cut-subtree))
+
+  (defun my/is-archive-tree ()
+    (and (string= "Archive"
+                  (org-get-heading t t t t))
+         (member "ARCHIVE" (org-get-tags))))
+
+  (defun my/archive-remove-all-sibling (&rest args)
+    (save-excursion
+      (let (points)
+        (org-loop/descendants
+          (when (my/is-archive-tree)
+            (push (point) points)))
+        (mapcar (lambda (p)
+                  (goto-char p)
+                  (my/org-delete-promote))
+                points))))
+
+  (advice-add #'org-archive-to-archive-sibling
+              :before
+              #'my/archive-remove-all-sibling)
+#+end_src
 * org agenda start on saturday
 #+begin_src emacs-lisp
   (setq org-agenda-start-on-weekday 6)

@@ -329,7 +329,57 @@
          (traverse-org-headlines (,(car files) ,file-symbol)
            ,@body))))
 #+end_src
+* org-loop
+#+begin_src emacs-lisp
+  (require 'cl)
 
+  (defmacro with-gensyms (symbols &rest body)
+    (declare (indent defun))
+    (assert (every #'symbolp symbols))
+    `(let ,(mapcar* #'list symbols '#1=((gensym) . #1#))
+       ,@body))
+
+  (defun ol/get-eot-marker ()
+    (if (not (org-at-heading-p))
+        (point-max-marker)
+      (save-excursion
+       (org-end-of-subtree t t)
+       (point-marker))))
+
+  (defun ol/get-bot-marker ()
+    (save-excursion
+      (if (org-at-heading-p)
+          (progn (outline-next-heading) (point-marker))
+        (goto-char (point-min))
+        (while (not (looking-at "*"))
+          (next-line))
+        (point-marker))))
+
+  (defmacro ol/descendants (&rest body)
+    (with-gensyms (end-of-subtree)
+      `(let ((,end-of-subtree (ol/get-eot-marker)))
+         (while (and (outline-next-heading)
+                     (< (point) ,end-of-subtree))
+           ,@body))))
+
+  (defmacro ol/children (&rest body)
+    (with-gensyms (end-of-subtree start)
+      `(let ((,start (progn (org-back-to-heading) (point)))
+             (,end-of-subtree (ol/get-eot-marker)))
+         (while (and (if (= (point) ,start) (org-goto-first-child) (org-end-of-subtree t t))
+                     (< (point) ,end-of-subtree))
+           ,@body))))
+
+  (defmacro ol/todo-children (&rest body)
+    (with-gensyms (todo-state tags)
+      `(ol/children
+        (let ((,todo-state (org-get-todo-state))
+              (,tags (org-get-tags)))
+          (when ,todo-state
+            (if (member "ARCHIVE" ,tags)
+                (org-end-of-subtree t nil) ;; Go to just before the heading
+              ,@body))))))
+#+end_src
 * org-agenda base folder
 #+begin_src emacs-lisp
   (defvar my/org-folder "~/MEGA/org")

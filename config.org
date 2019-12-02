@@ -3408,6 +3408,14 @@
  (setq inferior-lisp-program "/usr/bin/sbcl")
  (slime-setup '(slime-fancy slime-asdf))
 #+END_SRC
+** new etzy
+#+begin_src emacs-lisp
+  (load-file "~/.emacs.d/my-etzy.el")
+#+end_src
+** Google Translate
+#+begin_src emacs-lisp
+  (use-package google-translate)
+#+end_src
 * Broken
 ** Wunderlist
 #+BEGIN_SRC emacs-lisp#

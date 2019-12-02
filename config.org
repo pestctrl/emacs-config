@@ -1,6 +1,10 @@
 #+TITLE: Emacs Configuration
 #+AUTHOR: Benson Chu
 
+* Enable lexical binding
+#+begin_src emacs-lisp
+  ;;; -*- lexical-binding: t -*-
+#+end_src
 * Bugs
 ** Need this to fix broken config
 #+begin_src emacs-lisp

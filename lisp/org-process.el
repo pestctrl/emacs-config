@@ -28,9 +28,9 @@
 
 ;;; Code:
 
+(require 'cl)
 (require 'org)
 (require 'org-loop)
-
 
 ;; Utilities that will help with the rest of the code.
 
@@ -64,7 +64,7 @@
         (progn
           (fireorg/make-fireorg-window)
           (run-with-timer 4 nil 'op/youtube-loop))
-      (let ((org (find-file-noselect (op/agenda-file "refile.org"))))
+      (let ((org (find-file-noselect (my/agenda-file "refile.org"))))
         (fireorg/setup org ff
           ;; Goto youtube node
           (beginning-of-buffer)
@@ -89,11 +89,11 @@
                       "short"
                     "long"))
                  (op/org-add-tag "grow")
-                 (op/refile-to-location (op/agenda-file "sandbox.org")
+                 (op/refile-to-location (my/agenda-file "sandbox.org")
                                         "Educational Youtube Videos"))
         (org-todo "TODO")
         (op/org-add-tag "rest")
-        (op/refile-to-location (op/agenda-file "eternal.org")
+        (op/refile-to-location (my/agenda-file "eternal.org")
                                "Entertaining YouTube Videos")))))
 
 (defun op/get-rid-of-entertaining-youtube-videos ()
@@ -103,7 +103,7 @@
         (progn
           (fireorg/make-fireorg-window)
           (run-with-timer 4 nil 'op/get-rid-of-entertaining-youtube-videos))
-      (let ((org (find-file-noselect (op/agenda-file "refile.org"))))
+      (let ((org (find-file-noselect (my/agenda-file "refile.org"))))
         (fireorg/setup org ff
           (beginning-of-buffer)
           (search-forward "Youtube Videos: ")
@@ -117,7 +117,7 @@
                    (op/org-add-tag "watch")
                    (org-todo "TODO")
                    (op/org-add-tag "rest")
-                   (op/refile-to-location (op/agenda-file "eternal.org")
+                   (op/refile-to-location (my/agenda-file "eternal.org")
                                           "Entertaining YouTube Videos")))
                (org-get-last-sibling)))))))))
 
@@ -132,40 +132,67 @@
           (goto-char point)
           (org-insert-heading)
           (insert new-heading)
-          (op/org-add-tag "sorting")
+          (my/org-add-tag "sorting")
           (beginning-of-line)
           (forward-char)
           (point-marker))
       (when condition
         (outline-next-heading)))))
 
+;; (defun op/refile-quick-sort ()
+;;   (interactive)
+;;   (find-file (my/agenda-file "refile.org"))
+;;   (goto-char (point-min))
+;;   (outline-next-heading)
+;;   (let* ((youtube-marker (op/insert-category-heading "Youtube Videos"))
+;;          (reddit-marker (op/insert-category-heading "Reddit Things")))
+;;     (while
+;;         (progn
+;;           (org-copy-subtree)
+;;           (let ((tree-string (current-kill 0)))
+;;             (cond ((or (string-match-p "Watch \"" tree-string)
+;;                        (string-match-p "youtube\.com/" tree-string)
+;;                        (string-match-p "youtu\.be/" tree-string))
+;;                    (op/refile-to-point (buffer-file-name) youtube-marker))
+;;                   ((or (string-match-p "reddit\.com" tree-string)
+;;                        (string-match-p "redd\.it" tree-string))
+;;                    (op/refile-to-point (buffer-file-name) reddit-marker))
+;;                   (t (outline-next-heading))))))))
+
 (defun op/refile-quick-sort ()
   (interactive)
-  (find-file (op/agenda-file "refile.org"))
+  (find-file (my/agenda-file "refile.org"))
   (goto-char (point-min))
-  (outline-next-heading)
-  (let* ((youtube-marker (insert-category-heading "Youtube Videos"))
-         (reddit-marker (insert-category-heading "Reddit Things")))
-    (while
-        (progn
-          (org-copy-subtree)
-          (let ((tree-string (current-kill 0)))
-            (cond ((or (string-match-p "Watch \"" tree-string)
-                       (string-match-p "youtube\.com/" tree-string)
-                       (string-match-p "youtu\.be/" tree-string))
-                   (op/refile-to-point (buffer-file-name) youtube-marker))
-                  ((or (string-match-p "reddit\.com" tree-string)
-                       (string-match-p "redd\.it" tree-string))
-                   (op/refile-to-point (buffer-file-name) reddit-marker))
-                  (t (outline-next-heading))))))))
+  (let ((beg (ol/get-bot-marker)))
+    (outline-next-heading)
+    (let* ((youtube-marker (op/insert-category-heading beg "Youtube Videos"))
+           (reddit-marker (op/insert-category-heading beg "Reddit Things")))
+      (olsb/children
+       (org-copy-subtree)
+       (let ((tree-string (current-kill 0)))
+         (cond ((or (string-match-p "Watch \"" tree-string)
+                    (string-match-p "youtube\.com/" tree-string)
+                    (string-match-p "youtu\.be/" tree-string))
+                (op/refile-to-point (buffer-file-name) youtube-marker))
+               ((or (string-match-p "reddit\.com" tree-string)
+                    (string-match-p "redd\.it" tree-string))
+                (op/refile-to-point (buffer-file-name) reddit-marker))))))))
 
 (defun op/org-sort-subtree ()
   (interactive)
   (let ((db '((1-undecided . nil)))
         (beg (ol/get-bot-marker))
         (path (org-get-outline-path t)))
-    (ol/children
-     (when (not (member "sorting" (org-get-tags)))
+    (org-set-tags (delete "sorting" (org-get-tags nil t)))
+    (ols/children
+     (if (member "sorting" (org-get-tags))
+         (let* ((heading (org-get-heading t t t t))
+                (index-of (string-match-p ":" heading))
+                (category (intern (substring heading 0 index-of))))
+           (forward-char)
+           (setf (alist-get category db)
+                 (point-marker))
+           nil)
        (let* ((category-name (completing-read "Category? " (mapcar #'car db)))
               (category (intern category-name))
               (entry (assoc category db)))
@@ -174,8 +201,7 @@
              (setf (alist-get category db)
                    refile-location)))
          (when-let (location (alist-get category db))
-           (op/refile-to-point (buffer-file-name) location)
-           (org-get-last-sibling)))))))
+           (op/refile-to-point (buffer-file-name) location)))))))
 
 (defun fireorg/org-sort-subtree ()
   (interactive)
@@ -189,14 +215,16 @@
         (let ((db '((1-undecided . nil)))
               (beg (ol/get-bot-marker))
               (path (org-get-outline-path t)))
-          (ol/children
+          (org-set-tags (delete "sorting" (org-get-tags nil t)))
+          (ols/children
            (if (member "sorting" (org-get-tags))
                (let* ((heading (org-get-heading t t t t))
                       (index-of (string-match-p ":" heading))
                       (category (intern (substring heading 0 index-of))))
                  (forward-char)
                  (setf (alist-get category db)
-                       (point-marker)))
+                       (point-marker))
+                 nil)
              (fireorg/open-link ff
                (let* ((category-name (completing-read "Category? " (mapcar #'car db)))
                       (category (intern category-name))
@@ -206,8 +234,7 @@
                      (setf (alist-get category db)
                            refile-location)))
                  (when-let (location (alist-get category db))
-                   (op/refile-to-point (buffer-file-name) location)
-                   (org-get-last-sibling)))))))))))
+                   (op/refile-to-point (buffer-file-name) location)))))))))))
 
 ;; (defun op/open-loop ()
 ;;   (interactive)

@@ -24,9 +24,17 @@
 (require 'org)
 (require 'use-package)
 
-;; Remove comment if want to debug
+;; Uncomment if want to debug
 ;; (progn
 ;;   (toggle-debug-on-error))
+
+;; Add my modules
+
+(add-to-list 'load-path "~/.emacs.d/lisp")
+(let ((default-directory  "~/.emacs.d/lisp/"))
+  (normal-top-level-add-subdirs-to-load-path))
+
+(require 'libs)
 
 (setq use-package-always-ensure t)
 

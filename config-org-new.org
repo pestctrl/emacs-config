@@ -1873,7 +1873,7 @@
 #+end_src
 * org-notmuch
 #+begin_src emacs-lisp
-  (require 'org-notmuch)
+  (require 'ol-notmuch)
 #+end_src
 * remove inherited tags
 #+begin_src emacs-lisp

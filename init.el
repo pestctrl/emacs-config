@@ -1,4 +1,4 @@
-(setq package-list '(org-plus-contrib use-package))
+(setq package-list '(org use-package))
 ;; list the repositories containing them
 (setq package-archives '(("melpa" . "http://melpa.org/packages/")
                          ("org" . "https://orgmode.org/elpa/")

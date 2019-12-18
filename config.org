@@ -578,9 +578,10 @@
                (scratch1 . 1))
     "My custom workspace list")
 
-  (defun delete-frame-cleanup-workspace-monitor (&rest args)
+  (defun delete-frame-cleanup-workspace-monitor (orig &rest args)
     (unless exwm--floating-frame
       (let ((wnumber exwm-workspace-current-index))
+        (apply orig args)
         (setq my/workspace-list
               (remove-if (lambda (cell) (= wnumber (cdr cell)))
                          my/workspace-list))
@@ -712,10 +713,11 @@
          (cons f (flatten-list (cdr list)))))))
 
   (defun my/update-workspace-monitors (&optional no-refresh)
-    (->> (loop for j in (cl-sort (copy-seq my/workspace-list) #'< :key 'cdr)
-               collect (list (cdr j) (cdr (assoc (cdr j) my/monitor-list))))
-         (flatten-list)
-         (setq exwm-randr-workspace-monitor-plist))
+    (let ((primary (car (my/get-screens))))
+      (->> (loop for j in (cl-sort (copy-seq my/workspace-list) #'< :key 'cdr)
+                 collect (list (cdr j) (or (cdr (assoc (cdr j) my/monitor-list)) primary)))
+           (flatten-list)
+           (setq exwm-randr-workspace-monitor-plist)))
     (unless no-refresh
       (exwm-randr-refresh)))
 
@@ -761,7 +763,7 @@
   (defun my/init-workspace-module ()
     (my/setup-workspace-monitors)
     (advice-add #'delete-frame
-        :before
+        :around
         #'delete-frame-cleanup-workspace-monitor)
     (advice-add #'exwm-workspace-switch
         :before

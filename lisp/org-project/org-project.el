@@ -1,11 +1,11 @@
-;;; org-project.el --- Some useful functions for project management in org-agenda -*- lexical-binding: t -*-
+;;; org-project.el ---  -*- lexical-binding: t -*-
 
-;; Copyright (C) 2019 Benson Chu
+;; Copyright (C) 2019Benson Chu
 
 ;; Author: Benson Chu <bensonchu457@gmail.com>
-;; Created: <2019-12-05 Thu>
+;; Created: [2019-12-18 16:48]
 
-;; This file is not part of GNU Emacs.
+;; This file is not part of GNU Emacs
 
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -22,14 +22,15 @@
 
 ;;; Commentary:
 
-;; This was originally in my org-config file, but I found that navigating
-;; a literate config using xref (the natural way) was basically impossible.
-;; I've moved it to an elisp file to make that possible once again. 
-
 ;;; Code:
 
 (require 'org)
 (require 'org-loop)
+(require 'org-project-legacy)
 
+(defconst opr/strict-projects '("META" "META1" "SEQ" "EMPTY" "ETERNAL" "HOLD"))
 
+(defconst opr/strict-tasks '("TASK" "FUTURE" "TICKLER"))
 
+(provide 'org-project)
+;;; org-project.el ends here

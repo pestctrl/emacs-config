@@ -193,7 +193,7 @@
            (setf (alist-get category db)
                  (point-marker))
            nil)
-       (let* ((category-name (completing-read "Category? " (mapcar #'car db)))
+       (let* ((category-name (completing-read "Category? " (sort (mapcar #'car db) #'ivy-string<)))
               (category (intern category-name))
               (entry (assoc category db)))
          (unless entry ;; New category! 
@@ -226,7 +226,7 @@
                        (point-marker))
                  nil)
              (fireorg/open-link ff
-               (let* ((category-name (completing-read "Category? " (mapcar #'car db)))
+               (let* ((category-name (completing-read "Category? " (sort (mapcar #'car db) #'ivy-string<)))
                       (category (intern category-name))
                       (entry (assoc category db)))
                  (unless entry ;; New category! 

@@ -495,7 +495,8 @@
 #+begin_src emacs-lisp
   (defun my/is-unactionable-task ()
     (or (member "NOT_TASKS" (org-get-tags (point)))
-        (member (org-get-todo-state) (cons "INACT" org-done-keywords))))
+        (member (org-get-todo-state) (cons "INACT" org-done-keywords))
+        (string= "FUTURE" (org-get-todo-state))))
 
   (defun my/is-non-done-task ()
     (and (not (my/is-unactionable-task))
@@ -616,7 +617,7 @@
         (let ((todo (org-get-todo-state)))
           (if (and (org-time> (org-entry-get (point) "SCHEDULED")
                               (org-matcher-time "<now>"))
-                   (or (member todo '("META" "EMPTY" "SEQ"))
+                   (or (member todo '("META" "META1" "EMPTY" "SEQ"))
                        (member todo '("ONE" "TODO"))))
               'delayed
             (pcase todo
@@ -1824,10 +1825,11 @@
 * new headline set property
 #+begin_src emacs-lisp
   (defun my/org-set-created-property (&rest args)
-    (let ((fname (expand-file-name (buffer-file-name))))
-      (when (remove-if-not (lambda (x) (string= fname (expand-file-name x))) org-agenda-files)
-        (let ((ts (format-time-string "[%Y-%m-%d %a %H:%M]")))
-          (org-set-property "CREATED" ts)))))
+    (when-let (f (buffer-file-name))
+      (let ((fname (expand-file-name f)))
+        (when (remove-if-not (lambda (x) (string= fname (expand-file-name x))) org-agenda-files)
+          (let ((ts (format-time-string "[%Y-%m-%d %a %H:%M]")))
+            (org-set-property "CREATED" ts))))))
 
   (advice-add #'org-insert-heading
               :after

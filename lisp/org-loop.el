@@ -40,7 +40,7 @@ the contents of the subrtee are changing."
   (if (not (org-at-heading-p))
       (point-max-marker)
     (save-excursion
-     (org-end-of-subtree t t)
+     (org-end-of-subtree t nil)
      (point-marker))))
 
 (defun ol/get-bot-marker ()
@@ -76,11 +76,12 @@ Also handles case where point ends up back at the
 beginning of the subtree, will check to make sure
 it doesn't call `org-end-of-subtree' in that situation"
   (mmt-with-gensyms (end-of-subtree start)
-    `(let ((,start (progn (org-back-to-heading) (point)))
+    `(let ((,start (progn (org-back-to-heading t) (point)))
            (,end-of-subtree (ol/get-eot-marker)))
-       (while (and (if (= (point) ,start) (org-goto-first-child) (org-end-of-subtree t t))
-                   (< (point) ,end-of-subtree))
-         ,@body))))
+       (save-excursion
+         (while (and (if (= (point) ,start) (org-goto-first-child) (org-end-of-subtree t t))
+                     (< (point) ,end-of-subtree))
+           ,@body)))))
 
 (defmacro ol/todo-children (&rest body)
   "Wraps `BODY' in `ol/children', with the added criteria that children must have a todo-keyword."
@@ -99,7 +100,7 @@ and uses that to determine if the loop should iterate
 to the next position.  This is to allow a more simple
 method to \"continue\", like in traditional while loops."
   (mmt-with-gensyms (end-of-subtree start result)
-    `(let ((,start (progn (org-back-to-heading) (point)))
+    `(let ((,start (progn (org-back-to-heading t) (point)))
            (,end-of-subtree (ol/get-eot-marker)))
        (org-goto-first-child)
        (while (< (point) ,end-of-subtree)

@@ -1017,6 +1017,14 @@
 #+end_src
 * Agenda custom commands
 #+begin_src emacs-lisp
+  (add-to-list 'load-path 
+               "~/.emacs.d/custom/org-ql")
+  (require 'org-ql)
+  (require 'org-ql-search)
+  (require 'org-ql-custom-stuck-projects)
+
+  (defvar org-ql-indent-levels nil)
+
   (defun org-agenda-add-separater-between-project ()
     (setq buffer-read-only nil)
     (save-excursion
@@ -1064,11 +1072,85 @@
     (cons (my/agenda-file "eternal.org")
           org-agenda-files))
 
+  (defun my/valid-todo ()
+    (let (seen-non-todo)
+      (save-excursion 
+        (not
+         (catch 'break
+           (while (org-up-heading-safe)
+             (if (null (org-get-todo-state))
+                 (setf seen-non-todo t)
+               (when seen-non-todo
+                 (throw 'break t)))))))))
+
   (let* ((prod-tag "+time")
          (dev-tag "+dev")
          (sandbox-tag "+sandbox"))
     (setq org-agenda-custom-commands
-          `(("P" "Project View"
+          `(("d" "Dev"
+             ((org-ql-block '(and (tags "dev")
+                                  (tags "refile"))
+                            ((org-ql-block-header "Refile tasks")))
+              (my/org-ql-stuck-projects nil
+                                        ((org-ql-block-header "Stuck Projects")
+                                         (org-ql-indent-levels t)))
+              (tags-todo ,(concat dev-tag "-short" "/!" (mapconcat #'identity my/active-projects-and-tasks "|"))
+                         ((org-agenda-overriding-header "Active Projects")
+                          (org-agenda-skip-function 'my/dev-show-active-projects)
+                          (org-tags-match-list-sublevels 'indented)
+                          (org-agenda-sorting-strategy
+                           '((agenda category-keep)))))
+              (org-ql-block '(and (tags "dev")
+                                  (todo "WAIT"))
+                            ((org-ql-block-header "Waiting tasks")))
+              (org-ql-block '(and (tags "dev")
+                                  (todo "NEXT"))
+                            ((org-ql-block-header "Things to do")))
+              (agenda ""
+                      ((org-agenda-skip-function 'my/agenda-custom-skip)
+                       (org-agenda-span 'day)
+                       (org-agenda-tag-filter-preset (quote (,dev-tag)))
+                       (org-agenda-skip-deadline-if-done t)
+                       (org-agenda-skip-scheduled-if-done t)
+                       (org-super-agenda-groups '((:name "The Plan" :tag "PLAN")
+                                                  (:name "Overdue" :and (:deadline past :log nil))
+                                                  (:name "Upcoming" :deadline future)
+                                                  (:name "Should do" :and (:scheduled past :log nil))
+                                                  (:name "Today" :time-grid t
+                                                         :and (:not (:and (:not (:scheduled today)
+                                                                                :not (:deadline today)))))))))))
+            ("h" "Dev Hold" tags-todo "dev/!HOLD")
+            ("n" "Next Tasks List" tags-todo "-REFILE-HOLD-WAIT"
+             ((org-agenda-skip-function 'my/show-next-tasks-and-standalone-tasks)
+              (org-agenda-overriding-header "Next Tasks list")
+              (org-tags-match-list-sublevels t)
+              (org-agenda-sorting-strategy '(deadline-up))))
+            ("L" "Leaf Task List" tags-todo "-REFILE-HOLD-WAIT"
+             ((org-agenda-skip-function 'my/show-leaf-tasks)
+              (org-tags-match-list-sublevels 'indented)
+              (org-agenda-overriding-header "Next Tasks list")
+              (org-agenda-finalize-hook '(org-agenda-add-separater-between-project))))
+            ("a" . "Agendas")
+            ("aa" "Regular Agenda" agenda "")
+            ("ad" "Agenda 1 day" agenda ""
+             ((org-agenda-span 'day)))
+            ("aw" "Weekly view" agenda ""
+             ((org-agenda-overriding-arguments (list nil (my/this-or-last-saturday) 
+                                                     9))))
+            ("ad" "Dev agenda" agenda ""
+             ((org-agenda-skip-function 'my/agenda-custom-skip)
+              (org-agenda-span 'day)
+              (org-agenda-tag-filter-preset (quote (,dev-tag)))
+              (org-agenda-skip-deadline-if-done t)
+              (org-agenda-skip-scheduled-if-done t)
+              (org-super-agenda-groups '((:name "The Plan" :tag "PLAN")
+                                         (:name "Overdue" :and (:deadline past :log nil))
+                                         (:name "Upcoming" :deadline future)
+                                         (:name "Should do" :and (:scheduled past :log nil))
+                                         (:name "Today" :time-grid t
+                                                :and (:not (:and (:not (:scheduled today)
+                                                                       :not (:deadline today)))))))))
+            ("P" "Project View"
              ((tags-todo ,sandbox-tag
                          ((org-agenda-overriding-header "Active Projects")
                           (org-agenda-skip-function 'my/show-active-projects)
@@ -1095,95 +1177,6 @@
             ("pa" "All" ,(production-agenda prod-tag))
             ("pw" "work" ,(production-agenda "+work"))
             ("ps" "school" ,(production-agenda "+school"))
-            ("d" "dev"
-             ((tags-todo ,(concat dev-tag "+refile")
-                         ((org-agenda-overriding-header "Refile tasks")))
-              (tags-todo ,(concat dev-tag "/!" (mapconcat #'identity (cons "HOLD" my/active-projects-and-tasks) "|"))
-                         ((org-agenda-overriding-header "Stuck Projects")
-                          (org-agenda-skip-function 'my/dev-show-stuck-projects)
-                          (org-tags-match-list-sublevels 'indented)
-                          (org-agenda-sorting-strategy
-                           '((agenda category-keep)))))
-              (tags-todo ,(concat dev-tag "-short" "/!" (mapconcat #'identity my/active-projects-and-tasks "|"))
-                         ((org-agenda-overriding-header "Active Projects")
-                          (org-agenda-skip-function 'my/dev-show-active-projects)
-                          (org-tags-match-list-sublevels 'indented)
-                          (org-agenda-sorting-strategy
-                           '((agenda category-keep)))))
-              (tags-todo ,(concat dev-tag "/WAIT")
-                         ((org-agenda-overriding-header "Waiting tasks")))
-              (tags-todo ,(concat dev-tag "/NEXT")
-                         ((org-agenda-overriding-header "Things to do")))
-              (agenda ""
-                      ((org-agenda-skip-function 'my/agenda-custom-skip)
-                       (org-agenda-span 'day)
-                       (org-agenda-tag-filter-preset (quote (,dev-tag)))
-                       (org-agenda-skip-deadline-if-done t)
-                       (org-agenda-skip-scheduled-if-done t)
-                       (org-super-agenda-groups '((:name "Overdue" :and (:deadline past :log nil))
-                                                  (:name "Upcoming" :deadline future)
-                                                  (:name "Should do" :and (:scheduled past :log nil))
-                                                  (:name "Today" :time-grid t
-                                                         :and (:not (:and (:not (:scheduled today)
-                                                                                :not (:deadline today)))))))))))
-            ("h" "Dev Hold Projects" tags-todo "dev/!HOLD")
-            ("f" "fastdev?"
-             ((org-ql-block '(tags "refile")
-                            ((org-agenda-overriding-header "Refile tasks")))
-              (tags-todo ,(concat dev-tag "/!" (mapconcat #'identity my/active-projects-and-tasks "|"))
-                         ((org-agenda-overriding-header "Stuck Projects")
-                          (org-agenda-skip-function 'my/dev-show-stuck-projects)
-                          (org-tags-match-list-sublevels 'indented)
-                          (org-agenda-sorting-strategy
-                           '((agenda category-keep)))))
-              (tags-todo ,(concat dev-tag "-short" "/!" (mapconcat #'identity my/active-projects-and-tasks "|"))
-                         ((org-agenda-overriding-header "Active Projects")
-                          (org-agenda-skip-function 'my/dev-show-active-projects)
-                          (org-tags-match-list-sublevels 'indented)
-                          (org-agenda-sorting-strategy
-                           '((agenda category-keep)))))
-              (org-ql-block '(and (tags "dev")
-                                  (todo "WAIT"))
-                            ((org-agenda-overriding-header "Waiting tasks")))
-              (org-ql-block '(and (tags "dev")
-                                  (todo "NEXT"))
-                            ((org-agenda-overriding-header "Things to do")))
-              (agenda ""
-                      ((org-agenda-skip-function 'my/agenda-custom-skip)
-                       (org-agenda-span 'day)
-                       (org-agenda-tag-filter-preset (quote (,dev-tag)))
-                       (org-agenda-skip-deadline-if-done t)
-                       (org-agenda-skip-scheduled-if-done t)
-                       (org-super-agenda-groups '((:name "Overdue" :and (:deadline past :log nil))
-                                                  (:name "Upcoming" :deadline future)
-                                                  (:name "Should do" :and (:scheduled past :log nil))
-                                                  (:name "Today" :time-grid t
-                                                         :and (:not (:and (:not (:scheduled today)
-                                                                                :not (:deadline today)))))))))))
-            ("v" . "View just the agenda's")
-            ("vd" "Dev agenda"
-             ((agenda ""
-                      ((org-agenda-skip-function 'my/agenda-custom-skip)
-                       (org-agenda-span 'day)
-                       (org-agenda-tag-filter-preset (quote (,dev-tag)))
-                       (org-agenda-skip-deadline-if-done t)
-                       (org-agenda-skip-scheduled-if-done t)
-                       (org-super-agenda-groups '((:name "Overdue" :and (:deadline past :log nil))
-                                                  (:name "Upcoming" :deadline future)
-                                                  (:name "Should do" :and (:scheduled past :log nil))
-                                                  (:name "Today" :time-grid t
-                                                         :and (:not (:and (:not (:scheduled today)
-                                                                                :not (:deadline today)))))))))))
-            ;; ("t" "Todo" tags-todo ,dev-tag
-            ;;            ((org-agenda-overriding-header "Stuck Projects")
-            ;;             (org-agenda-skip-function 'my/dev-show-stuck-projects)
-            ;;             (org-tags-match-list-sublevels 'indented)))
-            ;; ("t" "Test "tags-todo (concat ,dev-tag "-PEOPLE")
-            ;;              ((org-agenda-overriding-header "Active Projects")
-            ;;               (org-agenda-skip-function 'my/dev-show-active-projects)
-            ;;               (org-tags-match-list-sublevels 'indented)))
-            ("T" "Test" tags-todo ,(concat dev-tag "&TODO=\"NEXT\"")
-             ((org-agenda-overriding-header "Things to do")))
             ("g" "General View"
              ((tags-todo "+sandbox+refile"
                          ((org-agenda-overriding-header "Refile tasks")))
@@ -1210,13 +1203,14 @@
                                                   (:name "Today" :time-grid t
                                                          :and (:not (:and (:not (:scheduled today)
                                                                                 :not (:deadline today)))))))))))
-            ("D" "Done Tasks" todo "DONE|CANCELLED|COMPLETE|ABANDON"
+            ("m" . "Maintainence")
+            ("md" "Done Tasks" todo "DONE|CANCELLED|COMPLETE|ABANDON"
              ((org-agenda-overriding-header "Done Tasks")
               (org-agenda-files ',(remove-if (lambda (x) 
                                                (member (expand-file-name x) my/non-agenda-files)) 
                                              my/all-agenda-files))
               (org-agenda-skip-function 'my/skip-if-top-level-dev)))
-            ("A" "Archive trees"
+            ("ma" "Archive trees"
              ((tags "ARCHIVE"
                     ((org-agenda-overriding-header "Big archive trees")
                      (org-tags-match-list-sublevels nil)
@@ -1228,40 +1222,41 @@
                      (org-agenda-skip-archived-trees nil)
                      (org-agenda-skip-function 'my/show-small-top-levels))))
              ((my/delete-blocks nil)))
-            ("R" "Recategorize dev to sandbox" todo (mapconcat #'identity org-done-keywords-for-agenda "|")
+            ("mr" "Recategorize dev to sandbox" todo (mapconcat #'identity org-done-keywords-for-agenda "|")
              ((org-agenda-skip-function 'my/show-top-level)
               (org-agenda-files '(,(my/agenda-file "dev.org")))))
-            ("n" "Next Tasks List" tags-todo "-REFILE-HOLD-WAIT"
-             ((org-agenda-skip-function 'my/show-next-tasks-and-standalone-tasks)
-              (org-agenda-overriding-header "Next Tasks list")
-              (org-tags-match-list-sublevels t)
-              (org-agenda-sorting-strategy '(deadline-up))))
-            ("L" "Leaf Task List" tags-todo "-REFILE-HOLD-WAIT"
-             ((org-agenda-skip-function 'my/show-leaf-tasks)
-              (org-tags-match-list-sublevels 'indented)
-              (org-agenda-overriding-header "Next Tasks list")
-              (org-agenda-finalize-hook '(org-agenda-add-separater-between-project))))
-            ("c" "Comms" tags-todo "datetime"
+            ("mv" "Invalid todos"
+             ((org-ql-block '(and (tags "prod")
+                                  (todo "TODO" "META" "META1" "EMPTY" "ONE")
+                                  (not (my/valid-todo)))
+                            ((org-ql-block-header "Production")))
+              (org-ql-block '(and (tags "dev")
+                                  (todo "TODO" "META" "META1" "EMPTY" "ONE")
+                                  (not (my/valid-todo)))
+                            ((org-ql-block-header "dev")))
+              (org-ql-block '(and (tags "sandbox")
+                                  (todo "TODO" "META" "META1" "EMPTY" "ONE")
+                                  (not (my/valid-todo)))
+                            ((org-ql-block-header "sandbox")))))
+            ("f" . "Flip through")
+            ("fc" "Comms" tags-todo "datetime"
              ((org-agenda-overriding-header "Comms")))
-            ("C" "Look at clocking" agenda ""
+            ("fC" "Look at clocking" agenda ""
              ((org-agenda-span 'day)
               (org-agenda-start-with-log-mode '(closed clock))
               (org-agenda-clockreport-mode t)))
-            ("j" "Reviews and Journals" tags "LEVEL=3&ITEM={Review for}|LEVEL=3&journal"
+            ("fj" "Reviews and Journals" tags "LEVEL=3&ITEM={Review for}|LEVEL=3&journal"
              ((org-agenda-files '(,(my/org-file "entries/reviews.gpg") 
                                   ,(my/org-file "entries/journal.gpg")))
               (org-agenda-sorting-strategy '(tsia-down))))
-            ("r" "Reviews" tags "LEVEL=3&ITEM={Review for}"
+            ("fr" "Reviews" tags "LEVEL=3&ITEM={Review for}"
              ((org-agenda-files '(,(my/org-file "entries/reviews.gpg") 
                                   ,(my/org-file "entries/journal.gpg")))
               (org-agenda-sorting-strategy '(tsia-down))))
             ("o" "Offline" tags-todo "offline"
              ((org-tags-match-list-sublevels nil)))
             ("b" "Bored" tags-todo "+short-grow"
-             ((org-tags-match-list-sublevels nil)))
-            ("t" "today" agenda ""
-             ((org-agenda-overriding-arguments (list nil (my/this-or-last-saturday) 
-                                                     9)))))))
+             ((org-tags-match-list-sublevels nil))))))
 
 
   (defun my/this-or-last-saturday ()
@@ -1362,6 +1357,8 @@
            (file ,(my/org-file "templates/weekly-review.org")))
           ("rm" "Manual Review" entry (file+function ,(my/org-file "entries/reviews.gpg") setup-manual-review)
            (file ,(my/org-file "templates/weekly-review.org")))
+          ("ro" "Reorient" entry (file ,(my/org-file "entries/reviews.gpg"))
+           (file ,(my/org-file "templates/reorient.org")))
           ;; ("rt" "Review Task" entry (file+headline ,(my/org-file "entries/reviews.gpg") "Tasks")
           ;;  "* TODO %?")
           ("d" "Dream" entry (file+olp+datetree ,(my/org-file "entries/dream.org"))

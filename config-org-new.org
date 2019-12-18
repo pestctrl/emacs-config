@@ -451,37 +451,28 @@
   ;; Task predicates
   (defun my/no-children ()
     "Check if there are NO tasks that are TODO or DONE"
-    (save-excursion
-      (not (orgc-loop/todo-children has-children
-             (setq has-children t)))))
+    (not (ol/any-children? (org-get-todo-state))))
 
   (defun my/has-children ()
     "Check if there are tasks that are TODO or DONE"
     (save-excursion
-      (orgc-loop/todo-children has-children
-        (setq has-children t))))
+      (ol/any-children? (org-get-todo-state))))
 
   (defun my/has-todo-child ()
     "Check if there are any tasks that are TODO"
-    (save-excursion 
-      (orgc-loop/todo-children has-children
-        (when (my/is-todo-task)
-          (setq has-children t)))))
+    (save-excursion
+      (ol/any-children? (my/is-todo-task))))
 
   (defun my/no-todo-children ()
     "Check if there are NO tasks that are TODO"
     (save-excursion
-      (not (orgc-loop/todo-children has-children
-             (when (my/is-todo-task)
-               (setq has-children t))))))
+      (not (ol/any-children? (my/is-todo-task)))))
 
   (defun my/has-non-active-todo-child ()
     "Check if there are any tasks that are TODO"
-    (save-excursion 
-      (orgc-loop/todo-children has-children
-        (when (and (my/is-todo-task)
-                   (not (org-get-scheduled-time (point))))
-          (setq has-children t)))))
+    (ol/any-todo-children?
+      (and (my/is-todo-task)
+           (not (org-get-scheduled-time (point))))))
 
   ;; Project Stuff
   (defconst my/project-keywords '("PROJECT" "META" "META1" "SEQ" "EMPTY" "ETERNAL" "SPEC" "HOLD"))
@@ -512,10 +503,7 @@
                       org-done-keywords))))
 
   (defun my/has-non-done-task ()
-    (save-excursion
-      (orgc-loop/todo-children has-non-done-task
-        (when (my/is-non-done-task)
-          (setq has-non-done-task t)))))
+    (ol/any-todo-children? (my/is-non-done-task)))
 
   (defun my/is-a-task ()
     (save-excursion
@@ -527,10 +515,7 @@
                     (my/no-children))))))
 
   (defun my/has-next-task ()
-    (save-excursion
-      (orgc-loop/todo-children has-next-task
-        (when (my/is-next-task)
-          (setq has-next-task t)))))
+    (ol/any-todo-children? (my/is-next-task)))
 
   (defun my/is-next-task ()
     (let ((todo (org-get-todo-state)))
@@ -1935,7 +1920,7 @@
   (defun my/archive-remove-all-sibling (&rest args)
     (save-excursion
       (let (points)
-        (org-loop/descendants
+        (ol/descendants
           (when (my/is-archive-tree)
             (push (point) points)))
         (mapcar (lambda (p)

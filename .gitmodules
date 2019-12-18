@@ -52,3 +52,6 @@
 [submodule "custom/org-reveal"]
 	path = custom/org-reveal
 	url = https://github.com/yjwen/org-reveal
+[submodule "custom/org-ql"]
+	path = custom/org-ql
+	url = https://github.com/pestctrl/org-ql/

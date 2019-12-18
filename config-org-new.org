@@ -668,68 +668,6 @@
               (message "Warn : open org-agenda buffer first.")))
           ))))
 #+end_src
-** NOT My own agenda renderer                                          :FIX:
-#+BEGIN_SRC emacs-lisp
-  (add-to-list 'load-path 
-               "~/.emacs.d/custom/org-ql")
-  (require 'org-ql)
-  (require 'org-habit)
-
-  ;; (org-ql-agenda '("~/MEGA/org/agenda/agenda.org") (or (and (todo "HABIT") (deadline <= today)) (todo "WAIT")) :super-groups ((:name "Tasks in other courts" :todo "WAIT") (:name "Incomplete Habits" :todo "HABIT")))
-
-  (defun org-ql-agenda-function (ignore)
-    (org-agenda-prepare "org-ql")
-    (insert
-     (save-window-excursion 
-       (org-ql-agenda org-agenda-files
-                      (or (and (todo "HABIT")
-                               (deadline <= today))
-                          (todo "WAIT")
-                          ;; (and (todo "TODO")
-                          ;;      (tags "REWARD")
-                          ;;      (priority = "A"))
-                          )
-                      :super-groups ((:name "Waiting tasks" :todo "WAIT")
-                                     (:name "Incomplete Habits" :todo "HABIT")
-                                     ;; (:name "Rewards" :tag "REWARD")
-                                     ))
-       (switch-to-buffer "*Org Agenda NG*")
-       (let ((res (buffer-string)))
-         (kill-buffer)
-         res))
-     "\n\n")
-    (org-agenda-finalize))
-
-  (defvar my/org-agenda-types nil)
-
-  (defun test (throwaway)
-    (if (null my/org-agenda-types)
-        (error "Need to specify my/org-agenda-types")
-      (org-agenda-prepare "This is a test")
-      (org-agenda--insert-overriding-header
-        ;; This string will be inserted if there is no overriding header
-        "This is a test")
-      (insert throwaway "\n")
-      (org-agenda-finalize))
-    ;; (setq buffer-read-only t)
-    )
-
-  (add-to-list 'org-agenda-custom-commands
-               '("E" "Experimental stuff"
-                 ((tags-todo "-REFILE/!"
-                             ((org-agenda-overriding-header "Stuck Projects")
-                              (org-tags-match-list-sublevels 'indented)
-                              (org-agenda-skip-function 'my/show-stuck-projects)
-                              (org-agenda-sorting-strategy
-                               '(category-keep))))
-                  (test "Hello"
-                        ((org-agenda-overriding-header "Hello World")
-                         (my/org-agenda-types t)))
-                  (org-ql-agenda-function ""))))
-
-  ;; Helper function
-  ;; (setq org-agenda-custom-commands (remove-if (lambda (a) (string= (car a) "E")) org-agenda-custom-commands))
-#+END_SRC
 * Agenda Project Filtering 
 #+begin_src emacs-lisp
   (defun my/show-active-projects ()
@@ -1100,7 +1038,7 @@
                           (org-tags-match-list-sublevels 'indented)
                           (org-agenda-sorting-strategy
                            '((agenda category-keep)))))
-              (org-ql-block '(and (tags "dev")
+              (org-ql-block '(and (tags "dev"o)
                                   (todo "WAIT"))
                             ((org-ql-block-header "Waiting tasks")))
               (org-ql-block '(and (tags "dev")
@@ -1264,38 +1202,6 @@
                    (if (string= "6" (format-time-string "%u"))
                        "."
                      "-sat")))
-  (progn
-    (pop org-agenda-custom-commands)
-    (add-to-list 'org-agenda-custom-commands
-                 `("m" "People"
-                   ((tags-todo ,(concat "+people" "/!" (mapconcat #'identity (cons "HOLD" my/active-projects-and-tasks) "|"))
-                               ((org-agenda-overriding-header "Stuck Projects")
-                                (org-agenda-skip-function 'my/show-stuck-projects)
-                                (org-tags-match-list-sublevels 'indented)
-                                (org-agenda-sorting-strategy
-                                 '((agenda category-keep)))))
-                    (tags-todo ,(concat "+people" "-short" "/!" (mapconcat #'identity my/active-projects-and-tasks "|"))
-                               ((org-agenda-overriding-header "Active Projects")
-                                (org-agenda-skip-function 'my/show-active-projects)
-                                (org-tags-match-list-sublevels 'indented)
-                                (org-agenda-sorting-strategy
-                                 '((agenda category-keep)))))
-                    (tags-todo ,(concat "+people" "/WAIT")
-                               ((org-agenda-overriding-header "Waiting tasks")))
-                    (tags-todo ,(concat "+people" "/NEXT")
-                               ((org-agenda-overriding-header "Things to do")))
-                    (agenda ""
-                            ((org-agenda-skip-function 'my/agenda-custom-skip)
-                             (org-agenda-span 'day)
-                             (org-agenda-tag-filter-preset (quote ("+people")))
-                             (org-agenda-skip-deadline-if-done t)
-                             (org-agenda-skip-scheduled-if-done t)
-                             (org-super-agenda-groups '((:name "Overdue" :and (:deadline past :log nil))
-                                                        (:name "Upcoming" :deadline future)
-                                                        (:name "Should do" :and (:scheduled past :log nil))
-                                                        (:name "Today" :time-grid t
-                                                               :and (:not (:and (:not (:scheduled today)
-                                                                                      :not (:deadline today)))))))))))))
 
   ;; (pop org-agenda-custom-commands)
 #+end_src

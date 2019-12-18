@@ -3422,6 +3422,17 @@
 #+begin_src emacs-lisp
   (use-package google-translate)
 #+end_src
+** ivy-posframe
+#+begin_src emacs-lisp
+  (use-package ivy-posframe)
+  ;; Different command can use different display function.
+  (setq ivy-posframe-display-functions-alist
+        '((swiper          . nil)
+          (complete-symbol . ivy-posframe-display-at-point)
+          (counsel-M-x     . ivy-posframe-display-at-window-bottom-left)
+          (t               . ivy-posframe-display)))
+  ;;(ivy-posframe-mode 1)
+#+end_src
 ** Code Snippet from Julien Masson for tree-folding in notmuch-tree 
 #+begin_src emacs-lisp
   (defcustom notmuch-tree-overlay-string " [...]"

@@ -1,0 +1,109 @@
+;;; org-ql-custom-stuck-projects.el ---  -*- lexical-binding: t -*-
+
+;; Copyright (C) 2019 Benson Chu
+
+;; Author: Benson Chu <bensonchu457@gmail.com>
+;; Created: [2019-12-17 19:56]
+
+;; This file is not part of GNU Emacs
+
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;;; Code:
+(defun my/top-level ()
+  (save-excursion
+    (catch 'break
+      (while (org-up-heading-safe)
+        (when (org-get-todo-state)
+          (throw 'break nil)))
+      t)))
+
+(defun my/testing-get-displayables ()
+  (interactive)
+  (my/get-project-stuck-displayables
+   (org-ql--add-markers
+    (org-element-headline-parser
+     (point)))))
+
+(defun my/get-project-stuck-displayables (element)
+  (let ((marker (org-element-property :org-marker element)))
+    (with-current-buffer (marker-buffer marker)
+      (goto-char marker)
+      (if (member (org-get-todo-state) '("EMPTY"))
+          (list element)
+        (cons element
+              (let ((display '()))
+                (ol/todo-children
+                 (cond ((my/is-a-project)
+                        (when (eq 'stuck
+                                  (my/get-project-type nil nil t))
+                          (let ((res (-> (point)
+                                         (org-element-headline-parser)
+                                         (org-ql--add-markers)
+                                         (my/get-project-stuck-displayables)
+                                         (reverse))))
+                            (unless (zerop (1- (length res)))
+                              (setf display (append res display))))))
+                       ((my/is-non-done-task)
+                        (push (org-ql--add-markers (org-element-headline-parser (point)))
+                              display))))
+                (reverse display)))))))
+
+(defun my/org-ql-stuck-projects (&rest args)
+  (let ((from (org-agenda-files nil 'ifmode))
+        (items (mapcan #'my/get-project-stuck-displayables
+                              (org-ql-select org-agenda-files
+                                '(and (tags "dev")
+                                      (or (todo "TODO" "ONE")
+                                          (and (todo "META" "META1" "EMPTY")
+                                               (not (scheduled))))
+                                      (my/top-level)
+                                      (or (and (my/is-a-task)
+                                               (my/is-standalone-task)
+                                               (not (org-get-scheduled-time (point)))
+                                               (not (org-get-deadline-time (point))))
+                                          (eq (my/get-project-type nil nil t)
+                                               'stuck)))
+                                :action 'element-with-markers
+                                :sort 'todo))))
+    (org-agenda-prepare)
+    ;; FIXME: `org-agenda--insert-overriding-header' is from an Org version newer than
+    ;; I'm using.  Should probably declare it as a minimum Org version after upgrading.
+    ;;  (org-agenda--insert-overriding-header (or org-ql-block-header (org-ql-agenda--header-line-format from query)))
+    (insert (org-add-props org-ql-block-header 
+                nil 'face 'org-agenda-structure 'org-agenda-type 'search) "\n")
+    ;; Calling `org-agenda-finalize' should be unnecessary, because in a "series" agenda,
+    ;; `org-agenda-multi' is bound non-nil, in which case `org-agenda-finalize' does nothing.
+    ;; But we do call `org-agenda-finalize-entries', which allows `org-super-agenda' to work.
+    (let ((org-agenda-sorting-strategy-selected '(category-keep) ))
+      (->> items
+           (-map #'org-ql-view--format-element)
+           org-agenda-finalize-entries
+           insert))
+    (insert "\n")))
+
+;; (test-stuck-projects)
+(add-to-list 'org-agenda-custom-commands
+             '("s" "Stuck project"
+               ((my/org-ql-stuck-projects nil
+                                          ((org-ql-block-header "Stuck Projects"))))))
+(add-to-list 'org-agenda-custom-commands
+             '("S" "Stuck raw search"
+               ((my/org-ql-stuck-projects nil
+                                           ((org-ql-block-header "Stuck Projects"))))))
+
+(provide 'org-ql-custom-stuck-projects)
+;;; org-ql-custom-stuck-projects.el ends here

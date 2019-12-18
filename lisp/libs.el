@@ -8,5 +8,9 @@
 ;;; These are utilities that I have written.
 
 (require 'org-loop)
+(require 'org-project)
+
+;; New stuff, may not stick around
+(require 'org-ql-custom-stuck-projects)
 
 (provide 'libs)

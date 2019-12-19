@@ -2693,7 +2693,25 @@
 ** elisp
 *** Macroexpand
 #+begin_src emacs-lisp
-  (define-key emacs-lisp-mode-map (kbd "C-c e") 'macrostep-expand)
+  (use-package macrostep)
+
+  (define-key macrostep-keymap (kbd "C-c C-c") nil)
+
+  (define-key macrostep-keymap (kbd "DEL") nil)
+  (define-key macrostep-keymap (kbd "c") nil)
+  (define-key macrostep-keymap (kbd "u") nil)
+  (define-key macrostep-keymap (kbd "C-c q") #'macrostep-collapse)
+
+  (define-key macrostep-keymap (kbd "RET") nil)
+  (define-key macrostep-keymap (kbd "e") nil)
+  (define-key emacs-lisp-mode-map (kbd "C-c e") #'macrostep-expand)
+
+
+  (define-key macrostep-keymap (kbd "n") nil)
+  (define-key macrostep-keymap (kbd "C-c C-n") #'macrostep-next-macro)
+
+  (define-key macrostep-keymap (kbd "p") nil)
+  (define-key macrostep-keymap (kbd "C-c C-p") #'macrostep-prev-macro)
 #+end_src
 *** auto-highlight-symbol
 #+begin_src emacs-lisp

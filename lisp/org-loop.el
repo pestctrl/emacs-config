@@ -155,5 +155,32 @@ result of `BODY' is nil"
          (and (< (point) ,end-of-subtree)
               ,condition)))))
 
+(defmacro olc/todo-children (&rest body)
+  (mmt-with-gensyms (todo-state tags)
+    `(ol/todo-children
+      (while (string= "CAT"
+                      (org-get-todo-state ))
+        (outline-next-heading))
+      ,@body)))
+
+(defmacro olc/any-todo-children? (condition)
+  (declare (indent defun))
+  (mmt-with-gensyms (end-of-subtree start)
+    `(save-excursion
+       (let ((,start (progn (org-back-to-heading t) (point)))
+             (,end-of-subtree (ol/get-eot-marker)))
+         (while (and (cond ((= (point) ,start) (org-goto-first-child))
+                           (t (org-end-of-subtree t t)))
+                     (progn (while (string= "CAT" (org-get-todo-state))
+                              (outline-next-heading))
+                            t)
+                     (< (point) ,end-of-subtree)
+                     (or (not (org-get-todo-state))
+                         (member "ARCHIVE" (org-get-tags))
+                         (not ,condition))))
+         (and (< (point) ,end-of-subtree)
+              (not (= (point) ,start))
+              ,condition)))))
+
 (provide 'org-loop)
 ;;; org-loop.el ends here

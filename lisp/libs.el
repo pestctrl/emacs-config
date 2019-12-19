@@ -9,6 +9,7 @@
 
 (require 'org-loop)
 (require 'org-project)
+(require 'org-delay)
 
 ;; New stuff, may not stick around
 (require 'org-ql-custom-stuck-projects)

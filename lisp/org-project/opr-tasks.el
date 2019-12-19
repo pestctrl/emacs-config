@@ -1,4 +1,4 @@
-;;; org-project-tasks.el ---  -*- lexical-binding: t -*-
+;;; opr-tasks.el ---  -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2019Benson Chu
 
@@ -24,7 +24,7 @@
 
 ;;; Code:
 
-(require 'org-project-util)
+(require 'opr-util)
 
 (define-todo-keyword "STUFF" 'task :color "goldenrod" :key ?s)
 
@@ -74,4 +74,4 @@
                 'stuck))))))
 
 (provide 'opr-tasks)
-;;; org-project-tasks.el ends here
+;;; opr-tasks.el ends here

@@ -1,4 +1,4 @@
-;;; org-project-projects.el ---  -*- lexical-binding: t -*-
+;;; opr-projects.el ---  -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2019Benson Chu
 
@@ -24,7 +24,7 @@
 
 ;;; Code:
 
-(require 'org-project-util)
+(require 'opr-util)
 
 ;; Context sensitive
 (define-todo-keyword "META" 'project :color "white" :key ?m)
@@ -80,9 +80,8 @@
       ("ETERNAL" 'active)
       (t (when (or (not (member state opr/ambiguous))
                    (eq 'project (opr/ambiguous-task-or-project)))
-           (if (and (member state opr/strict-projects)
-                    (org-time> (org-entry-get (point) "SCHEDULED")
-                               (org-matcher-time "<now>")))
+           (if (org-time> (org-entry-get (point) "DELAYED")
+                          (org-matcher-time "<now>"))
              'invis
            (pcase state
              ("EMPTY" (empty-status?))
@@ -95,4 +94,4 @@
                        (meta1-status?))))))))))
 
 (provide 'opr-projects)
-;;; org-project-projects.el ends here
+;;; opr-projects.el ends here

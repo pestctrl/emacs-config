@@ -26,11 +26,12 @@
 
 (require 'org)
 (require 'org-loop)
-(require 'org-project-legacy)
 (require 'pcase)
+(require 'org-delay)
+(require 'org-project-legacy)
 
 ;; Import init function, opr/strict-projects, opr/ambiguous, and opr/strict-task
-(load-file "./opr-util.el")
+(require 'opr-util)
 
 (opr/init)
 
@@ -94,7 +95,7 @@
         'task
       type)))
 
- (defun opr/get-type-and-state ()
+(defun opr/get-type-and-state ()
   (let* ((state (org-get-todo-state))
          (type (cond ((member state opr/strict-projects)
                       'project)
@@ -103,7 +104,7 @@
                      ((member state opr/ambiguous)
                       (opr/ambiguous-task-or-project))
                      (t 'legacy))))
-    (list (if (eq 'legacy type)
+    (cons (if (eq 'legacy type)
               'task
             type)
           (pcase type
@@ -113,7 +114,10 @@
 
 (defun opr/print-type-and-state ()
   (interactive)
-  (message "Headline has todo keyword \"%s\" and is \"%s\"" (opr/get-type)))
+  (let ((ts (opr/get-type-and-state)))
+    (message "Headline has todo keyword \"%s\" and is \"%s\""
+             (car ts)
+             (cdr ts))))
 
 (provide 'org-project)
 ;;; org-project.el ends here

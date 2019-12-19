@@ -3594,6 +3594,11 @@
               #'notmuch-tree-clean-up-overlays)
 
 #+end_src
+** read-identifier too stlow
+#+begin_src emacs-lisp
+  (add-to-list 'xref-prompt-for-identifier
+               'xref--read-identifier)
+#+end_src
 * Broken
 ** Wunderlist
 #+BEGIN_SRC emacs-lisp#

@@ -1,6 +1,6 @@
 ;;; org-project-legacy.el ---  -*- lexical-binding: t -*-
 
-;; Copyright (C) 2019Benson Chu
+;; Copyright (C) 2019 Benson Chu
 
 ;; Author: Benson Chu <bensonchu457@gmail.com>
 ;; Created: [2019-12-18 16:54]
@@ -62,9 +62,6 @@
 ;; New stuff
 (defconst not-tasks-tag "NOT_TASKS")
 (defconst these-are-not-tasks '("TTTT" "INACT" "CLOCK" "FUTURE" "DEPEND" "CAT"))
-
-(defun my/is-done-task ()
-  (member (org-get-todo-state) org-done-keywords))
 
 (defun my/is-non-task ()
   (member (org-get-todo-state) these-are-not-tasks))
@@ -279,8 +276,182 @@
              (when (my/has-todo-child)
                (if (my/greedy-active-project (buffer-file-name) (point))
                    'active 'stuck)))))))))
+(defun my/show-active-projects ()
+  "Only show subtrees that are stuck projects"
+  (save-restriction
+    (widen)
+    (let ((subtree-end (save-excursion (org-end-of-subtree t))))
+      (unless (member (my/get-project-type buffer-file-name (point) nil)
+                      '(active))
+        subtree-end))))
+
+(defun my/dev-show-active-projects ()
+  "Only show subtrees that are stuck projects"
+  (save-restriction
+    (widen)
+    (let ((subtree-end (save-excursion (org-end-of-subtree t))))
+      (unless (or (and (my/is-todo-task)
+                       (my/is-standalone-task)
+                       (or (string= (org-get-todo-state) "NEXT")
+                           (org-get-scheduled-time (point))
+                           (org-get-deadline-time (point))))
+                  (member (my/get-project-type buffer-file-name (point) nil)
+                          '(active)))
+        subtree-end))))
+
+(defun my/show-stuck-projects ()
+  "Only show subtrees that are stuck projects"
+  (save-restriction
+    (widen)
+    (let ((subtree-end (save-excursion (org-end-of-subtree t t)))
+          (next-heading (save-excursion (outline-next-heading))))
+      ;; (setq debug-p (point)
+      ;;       debuf-f (buffer-file-name))
+      (if (org-get-todo-state)
+          (unless (or (and (my/is-a-task)
+                           (my/is-standalone-task)
+                           (not (org-get-scheduled-time (point)))
+                           (not (org-get-deadline-time (point))))
+                      (eq (my/get-project-type buffer-file-name (point) t)
+                          'stuck))
+            subtree-end)
+        next-heading))))
+
+(defun my/dev-show-stuck-projects ()
+  "Only show subtrees that are stuck projects"
+  (save-restriction
+    (widen)
+    (let ((subtree-end (save-excursion (org-end-of-subtree t t)))
+          (next-heading (save-excursion (outline-next-heading))))
+      (if (org-get-todo-state)
+          (unless (or (and (my/is-a-task)
+                           (my/is-standalone-task)
+                           (not (org-get-scheduled-time (point)))
+                           (not (org-get-deadline-time (point))))
+                      (eq (my/get-project-type buffer-file-name (point) t)
+                          'stuck))
+            subtree-end)
+        next-heading))))
+
+(defun my/show-delayed-projects ()
+  (save-restriction
+    (widen)
+    (let ((subtree-end (save-excursion (org-end-of-subtree t))))
+      (unless (eq (my/get-project-type buffer-file-name (point))
+                  'delayed)
+        subtree-end))))
+
+(defun my/agenda-custom-skip ()
+  (let ((next-headline (save-excursion (or (outline-next-heading) (point-max))))
+        (current (point))
+        display)
+    (save-restriction
+      (widen)
+      (save-excursion
+        (when (or (my/is-a-project)
+                  (member (org-get-todo-state) '("FUTURE" "WAIT" "HABIT" nil)))
+          next-headline)))))
+
+(defun my/show-next-tasks-and-standalone-tasks ()
+  (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+    (unless (and (my/is-a-task)
+                 (or 
+                  (my/is-next-task)
+                  (my/is-standalone-task)))
+      next-headline)))
 
 
+(defun my/has-next-todo ()
+  (save-excursion
+    (let ((end-of-subtree (save-excursion (org-end-of-subtree t)))
+          flag)
+      (while (and (not flag)
+                  (outline-next-heading)
+                  (< (point) next-headline))
+        (when (string= (org-get-todo-state) "NEXT")
+          (setq flag (point))))
+      flag)))
+
+(defun my/show-leaf-tasks ()
+  (let ((next-headline (save-excursion (org-end-of-subtree t))))
+    (unless (or (string= "NEXT" (org-get-todo-state))
+                (my/has-next-todo))
+      next-headline)))
+
+(defun my/skip-standalone-tasks ()
+  (when (my/is-standalone-task)
+    (org-end-of-subtree t t)))
+
+
+;; (defvar my/done-projects-flag nil)
+
+;; (defun my/show-done-projects-and-tasks ()
+;;   "Show top level leaf of these todos: DONE|CANCELLED|COMPLETE"
+;;   (save-restriction
+;;     (widen)
+;;     (let ((subtree-end (save-excursion (org-end-of-subtree t)))
+;;           (next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+;;       (if my/done-projects-flag
+;;           (let ((ov my/done-projects-flag))
+;;             (setq my/done-projects-flag nil)
+;;             ov)
+;;         (if (member (org-get-todo-state) org-done-keywords)
+;;             (progn (setq my/done-projects-flag subtree-end)
+;;                    nil)
+;;           next-headline)))))
+
+(defun my/show-done-projects-and-tasks ()
+  "Show top level leaf of these todos: DONE|CANCELLED|COMPLETE"
+  (save-restriction
+    (widen)
+    (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+      (unless (and (member (org-get-todo-state) org-done-keywords)
+                   (not (my/is-part-of-subtree)))
+        next-headline))))
+
+(defun my/parent-is-eternal ()
+  (save-excursion
+    (and (not (= 1 (org-current-level)))
+         (progn
+           (org-up-heading-safe)
+           (string= (org-get-todo-state) "ETERNAL")))))
+
+(defun my/show-top-level ()
+  (save-restriction
+    (widen)
+    (let ((next-headline (save-excursion (or (outline-next-heading) (point-max)))))
+      (unless (or (not (my/is-part-of-subtree))
+                  (my/parent-is-eternal))
+        next-headline))))
+
+(defun my/show-big-top-levels ()
+  (save-restriction
+    (widen)
+    (let ((next-headline (save-excursion (or (outline-next-heading) (point-max))))
+          (size (- (save-excursion (org-end-of-subtree t t)) (point))))
+      (unless (and
+               (or (not (my/is-part-of-subtree))
+                   (my/parent-is-eternal))
+               (> size 50000))
+        next-headline))))
+
+(defun my/show-small-top-levels ()
+  (save-restriction
+    (widen)
+    (let ((next-headline (save-excursion (or (outline-next-heading) (point-max))))
+          (size (- (save-excursion (org-end-of-subtree t t)) (point))))
+      (unless (and
+               (or (not (my/is-part-of-subtree))
+                   (my/parent-is-eternal))
+               (< size 50000))
+        next-headline))))
+
+(defun my/skip-if-top-level-dev ()
+  (let ((bname (file-name-nondirectory (buffer-file-name))))
+    (when (and (string= bname "dev.org")
+               (not (my/is-part-of-subtree)))
+      (save-excursion
+        (outline-next-heading)))))
 
 (provide 'org-project-legacy)
 ;;; org-project-legacy.el ends here

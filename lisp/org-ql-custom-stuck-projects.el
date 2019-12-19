@@ -23,6 +23,10 @@
 ;;; Commentary:
 
 ;;; Code:
+(require 'org)
+(require 'org-agenda)
+(require 'org-project)
+
 (defun my/top-level ()
   (save-excursion
     (catch 'break
@@ -45,11 +49,14 @@
       (if (member (org-get-todo-state) '("EMPTY"))
           (list element)
         (cons element
-              (let ((display '()))
-                (ol/todo-children
+              (let ((type (opr/get-type)))
+                (pcase type
+                  ('project )
+                  ('task))
+                (olc/todo-children
+                 
                  (cond ((my/is-a-project)
-                        (when (eq 'stuck
-                                  (my/get-project-type nil nil t))
+                        (when (eq 'stuck (opr/type-of-project))
                           (let ((res (-> (point)
                                          (org-element-headline-parser)
                                          (org-ql--add-markers)
@@ -68,15 +75,11 @@
                               (org-ql-select org-agenda-files
                                 '(and (tags "dev")
                                       (or (todo "TODO" "ONE")
-                                          (and (todo "META" "META1" "EMPTY")
+                                          (and (todo "META" "META1" "EMPTY" "SEQ")
                                                (not (scheduled))))
                                       (my/top-level)
-                                      (or (and (my/is-a-task)
-                                               (my/is-standalone-task)
-                                               (not (org-get-scheduled-time (point)))
-                                               (not (org-get-deadline-time (point))))
-                                          (eq (my/get-project-type nil nil t)
-                                               'stuck)))
+                                      (or (eq 'stuck (opr/type-of-task))
+                                          (eq 'stuck (opr/type-of-project))))
                                 :action 'element-with-markers
                                 :sort 'todo))))
     (org-agenda-prepare)
@@ -100,10 +103,6 @@
              '("s" "Stuck project"
                ((my/org-ql-stuck-projects nil
                                           ((org-ql-block-header "Stuck Projects"))))))
-(add-to-list 'org-agenda-custom-commands
-             '("S" "Stuck raw search"
-               ((my/org-ql-stuck-projects nil
-                                           ((org-ql-block-header "Stuck Projects"))))))
 
 (provide 'org-ql-custom-stuck-projects)
 ;;; org-ql-custom-stuck-projects.el ends here

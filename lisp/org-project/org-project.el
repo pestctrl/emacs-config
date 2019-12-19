@@ -1,6 +1,6 @@
 ;;; org-project.el ---  -*- lexical-binding: t -*-
 
-;; Copyright (C) 2019Benson Chu
+;; Copyright (C) 2019 Benson Chu
 
 ;; Author: Benson Chu <bensonchu457@gmail.com>
 ;; Created: [2019-12-18 16:48]
@@ -27,10 +27,93 @@
 (require 'org)
 (require 'org-loop)
 (require 'org-project-legacy)
+(require 'pcase)
 
-(defconst opr/strict-projects '("META" "META1" "SEQ" "EMPTY" "ETERNAL" "HOLD"))
+;; Import init function, opr/strict-projects, opr/ambiguous, and opr/strict-task
+(load-file "./opr-util.el")
 
-(defconst opr/strict-tasks '("TASK" "FUTURE" "TICKLER"))
+(opr/init)
+
+;; TASKS
+(require 'opr-tasks)
+
+
+;; Projects
+(require 'opr-projects)
+
+
+;; Ambiguous
+
+(define-todo-keyword "TODO" 'ambiguous :key ?T)
+
+(define-todo-keyword "ONE" 'ambiguous :color "royal blue" :key ?o)
+
+(finish-active-type 'ambiguous)
+
+(defun opr/ambiguous-task-or-project ()
+  (when-let ((state (org-get-todo-state)))
+    (pcase state
+      ("TODO" (if (olc/any-todo-children?
+                    (or (member (opr/type-of-task) '(done stuck active))
+                        (opr/type-of-project)))
+                  'project
+                'task))
+      ("ONE" (if (olc/any-todo-children?
+                   (or (member (opr/type-of-task) '(stuck active))
+                       (opr/type-of-project)))
+                 'project
+               'task)))))
+
+;; Util
+
+;; Depended by olc/any-todo-children?  
+(define-todo-keyword "CAT" 'util :key ?C)
+
+(finish-active-type 'util)
+
+;; Legacy keywords
+
+(define-todo-keyword "CLOCK" 'legacy :color "dark gray")
+
+(define-todo-keyword "INACT" 'legacy :color "dark gray")
+
+(finish-active-type 'legacy)
+
+(define-todo-keyword "ABANDON" 'legacy :color "dark gray" :recordstr "@/!")
+
+(defun opr/get-type ()
+  (let* ((state (org-get-todo-state))
+         (type (cond ((member state opr/strict-projects)
+                      'project)
+                     ((member state opr/strict-tasks)
+                      'task)
+                     ((member state opr/ambiguous)
+                      (opr/ambiguous-task-or-project))
+                     (t 'legacy))))
+    (if (eq 'legacy type)
+        'task
+      type)))
+
+ (defun opr/get-type-and-state ()
+  (let* ((state (org-get-todo-state))
+         (type (cond ((member state opr/strict-projects)
+                      'project)
+                     ((member state opr/strict-tasks)
+                      'task)
+                     ((member state opr/ambiguous)
+                      (opr/ambiguous-task-or-project))
+                     (t 'legacy))))
+    (list (if (eq 'legacy type)
+              'task
+            type)
+          (pcase type
+            ('project (opr/type-of-project))
+            ('task (opr/type-of-task))
+            ('legacy 'invis)))))
+
+(defun opr/print-type-and-state ()
+  (interactive)
+  (message "Headline has todo keyword \"%s\" and is \"%s\"" (opr/get-type)))
 
 (provide 'org-project)
 ;;; org-project.el ends here

@@ -64,6 +64,29 @@
                                                         (:name "Today" :time-grid t
                                                                :and (:not (:and (:not (:scheduled today)
                                                                                       :not (:deadline today))))))))))))
+          ("P" "Project View"
+           ((tags-todo ,sandbox-tag
+                       ((org-agenda-overriding-header "Active Projects")
+                        (org-agenda-skip-function 'my/show-active-projects)
+                        (org-tags-match-list-sublevels 'indented)))
+            (tags-todo ,sandbox-tag
+                       ((org-agenda-overriding-header "Stuck Projects")
+                        (org-tags-match-list-sublevels 'indented)
+                        (org-agenda-skip-function 'my/show-stuck-projects)
+                        (org-agenda-sorting-strategy
+                         '(category-keep))))
+            (tags-todo ,sandbox-tag
+                       ((org-agenda-overriding-header "Delayed projects")
+                        (org-agenda-skip-function 'my/show-delayed-projects)))
+            (tags-todo ,(concat sandbox-tag "-PEOPLE/!HOLD")
+                       ((org-agenda-overriding-header "Projects on hold")))
+            (tags-todo ,(concat sandbox-tag "+PEOPLE/!HOLD")
+                       ((org-agenda-overriding-header "People on hold")))
+            (tags-todo ,(concat sandbox-tag "/!FUTURE")
+                       ((org-agenda-overriding-header "Someday projects")
+                        (org-agenda-sorting-strategy '(tag-up))))
+            (tags-todo ,(concat sandbox-tag "/!ETERNAL")
+                       ((org-agenda-overriding-header "Eternal Projects")))))
 
 (provide 'experimental-agenda-views)
 ;;; experimental-agenda-views.el ends here

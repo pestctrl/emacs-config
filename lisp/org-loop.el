@@ -59,6 +59,8 @@ right below the subtree."
 (defmacro ol/descendants (&rest body)
   "Wraps `BODY' in a while loop that loops over all descendants of a subtree.
 Iterate using `outline-next-heading'."
+  (declare (indent defun)
+           (debug (&rest form)))
   (mmt-with-gensyms (end-of-subtree)
     `(let ((,end-of-subtree (ol/get-eot-marker)))
        (while (and (outline-next-heading)
@@ -75,6 +77,8 @@ Iterate using `org-end-of-subtree'.
 Also handles case where point ends up back at the
 beginning of the subtree, will check to make sure
 it doesn't call `org-end-of-subtree' in that situation"
+  (declare (indent defun)
+           (debug (&rest form)))
   (mmt-with-gensyms (end-of-subtree start)
     `(let ((,start (progn (org-back-to-heading t) (point)))
            (,end-of-subtree (ol/get-eot-marker)))
@@ -85,6 +89,8 @@ it doesn't call `org-end-of-subtree' in that situation"
 
 (defmacro ol/todo-children (&rest body)
   "Wraps `BODY' in `ol/children', with the added criteria that children must have a todo-keyword."
+  (declare (indent defun)
+           (debug (&rest form)))
   (mmt-with-gensyms (todo-state tags)
     `(ol/children
       (let ((,todo-state (org-get-todo-state))
@@ -99,6 +105,8 @@ Experimental version that takes the result of `BODY'
 and uses that to determine if the loop should iterate
 to the next position.  This is to allow a more simple
 method to \"continue\", like in traditional while loops."
+  (declare (indent defun)
+           (debug (&rest form)))
   (mmt-with-gensyms (end-of-subtree start result)
     `(let ((,start (progn (org-back-to-heading t) (point)))
            (,end-of-subtree (ol/get-eot-marker)))
@@ -112,12 +120,15 @@ method to \"continue\", like in traditional while loops."
   "Wraps `BODY' in a while loop that loops over all direct children of a FILE.
 Added experimental \"s\" feature, meaning that iteration will only occur if
 result of `BODY' is nil"
+  (declare (indent defun)
+           (debug (&rest form)))
   `(while (not (eobp))
      (unless (progn ,@body)
        (org-get-next-sibling))))
 
 (defmacro ol/any-children? (condition)
-  (declare (indent defun))
+  (declare (indent defun)
+           (debug (&rest form)))
   (mmt-with-gensyms (end-of-subtree start)
     `(save-excursion
        (let ((,start (progn (org-back-to-heading t) (point)))
@@ -130,7 +141,8 @@ result of `BODY' is nil"
               ,condition)))))
 
 (defmacro ol/any-todo-children? (condition)
-  (declare (indent defun))
+  (declare (indent defun)
+           (debug (&rest form)))
   (mmt-with-gensyms (end-of-subtree start)
     `(save-excursion
        (let ((,start (progn (org-back-to-heading t) (point)))
@@ -145,7 +157,8 @@ result of `BODY' is nil"
               ,condition)))))
 
 (defmacro ol/any-descendents? (condition)
-  (declare (indent defun))
+  (declare (indent defun)
+           (debug (&rest form)))
   (mmt-with-gensyms (end-of-subtree)
     `(save-excursion
        (let ((,end-of-subtree (ol/get-eot-marker)))
@@ -156,6 +169,8 @@ result of `BODY' is nil"
               ,condition)))))
 
 (defmacro olc/todo-children (&rest body)
+  (declare (indent defun)
+           (debug (&rest form)))
   (mmt-with-gensyms (todo-state tags)
     `(ol/todo-children
       (while (string= "CAT"
@@ -164,7 +179,8 @@ result of `BODY' is nil"
       ,@body)))
 
 (defmacro olc/any-todo-children? (condition)
-  (declare (indent defun))
+  (declare (indent defun)
+           (debug (&rest form)))
   (mmt-with-gensyms (end-of-subtree start)
     `(save-excursion
        (let ((,start (progn (org-back-to-heading t) (point)))

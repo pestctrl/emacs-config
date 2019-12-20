@@ -129,7 +129,7 @@
 #+end_src
 * org-agenda base folder
 #+begin_src emacs-lisp
-  (defvar my/org-folder "~/MEGA/org")
+  (defconst my/org-folder "~/MEGA/org")
   (defconst my/agenda-folder (expand-file-name "2019-05-agenda" my/org-folder))
 
   (defun my/org-file (str)

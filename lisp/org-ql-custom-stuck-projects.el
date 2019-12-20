@@ -49,24 +49,23 @@
       (if (member (org-get-todo-state) '("EMPTY"))
           (list element)
         (cons element
-              (let ((type (opr/get-type)))
-                (pcase type
-                  ('project )
-                  ('task))
+              (let ((display '()))
                 (olc/todo-children
-                 
-                 (cond ((my/is-a-project)
-                        (when (eq 'stuck (opr/type-of-project))
-                          (let ((res (-> (point)
-                                         (org-element-headline-parser)
-                                         (org-ql--add-markers)
-                                         (my/get-project-stuck-displayables)
-                                         (reverse))))
-                            (unless (zerop (1- (length res)))
-                              (setf display (append res display))))))
-                       ((my/is-non-done-task)
+                 (let ((type (opr/get-type)))
+                   (pcase type
+                     ('project
+                      (when (eq 'stuck (opr/type-of-project))
+                        (let ((res (-> (point)
+                                       (org-element-headline-parser)
+                                       (org-ql--add-markers)
+                                       (my/get-project-stuck-displayables)
+                                       (reverse))))
+                          (unless (zerop (1- (length res)))
+                            (setf display (append res display))))))
+                     ('task
+                      (when (eq 'stuck (opr/type-of-task))
                         (push (org-ql--add-markers (org-element-headline-parser (point)))
-                              display))))
+                              display))))))
                 (reverse display)))))))
 
 (defun my/org-ql-stuck-projects (&rest args)

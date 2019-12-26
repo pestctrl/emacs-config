@@ -27,7 +27,7 @@
 (require 'org)
 (require 'org-loop)
 (require 'pcase)
-(require 'org-delay)
+;; (require 'org-delay)
 (require 'org-project-legacy)
 
 ;; Import init function, opr/strict-projects, opr/ambiguous, and opr/strict-task

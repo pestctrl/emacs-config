@@ -34,9 +34,11 @@
 
 (define-todo-keyword "TASK" 'task :key ?t)
 
-(define-todo-keyword "NEXT" 'task :key ?n)
+(define-todo-keyword "NEXT" 'task :key ?n :color "cyan")
 
 (define-todo-keyword "WAIT" 'task :color "yellow" :key ?w :recordstr "@/!")
+
+(define-todo-keyword "HALT" 'task :color "red" :key ?H :recordstr "@/!")
 
 (finish-active-type 'task)
 
@@ -59,19 +61,22 @@
       ("COMPLETE" 'done)
       ("HALT" 'stuck)
       ("WAIT" 'active)
-      ("TASK" (if (org-get-scheduled-time (point))
-                  'active
-                'stuck))
-      ("ONE" (when (eq 'task (opr/ambiguous-task-or-project))
+      (_ (if (member "_invis_" (org-get-tags))
+             'invis
+           (pcase state
+             ("TASK" (if (org-get-scheduled-time (point))
+                         'active
+                       'stuck))
+             ("ONE" (when (eq 'task (opr/ambiguous-task-or-project))
                (if (or (org-get-deadline-time (point))
                        (org-get-scheduled-time (point)))
-                  'active
-                'stuck)))
-      ("TODO" (when (eq 'task (opr/ambiguous-task-or-project))
-                (if (or (org-get-deadline-time (point))
-                       (org-get-scheduled-time (point)))
-                  'active
-                'stuck))))))
+                   'active
+                 'stuck)))
+             ("TODO" (when (eq 'task (opr/ambiguous-task-or-project))
+                       (if (or (org-get-deadline-time (point))
+                               (org-get-scheduled-time (point)))
+                           'active
+                         'stuck)))))))))
 
 (provide 'opr-tasks)
 ;;; opr-tasks.el ends here

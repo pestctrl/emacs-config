@@ -59,13 +59,14 @@
     'invis))
 
 ;; Simple ones
-(define-todo-keyword "ETERNAL" 'project :color "white" :key ?E)
+(define-todo-keyword "ETERNAL" 'project :key ?E)
 
 (define-todo-keyword "HOLD" 'project :color "red" :key ?h)
 
 (finish-active-type 'project)
 
-(define-todo-keyword "COMPLETE" 'task :key ?c :recordstr "!")
+;; I don't need this, but it's legacy
+(define-todo-keyword "COMPLETE" 'task :recordstr "!")
 
 (defun opr/is-project ()
   (let ((state (org-get-todo-state)))

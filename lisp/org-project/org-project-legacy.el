@@ -67,10 +67,11 @@
   (member (org-get-todo-state) these-are-not-tasks))
 
 (defun my/is-todo-task ()
-  (pcase (org-get-todo-state)
-    ("TODO" (my/no-children))
-    ("ONE"  (my/no-todo-children))
-    ("NEXT" t)))
+  (and (not (member "_invis_" (org-get-tags)))
+       (pcase (org-get-todo-state)
+         ("TODO" (my/no-children))
+         ("ONE"  (my/no-todo-children))
+         ("NEXT" t))))
 
 ;; Standalone tasks
 (defun my/is-part-of-subtree ()

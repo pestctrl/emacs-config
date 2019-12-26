@@ -73,9 +73,7 @@
         (items (mapcan #'my/get-project-stuck-displayables
                               (org-ql-select org-agenda-files
                                 '(and (tags "dev")
-                                      (or (todo "TODO" "ONE")
-                                          (and (todo "META" "META1" "EMPTY" "SEQ")
-                                               (not (scheduled))))
+                                      (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
                                       (my/top-level)
                                       (or (eq 'stuck (opr/type-of-task))
                                           (eq 'stuck (opr/type-of-project))))

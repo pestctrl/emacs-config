@@ -31,6 +31,7 @@
 (require 'cl)
 (require 'org)
 (require 'org-loop)
+(require 'fireorg)
 
 ;; Utilities that will help with the rest of the code.
 
@@ -203,38 +204,37 @@
          (when-let (location (alist-get category db))
            (op/refile-to-point (buffer-file-name) location)))))))
 
-(defun fireorg/org-sort-subtree ()
-  (interactive)
-  (let ((ff (get-buffer "fireorg"))
-        (org (current-buffer)))
+(defun fireorg/org-sort-subtree (org)
+  (interactive (list (current-buffer)))
+  (let ((ff (get-buffer "fireorg")))
     (if (null ff)
         (progn
           (fireorg/make-fireorg-window)
-          (run-with-timer 4 nil 'fireorg/org-sort-subtree))
+          (run-with-timer 4 nil 'fireorg/org-sort-subtree org))
       (fireorg/setup org ff
         (let ((db '((1-undecided . nil)))
               (beg (ol/get-bot-marker))
               (path (org-get-outline-path t)))
           (org-set-tags (delete "sorting" (org-get-tags nil t)))
           (ols/children
-           (if (member "sorting" (org-get-tags))
-               (let* ((heading (org-get-heading t t t t))
-                      (index-of (string-match-p ":" heading))
-                      (category (intern (substring heading 0 index-of))))
-                 (forward-char)
-                 (setf (alist-get category db)
-                       (point-marker))
-                 nil)
-             (fireorg/open-link ff
-               (let* ((category-name (completing-read "Category? " (sort (mapcar #'car db) #'ivy-string<)))
-                      (category (intern category-name))
-                      (entry (assoc category db)))
-                 (unless entry ;; New category! 
-                   (let ((refile-location (op/insert-category-heading beg category-name)))
-                     (setf (alist-get category db)
-                           refile-location)))
-                 (when-let (location (alist-get category db))
-                   (op/refile-to-point (buffer-file-name) location)))))))))))
+            (if (member "sorting" (org-get-tags))
+                (let* ((heading (org-get-heading t t t t))
+                       (index-of (string-match-p ":" heading))
+                       (category (intern (substring heading 0 index-of))))
+                  (forward-char)
+                  (setf (alist-get category db)
+                        (point-marker))
+                  nil)
+              (fireorg/open-link ff
+                (let* ((category-name (completing-read "Category? " (sort (mapcar #'car db) #'ivy-string<)))
+                       (category (intern category-name))
+                       (entry (assoc category db)))
+                  (unless entry ;; New category! 
+                    (let ((refile-location (op/insert-category-heading beg category-name)))
+                      (setf (alist-get category db)
+                            refile-location)))
+                  (when-let (location (alist-get category db))
+                    (op/refile-to-point (buffer-file-name) location)))))))))))
 
 ;; (defun op/open-loop ()
 ;;   (interactive)

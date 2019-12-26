@@ -24,23 +24,38 @@
 
 ;;; Code:
 
+(require 'org)
+(require 'org-agenda)
+
+(require 'org-project)
+
 (defun org-delay (arg &optional time)
   (interactive "P")
   (if (and (org-region-active-p) org-loop-over-headlines-in-active-region)
       (error "Not supported yet")
     (pcase arg
       ('(4)
-       (org-entry-delete (point) "DELAYED"))
+       (org-entry-delete (point) "DELAYED")
+       "Removed delay on entry")
       (_
-       (let ((new-time
+       (let* ((new-time
               (or time
-                  (format "<%s>"
-                          (org-read-date
-                           nil nil nil
-                           "Delay until when?")))))
-         (org-entry-put (point) "DELAYED" new-time))))))
+                  (org-read-date
+                   nil nil nil
+                   "Delay until when?")))
+              (formatted (format "<%s>" new-time)))
+         (if (eq 'task (opr/get-type))
+             (org-schedule arg new-time)
+           (org-entry-put (point) "DELAYED" formatted)
+           (format "Delayed until %s" formatted)))))))
+
+(defun org-delay-until-next-week ()
+  (interactive)
+  (let ((time (org-read-date nil nil "fri")))
+    (org-delay nil time)))
 
 (define-key org-mode-map (kbd "C-c <C-tab>") #'org-delay)
+(define-key org-mode-map (kbd "C-c <tab>") #'org-delay-until-next-week)
 
 (defun org-agenda-delay (arg &optional time)
   (interactive "P")
@@ -57,9 +72,35 @@
         (goto-char pos)
         (setq ts (org-delay arg time)))
       (org-agenda-show-new-time marker ts " D"))
+    (next-line)
     (message "%s" ts)))
 
-(define-key org-agenda-mode-map (kbd "C-c <C-tab>") #'org-agenda-delay)
+(defun org-agenda-delay-until-next-week (arg)
+  (interactive "P")
+  (org-agenda-check-type t 'agenda 'todo 'tags 'search)
+  (org-agenda-check-no-diary)
+  (let* ((marker (or (org-get-at-bol 'org-marker)
+                     (org-agenda-error)))
+         (buffer (marker-buffer marker))
+         (pos (marker-position marker))
+         ts)
+    (org-with-remote-undo buffer
+      (with-current-buffer buffer
+        (widen)
+        (goto-char pos)
+        (setq ts (if arg
+                     (org-delay arg)
+                   (org-delay-until-next-week))))
+      (org-agenda-show-new-time marker ts " D"))
+    (message "%s" ts)
+    (next-line)))
+
+(define-prefix-command '*org-delay-map*)
+(define-key org-agenda-mode-map (kbd "d") '*org-delay-map*)
+
+(define-key *org-delay-map* (kbd "d") #'org-agenda-delay-until-next-week)
+(define-key *org-delay-map* (kbd "D") #'org-agenda-delay)
+(define-key *org-delay-map* (kbd "u") (lambda () (interactive) (org-agenda-delay '(4))))
 
 
 (provide 'org-delay)

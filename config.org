@@ -436,6 +436,10 @@
           (,(kbd "s-a") . my/toggle-keyboard)
           (,my/keymap-key . *root-map*)))
 
+  (defmacro define-exwm-input-key (keybinding function)
+    `(add-to-list 'exwm-input-global-keys
+                  (cons ,keybinding ,function)))
+
   (global-set-key (kbd "s-h") 'windmove-left)
   (global-set-key (kbd "s-l") 'windmove-right)
   (define-key desktop-environment-mode-map (kbd "s-l") nil)
@@ -729,6 +733,31 @@
 ** exwm-edit
 #+begin_src emacs-lisp
   (use-package exwm-edit)
+#+end_src
+** workspace manipulation
+#+begin_src emacs-lisp
+  (setq exwm-workspace-show-all-buffers t
+        exwm-layout-show-all-buffers t)
+
+  (let ((monitors (my/get-screens)))
+    (setq exwm-workspace-number (length monitors)))
+
+  (setq exwm-randr-workspace-monitor-plist
+        (loop for m in (my/get-screens)
+              for i from 0
+              collect i
+              collect m))
+
+  (defun my/get-next-workspace-number ()
+    (-> exwm-workspace-current-index
+        1+
+        (mod 2)))
+
+  (defun my/next-workspace ()
+    (interactive)
+    (exwm-workspace-switch (my/get-next-workspace-number)))
+
+  (define-exwm-input-key (kbd "<s-tab>") #'my/next-workspace)
 #+end_src
 ** Floating windows don't need that many faces ^_^
 #+begin_src emacs-lisp
@@ -3394,6 +3423,9 @@
   (define-key *root-map* (kbd "R") #'wg-rename-workgroup)
   (define-key *root-map* (kbd "q") #'wg-kill-workgroup)
   (define-key *root-map* (kbd "Q") #'wg-delete-other-workgroups)
+
+  (setq wg-emacs-exit-save-behavior nil
+        wg-workgroups-mode-exit-save-behavior nil)
 #+end_src
 ** opml to elfeed-org
 #+begin_src emacs-lisp

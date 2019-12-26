@@ -11,6 +11,7 @@
 (require 'org-process)
 (require 'org-project)
 (require 'org-delay)
+(require 'clojure-swap)
 
 ;; Buggy overall, not needed cause of workgroups2.el
 ;; (require 'exwm-workspace-counsel)

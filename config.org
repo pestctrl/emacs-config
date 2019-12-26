@@ -742,6 +742,8 @@
   (let ((monitors (my/get-screens)))
     (setq exwm-workspace-number (length monitors)))
 
+  (defvar exwm-randr/current-offset 0)
+
   (setq exwm-randr-workspace-monitor-plist
         (loop for m in (my/get-screens)
               for i from 0
@@ -758,6 +760,25 @@
     (exwm-workspace-switch (my/get-next-workspace-number)))
 
   (define-exwm-input-key (kbd "<s-tab>") #'my/next-workspace)
+
+  (defun my/swap-screens ()
+    (interactive)
+    (clj-swap exwm-randr/current-offset
+              (lambda (x)
+                (mod (1+ x)
+                     2)))
+    (let ((monitors (my/get-screens)))
+      (setq exwm-randr-workspace-monitor-plist
+            (loop for i from 0 below exwm-workspace-number
+                  for m = (nth (mod (+ i exwm-randr/current-offset)
+                                    exwm-workspace-number)
+                               monitors)
+                  collect i
+                  collect m)))
+    (exwm-workspace-switch (mod (1- exwm-workspace-current-index)
+                                2))
+    (exwm-randr-refresh))
+
 #+end_src
 ** Floating windows don't need that many faces ^_^
 #+begin_src emacs-lisp
@@ -3426,6 +3447,27 @@
 
   (setq wg-emacs-exit-save-behavior nil
         wg-workgroups-mode-exit-save-behavior nil)
+
+
+  ;; Advice for frames, don't switch to an active workgroup
+  (defun get-active-workgroups ()
+    (loop for frame in exwm-workspace--list
+          unless (eq (selected-frame) frame)
+          collect (with-selected-frame frame
+                    (wg-workgroup-name (wg-current-workgroup)))))
+
+  (defun wg-dont-switch-to-active (orig &optional workgroup noerror)
+    (if workgroup
+        (funcall orig workgroup noerror)
+      (let ((active (get-active-workgroups))
+            (to-switch (wg-read-workgroup-name)))
+        (if (member to-switch active)
+            (message "Workgroup \"%s\" already active" to-switch)
+          (funcall orig to-switch noerror)))))
+
+  (advice-add #'wg-switch-to-workgroup
+              :around
+              #'wg-dont-switch-to-active)
 #+end_src
 ** opml to elfeed-org
 #+begin_src emacs-lisp

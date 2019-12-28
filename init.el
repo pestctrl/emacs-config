@@ -38,6 +38,8 @@
 
 (setq use-package-always-ensure t)
 
+(define-prefix-command '*root-map*)
+
 (org-babel-load-file
  (expand-file-name "config.org"
                    user-emacs-directory))

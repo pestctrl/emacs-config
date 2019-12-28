@@ -39,6 +39,7 @@
 (setq use-package-always-ensure t)
 
 (define-prefix-command '*root-map*)
+(global-set-key (kbd "C-t") '*root-map*)
 
 ;; (org-babel-load-file
 ;;  (expand-file-name "config-exwm.org"

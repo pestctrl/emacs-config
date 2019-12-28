@@ -1399,7 +1399,7 @@
                '("r" ("-inbox" "+recruiting") "Recruiting"))
 #+end_src
 ** mu4e
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp#
   (unless (eq system-type 'windows-nt)
     (require 'mu4e)
 

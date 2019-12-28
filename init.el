@@ -41,6 +41,15 @@
 (define-prefix-command '*root-map*)
 (global-set-key (kbd "C-t") '*root-map*)
 
+(define-key *root-map* (kbd "C-n") 'switch-window)
+(define-key *root-map* (kbd "i") 'org-mru-clock-in)
+(define-key *root-map* (kbd "C-i") 'leaving-computer)
+(define-key *root-map* (kbd "C") 'org-resolve-clocks)
+(define-key *root-map* (kbd "j") 'org-clock-goto)
+(define-key *root-map* (kbd "o") 'switch-window)
+(define-key *root-map* (kbd "n") 'toggle-notifications)
+(define-key *root-map* (kbd "RET") 'dired-jump)
+
 ;; (org-babel-load-file
 ;;  (expand-file-name "config-exwm.org"
 ;;                    user-emacs-directory))

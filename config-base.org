@@ -17,18 +17,13 @@
     (interactive)
     (shell-command "setxkbmap de neo_dvorak"))
 #+END_SRC
-* Lib
-** memoize
-#+begin_src emacs-lisp
-
-#+end_src
-* Custom file
+* Emacs
+** Custom file
 #+BEGIN_SRC emacs-lisp
   (setq custom-file "~/.emacs.d/custom.el")
   (load custom-file 'noerror)
   (setq backup-directory-alist `(("." . ,(concat user-emacs-directory "backups"))))
 #+END_SRC
-* Emacs
 ** Reload Config
 #+BEGIN_SRC emacs-lisp
   (defun reload-config () (interactive) (load-file "~/.emacs.d/init.el"))
@@ -132,6 +127,12 @@
                h)))
 #+end_src
 * Look and feel
+** Base look
+#+begin_src emacs-lisp
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+(fringe-mode '(10 . 0))
+#+end_src
 ** Theme
 #+BEGIN_SRC emacs-lisp
   (use-package color-theme-modern)

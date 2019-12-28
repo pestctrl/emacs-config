@@ -43,10 +43,12 @@
 
 (defconst my/keymap-key (kbd "C-t"))
 ;; Disable C-t for all others
-(define-key vterm-mode-map (kbd "C-t") nil)
+(with-eval-after-load "vterm"
+  (define-key vterm-mode-map (kbd "C-t") nil))
 (with-eval-after-load "ibuf-ext"
   (define-key ibuffer-mode-map my/keymap-key nil))
-(define-key dired-mode-map my/keymap-key nil)
+(with-eval-after-load "dired"
+  (define-key dired-mode-map my/keymap-key nil))
 
 (define-key *root-map* (kbd "C-n") 'switch-window)
 (define-key *root-map* (kbd "i") 'org-mru-clock-in)

@@ -5,6 +5,10 @@
 (use-package s)
 (use-package dash)
 (use-package mmt)
+(use-package memoize)
+(use-package hydra)
+
+(require 'cl)
 
 ;;; These are utilities that I have written.
 

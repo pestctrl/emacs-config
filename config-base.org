@@ -20,15 +20,7 @@
 * Lib
 ** memoize
 #+begin_src emacs-lisp
-  (use-package memoize)
-#+end_src
-** hydra
-#+begin_src emacs-lisp
-  (use-package hydra)
-#+end_src
-** cl
-#+begin_src emacs-lisp
-  (require 'cl)
+
 #+end_src
 * Custom file
 #+BEGIN_SRC emacs-lisp

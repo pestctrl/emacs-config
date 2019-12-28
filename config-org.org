@@ -265,7 +265,8 @@
 #+END_SRC
 * Face
 #+BEGIN_SRC emacs-lisp
-  (when (not (eq system-type 'windows-nt))
+  (when (and (not (eq system-type 'windows-nt))
+             (find-font (font-spec :name "Font Awesome 5 Free")))
     (setq org-ellipsis " "))
 #+END_SRC
 * Variables

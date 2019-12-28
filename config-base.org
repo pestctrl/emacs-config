@@ -28,6 +28,17 @@
 #+BEGIN_SRC emacs-lisp
   (defun reload-config () (interactive) (load-file "~/.emacs.d/init.el"))
 #+END_SRC
+** New Scratch buffer
+#+begin_src emacs-lisp
+  (defun scratch-buffer ()
+    (interactive)
+    (let ((count 0))
+      (while (get-buffer (format "*scratch%d*" count))
+        (incf count))
+      (switch-to-buffer (get-buffer-create (format "*scratch%d*" count)))
+      (lisp-interaction-mode)
+      (insert (substitute-command-keys initial-scratch-message))))
+#+end_src
 ** Select Help Window
 #+BEGIN_SRC emacs-lisp
   (setq help-window-select t)
@@ -55,18 +66,6 @@
   (setq which-key-idle-delay 3)
   (which-key-mode)
 #+END_SRC
-** beacon
-#+BEGIN_SRC emacs-lisp
-  (use-package beacon)
-  (beacon-mode 1)
-  (setq beacon-blink-delay 0.1)
-  (setq beacon-color "#006400")
-#+END_SRC
-** Dashboard
-#+BEGIN_SRC emacs-lisp
-  (use-package dashboard)
-  ;(dashboard-setup-startup-hook)
-#+END_SRC
 ** undo-tree
 #+BEGIN_SRC emacs-lisp
   (use-package undo-tree)
@@ -91,17 +90,6 @@
              (insert (current-kill 0)))))
 
   (global-set-key (kbd "C-c C-e") 'my/eval-and-replace)
-#+end_src
-** New Scratch buffer
-#+begin_src emacs-lisp
-  (defun scratch-buffer ()
-    (interactive)
-    (let ((count 0))
-      (while (get-buffer (format "*scratch%d*" count))
-        (incf count))
-      (switch-to-buffer (get-buffer-create (format "*scratch%d*" count)))
-      (lisp-interaction-mode)
-      (insert (substitute-command-keys initial-scratch-message))))
 #+end_src
 ** uniq emacs
 #+begin_src emacs-lisp
@@ -593,6 +581,18 @@
   (set-face-attribute 'term-bold       t :weight 'bold)
   (set-face-attribute 'term-color-blue t :background "dodger blue" :foreground "dodger blue")
 #+end_src
+** Dashboard
+#+BEGIN_SRC emacs-lisp
+  (use-package dashboard)
+  ;(dashboard-setup-startup-hook)
+#+END_SRC
+** beacon
+#+BEGIN_SRC emacs-lisp
+  (use-package beacon)
+  (beacon-mode 1)
+  (setq beacon-blink-delay 0.1)
+  (setq beacon-color "#006400")
+#+END_SRC
 * Navigation
 ** IDO
 #+BEGIN_SRC emacs-lisp

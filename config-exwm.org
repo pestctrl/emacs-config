@@ -235,8 +235,6 @@
 #+BEGIN_SRC emacs-lisp
   (use-package vterm)
 
-  (define-key vterm-mode-map (kbd "C-t") nil)
-
   (defmacro exec (body)
     `(lambda ()
        (interactive)
@@ -367,8 +365,6 @@
 #+BEGIN_SRC emacs-lisp
   (use-package transpose-frame)
 
-  (defconst my/keymap-key (kbd "C-t"))
-
   (setq exwm-input-global-keys
         `(([?\s-r] . exwm-reset)
           ;; ([?\s-w] . exwm-workspace-switch)
@@ -391,12 +387,6 @@
   (global-set-key (kbd "s-h") 'windmove-left)
   (global-set-key (kbd "s-l") 'windmove-right)
   (define-key desktop-environment-mode-map (kbd "s-l") nil)
-
-  ;; Disable C-t for all others
-  (with-eval-after-load "ibuf-ext"
-    (define-key ibuffer-mode-map my/keymap-key nil))
-
-  (define-key dired-mode-map my/keymap-key nil)
 
   (defun dvorak? ()
     (string-match-p "de(neo_dvorak)" 

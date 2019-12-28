@@ -771,12 +771,6 @@
   (global-set-key (kbd "M-f") 'forward-to-word)
   (global-set-key (kbd "M-F") 'forward-word)
 #+end_src
-* org-mode in separate file
-#+begin_src emacs-lisp
-  (org-babel-load-file
-   (expand-file-name "config-org-new.org"
-                     user-emacs-directory))
-#+end_src
 * Tools
 ** Encryption
 #+BEGIN_SRC emacs-lisp

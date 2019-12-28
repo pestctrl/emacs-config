@@ -40,8 +40,12 @@
 
 (define-prefix-command '*root-map*)
 
+;; (org-babel-load-file
+;;  (expand-file-name "config-exwm.org"
+;;                    user-emacs-directory))
+
 (org-babel-load-file
- (expand-file-name "config.org"
+ (expand-file-name "config-base.org"
                    user-emacs-directory))
 
 (org-babel-load-file

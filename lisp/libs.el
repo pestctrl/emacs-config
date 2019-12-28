@@ -4,6 +4,7 @@
 (use-package f)
 (use-package s)
 (use-package dash)
+(use-package mmt)
 
 ;;; These are utilities that I have written.
 

@@ -69,16 +69,16 @@
                 (reverse display)))))))
 
 (defun my/org-ql-stuck-projects (&rest args)
-  (let ((from (org-agenda-files nil 'ifmode))
-        (items (mapcan #'my/get-project-stuck-displayables
-                              (org-ql-select org-agenda-files
-                                '(and (tags "dev")
-                                      (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
+  (let* ((from (org-agenda-files nil 'ifmode))
+         (items (mapcan #'my/get-project-stuck-displayables
+                        (org-ql-select org-agenda-files
+                          '(and (tags "dev")
+                                (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
                                       (my/top-level)
                                       (or (eq 'stuck (opr/type-of-task))
                                           (eq 'stuck (opr/type-of-project))))
-                                :action 'element-with-markers
-                                :sort 'todo))))
+                          :action 'element-with-markers
+                          :sort 'todo))))
     (org-agenda-prepare)
     ;; FIXME: `org-agenda--insert-overriding-header' is from an Org version newer than
     ;; I'm using.  Should probably declare it as a minimum Org version after upgrading.
@@ -116,18 +116,18 @@
                 (reverse display)))))))
 
 (defun my/org-ql-active-projects (&rest args)
-  (let ((from (org-agenda-files nil 'ifmode))
-        (items (mapcan #'my/get-project-active-displayables
-                       (org-ql-select org-agenda-files
-                         '(and (tags "dev")
-                               (not (tags "short"))
+  (let* ((from (org-agenda-files nil 'ifmode))
+         (items (mapcan #'my/get-project-active-displayables
+                        (org-ql-select org-agenda-files
+                          '(and (tags "dev")
+                                (not (tags "short"))
                                (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
                                (my/top-level)
                                (or (eq 'active (opr/type-of-task))
                                    (eq 'active (opr/type-of-project 'active))))
-                         :action 'element-with-markers
-                         :sort 'todo
-                         ))))
+                          :action 'element-with-markers
+                          :sort 'todo
+                          ))))
     (org-agenda-prepare)
     ;; FIXME: `org-agenda--insert-overriding-header' is from an Org version newer than
     ;; I'm using.  Should probably declare it as a minimum Org version after upgrading.

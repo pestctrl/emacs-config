@@ -70,6 +70,7 @@
 
 (defun my/org-ql-stuck-projects (&rest args)
   (let* ((from (org-agenda-files nil 'ifmode))
+         (org-todo-keywords-1 '("EMPTY" "ONE" "META" "META1" "TODO"))
          (items (mapcan #'my/get-project-stuck-displayables
                         (org-ql-select org-agenda-files
                           '(and (tags "dev")
@@ -117,6 +118,7 @@
 
 (defun my/org-ql-active-projects (&rest args)
   (let* ((from (org-agenda-files nil 'ifmode))
+         (org-todo-keywords-1 '("EMPTY" "META" "META1" "ONE" "TODO" ))
          (items (mapcan #'my/get-project-active-displayables
                         (org-ql-select org-agenda-files
                           '(and (tags "dev")

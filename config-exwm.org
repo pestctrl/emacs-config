@@ -592,24 +592,19 @@
 
   (add-hook 'exwm-init-hook 'my/setup-screens)
 
-  (defvar my/in-presentation-mode? nil)
-
-  (defun my/enter-presentation-mode ()
-    (let ((primary (shell-command-to-string "xrandr --query | grep ' connected' | grep eDP | cut -d ' ' -f 1 | tr -d '\n'"))
-          (secondary (shell-command-to-string "xrandr --query | grep ' connected' | grep -v eDP | cut -d ' ' -f 1 | tr -d '\n'")))
-      (shell-command
-       (format "xrandr --output %s --mode 1920x1080 --same-as %s"
-               secondary
+  (define-minor-mode exwm-presentation-mode
+    "Make both screen outputs display the same thing"
+    nil nil nil
+    (cond (exwm-presentation-mode
+           (cl-destructuring-bind (primary . secondary) (my/get-screens)
+             (shell-command
+              (format "xrandr --output %s --mode 1920x1080 --same-as %s"
+               (car secondary)
                primary))
-      (setq exwm-randr-workspace-monitor-plist nil)
-      (exwm-randr-refresh)))
-
-  (defun my/toggle-presentation-mode ()
-    (interactive)
-    (if my/in-presentation-mode?
-        (my/setup-screens)
-      (my/enter-presentation-mode))
-    (setq my/in-presentation-mode? (not my/in-presentation-mode?)))
+             (setq exwm-randr-workspace-monitor-plist nil)
+             (exwm-randr-refresh)))
+          (t
+           (my/setup-screens))))
 #+END_SRC
 
 ** System tray, display time, display battery, display hard-drive-space

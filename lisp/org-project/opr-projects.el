@@ -29,13 +29,20 @@
 ;; Context sensitive
 (define-todo-keyword "META" 'project :color "white" :key ?m)
 
-(defun meta-status? ()
-  (if (or (not (olc/any-todo-children?
-                 (eq 'active (opr/type-of-task))))
-          (olc/any-todo-children?
-            (eq 'stuck (opr/type-of-project))))
-      'stuck
-    'active))
+(defun meta-status? (&optional greedy-active)
+  (if greedy-active
+      (if (or (olc/any-todo-children? 
+                (eq 'active (opr/type-of-task)))
+              (olc/any-todo-children?
+                (eq 'active (opr/type-of-project))))
+          'active
+        'stuck)
+    (if (or (not (olc/any-todo-children?
+                   (eq 'active (opr/type-of-task))))
+            (olc/any-todo-children?
+              (eq 'stuck (opr/type-of-project))))
+        'stuck
+      'active)))
 
 (define-todo-keyword "META1" 'project :color "white" :key ?M)
 
@@ -74,25 +81,25 @@
         (and (member state opr/ambiguous)
              (opr/ambiguous-project-or-task)))))
 
-(defun opr/type-of-project ()
+(defun opr/type-of-project (&optional greedy-active)
   (when-let ((state (org-get-todo-state)))
     (pcase state
       ("HOLD" 'hold)
       ("ETERNAL" 'active)
-      (t (when (or (not (member state opr/ambiguous))
+      (_ (when (or (not (member state opr/ambiguous))
                    (eq 'project (opr/ambiguous-task-or-project)))
            (if (org-time> (org-entry-get (point) "DELAYED")
                           (org-matcher-time "<now>"))
-             'invis
-           (pcase state
-             ("EMPTY" (empty-status?))
-             ("SEQ" (seq-status?))
-             ("META1" (meta1-status?))
-             ("META" (meta-status?))
-             ("ONE" (when (eq 'project (opr/ambiguous-task-or-project))
-                      (meta1-status?)))
-             ("TODO" (when (eq 'project (opr/ambiguous-task-or-project))
-                       (meta1-status?))))))))))
+               'invis
+             (pcase state
+               ("EMPTY" (empty-status?))
+               ("SEQ" (seq-status?))
+               ("META1" (meta1-status?))
+               ("META" (meta-status? greedy-active))
+               ("ONE" (when (eq 'project (opr/ambiguous-task-or-project))
+                        (meta1-status?)))
+               ("TODO" (when (eq 'project (opr/ambiguous-task-or-project))
+                         (meta1-status?))))))))))
 
 (provide 'opr-projects)
 ;;; opr-projects.el ends here

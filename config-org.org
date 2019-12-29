@@ -72,7 +72,7 @@
         org-caldav-delete-org-entries 'never)
 
   (setq org-caldav-skip-conditions '(nottodo ("TODO" "NEXT"))
-        org-caldav-exclude-tags '("ARCHIVE" "ONLYEMACS"))
+        org-caldav-exclude-tags '("ARCHIVE" "_nosync_"))
 #+END_SRC
 ** Reveal.js
 #+begin_src emacs-lisp#

@@ -893,11 +893,11 @@
   (defun dired-browse-with-w3m (arg)
     (interactive "P")
     (let ((browse-url-browser-function (if arg
-                                           #'browse-url-browser-function
-                                         #'browse-url-w3)))
+                                           (symbol-function browse-url-browser-function)
+                                         #'w3m-browse-url)))
       (browse-url-of-dired-file)))
 
-  ;; (define-key dired-mode-map (kbd "W") 'dired-browse-with-w3m)
+  (define-key dired-mode-map (kbd "W") 'dired-browse-with-w3m)
 #+end_src
 *** rename-follow
 #+begin_src emacs-lisp

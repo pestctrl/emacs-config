@@ -658,6 +658,7 @@
 #+BEGIN_SRC emacs-lisp
   (use-package switch-window)
   (global-set-key (kbd "C-x o") 'switch-window)
+  (global-set-key (kbd "s-o") 'other-window)
   (setq switch-window-shortcut-style 'qwerty)
   (setq switch-window-qwerty-shortcuts
         '("a" "o" "e" "u" "i" "d" "h" "t" "n" "s"))

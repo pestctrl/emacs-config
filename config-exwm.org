@@ -305,7 +305,7 @@
   (define-key *window-map* (kbd "t") 'exwm-background/window-transparency-hydra/body)
   (setq window-system-default-frame-alist `((x . ((alpha . (,exwm-background/current-transparency . 50))))))
   (global-set-key (kbd "s-v") #'exwm-background/toggle-viewing-background)
-  (global-set-key (kbd "s-b") #'exwm-background/exwm-background-window)
+  (global-set-key (kbd "s-b") #'exwm-background/exwm-background-window) ;; TODO: Fix keybinding
   (define-key desktop-environment-mode-map (kbd "<S-XF86MonBrightnessDown>") #'exwm-background/decrease-transparency)
   (define-key desktop-environment-mode-map (kbd "<S-XF86MonBrightnessUp>") #'exwm-background/increase-transparency)
   (define-key *window-map* (kbd "b") #'exwm-background/exwm-background-window)
@@ -369,7 +369,6 @@
         `(([?\s-r] . exwm-reset)
           ;; ([?\s-w] . exwm-workspace-switch)
           ([?\s-l] . lock-screen)
-          (,(kbd "s-b") . ivy-switch-buffer)
           (,(kbd "s-c") . org-capture)
           (,(kbd "s-n") . switch-window)
           (,(kbd "s-k") . kill-this-buffer)
@@ -763,4 +762,8 @@
   (advice-add #'exwm-floating--set-floating
               :around
               #'my/exwm-floating--advise-make-frame)
+#+end_src
+* 
+#+begin_src emacs-lisp
+  (define-exwm-input-key (kbd "s-b") #'wg-undo-wconfig-change)
 #+end_src

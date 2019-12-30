@@ -649,7 +649,15 @@
                                                   (:name "Today" :time-grid t
                                                          :and (:not (:and (:not (:scheduled today)
                                                                                 :not (:deadline today)))))))))))
-            ("h" "Dev Hold" tags-todo "dev/!HOLD")
+            ("h" "Dev Hold and Delay"
+             ((org-ql-block '(and (tags "dev")
+                                  (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
+                                  (property "DELAYED")
+                                  (org-time> (org-entry-get (point) "DELAYED")
+                                             (org-matcher-time "<now>")))
+                            ((org-ql-block-header "Delayed projects")))
+              (tags-todo "dev/!HOLD"
+                         ((org-agenda-overriding-header "Hold projects")))))
             ("n" "Next Tasks List" tags-todo "-REFILE-HOLD-WAIT"
              ((org-agenda-skip-function 'my/show-next-tasks-and-standalone-tasks)
               (org-agenda-overriding-header "Next Tasks list")

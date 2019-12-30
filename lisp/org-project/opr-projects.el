@@ -72,9 +72,6 @@
 
 (finish-active-type 'project)
 
-;; I don't need this, but it's legacy
-(define-todo-keyword "COMPLETE" 'task :recordstr "!")
-
 (defun opr/is-project ()
   (let ((state (org-get-todo-state)))
     (or (member state opr/strict-projects)

@@ -886,6 +886,10 @@
 #+end_src
 *** browse-url use w3m
 #+begin_src emacs-lisp
+  ;; Remove when Emacs 27 releases
+  (setq w3m-use-tabs nil)
+  (use-package w3m)
+
   (defun dired-browse-with-w3m (arg)
     (interactive "P")
     (let ((browse-url-browser-function (if arg

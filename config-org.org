@@ -169,10 +169,11 @@
   (defun my/org-agenda-get-name ()
     (-> (rx "*Org Agenda("
             (group (+? anything))
-            (optional
-             (zero-or-one ":")
-             (one-or-more anything))
-            ")*")
+            (or ")"
+                (and 
+                 ":"
+                 (one-or-more anything)))
+            "*")
         (s-match-strings-all (buffer-name))
         (cadar)
         (assoc org-agenda-custom-commands)
@@ -185,7 +186,7 @@
         ("Reviews" (advice-add #'org-agenda-do-context-action
                                :override
                                #'my/org-agenda-do-context-action-for-review))
-        ("dev" (advice-add #'org-agenda-do-context-action
+        ("Dev" (advice-add #'org-agenda-do-context-action
                            :override
                            #'my/org-agenda-do-context-action-for-project))
         (_ (advice-unadvice #'org-agenda-do-context-action)))))

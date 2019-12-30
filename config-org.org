@@ -870,7 +870,7 @@
           ("jd" "Decision template" entry (file+olp+datetree ,(my/org-file "entries/journal.gpg"))
            (file ,(my/org-file "templates/decide.org")))
           ("je" "Journal Entry" entry (file+olp+datetree ,(my/org-file "entries/journal.gpg"))
-           "* %<%R> %?\n%U\n\n")
+           "* %<%R> %?")
           ;; ("jp" "Plan your day" entry (file+olp+datetree ,(my/org-file "entries/journal.gpg"))
           ;;  (file ,(my/org-file "templates/daily-plan.org")))
           ("jp" "Programming Interview Prep Journal" entry (file+olp+datetree ,(my/org-file "entries/journal.gpg"))
@@ -1506,4 +1506,23 @@
   (advice-add #'org-indent--compute-prefixes
               :override
               #'my/org-indent-prefixes)
+#+end_src
+
+* Insert inactive timestamp after last org-datetree--find-create
+#+begin_src emacs-lisp
+  (defun org-datetree--find-create-add-timestamp (regex-template year &optional month day insert)
+    (save-excursion
+      (when day
+        (let ((lnum (line-number-at-pos)))
+          (next-line)
+          (when (= lnum (line-number-at-pos))
+            (end-of-line)
+            (insert "\n")))
+        (unless (looking-at-p (rx "[" (repeat 4 digit) "-" (repeat 2 digit) "-"
+                                  (repeat 2 digit) " " (repeat 3 alpha) "]"))
+          (insert (format-time-string "[%Y-%m-%d %a]"))))))
+
+  (advice-add #'org-datetree--find-create
+              :after
+              #'org-datetree--find-create-add-timestamp)
 #+end_src

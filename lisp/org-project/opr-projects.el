@@ -87,8 +87,9 @@
       ("ETERNAL" 'active)
       (_ (when (or (not (member state opr/ambiguous))
                    (eq 'project (opr/ambiguous-task-or-project)))
-           (if (org-time> (org-entry-get (point) "DELAYED")
-                          (org-matcher-time "<now>"))
+           (if (or (member "_invis_" (org-get-tags))
+                   (org-time> (org-entry-get (point) "DELAYED")
+                              (org-matcher-time "<now>")))
                'invis
              (pcase state
                ("EMPTY" (empty-status?))

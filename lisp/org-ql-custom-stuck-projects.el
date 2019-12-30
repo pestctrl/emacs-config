@@ -46,10 +46,11 @@
   (let ((marker (org-element-property :org-marker element)))
     (with-current-buffer (marker-buffer marker)
       (goto-char marker)
-      (let ((include-tasks (not
-                            (olc/any-todo-children?
-                              (eq 'active (opr/type-of-task))))))
-        (if (member (org-get-todo-state) '("EMPTY"))
+      (let* ((state (org-get-todo-state))
+             (include-tasks (or (not (string= state "META"))
+                                (not (olc/any-todo-children?
+                                       (eq 'active (opr/type-of-task)))))))
+        (if (member state '("EMPTY"))
             (list element)
           (cons element
                 (let ((display '()))

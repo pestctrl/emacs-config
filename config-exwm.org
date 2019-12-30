@@ -714,7 +714,6 @@
     (exwm-randr-refresh)
     (exwm-workspace-switch (mod (1- exwm-workspace-current-index)
                                 2)))
-
 #+end_src
 * Floating windows don't need that many faces ^_^
 #+begin_src emacs-lisp

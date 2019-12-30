@@ -64,7 +64,8 @@
       (_ (if (member "_invis_" (org-get-tags))
              'invis
            (pcase state
-             ("TASK" (if (org-get-scheduled-time (point))
+             ("TASK" (if (or (org-get-deadline-time (point))
+                             (org-get-scheduled-time (point)))
                          'active
                        'stuck))
              ("ONE" (when (eq 'task (opr/ambiguous-task-or-project))

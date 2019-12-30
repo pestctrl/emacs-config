@@ -46,7 +46,7 @@
         'stuck
       'active)))
 
-(define-todo-keyword "META1" 'project :color "white" :key ?M)
+(define-todo-keyword "META1" 'project :color "white" :key ?1)
 
 (defun meta1-status? ()
   (if (olc/any-todo-children?

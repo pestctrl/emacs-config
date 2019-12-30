@@ -30,7 +30,7 @@
 
 (define-todo-keyword "FUTURE" 'task :color "medium spring green" :key ?f)
 
-(define-todo-keyword "TICKLER" 'task :key ?r)
+(define-todo-keyword "TICKLER" 'task :key ?\))
 
 (define-todo-keyword "TASK" 'task :key ?t)
 

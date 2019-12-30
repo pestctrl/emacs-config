@@ -631,7 +631,8 @@
              ((org-agenda-span 'day)))
             ("aw" "Weekly view" agenda ""
              ((org-agenda-overriding-arguments (list nil (my/this-or-last-saturday) 
-                                                     9))))
+                                                     9))
+              (org-agenda-tag-filter-preset (quote (,dev-tag)))))
             ("ad" "Dev agenda" agenda ""
              ((org-agenda-skip-function 'my/agenda-custom-skip)
               (org-agenda-span 'day)

@@ -46,27 +46,30 @@
   (let ((marker (org-element-property :org-marker element)))
     (with-current-buffer (marker-buffer marker)
       (goto-char marker)
-      (if (member (org-get-todo-state) '("EMPTY"))
-          (list element)
-        (cons element
-              (let ((display '()))
-                (olc/todo-children
-                 (let ((type (opr/get-type)))
-                   (pcase type
-                     ('project
-                      (when (eq 'stuck (opr/type-of-project))
-                        (let ((res (-> (point)
-                                       (org-element-headline-parser)
-                                       (org-ql--add-markers)
-                                       (my/get-project-stuck-displayables)
-                                       (reverse))))
-                          (unless (zerop (1- (length res)))
-                            (setf display (append res display))))))
-                     ('task
-                      (when (eq 'stuck (opr/type-of-task))
-                        (push (org-ql--add-markers (org-element-headline-parser (point)))
-                              display))))))
-                (reverse display)))))))
+      (let ((include-tasks (not
+                            (olc/any-todo-children?
+                              (eq 'active (opr/type-of-task))))))
+        (if (member (org-get-todo-state) '("EMPTY"))
+            (list element)
+          (cons element
+                (let ((display '()))
+                  (olc/todo-children
+                    (let ((type (opr/get-type)))
+                      (pcase type
+                        ('project
+                         (when (eq 'stuck (opr/type-of-project))
+                           (let ((res (-> (point)
+                                          (org-element-headline-parser)
+                                          (org-ql--add-markers)
+                                          (my/get-project-stuck-displayables)
+                                          (reverse))))
+                             (unless (zerop (1- (length res)))
+                               (setf display (append res display))))))
+                        ('task
+                         (when (and include-tasks (eq 'stuck (opr/type-of-task)))
+                           (push (org-ql--add-markers (org-element-headline-parser (point)))
+                                 display))))))
+                  (reverse display))))))))
 
 (defun my/org-ql-stuck-projects (&rest args)
   (let* ((from (org-agenda-files nil 'ifmode))

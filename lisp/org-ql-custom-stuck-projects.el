@@ -79,9 +79,9 @@
                         (org-ql-select org-agenda-files
                           '(and (tags "dev")
                                 (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
-                                      (my/top-level)
-                                      (or (eq 'stuck (opr/type-of-task))
-                                          (eq 'stuck (opr/type-of-project))))
+                                (my/top-level)
+                                (or (eq 'stuck (opr/type-of-task))
+                                    (eq 'stuck (opr/type-of-project))))
                           :action 'element-with-markers
                           :sort 'todo))))
     (org-agenda-prepare)
@@ -109,15 +109,15 @@
         (cons element
               (let ((display '()))
                 (olc/todo-children
-                 (let ((type (opr/get-type)))
-                   (when (and (eq 'project (opr/get-type))
-                              (eq 'active (opr/type-of-project 'active)))
-                     (let ((res (-> (point)
-                                    (org-element-headline-parser)
-                                    (org-ql--add-markers)
-                                    (my/get-project-active-displayables)
-                                    (reverse))))
-                       (setf display (append res display))))))
+                  (let ((type (opr/get-type)))
+                    (when (and (eq 'project (opr/get-type))
+                               (eq 'active (opr/type-of-project 'active)))
+                      (let ((res (-> (point)
+                                     (org-element-headline-parser)
+                                     (org-ql--add-markers)
+                                     (my/get-project-active-displayables)
+                                     (reverse))))
+                        (setf display (append res display))))))
                 (reverse display)))))))
 
 (defun my/org-ql-active-projects (&rest args)
@@ -127,10 +127,10 @@
                         (org-ql-select org-agenda-files
                           '(and (tags "dev")
                                 (not (tags "short"))
-                               (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
-                               (my/top-level)
-                               (or (eq 'active (opr/type-of-task))
-                                   (eq 'active (opr/type-of-project 'active))))
+                                (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
+                                (my/top-level)
+                                (or (eq 'active (opr/type-of-task))
+                                    (eq 'active (opr/type-of-project 'active))))
                           :action 'element-with-markers
                           :sort 'todo
                           ))))

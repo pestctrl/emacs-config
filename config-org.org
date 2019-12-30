@@ -186,6 +186,9 @@
         ("Reviews" (advice-add #'org-agenda-do-context-action
                                :override
                                #'my/org-agenda-do-context-action-for-review))
+        ("Reviews and Journals" (advice-add #'org-agenda-do-context-action
+                                            :override
+                                            #'my/org-agenda-do-context-action-for-journal))
         ("Dev" (advice-add #'org-agenda-do-context-action
                            :override
                            #'my/org-agenda-do-context-action-for-project))
@@ -243,6 +246,38 @@
                (my/org-agenda-show-review)))
         (and org-agenda-show-outline-path
              (org-with-point-at m (org-display-outline-path t))))))
+
+  (defun my/org-agenda-show-journal (&optional full-entry)
+    "Display the Org file which contains the item at point.
+      With prefix argument FULL-ENTRY, make the entire entry visible
+      if it was hidden in the outline."
+    (interactive "P")
+    (let ((win (selected-window)))
+      (org-agenda-goto t)
+      (org-narrow-to-subtree)
+      (org-flag-subtree t)
+      (call-interactively 'org-show-all)
+      (org-hide-archived-subtrees (point-min) (point-max))
+      (select-window win)))
+
+  (defun my/org-agenda-do-context-action-for-journal ()
+    "Show outline path and, maybe, follow mode window."
+    (let ((m (org-get-at-bol 'org-marker)))
+      (when (and (markerp m) (marker-buffer m))
+        (and org-agenda-follow-mode
+             (if org-agenda-follow-indirect
+                 (org-agenda-tree-to-indirect-buffer nil)
+               (my/org-agenda-show-journal)))
+        (and org-agenda-show-outline-path
+             (org-with-point-at m (org-display-outline-path t))))))
+
+  (defun org-agenda-goto-disable-follow (&optional highlight)
+    (interactive)
+    (when org-agenda-follow-mode
+      (org-agenda-follow-mode))
+    (org-agenda-goto highlight))
+
+  (define-key org-agenda-mode-map (kbd "<tab>") #'org-agenda-goto-disable-follow)
 #+end_src
 * count archive tree characters
 #+begin_src emacs-lisp

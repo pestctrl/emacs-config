@@ -377,10 +377,6 @@
   (exwm-global-set-key (kbd "s-a") #'my/toggle-keyboard)
   (exwm-global-set-key my/keymap-key '*root-map*)
 
-  (defmacro define-exwm-input-key (keybinding function)
-    `(add-to-list 'exwm-input-global-keys
-                  (cons ,keybinding ,function)))
-
   (exwm-global-set-key (kbd "s-h") 'windmove-left)
   (exwm-global-set-key (kbd "s-l") 'windmove-right)
   (define-key desktop-environment-mode-map (kbd "s-l") nil)
@@ -399,8 +395,8 @@
       (set-keyboard "de neo_dvorak")))
 
   (exwm-global-set-key (kbd "C-x p") 'launch-program)
-  (exwm-global-set-key (kbd "M-…") 'multi-term)
-  (exwm-global-set-key (kbd "C-ü") 'undo-tree-undo)
+  (global-set-key (kbd "M-…") 'multi-term)
+  (global-set-key (kbd "C-ü") 'undo-tree-undo)
 
   (defun prompt-workspace (&optional prompt)
     "Prompt for a workspace, returning the workspace frame."
@@ -692,7 +688,7 @@
     (interactive)
     (exwm-workspace-switch (my/get-next-workspace-number)))
 
-  (define-exwm-input-key (kbd "<s-tab>") #'my/next-workspace)
+  (exwm-global-set-key (kbd "<s-tab>") #'my/next-workspace)
 
   (defun my/swap-screens ()
     (interactive)
@@ -761,5 +757,5 @@
 #+end_src
 * 
 #+begin_src emacs-lisp
-  (define-exwm-input-key (kbd "s-b") #'wg-undo-wconfig-change)
+  (exwm-global-set-key (kbd "s-b") #'wg-undo-wconfig-change)
 #+end_src

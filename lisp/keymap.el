@@ -1,5 +1,13 @@
+(defmacro exwm-global-set-key (keybinding function)
+  `(progn
+     (if (boundp 'exwm-input-global-keys)
+         (add-to-list 'exwm-input-global-keys
+                      (cons ,keybinding ,function))
+       (global-set-key ,keybinding ,function))))
+
 (define-prefix-command '*root-map*)
-(global-set-key (kbd "C-t") '*root-map*)
+(exwm-global-set-key (kbd "C-t") '*root-map*)
+(exwm-global-set-key (kbd "M-T") 'flop-frame)
 
 (defconst my/keymap-key (kbd "C-t"))
 ;; Disable C-t for all others

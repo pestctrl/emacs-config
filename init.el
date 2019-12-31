@@ -24,9 +24,9 @@
 (require 'org)
 (require 'use-package)
 
-;; Uncomment if want to debug
-;; (progn
-;;   (toggle-debug-on-error))
+(setq use-package-always-ensure t)
+
+(defvar my/enable-exwm t)
 
 ;; Add my modules
 
@@ -36,13 +36,16 @@
 
 (require 'libs)
 
-(setq use-package-always-ensure t)
+(when my/enable-exwm
+  (use-package exwm)
+  (setq exwm-input-global-keys nil))
 
 (load-file "~/.emacs.d/lisp/keymap.el")
 
-(org-babel-load-file
- (expand-file-name "config-exwm.org"
-                   user-emacs-directory))
+(when my/enable-exwm
+  (org-babel-load-file
+   (expand-file-name "config-exwm.org"
+                     user-emacs-directory))
 
 (org-babel-load-file
  (expand-file-name "config-base.org"

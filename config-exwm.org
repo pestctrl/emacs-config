@@ -304,8 +304,8 @@
   (require 'exwm-background)
   (define-key *window-map* (kbd "t") 'exwm-background/window-transparency-hydra/body)
   (setq window-system-default-frame-alist `((x . ((alpha . (,exwm-background/current-transparency . 50))))))
-  (global-set-key (kbd "s-v") #'exwm-background/toggle-viewing-background)
-  (global-set-key (kbd "s-b") #'exwm-background/exwm-background-window) ;; TODO: Fix keybinding
+  (exwm-global-set-key (kbd "s-v") #'exwm-background/toggle-viewing-background)
+  (exwm-global-set-key (kbd "s-b") #'exwm-background/exwm-background-window) ;; TODO: Fix keybinding
   (define-key desktop-environment-mode-map (kbd "<S-XF86MonBrightnessDown>") #'exwm-background/decrease-transparency)
   (define-key desktop-environment-mode-map (kbd "<S-XF86MonBrightnessUp>") #'exwm-background/increase-transparency)
   (define-key *window-map* (kbd "b") #'exwm-background/exwm-background-window)
@@ -365,26 +365,24 @@
 #+BEGIN_SRC emacs-lisp
   (use-package transpose-frame)
 
-  (setq exwm-input-global-keys
-        `(([?\s-r] . exwm-reset)
-          ;; ([?\s-w] . exwm-workspace-switch)
-          ([?\s-l] . lock-screen)
-          (,(kbd "s-c") . org-capture)
-          (,(kbd "s-n") . switch-window)
-          (,(kbd "s-k") . kill-this-buffer)
-          (,(kbd "s-z") . resize-window)
-          (,(kbd "s-s") . youtube-split)
-          (,(kbd "s-n") . switch-to-next-buffer)
-          (,(kbd "s-p") . switch-to-prev-buffer)
-          (,(kbd "s-a") . my/toggle-keyboard)
-          (,my/keymap-key . *root-map*)))
+  (exwm-global-set-key (kbd "s-r") #'exwm-reset)
+  (exwm-global-set-key (kbd "s-l") #'lock-screen)
+  (exwm-global-set-key (kbd "s-c") #'org-capture)
+  (exwm-global-set-key (kbd "s-n") #'switch-window)
+  (exwm-global-set-key (kbd "s-k") #'kill-this-buffer)
+  (exwm-global-set-key (kbd "s-z") #'resize-window)
+  (exwm-global-set-key (kbd "s-s") #'youtube-split)
+  (exwm-global-set-key (kbd "s-n") #'switch-to-next-buffer)
+  (exwm-global-set-key (kbd "s-p") #'switch-to-prev-buffer)
+  (exwm-global-set-key (kbd "s-a") #'my/toggle-keyboard)
+  (exwm-global-set-key my/keymap-key '*root-map*)
 
   (defmacro define-exwm-input-key (keybinding function)
     `(add-to-list 'exwm-input-global-keys
                   (cons ,keybinding ,function)))
 
-  (global-set-key (kbd "s-h") 'windmove-left)
-  (global-set-key (kbd "s-l") 'windmove-right)
+  (exwm-global-set-key (kbd "s-h") 'windmove-left)
+  (exwm-global-set-key (kbd "s-l") 'windmove-right)
   (define-key desktop-environment-mode-map (kbd "s-l") nil)
 
   (defun dvorak? ()
@@ -400,10 +398,9 @@
         (set-keyboard "us")
       (set-keyboard "de neo_dvorak")))
 
-  (global-set-key (kbd "M-T") 'flop-frame)
-  (global-set-key (kbd "C-x p") 'launch-program)
-  (global-set-key (kbd "M-…") 'multi-term)
-  (global-set-key (kbd "C-ü") 'undo-tree-undo)
+  (exwm-global-set-key (kbd "C-x p") 'launch-program)
+  (exwm-global-set-key (kbd "M-…") 'multi-term)
+  (exwm-global-set-key (kbd "C-ü") 'undo-tree-undo)
 
   (defun prompt-workspace (&optional prompt)
     "Prompt for a workspace, returning the workspace frame."

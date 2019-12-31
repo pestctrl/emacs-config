@@ -64,8 +64,7 @@
                                           (org-ql--add-markers)
                                           (my/get-project-stuck-displayables)
                                           (reverse))))
-                             (unless (zerop (length res))
-                               (setf display (append res display))))))
+                             (setf display (append res display)))))
                         ('task
                          (when (and include-tasks (eq 'stuck (opr/type-of-task)))
                            (push (org-ql--add-markers (org-element-headline-parser (point)))

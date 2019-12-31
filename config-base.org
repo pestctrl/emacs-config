@@ -2629,7 +2629,8 @@
 ** read-identifier too slow
 #+begin_src emacs-lisp
   (add-to-list 'xref-prompt-for-identifier
-               'xref--read-identifier)
+               'xref-find-references
+               'append)
 #+end_src
 ** workgroups2
 #+begin_src emacs-lisp

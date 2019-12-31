@@ -726,12 +726,15 @@
                                                          :and (:not (:and (:not (:scheduled today)
                                                                                 :not (:deadline today)))))))))))
             ("m" . "Maintainence")
-            ("md" "Done Tasks" todo "DONE|CANCELLED|COMPLETE|ABANDON"
-             ((org-agenda-overriding-header "Done Tasks")
-              (org-agenda-files ',(remove-if (lambda (x) 
-                                               (member (expand-file-name x) my/non-agenda-files)) 
-                                             my/all-agenda-files))
-              (org-agenda-skip-function 'my/skip-if-top-level-dev)))
+            ("md" "Done Tasks"
+             ((org-ql-block '(and (not (tags "ARCHIVE"))
+                                  (todo "DONE" "ABANDON")
+                                  (or (not (my/top-level))
+                                      (not (tags "dev"))))
+                            ((org-ql-block-header "Done tasks")
+                             (org-agenda-files ',(remove-if (lambda (x) 
+                                                              (member (expand-file-name x) my/non-agenda-files)) 
+                                                            my/all-agenda-files))))))
             ("ma" "Archive trees"
              ((tags "ARCHIVE"
                     ((org-agenda-overriding-header "Big archive trees")
@@ -1525,4 +1528,9 @@
   (advice-add #'org-datetree--find-create
               :after
               #'org-datetree--find-create-add-timestamp)
+#+end_src
+
+* repeat to previous state
+#+begin_src emacs-lisp
+  (setq org-todo-repeat-to-state t)
 #+end_src

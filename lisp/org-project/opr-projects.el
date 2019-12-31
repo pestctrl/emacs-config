@@ -89,21 +89,25 @@
     (pcase state
       ("HOLD" 'hold)
       ("ETERNAL" 'active)
-      (_ (when (or (not (member state opr/ambiguous))
-                   (eq 'project (opr/ambiguous-task-or-project)))
+      (_ (when (or (member state opr/strict-projects)
+                   (and (member state opr/ambiguous)
+                        (eq 'project (opr/ambiguous-task-or-project))))
            (if (or (member "_invis_" (org-get-tags))
-                   (org-time> (org-entry-get (point) "DELAYED")
-                              (org-matcher-time "<now>")))
+                   (when-let (d (org-entry-get (point) "DELAYED"))
+                     (org-time> d (org-matcher-time "<now>"))))
                'invis
-             (pcase state
-               ("EMPTY" (empty-status?))
-               ("SEQ" (seq-status?))
-               ("META1" (meta1-status?))
-               ("META" (meta-status? greedy-active))
-               ("ONE" (when (eq 'project (opr/ambiguous-task-or-project))
-                        (meta1-status?)))
-               ("TODO" (when (eq 'project (opr/ambiguous-task-or-project))
-                         (meta1-status?))))))))))
+             (if (when-let (s (org-entry-get (point) "SCHEDULED"))
+                   (org-time> s (org-matcher-time "<now>")))
+                 'active
+               (pcase state
+                 ("EMPTY" (empty-status?))
+                 ("SEQ" (seq-status?))
+                 ("META1" (meta1-status?))
+                 ("META" (meta-status? greedy-active))
+                 ("ONE" (when (eq 'project (opr/ambiguous-task-or-project))
+                          (meta1-status?)))
+                 ("TODO" (when (eq 'project (opr/ambiguous-task-or-project))
+                           (meta1-status?)))))))))))
 
 (provide 'opr-projects)
 ;;; opr-projects.el ends here

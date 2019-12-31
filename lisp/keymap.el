@@ -1,9 +1,9 @@
 (defmacro exwm-global-set-key (keybinding function)
   `(progn
-     (if (boundp 'exwm-input-global-keys)
+     (when (boundp 'exwm-input-global-keys)
          (add-to-list 'exwm-input-global-keys
-                      (cons ,keybinding ,function))
-       (global-set-key ,keybinding ,function))))
+                      (cons ,keybinding ,function)))
+     (global-set-key ,keybinding ,function)))
 
 (define-prefix-command '*root-map*)
 (exwm-global-set-key (kbd "C-t") '*root-map*)

@@ -36,16 +36,18 @@
 
 (require 'libs)
 
-(when my/enable-exwm
+(when (and (eq 'x window-system)
+           my/enable-exwm)
   (use-package exwm)
   (setq exwm-input-global-keys nil))
 
 (load-file "~/.emacs.d/lisp/keymap.el")
 
-(when my/enable-exwm
+(when (and (eq 'x window-system)
+           my/enable-exwm)
   (org-babel-load-file
    (expand-file-name "config-exwm.org"
-                     user-emacs-directory))
+                     user-emacs-directory)))
 
 (org-babel-load-file
  (expand-file-name "config-base.org"

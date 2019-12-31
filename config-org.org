@@ -617,6 +617,10 @@
                (when seen-non-todo
                  (throw 'break t)))))))))
 
+  (defun my/ambiguous-todo ()
+    (and (opr/type-of-project)
+         (opr/type-of-task))))
+
   (let* ((prod-tag "+time")
          (dev-tag "+dev")
          (sandbox-tag "+sandbox"))
@@ -736,17 +740,18 @@
                                                               (member (expand-file-name x) my/non-agenda-files)) 
                                                             my/all-agenda-files))))))
             ("ma" "Archive trees"
-             ((tags "ARCHIVE"
-                    ((org-agenda-overriding-header "Big archive trees")
-                     (org-tags-match-list-sublevels nil)
-                     (org-agenda-skip-archived-trees nil)
-                     (org-agenda-skip-function 'my/show-big-top-levels)))
-              (tags "ARCHIVE"
-                    ((org-agenda-overriding-header "Small archive trees")
-                     (org-tags-match-list-sublevels nil)
-                     (org-agenda-skip-archived-trees nil)
-                     (org-agenda-skip-function 'my/show-small-top-levels))))
-             ((my/delete-blocks nil)))
+             ((org-ql-block '(and (tags "ARCHIVE")
+                                  (my/top-level)
+                                  (let ((size (- (save-excursion (org-end-of-subtree t t)) (point))))
+                                    (>= size 50000)))
+                            ((org-ql-block-header "Big archive trees")))
+              (org-ql-block '(and (tags "ARCHIVE")
+                                  (my/top-level)
+                                  (let ((size (- (save-excursion (org-end-of-subtree t t)) (point))))
+                                    (< size 50000)))
+                            ((org-ql-block-header "Small archive trees"))))
+              ((my/delete-blocks nil)
+               (org-use-tag-inheritance nil)))
             ("mr" "Recategorize dev to sandbox" todo (mapconcat #'identity org-done-keywords-for-agenda "|")
              ((org-agenda-skip-function 'my/show-top-level)
               (org-agenda-files '(,(my/agenda-file "dev.org")))))
@@ -762,6 +767,10 @@
               (org-ql-block '(and (tags "sandbox")
                                   (todo "TODO" "META" "META1" "EMPTY" "ONE")
                                   (not (my/valid-todo)))
+                            ((org-ql-block-header "sandbox")))))
+            ("mA" "Ambiguous todos"
+             ((org-ql-block '(and (todo)
+                                  (my/ambiguous-todo))
                             ((org-ql-block-header "sandbox")))))
             ("f" . "Flip through")
             ("fc" "Comms" tags-todo "datetime"

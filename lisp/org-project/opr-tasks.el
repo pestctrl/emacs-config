@@ -61,23 +61,27 @@
       ("COMPLETE" 'done)
       ("HALT" 'stuck)
       ("WAIT" 'active)
-      (_ (if (member "_invis_" (org-get-tags))
-             'invis
-           (pcase state
-             ("TASK" (if (or (org-get-deadline-time (point))
-                             (org-get-scheduled-time (point)))
-                         'active
-                       'stuck))
-             ("ONE" (when (eq 'task (opr/ambiguous-task-or-project))
-               (if (or (org-get-deadline-time (point))
-                       (org-get-scheduled-time (point)))
-                   'active
-                 'stuck)))
-             ("TODO" (when (eq 'task (opr/ambiguous-task-or-project))
-                       (if (or (org-get-deadline-time (point))
+      (_ (when (or (member state opr/strict-tasks)
+                   (and (member state opr/ambiguous)
+                        (eq 'task
+                            (opr/ambiguous-task-or-project))))
+           (if (member "_invis_" (org-get-tags))
+               'invis
+             (pcase state
+               ("TASK" (if (or (org-get-deadline-time (point))
                                (org-get-scheduled-time (point)))
                            'active
-                         'stuck)))))))))
+                         'stuck))
+               ("ONE" (when (eq 'task (opr/ambiguous-task-or-project))
+                        (if (or (org-get-deadline-time (point))
+                                (org-get-scheduled-time (point)))
+                            'active
+                          'stuck)))
+               ("TODO" (when (eq 'task (opr/ambiguous-task-or-project))
+                         (if (or (org-get-deadline-time (point))
+                                 (org-get-scheduled-time (point)))
+                             'active
+                           'stuck))))))))))
 
 (provide 'opr-tasks)
 ;;; opr-tasks.el ends here

@@ -394,7 +394,9 @@
         (set-keyboard "us")
       (set-keyboard "de neo_dvorak")))
 
-  (exwm-global-set-key (kbd "C-x p") 'launch-program)
+  ;; Don't do this one, causes blinking
+  (global-set-key (kbd "C-x p") 'launch-program)
+  ;; These have issues, presumably utf8 or something
   (global-set-key (kbd "M-…") 'multi-term)
   (global-set-key (kbd "C-ü") 'undo-tree-undo)
 

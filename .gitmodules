@@ -1,57 +1,57 @@
 [submodule "custom/mu"]
-	path = custom/mu
+	path = submodule/mu
 	url = https://github.com/djcb/mu
 [submodule "custom/youtube-dl-emacs"]
-	path = custom/youtube-dl-emacs
+	path = submodule/youtube-dl-emacs
 	url = https://github.com/skeeto/youtube-dl-emacs
 [submodule "custom/dired-plus"]
-	path = custom/dired-plus
+	path = submodule/dired-plus
 	url = https://github.com/emacsmirror/dired-plus
 [submodule "custom/bookmark-plus"]
-	path = custom/bookmark-plus
+	path = submodule/bookmark-plus
 	url = https://github.com/emacsmirror/bookmark-plus
 [submodule "custom/emacs-memoize"]
-	path = custom/emacs-memoize
+	path = submodule/emacs-memoize
 	url = https://github.com/skeeto/emacs-memoize
 [submodule "custom/exwm"]
-	path = custom/exwm
+	path = submodule/exwm
 	url = https://github.com/ch11ng/exwm
 [submodule "custom/xelb"]
-	path = custom/xelb
+	path = submodule/xelb
 	url = https://github.com/ch11ng/xelb
 [submodule "custom/org-fstree"]
-	path = custom/org-fstree
+	path = submodule/org-fstree
 	url = http://repo.or.cz/org-fstree.git
 [submodule "custom/ts.el"]
-	path = custom/ts.el
+	path = submodule/ts.el
 	url = https://github.com/alphapapa/ts.el
 [submodule "custom/eosd"]
-	path = custom/eosd
+	path = submodule/eosd
 	url = https://github.com/clarete/eosd
 [submodule "custom/org-now"]
-	path = custom/org-now
+	path = submodule/org-now
 	url = https://github.com/alphapapa/org-now
 [submodule "custom/power-mode.el"]
-	path = custom/power-mode.el
+	path = submodule/power-mode.el
 	url = https://github.com/ALSchwalm/power-mode.el
 [submodule "custom/leetcode-emacs"]
-	path = custom/leetcode-emacs
+	path = submodule/leetcode-emacs
 	url = https://github.com/ginqi7/leetcode-emacs
 [submodule "custom/subed"]
-	path = custom/subed
+	path = submodule/subed
 	url = https://github.com/rndusr/subed
 [submodule "custom/exwm-background"]
-	path = custom/exwm-background
+	path = submodule/exwm-background
 	url = https://github.com/pestctrl/exwm-background
 [submodule "custom/erlang_ls"]
-	path = custom/erlang_ls
+	path = submodule/erlang_ls
 	url = https://github.com/erlang-ls/erlang_ls
 [submodule "custom/sourcer"]
-	path = custom/sourcer
+	path = submodule/sourcer
 	url = https://github.com/erlang/sourcer
 [submodule "custom/org-reveal"]
-	path = custom/org-reveal
+	path = submodule/org-reveal
 	url = https://github.com/yjwen/org-reveal
 [submodule "custom/org-ql"]
-	path = custom/org-ql
+	path = submodule/org-ql
 	url = https://github.com/pestctrl/org-ql/

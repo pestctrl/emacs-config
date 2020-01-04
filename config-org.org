@@ -184,16 +184,16 @@
     (if org-agenda-follow-mode
         (advice-unadvice #'org-agenda-do-context-action)
       (pcase (my/org-agenda-get-name)
-        ("Reviews" (advice-add #'org-agenda-do-context-action
+        ("Reviews" (advice-add #'org-agenda-show
                                :override
-                               #'my/org-agenda-do-context-action-for-review))
-        ("Reviews and Journals" (advice-add #'org-agenda-do-context-action
+                               #'my/org-agenda-show-review))
+        ("Reviews and Journals" (advice-add #'org-agenda-show
                                             :override
-                                            #'my/org-agenda-do-context-action-for-journal))
-        ("Dev" (advice-add #'org-agenda-do-context-action
+                                            #'my/org-agenda-show-journal))
+        ("Dev" (advice-add #'org-agenda-show
                            :override
-                           #'my/org-agenda-do-context-action-for-project))
-        (_ (advice-unadvice #'org-agenda-do-context-action)))))
+                           #'my/org-agenda-show-project))
+        (_ (advice-unadvice #'org-agenda-show)))))
 
   (defun advice-unadvice (sym)
     "Remove all advices from symbol SYM."
@@ -213,17 +213,6 @@
       (org-hide-archived-subtrees (point-min) (point-max))
       (select-window win)))
 
-  (defun my/org-agenda-do-context-action-for-project ()
-    "Show outline path and, maybe, follow mode window."
-    (let ((m (org-get-at-bol 'org-marker)))
-      (when (and (markerp m) (marker-buffer m))
-        (and org-agenda-follow-mode
-             (if org-agenda-follow-indirect
-                 (org-agenda-tree-to-indirect-buffer nil)
-               (my/org-agenda-show-project)))
-        (and org-agenda-show-outline-path
-             (org-with-point-at m (org-display-outline-path t))))))
-
   (defun my/org-agenda-show-review (&optional full-entry)
     "Display the Org file which contains the item at point.
       With prefix argument FULL-ENTRY, make the entire entry visible
@@ -237,17 +226,6 @@
       (org-hide-archived-subtrees (point-min) (point-max))
       (select-window win)))
 
-  (defun my/org-agenda-do-context-action-for-review ()
-    "Show outline path and, maybe, follow mode window."
-    (let ((m (org-get-at-bol 'org-marker)))
-      (when (and (markerp m) (marker-buffer m))
-        (and org-agenda-follow-mode
-             (if org-agenda-follow-indirect
-                 (org-agenda-tree-to-indirect-buffer nil)
-               (my/org-agenda-show-review)))
-        (and org-agenda-show-outline-path
-             (org-with-point-at m (org-display-outline-path t))))))
-
   (defun my/org-agenda-show-journal (&optional full-entry)
     "Display the Org file which contains the item at point.
       With prefix argument FULL-ENTRY, make the entire entry visible
@@ -260,17 +238,6 @@
       (call-interactively 'org-show-all)
       (org-hide-archived-subtrees (point-min) (point-max))
       (select-window win)))
-
-  (defun my/org-agenda-do-context-action-for-journal ()
-    "Show outline path and, maybe, follow mode window."
-    (let ((m (org-get-at-bol 'org-marker)))
-      (when (and (markerp m) (marker-buffer m))
-        (and org-agenda-follow-mode
-             (if org-agenda-follow-indirect
-                 (org-agenda-tree-to-indirect-buffer nil)
-               (my/org-agenda-show-journal)))
-        (and org-agenda-show-outline-path
-             (org-with-point-at m (org-display-outline-path t))))))
 
   (defun org-agenda-goto-disable-follow (&optional highlight)
     (interactive)

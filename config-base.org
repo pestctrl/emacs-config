@@ -132,9 +132,13 @@
 ** Theme
 #+BEGIN_SRC emacs-lisp
   (use-package color-theme-modern)
+  ;; (use-package gruvbox-theme)
   (load-theme 'calm-forest t)
   ;; My font and background color
   (load-theme 'dark-default t)
+
+  ;; (load-theme 'gruvbox-dark-medium)
+  ;; (load-theme 'gruv-adj)
 #+END_SRC
 ** mode-line
 *** Smart Mode Line

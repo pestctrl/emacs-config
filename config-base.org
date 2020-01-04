@@ -2605,14 +2605,19 @@
 ** Slime mode
 #+BEGIN_SRC emacs-lisp
   (use-package slime)
-  (add-hook 'lisp-mode-hook (lambda () (slime-mode t)))
-  (add-hook 'inferior-lisp-mode-hook (lambda () (inferior-slime-mode t)))
+  (use-package slime-company)
+
+  (add-hook 'lisp-mode-hook #'slime-mode)
+  (add-hook 'inferior-lisp-mode-hook #'inferior-slime-mode)
+
   (setq inferior-lisp-program "/usr/bin/sbcl")
+
   (let ((clhs-file "~/quicklisp/clhs-use-local.el"))
     (if (file-exists-p clhs-file)
         (load-file clhs-file)
       (warn "clhs not installed. Please install")))
-  (slime-setup '(slime-fancy slime-asdf))
+
+  (slime-setup '(slime-fancy slime-asdf slime-company))
 #+END_SRC
 ** new etzy
 #+begin_src emacs-lisp

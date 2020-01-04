@@ -71,12 +71,12 @@
                                  display))))))
                   (reverse display))))))))
 
-(defun my/org-ql-stuck-projects (&rest args)
+(defun my/org-ql-stuck-projects (tag)
   (let* ((from (org-agenda-files nil 'ifmode))
          (org-todo-keywords-1 '("EMPTY" "ONE" "META" "META1" "TODO"))
          (items (mapcan #'my/get-project-stuck-displayables
                         (org-ql-select org-agenda-files
-                          '(and (tags "dev")
+                          `(and (tags ,tag)
                                 (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
                                 (my/top-level)
                                 (or (eq 'stuck (opr/type-of-task))
@@ -119,12 +119,12 @@
                         (setf display (append res display))))))
                 (reverse display)))))))
 
-(defun my/org-ql-active-projects (&rest args)
+(defun my/org-ql-active-projects (tag)
   (let* ((from (org-agenda-files nil 'ifmode))
          (org-todo-keywords-1 '("EMPTY" "META" "META1" "ONE" "TODO" ))
          (items (mapcan #'my/get-project-active-displayables
                         (org-ql-select org-agenda-files
-                          '(and (tags "dev")
+                          `(and (tags ,tag)
                                 (not (tags "short"))
                                 (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
                                 (my/top-level)

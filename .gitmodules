@@ -55,3 +55,6 @@
 [submodule "custom/org-ql"]
 	path = submodule/org-ql
 	url = https://github.com/pestctrl/org-ql/
+[submodule "submodule/emacs-piper"]
+	path = submodule/emacs-piper
+	url = https://gitlab.com/howardabrams/emacs-piper

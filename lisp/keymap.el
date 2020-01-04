@@ -26,5 +26,5 @@
 (define-key *root-map* (kbd "o") 'switch-window)
 (define-key *root-map* (kbd "n") 'toggle-notifications)
 (define-key *root-map* (kbd "RET") 'dired-jump)
-(define-key *root-map* (kbd "C-b") (lambda () (interactive) (switch-to-buffer (other-buffer (current-buffer) 1))))
+(define-key *root-map* (kbd "C-b") 'previous-buffer)
 

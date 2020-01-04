@@ -1,3 +1,5 @@
+#+PROPERTY: header-args :tangle "~/.emacs.d/config-exwm.el" :comments both
+
 * e2wm
 #+begin_src emacs-lisp
   (use-package e2wm

@@ -1,14 +1,21 @@
 #+TITLE: Emacs Configuration
 #+AUTHOR: Benson Chu
+#+PROPERTY: header-args :tangle "~/.emacs.d/config-base.el" :comments both
 
 * Enable lexical binding
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :comments no
   ;;; -*- lexical-binding: t -*-
 #+end_src
 * Bugs
 ** Need this to fix broken config
 #+begin_src emacs-lisp
   (use-package magit-popup)
+#+end_src
+* custom-tangle
+#+begin_src emacs-lisp
+  (defun tangle-elisp ()
+    (interactive)
+    (org-babel-tangle nil nil 'emacs-lisp))
 #+end_src
 * Neo keyboard issues
 #+BEGIN_SRC emacs-lisp

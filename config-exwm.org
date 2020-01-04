@@ -288,6 +288,7 @@
   (define-key *music-map* (kbd "SPC") (exec (shell-command "clementine -t")))
   (define-key *music-map* (kbd "n") (exec (shell-command "clementine --next")))
   (define-key *music-map* (kbd "p") (exec (shell-command "clementine --previous")))
+  (define-key *music-map* (kbd "r") (exec (shell-command "clementine --restart-or-previous")))
   (defhydra clementine-volume-hydra (*music-map* "v")
     "Clementine volume up and down"
     ("j" (lambda () (interactive) (shell-command "clementine --volume-down")))

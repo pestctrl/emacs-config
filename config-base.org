@@ -557,17 +557,13 @@
   ;; (set-default-font "Hack 10")
   ;; (set-default-font "UbuntuMono 11")
   ;; (set-default-font "OfficeCodePro 11")
-  (if (eq system-type 'windows-nt)
-      (set-frame-font "Roboto Mono 10")
-    (set-frame-font "RobotoMono 11")
-    (let ((font
-       (format "%s"
-           "RobotoMono-11"
-           ;; "Tamzen"
-           ;; "SourceCodePro"
-           ;; "Gohu Gohufont"
-           )))
-      (add-to-list 'default-frame-alist `(font . ,font))))
+  ;; "Tamzen"
+  ;; "SourceCodePro"
+  ;; "Gohu Gohufont"
+
+  (set-fontset-font t nil (font-spec :size 11 :name "RobotoMono"))
+
+  (set-fontset-font t 'unicode (font-spec :size 16 :name "DejaVu Sans Mono"))
   ;; (set-frame-font "Menlo")
   (defun reading-buffer ()
     (interactive)

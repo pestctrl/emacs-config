@@ -1238,24 +1238,28 @@
 #+BEGIN_SRC emacs-lisp
   (use-package ledger-mode
     :mode "\\.dat\\'")
+
+  (defconst new-report-str (concat "%(binary) -f %(ledger-file) --cleared-format "
+                                   "'%(justify(scrub(get_at(display_total, 0)), 16, 16 + int(prepend_width), true, color))"
+                                   "  %(justify(scrub(get_at(display_total, 1)), 18, 36 + int(prepend_width), true, color))"
+                                   "  %(justify(scrub(get_at(display_total, 0) - get_at(display_total, 1)), 18, 36 + int(prepend_width), true, color))"
+                                   "    %(latest_cleared ? format_date(latest_cleared) : \"         \")"
+                                   "    %(!options.flat ? depth_spacer : \"\")%-(ansify_if(partial_account(options.flat), blue if color))\\n"
+                                   "%/%$1  %$2  %$3    %$4\\n"
+                                   "%/%(prepend_width ? \" \" * int(prepend_width) : \"\")----------------    ----------------    ----------------    ---------\\n'"
+                                   " cleared"))
+
   (setq ledger-reports
-        '(("expmonth" "%(binary) -f %(ledger-file) -M reg Expenses")
+        `(("account" "%(binary) -f %(ledger-file) reg %(account)")
+          ("bal" "%(binary) -f %(ledger-file) bal")
+          ("reg" "%(binary) -f %(ledger-file) reg")
+          ("cleared" ,new-report-str)
+          ;; ("cleared" "%(binary) -f %(ledger-file) cleared")
+          ("expmonth" "%(binary) -f %(ledger-file) -M reg Expenses")
           ("owedmom" "%(binary) -f %(ledger-file) reg Liabilities")
           ("progress" "%(binary) -f %(ledger-file) reg Assets Equity Liabilities")
-          ("cleared" "%(binary) -f %(ledger-file) cleared")
-          ("food" "%(binary) -f %(ledger-file) --add-budget reg Assets")
-          (#("bal" 0 1
-             (idx 1))
-           "%(binary) -f %(ledger-file) bal")
-          (#("reg" 0 1
-             (idx 4))
-           "%(binary) -f %(ledger-file) reg")
-          (#("payee" 0 1
-             (idx 3))
-           "%(binary) -f %(ledger-file) reg @%(payee)")
-          (#("account" 0 1
-             (idx 0))
-           "%(binary) -f %(ledger-file) reg %(account)")))
+          ;; ("food" "%(binary) -f %(ledger-file) --add-budget reg Assets")
+          ("payee" "%(binary) -f %(ledger-file) reg @%(payee)")))
 
   (setq dynamic-reports
         '(("budgetcal" "%(binary) -f ~/MEGA/org/entries/food.ledger --daily --add-budget reg Expenses")))

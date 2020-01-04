@@ -1541,3 +1541,12 @@
 #+begin_src emacs-lisp
   (setq org-todo-repeat-to-state t)
 #+end_src
+* I'm bored
+#+begin_src emacs-lisp
+  (defun im-bored ()
+    (interactive)
+    (org-ql-search (append org-agenda-files
+                           (list (my/agenda-file "when_im_bored.org")
+                                 (my/agenda-file "eternal.org")))
+      '(and (tags-local "bored"))))
+#+end_src

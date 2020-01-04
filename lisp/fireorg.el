@@ -76,16 +76,27 @@
          (progn
            ;; (delete-other-windows)
            (switch-to-buffer ,org)
-           (split-window-horizontally)
-           (switch-window)
-           (switch-to-buffer ,ff)
-           (switch-window)
+           (let ((w (selected-window)))
+             (pop-to-buffer ,ff)
+             (select-window w))
 
            ,@body
 
            (delete-other-windows))
        (fireorg/unignore-focus)           
        (exwm-background/exwm-input--fake-key-to-window (exwm--buffer->id ,ff) ?\C-q))))
+
+;; (defmacro defun-fireorg-command (name arglist &optional docstring &rest body)
+;;   (let* ((has-docstring (eq 'string (type-of docstring)))
+;;          (body (if has-docstring
+;;                    body
+;;                  (cons docstring body)))
+;;          (docstring (or (and has-docstring
+;;                              docstring)
+;;                         nil)))
+;;     `(defun ,name ,arglist
+;;        ,docstring
+;;        )))
 
 (provide 'fireorg)
 ;;; fireorg.el ends here

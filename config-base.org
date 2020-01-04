@@ -155,6 +155,23 @@
   ;;    (require 'smart-mode-line)
   ;;    (setq sml/theme 'powerline)
   ;;    (sml/setup)))
+
+  (defvar minor-modes-cache (make-hash-table))
+
+  (defun sml/minor-modes-cache (orig &rest args)
+    (let ((results (gethash (current-buffer) minor-modes-cache))
+          (current-time (string-to-number (format-time-string "%s"))))
+      (if (and results
+               (let ((cache-time (car results)))
+                 (< current-time (1+ cache-time))))
+          (cdr results)
+        (let ((str (apply orig args)))
+          (puthash (current-buffer) (cons current-time str) minor-modes-cache)
+          str))))
+
+  (advice-add 'sml/generate-minor-modes
+              :around
+              'sml/minor-modes-cache)
 #+END_SRC
 *** Powerline
 **** Test new mode-line

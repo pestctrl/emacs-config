@@ -133,6 +133,8 @@
 #+BEGIN_SRC emacs-lisp
   (use-package color-theme-modern)
   (load-theme 'calm-forest t)
+  ;; My font and background color
+  (load-theme 'dark-default t)
 #+END_SRC
 ** mode-line
 *** Smart Mode Line
@@ -572,10 +574,6 @@
 #+BEGIN_SRC emacs-lisp
   (setq fancy-splash-image "~/.emacs.d/res/icon.png")
 #+END_SRC
-** new-text-color
-#+begin_src emacs-lisp
-  (set-face-attribute 'default nil :background "gray8" :foreground "#70FF00")
-#+end_src
 ** sml faces
 #+begin_src emacs-lisp
   ;; (set-face-attribute 'sml/line-number t :inherit sml/global :background "#5f00af" :foreground "light gray" :weight normal)

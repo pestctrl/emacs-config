@@ -34,6 +34,9 @@
 (let ((default-directory  "~/.emacs.d/lisp/"))
   (normal-top-level-add-subdirs-to-load-path))
 
+(let ((default-directory  "~/.emacs.d/submodule/"))
+  (normal-top-level-add-subdirs-to-load-path))
+
 (require 'libs)
 
 (when (and (eq 'x window-system)

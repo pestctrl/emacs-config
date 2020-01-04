@@ -24,4 +24,6 @@
 ;; New stuff, may not stick around
 (require 'org-ql-custom-stuck-projects)
 
+(add-to-list 'custom-theme-load-path "~/.emacs.d/lisp/themes")
+
 (provide 'libs)

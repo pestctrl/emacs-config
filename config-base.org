@@ -2209,9 +2209,10 @@
   (setq erc-kill-buffer-on-part t)
   (setq erc-autojoin-channels-alist
         '(("freenode.net" "#emacs" "#org-mode"
-           "##linux" "#compilers" "#pltclub" 
-           "##cs" "##computerscience" "##programming" "#lisp" "##lisp"
-           "#sbcl" "#ecl")))
+           ;; "##linux" "#compilers" "#pltclub" 
+           ;; "##cs" "##computerscience" "##programming" "#lisp" "##lisp"
+           ;; "#sbcl" "#ecl"
+           )))
 
   (defun get-authinfo (host port)
     (let* ((netrc (netrc-parse (expand-file-name "~/.emacs.d/secrets/.authinfo.gpg")))

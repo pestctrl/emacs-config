@@ -13,7 +13,7 @@
  (rear-context-string)
  (position . 1))
 ("exwm-background"
- (filename . "~/.emacs.d/custom/exwm-background/")
+ (filename . "~/.emacs.d/submodules/exwm-background/")
  (front-context-string . "screenshots\n  -r")
  (rear-context-string . "96 Jun 16 21:35 ")
  (position . 146))

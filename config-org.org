@@ -96,7 +96,6 @@
 #+BEGIN_SRC emacs-lisp
   (use-package org-timeline)
   (remove-hook 'org-agenda-finalize-hook 'org-timeline-insert-timeline)
-
 #+END_SRC
 ** Code-blocks
 #+BEGIN_SRC emacs-lisp
@@ -257,7 +256,6 @@
       (message (format "This subtree has %d characters. " (- (region-end) (region-beginning))))))
 
   (define-key org-agenda-mode-map (kbd "C") #'my/org-count-subtree-characters)
-
 #+end_src
 
 * My Template
@@ -449,73 +447,6 @@
     (use-package htmlize)
     (org-super-agenda-mode)
     (setq org-super-agenda-header-separator "")
-#+end_src
-* memoization attempt
-#+begin_src emacs-lisp
-
-
-  ;; (defmacro measure-time (&rest body)
-  ;;   "Measure the time it takes to evaluate BODY."
-  ;;   `(let ((time (current-time)))
-  ;;      ,@body
-  ;;      (message "%.06f" (float-time (time-since time)))))
-
-  ;; (require 'memoize)
-  ;; (defun reset-memo-for-projects ()
-  ;;   (interactive)
-  ;;   (ignore-errors
-  ;;     (memoize-restore 'my/get-project-type))
-  ;;   (memoize 'my/get-project-type))
-  ;; (add-hook 'org-agenda-finalize-hook
-  ;;           #'reset-memo-for-projects)
-
-  ;; (defvar my/stuck-projects-flag nil)
-
-  ;; (defvar my/stuck-projects-file nil)
-
-  ;; (defun my/show-stuck-projects ()
-  ;;   "Only show subtrees that are stuck projects"
-  ;;   (setq stuck-here t)
-  ;;   (save-restriction
-  ;;     (widen)
-  ;;     (let ((subtree-end (save-excursion (org-end-of-subtree t))))
-  ;;       (if (and my/stuck-projects-flag
-  ;;                (string= my/stuck-projects-file
-  ;;                         (buffer-file-name))
-  ;;                (< (point) my/stuck-projects-flag))
-  ;;           (if (or (my/is-next-task)
-  ;;                   (my/is-unactionable-task)
-  ;;                   (and (not (my/is-a-task))
-  ;;                        (not (eq (my/get-project-type buffer-file-name (point) t)
-  ;;                            'stuck))))
-  ;;               subtree-end
-  ;;             nil)
-  ;;         (setq my/stuck-projects-flag nil
-  ;;               my/stuck-projects-file nil)
-  ;;         (cond ((and (my/is-a-task)
-  ;;                     (my/is-standalone-task)
-  ;;                     (not (org-get-scheduled-time (point)))
-  ;;                     (not (org-get-deadline-time (point))))
-  ;;                nil)
-  ;;               ((eq (my/get-project-type buffer-file-name
-  ;;                                         (point) t)
-  ;;                    'stuck)
-  ;;                (setq my/stuck-projects-flag subtree-end)
-  ;;                (setq my/stuck-projects-file (buffer-file-name))
-  ;;                nil)
-  ;;               (t subtree-end))))))
-
-  ;; (defvar my/done-projects-flag nil)
-  ;; (defvar my/next-task-flag nil)
-
-  ;; (defun my/org-agenda-reset-vars ()
-  ;;   (interactive)
-  ;;   (setq my/stuck-projects-flag nil
-  ;;         my/done-projects-flag nil
-  ;;         my/next-task-flag nil))
-
-  ;; (add-to-list 'org-agenda-finalize-hook
-  ;;              #'my/org-agenda-reset-vars)
 #+end_src
 * Agenda custom commands
 #+begin_src emacs-lisp
@@ -877,68 +808,6 @@
           ("li" "Important Information" entry (file ,(my/org-file "entries/important.gpg")) "* %?")))
 #+end_src
 * Weekly Reviews Implementation
-** Attempt 3
-#+BEGIN_SRC emacs-lisp#
-  (defun completed-tags-search (start-date end-date)
-    (let ((org-agenda-overriding-header "* Log")
-          (tag-search (concat (format "TODO=\"DONE\"&CLOSED>=\"<%s>\"&CLOSED<=\"<%s>\""
-                                      start-date
-                                      end-date))))
-      (org-tags-view nil tag-search)))
-
-  (defun get-tasks-from (start-date end-date)
-    (let (string)
-      (save-window-excursion
-        (completed-tags-search start-date end-date)
-        (setq string (mapconcat 'identity
-                                (mapcar (lambda (a)
-                                          (concat "***" a))
-                                        (butlast (cdr (split-string (buffer-string) "\n")) 1)) 
-                                "\n"))
-        (kill-buffer))
-      string))
-
-  (defun weekly-review-file ()
-    (set-buffer
-     (org-capture-target-buffer (format "~/MEGA/org/entries/review/%s/Year of %s, Week %s.org"
-                                        (format-time-string "%Y")
-                                        yearly-theme
-                                        (format-time-string "%V")))))
-
-  (defun make-up-review-file ()
-    (let* ((date (org-read-date))
-           (week (number-to-string
-                  (org-days-to-iso-week
-                   (org-time-string-to-absolute date)))))
-      (org-capture-put :start-date date)
-      (org-capture-put :start-week week)
-      (set-buffer 
-       (org-capture-target-buffer
-        (format "~/MEGA/org/entries/review/%s/Year of %s, Week %s-%s.org"
-                (format-time-string "%Y")
-                yearly-theme
-                week
-                (format-time-string "%V"))))))
-
-  (defun setup-make-up-review ()
-    (let* ((date (org-read-date))
-           (week (number-to-string
-                  (org-days-to-iso-week
-                   (org-time-string-to-absolute date)))))
-      (org-capture-put :start-date date)
-      (org-capture-put :start-week week)))
-
-  (defvar my/review-visibility-level nil)
-
-  (defun my/review-set-visibility ()
-    (when my/review-visibility-level
-      (outline-hide-sublevels my/review-visibility-level)
-      (org-show-entry)
-      (setq my/review-visibility-level nil)))
-
-  (add-hook 'org-capture-mode-hook
-            'my/review-set-visibility)
-#+END_SRC
 ** Attempt 4
 #+begin_src emacs-lisp
   (defvar yearly-theme "Thought")

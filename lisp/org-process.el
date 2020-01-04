@@ -167,7 +167,8 @@
   (let ((beg (ol/get-bot-marker)))
     (outline-next-heading)
     (let* ((youtube-marker (op/insert-category-heading beg "Youtube Videos"))
-           (reddit-marker (op/insert-category-heading beg "Reddit Things")))
+           (reddit-marker (op/insert-category-heading beg "Reddit Things"))
+           (other-marker (op/insert-category-heading beg "Other")))
       (olsb/children
        (org-copy-subtree)
        (let ((tree-string (current-kill 0)))
@@ -177,7 +178,8 @@
                 (op/refile-to-point (buffer-file-name) youtube-marker))
                ((or (string-match-p "reddit\.com" tree-string)
                     (string-match-p "redd\.it" tree-string))
-                (op/refile-to-point (buffer-file-name) reddit-marker))))))))
+                (op/refile-to-point (buffer-file-name) reddit-marker))
+               (t (op/refile-to-point (buffer-file-name) other-marker))))))))
 
 (defun op/org-sort-subtree ()
   (interactive)

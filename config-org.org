@@ -998,6 +998,12 @@
       (goto-char (point-min))
       (re-search-forward "Reviews")))
 
+  (defun aux-get-week-string ()
+    (let ((this (plist-get org-capture-plist :start-week))
+          (last (format-time-string "%V")))
+      (if (string= this last)
+          (concat "Week " this)
+        (concat "Weeks " last "-" this))))
 
   (defun setup-manual-review ()
     ;; Read the date manually, and setup review accordingly
@@ -1078,6 +1084,28 @@
   ;; (my/save-agenda-week "2019-06-03" "2019-08-18")
 
   ;; (my/save-agenda-week "2019-07-14")
+#+end_src
+
+** png-ize buffer for weekly review
+#+begin_src emacs-lisp
+  (defun my/png-ize-buffer (buffer name-without-ext)
+    (with-current-buffer (htmlize-buffer buffer)
+      (write-file (my/agenda-file (concat name-without-ext ".html"))))
+    (shell-command (format "wkhtmltoimage %s %s"
+                           (my/agenda-file (concat name-without-ext ".html"))
+                           (my/agenda-file (concat name-without-ext ".png")))))
+
+  (defun my/write-agendas-for-review ()
+    (interactive)
+    (let* ((org-agenda-sticky nil)
+           (dev (save-excursion 
+                  (org-agenda nil "d")
+                  (current-buffer)))
+           (week (save-excursion
+                   (org-agenda nil "d")
+                   (current-buffer))))
+      (my/png-ize-buffer dev "org-agenda")
+      (my/png-ize-buffer week "org-week")))
 #+end_src
 * prompt for automatic org-board
 #+begin_src emacs-lisp

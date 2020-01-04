@@ -3,7 +3,7 @@
 ** fstree
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'load-path
-               "~/.emacs.d/custom/org-fstree")
+               "~/.emacs.d/submodule/org-fstree")
   (require 'org-fstree)
 #+END_SRC
 ** org-bullets
@@ -82,7 +82,7 @@
 *** Old ox-reveal package
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'load-path
-               "~/.emacs.d/custom/org-reveal")
+               "~/.emacs.d/submodule/org-reveal")
   (require 'ox-reveal)
   (setq org-reveal-root "file:///home/benson/.reveal.js")
   (setq org-structure-template-alist (remove-if (lambda (c) (string= (car c) "n")) org-structure-template-alist))
@@ -552,7 +552,7 @@
 * Agenda custom commands
 #+begin_src emacs-lisp
   (add-to-list 'load-path 
-               "~/.emacs.d/custom/org-ql")
+               "~/.emacs.d/submodule/org-ql")
   (require 'org-ql)
   (require 'org-ql-search)
   (require 'org-ql-custom-stuck-projects)
@@ -1312,7 +1312,7 @@
 #+end_src
 ** org-now
 #+begin_src emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/custom/org-now")
+  (add-to-list 'load-path "~/.emacs.d/submodule/org-now")
   (require 'org-now)
   (setq org-now-location
         nil)

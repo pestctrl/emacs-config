@@ -789,7 +789,7 @@
 *** Dired+, for formatting
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'load-path
-               "~/.emacs.d/custom/dired-plus")
+               "~/.emacs.d/submodule/dired-plus")
   (require 'dired+)
   (setq dired-listing-switches "-al  --group-directories-first --sort=extension")
 
@@ -1886,9 +1886,9 @@
   (use-package erlang)
 
   (add-to-list 'load-path
-               "~/.emacs.d/custom/erlang_ls/")
+               "~/.emacs.d/submodule/erlang_ls/")
 
-  (setq lsp-erlang-server-install-dir "~/.emacs.d/custom/erlang_ls")
+  (setq lsp-erlang-server-install-dir "~/.emacs.d/submodule/erlang_ls")
 
   (defun my/erlang-keymap-hook ()
     (local-set-key (kbd "C-c C-c") 'erlang-compile))
@@ -1898,7 +1898,7 @@
 * New
 ** Youtube-dl
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/custom/youtube-dl-emacs/")
+  (add-to-list 'load-path "~/.emacs.d/submodule/youtube-dl-emacs/")
   (require 'youtube-dl)
 
   (defun youtube-dl-song (url)
@@ -2096,7 +2096,7 @@
 ** eosd
 #+begin_src emacs-lisp
   ;; (add-to-list 'load-path 
-  ;;              "~/.emacs.d/custom/eosd")
+  ;;              "~/.emacs.d/submodule/eosd")
   ;; (require 'eosd)
 #+end_src
 ** helpful
@@ -2122,7 +2122,7 @@
   (use-package ctable)
   (use-package names)
   (add-to-list 'load-path
-               "~/.emacs.d/custom/leetcode-emacs")
+               "~/.emacs.d/submodule/leetcode-emacs")
 
   (require 'leetcode)
 
@@ -2214,7 +2214,7 @@
 ** bookmark+
 #+begin_src emacs-lisp
   (add-to-list 'load-path
-               "~/.emacs.d/custom/bookmark-plus")
+               "~/.emacs.d/submodule/bookmark-plus")
 
   (require 'bookmark+)
 #+end_src
@@ -2244,7 +2244,7 @@
 #+end_src
 ** Subtitles editing 
 #+begin_src emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/custom/subed/subed")
+  (add-to-list 'load-path "~/.emacs.d/submodule/subed/subed")
 
   (require 'subed)
 

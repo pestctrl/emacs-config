@@ -301,7 +301,7 @@
 #+END_SRC
 * exwm-background
 #+begin_src emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/custom/exwm-background/")
+  (add-to-list 'load-path "~/.emacs.d/submodule/exwm-background/")
   (require 'exwm-background)
   (define-key *window-map* (kbd "t") 'exwm-background/window-transparency-hydra/body)
   (setq window-system-default-frame-alist `((x . ((alpha . (,exwm-background/current-transparency . 50))))))

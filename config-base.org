@@ -1498,6 +1498,45 @@
   (advice-add #'notmuch-tree-worker
               :before
               #'notmuch-tree-clean-up-overlays)
+
+  (defun advice-replace-forward-line-with-next-line (orig &rest args)
+    (letf (((symbol-function 'forward-line) (symbol-function 'next-line)))
+      (apply orig args)))
+
+  ;; Needed for n and p to work
+  (advice-add #'notmuch-tree-prev-matching-message
+              :around
+              #'advice-replace-forward-line-with-next-line)
+
+  (advice-add #'notmuch-tree-next-matching-message
+              :around
+              #'advice-replace-forward-line-with-next-line)
+
+
+  (defun notmuch-tree-next-sibling ()
+    (interactive)
+    (let ((l (length (notmuch-tree-get-prop :tree-status))))
+      (while (progn (next-line)
+                    (and (not (bobp))
+                         (< l (length (notmuch-tree-get-prop :tree-status)))))))
+    (when (window-live-p notmuch-tree-message-window)
+      (notmuch-tree-show-message-in)))
+
+  (defun notmuch-tree-prev-sibling ()
+    (interactive)
+    (let ((l (length (notmuch-tree-get-prop :tree-status))))
+      (while (progn (previous-line)
+                    (and (not (bobp))
+                         (< l (length (notmuch-tree-get-prop :tree-status)))))))
+    (when (window-live-p notmuch-tree-message-window)
+      (notmuch-tree-show-message-in)))
+
+  (define-key notmuch-tree-mode-map (kbd "C-n") 'notmuch-tree-next-sibling)
+  (define-key notmuch-tree-mode-map (kbd "C-p") 'notmuch-tree-prev-sibling)
+#+end_src
+*** Scroll up in tree view
+#+begin_src emacs-lisp
+  (define-key notmuch-tree-mode-map (kbd "S-SPC") 'notmuch-tree-scroll-message-window-back)
 #+end_src
 ** mu4e
 #+BEGIN_SRC emacs-lisp#

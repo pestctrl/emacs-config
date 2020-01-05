@@ -187,14 +187,6 @@
 #+BEGIN_SRC emacs-lisp
   (setq fancy-splash-image "~/.emacs.d/res/icon.png")
 #+END_SRC
-** sml faces
-#+begin_src emacs-lisp
-  ;; (set-face-attribute 'sml/line-number t :inherit sml/global :background "#5f00af" :foreground "light gray" :weight normal)
-  ;; (set-face-attribute 'sml/time        t :inherit sml/global :background "#5f00af" :foreground "light gray" :weight normal)
-  ;; (set-face-attribute 'sml/charging    t :inherit sml/global :background "#5f00af" :foreground "#00FF00" :weight normal)
-  ;; (set-face-attribute 'sml/discharging t :inherit sml/global :background "#5f00af" :foreground "deep pink" :weight normal)
-  ;; (set-face-attribute 'sml/charging t :inherit 'sml/global :foreground "forest green")
-#+end_src
 ** term faces
 #+begin_src emacs-lisp
   (set-face-attribute 'term-bold       t :weight 'bold)

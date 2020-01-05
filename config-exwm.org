@@ -722,15 +722,19 @@
   Finally, apply any relevant face attributes found amongst the
   frame parameters in PARAMETERS."
     ;; The `reverse' is so that `default' goes first.
-    ;; (dolist (face (nreverse (face-list)))
-    ;;   (condition-case ()
-    ;;   (progn
-    ;;     ;; Initialize faces from face spec and custom theme.
-    ;;     (face-spec-recalc face frame)
-    ;;     ;; Apply attributes specified by face-new-frame-defaults
-    ;;     (internal-merge-in-global-face face frame))
-    ;;     ;; Don't let invalid specs prevent frame creation.
-    ;;     (error nil)))
+    (dolist (face (remove-if-not (lambda (x)
+                                   (let ((name (symbol-name x)))
+                                     (string-match-p "^doom-.*"
+                                                     name)))
+                                 (nreverse (face-list))))
+      (condition-case ()
+          (progn
+            ;; Initialize faces from face spec and custom theme.
+            (face-spec-recalc face frame)
+            ;; Apply attributes specified by face-new-frame-defaults
+            (internal-merge-in-global-face face frame))
+        ;; Don't let invalid specs prevent frame creation.
+        (error nil)))
 
     ;; Apply attributes specified by frame parameters.
     (let ((face-params '((foreground-color default :foreground)

@@ -257,10 +257,6 @@
 #+begin_src emacs-lisp
   (define-key Info-mode-map (kbd "C-s") 'isearch-forward)
 #+end_src
-** transpose-frame
-#+BEGIN_SRC emacs-lisp
-
-#+END_SRC
 ** Evil mode
 #+BEGIN_SRC emacs-lisp
   (use-package evil)
@@ -289,17 +285,27 @@
 ** ibuffer
 *** Keybindings
 #+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "C-x C-b") 'ibuffer)
-#+END_SRC
-*** Config
-#+BEGIN_SRC emacs-lisp
   (require 'ibuf-ext)
+  (global-set-key (kbd "C-x C-b") 'ibuffer)
 
   (add-to-list 'ibuffer-never-show-predicates
                '(lambda (buf)
                   (with-current-buffer buf
                     (eq major-mode 'helm-major-mode))))
 
+  (setq ibuffer-show-empty-filter-groups nil)
+
+  (add-hook 'ibuffer-mode-hook
+            '(lambda ()
+                (ibuffer-switch-to-saved-filter-groups "default")
+                (ibuffer-do-sort-by-alphabetic)
+                ;; (ibuffer-auto-mode)
+                ))
+
+  ;; (setq ibuffer-mode-hook nil)(list (car ibuffer-mode-hook)))
+#+END_SRC
+*** Filter Groups
+#+BEGIN_SRC emacs-lisp
   (setq ibuffer-saved-filter-groups
         '(("default"
            ("X-Windows"       (mode . exwm-mode))
@@ -340,17 +346,6 @@
            ("Help"            (or (name . "\*Help\*")
                                   (name . "\*Apropos\*")
                                   (name . "\*info\*"))))))
-
-  (setq ibuffer-show-empty-filter-groups nil)
-
-  (add-hook 'ibuffer-mode-hook
-            '(lambda ()
-                (ibuffer-switch-to-saved-filter-groups "default")
-                (ibuffer-do-sort-by-alphabetic)
-                ;; (ibuffer-auto-mode)
-                ))
-
-  ;; (setq ibuffer-mode-hook nil)(list (car ibuffer-mode-hook)))
 #+END_SRC
 *** Custom Filters
 #+BEGIN_SRC emacs-lisp
@@ -831,22 +826,13 @@
         (start-process-shell-command "wget" nil (format "wget %s -O %s" img-url filepath)))
       filepath))
 #+end_src
-** Freekeys
-#+BEGIN_SRC emacs-lisp#
-   (use-package free-keys)
-   (bind-key "C-h C-k" 'free-keys)
-#+END_SRC 
-** Eww
+** w3m
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-c g")
           (lambda ()
             (interactive)
             (w3m-goto-url "https://google.com")))
 #+END_SRC
-** eshell
-#+begin_src emacs-lisp
-  ;; (push "watch" eshell-visual-command)
-#+end_src
 ** Ledger mode
 #+BEGIN_SRC emacs-lisp
   (use-package ledger-mode
@@ -1223,6 +1209,12 @@
   (add-hook 'emacs-lisp-mode-hook
             'company-mode)
 #+END_SRC
+** Magit
+#+BEGIN_SRC emacs-lisp
+  (use-package magit)
+  (global-set-key (kbd "C-x g") 'magit-status)
+  (global-set-key (kbd "C-x M-g") 'magit-dispatch-popup)
+#+END_SRC
 ** irony
 #+begin_src emacs-lisp
   (use-package irony
@@ -1321,12 +1313,6 @@
 ** Ensime (scala)
 #+BEGIN_SRC emacs-lisp
   (use-package ensime)
-#+END_SRC
-** Magit
-#+BEGIN_SRC emacs-lisp
-  (use-package magit)
-  (global-set-key (kbd "C-x g") 'magit-status)
-  (global-set-key (kbd "C-x M-g") 'magit-dispatch-popup)
 #+END_SRC
 ** SPACES
 #+BEGIN_SRC emacs-lisp
@@ -1633,12 +1619,6 @@
   (skeletor-define-template "java-maven"
     :title "Java with Maven")
 #+end_src
-** Spaces
-#+BEGIN_SRC emacs-lisp
-  (setq default-tab-width 4)
-  (setq-default indent-tabs-mode nil)
-  (setq-default tab-width 4)
-#+END_SRC
 ** Erlang
 #+begin_src emacs-lisp
   (use-package erlang)
@@ -1653,6 +1633,12 @@
 
   (add-hook 'erlang-mode-hook 'my/erlang-keymap-hook)
 #+end_src
+** Spaces
+#+BEGIN_SRC emacs-lisp
+  (setq default-tab-width 4)
+  (setq-default indent-tabs-mode nil)
+  (setq-default tab-width 4)
+#+END_SRC
 * New
 ** Youtube-dl
 #+BEGIN_SRC emacs-lisp

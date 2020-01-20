@@ -29,7 +29,9 @@
 (custom-theme-set-faces
  'dark-default
  
- '(default ((t (:background "gray8" :foreground "#70FF00")))))
+ '(default ((t (:background "gray8" :foreground "#70FF00"))))
+ '(mode-line-inactive ((t :foreground "gray60" :background "#404045" :inverse-video nil)))
+ '(mode-line     ((t :foreground "gray60" :background "black" :inverse-video nil))))
 
 ;;###autoload
 (when load-file-name

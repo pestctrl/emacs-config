@@ -2241,9 +2241,11 @@
   ;; (setq ivy-posframe-parameters '((parent-frame t)))
   ;; Different command can use different display function.
   (setq ivy-posframe-display-functions-alist
-        '((swiper          . nil)
+        '((swiper          . ivy-posframe-display-at-frame-center)
           (complete-symbol . ivy-posframe-display-at-point)
+          (iwc-switch-to-wc . nil)
           (t               . ivy-posframe-display-at-window-top-center)))
+
   (ivy-posframe-mode 1)
 
   (defun disable-ivy-posframe-on-exwm-windows (orig &rest args)
@@ -2252,10 +2254,14 @@
       (letf (((symbol-function 'display-graphic-p) (lambda (&optional display) nil)))
         (apply orig args))))
 
+  ;; (def-face-copier my/posframe-faces (sym)
+  ;;   (let ((name (symbol-name sym)))
+  ;;     (string-match-p "^ivy-.*"
+  ;;                     name)))
+
   (advice-add #'ivy-posframe--read
               :around
               #'disable-ivy-posframe-on-exwm-windows)
-
 
   (defun ivy-posframe-display-at-window-top-center (str)
     (ivy-posframe--display str #'posframe-poshandler-window-top-center))
@@ -2271,11 +2277,23 @@
            (window-top (plist-get info :parent-window-top))
            (window-width (plist-get info :parent-window-width))
            (posframe-width (plist-get info :posframe-width)))
-      (cons (+ window-left (/ (- window-width posframe-width) 2))
+      (cons (min (- frame-width posframe-width)
+                 (+ window-left (max 0
+                                     (/ (- window-width posframe-width) 2))))
             (+ window-top 50))))
 
   (use-package ivy-rich)
   (ivy-rich-mode 1)
+
+  (setq ivy-posframe-min-height 0)
+  ;; (setq ivy-posframe-height 24)
+
+  ;; (setq ivy-height-alist
+  ;;       '((t . 24)))
+  ;; (setq ivy-posframe-height-alist
+  ;;       '((counsel-M-x . 8)
+  ;;         (t . 24)))
+  ;; '((swiper . 24)))
 #+end_src
 ** Setup convenient headers
 #+begin_src emacs-lisp

@@ -13,9 +13,9 @@
 #+end_src
 * Meta
 #+BEGIN_SRC emacs-lisp
-(use-package exwm)
-(require 'exwm-config)
-(exwm-config-default)
+  (use-package exwm)
+  (require 'exwm-config)
+  (exwm-config-default)
 #+END_SRC
 * Naming Windows
 #+BEGIN_SRC emacs-lisp
@@ -599,7 +599,6 @@
                                       fullscreen t)
                                      ((equal exwm-class-name "plasmashell")
                                       floating t)))
-
 #+END_SRC
 * Wallpaper
 #+BEGIN_SRC emacs-lisp

@@ -372,7 +372,7 @@
   (exwm-global-set-key (kbd "s-l") #'lock-screen)
   (exwm-global-set-key (kbd "s-c") #'org-capture)
   (exwm-global-set-key (kbd "s-n") #'switch-window)
-  (exwm-global-set-key (kbd "s-k") #'kill-this-buffer)
+  (exwm-global-set-key (kbd "s-k") (lambda () (interactive) (kill-buffer (current-buffer))))
   (exwm-global-set-key (kbd "s-z") #'resize-window)
   (exwm-global-set-key (kbd "s-s") #'youtube-split)
   (exwm-global-set-key (kbd "s-n") #'switch-to-next-buffer)

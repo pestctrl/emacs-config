@@ -1106,8 +1106,6 @@
               (notmuch-tree-remove-overlay overlay)
             (notmuch-tree-add-overlay start end))))))
 
-  (define-key notmuch-tree-mode-map "t" 'notmuch-tree-toggle-folding-thread)
-
   (advice-add #'notmuch-tree-worker
               :before
               #'notmuch-tree-clean-up-overlays)

@@ -616,50 +616,15 @@
 #+end_src
 * Floating windows don't need that many faces ^_^
 #+begin_src emacs-lisp
-  (defun my/frame-dont-copy-faces (frame &optional parameters)
-    "Initialize the frame-local faces of FRAME.
-  Calculate the face definitions using the face specs, custom theme
-  settings, X resources, and `face-new-frame-defaults'.
-  Finally, apply any relevant face attributes found amongst the
-  frame parameters in PARAMETERS."
-    ;; The `reverse' is so that `default' goes first.
-    (dolist (face (remove-if-not (lambda (x)
-                                   (let ((name (symbol-name x)))
-                                     (string-match-p "^doom-.*"
-                                                     name)))
-                                 (nreverse (face-list))))
-      (condition-case ()
-          (progn
-            ;; Initialize faces from face spec and custom theme.
-            (face-spec-recalc face frame)
-            ;; Apply attributes specified by face-new-frame-defaults
-            (internal-merge-in-global-face face frame))
-        ;; Don't let invalid specs prevent frame creation.
-        (error nil)))
-
-    ;; Apply attributes specified by frame parameters.
-    (let ((face-params '((foreground-color default :foreground)
-                         (background-color default :background)
-                         (font default :font)
-                         (border-color border :background)
-                         (cursor-color cursor :background)
-                         (scroll-bar-foreground scroll-bar :foreground)
-                         (scroll-bar-background scroll-bar :background)
-                         (mouse-color mouse :background))))
-      (dolist (param face-params)
-        (let* ((param-name (nth 0 param))
-               (value (cdr (assq param-name parameters))))
-          (if value
-              (set-face-attribute (nth 1 param) frame
-                                  (nth 2 param) value))))))
+  (def-face-copier1 my/frame-dont-copy-faces (sym)
+    (let ((name (symbol-name sym)))
+      (string-match-p "^doom-.*" name))
+    mode-line
+    mode-line-inactive)
 
   (defun my/exwm-floating--advise-make-frame (orig id)
-    (advice-add 'face-set-after-frame-default
-                :override
-                'my/frame-dont-copy-faces)
-    (funcall orig id)
-    (advice-remove 'face-set-after-frame-default
-                   'my/frame-dont-copy-faces))
+    (override1-face my/frame-dont-copy-faces
+      (funcall orig id)))
 
   (advice-add #'exwm-floating--set-floating
               :around

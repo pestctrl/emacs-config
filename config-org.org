@@ -1419,3 +1419,21 @@
                                  (my/agenda-file "eternal.org")))
       '(and (tags-local "bored"))))
 #+end_src
+* org-noter
+#+begin_src emacs-lisp
+  (use-package org-noter)
+  (when (featurep 'exwm)
+    (setq org-noter-always-create-frame nil))
+
+  (def-face-copier x-show-tip-faces (sym)
+    nil
+    tooltip)
+
+  (defun dont-copy-faces-for-x-show-tip (orig &rest args)
+    (override1-face x-show-tip-faces
+      (apply orig args)))
+
+  (advice-add #'x-show-tip
+              :around
+              #'dont-copy-faces-for-x-show-tip)
+#+end_src

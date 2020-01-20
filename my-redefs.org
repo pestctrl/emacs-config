@@ -220,7 +220,8 @@ https://github.com/org-trello/org-trello/issues/258
       (let ((levels 0))
         (while (and (org-up-heading-safe)
                     (org-get-todo-state))
-          (incf levels))
+          (when (not (string= "CAT" (org-get-todo-state)))
+            (incf levels)))
         levels)))
 
   (defun my/org-scan-tags (action matcher todo-only &optional start-level)

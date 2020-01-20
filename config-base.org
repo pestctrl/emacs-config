@@ -2320,43 +2320,46 @@
 #+end_src
 ** workgroups2
 #+begin_src emacs-lisp
-  (use-package workgroups2)
+  ;; (use-package workgroups2)
 
-  (setq wg-prefix-key (kbd "C-c z"))
+  ;; (setq wg-prefix-key (kbd "C-c z"))
 
-  (setq wg-session-file "~/.emacs.d/.emacs_workgroups")
+  ;; (setq wg-session-file "~/.emacs.d/.emacs_workgroups")
 
-  (define-prefix-command '*workgroup-map*)
+  (require 'ivy-window-configurations)
 
-  (define-key *root-map* (kbd "b") #'wg-switch-to-workgroup)
-  (define-key *root-map* (kbd "u") #'wg-undo-wconfig-change)
-  (define-key *root-map* (kbd "R") #'wg-rename-workgroup)
-  (define-key *root-map* (kbd "q") #'wg-kill-workgroup)
-  (define-key *root-map* (kbd "Q") #'wg-delete-other-workgroups)
+  (define-key *root-map* (kbd "b") #'iwc-switch-to-wc)
+  (define-key *root-map* (kbd "R") #'iwc-rename)
 
-  (setq wg-emacs-exit-save-behavior nil
-        wg-workgroups-mode-exit-save-behavior nil)
+  (iwc-mode)
+  ;; (define-key *root-map* (kbd "u") #'wg-undo-wconfig-change)
+  ;; (define-key *root-map* (kbd "q") #'wg-kill-workgroup)
+  ;; (define-key *root-map* (kbd "Q") #'wg-delete-other-workgroups)
+
+  ;; (setq wg-emacs-exit-save-behavior nil
+  ;;       wg-workgroups-mode-exit-save-behavior nil)
 
 
-  ;; Advice for frames, don't switch to an active workgroup
-  (defun get-active-workgroups ()
-    (loop for frame in exwm-workspace--list
-          unless (eq (selected-frame) frame)
-          collect (with-selected-frame frame
-                    (wg-workgroup-name (wg-current-workgroup)))))
+  ;; ;; Advice for frames, don't switch to an active workgroup
+  ;; (defun get-active-workgroups ()
+  ;;   (loop for frame in exwm-workspace--list
+  ;;         unless (eq (selected-frame) frame)
+  ;;         collect (with-selected-frame frame
+  ;;                   (wg-workgroup-name (wg-current-workgroup)))))
 
-  (defun wg-dont-switch-to-active (orig &optional workgroup noerror)
-    (if workgroup
-        (funcall orig workgroup noerror)
-      (let ((active (get-active-workgroups))
-            (to-switch (wg-read-workgroup-name)))
-        (if (member to-switch active)
-            (message "Workgroup \"%s\" already active" to-switch)
-          (funcall orig to-switch noerror)))))
+  ;; (defun wg-dont-switch-to-active (orig &optional workgroup noerror)
+  ;;   (interactive)
+  ;;   (if workgroup
+  ;;       (funcall orig workgroup noerror)
+  ;;     (let ((active (get-active-workgroups))
+  ;;           (to-switch (wg-read-workgroup-name)))
+  ;;       (if (member to-switch active)
+  ;;           (message "Workgroup \"%s\" already active" to-switch)
+  ;;         (funcall orig to-switch noerror)))))
 
-  (advice-add #'wg-switch-to-workgroup
-              :around
-              #'wg-dont-switch-to-active)
+  ;; (advice-add #'wg-switch-to-workgroup
+  ;;             :around
+  ;;             #'wg-dont-switch-to-active)
 #+end_src
 ** opml to elfeed-org
 #+begin_src emacs-lisp

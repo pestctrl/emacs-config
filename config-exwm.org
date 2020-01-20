@@ -424,8 +424,6 @@
 #+END_SRC
 * Helper functions
 #+BEGIN_SRC emacs-lisp
-  (defvar wallpaper-path "/home/benson/.emacs.d/res/digital_space_universe_4k_8k-wide.jpg")
-  (defvar live-wallpaper-path "/home/benson/MEGA/pictures/wallpapers/videos/bg.mp4")
   (setq i3-string "Xephyr -br -ac -noreset -resizeable -screen 1920x1080 :8 & sleep 1s; DISPLAY=:8 i3")
   (setq xfce4-string "Xephyr -br -ac -noreset -resizeable -screen 1920x1080 :8 & sleep 1s; DISPLAY=:8 xfce4-session")
   (setq kde-string "Xephyr -br -ac -noreset -resizeable -screen 1920x1080 :8 & sleep 1s; DISPLAY=:8 startkde")
@@ -479,14 +477,6 @@
       (if (listp program)
         (launch-program (car program) (cadr program))
         (launch-program program))))
-
-  (defun setup-wallpaper ()
-    (launch-program (concat "feh --bg-fill " wallpaper-path) "feh"))
-
-  (defun setup-live-wallpaper () 
-    (if (get-process "xwinwrap")
-      (delete-process "xwinwrap"))
-    (launch-program (concat "xwinwrap -ni -ov -g 1920x1080+1280+0 -s -st -sp -nf -- mpv --loop=inf -wid WID " live-wallpaper-path) "xwinwrap"))
 
   (defun get-hard-drive-space ()
     (shell-command-to-string "df -h -P -l / | tail -n 1 | tr -s ' ' | cut -d ' ' -f 4"))
@@ -546,49 +536,7 @@
   ; Reminder: Hooks execute in order. Make sure megasync launches after systemtray is enabled
   (add-hook 'exwm-init-hook 'call-startup-programs)
 
-  (defvar my/monitor-primary "eDP1")
-  (defvar my/monitor-secondary nil)
-
-  (defun my/get-screens ()
-    (-> "xrandr | grep ' connected ' | cut -d ' ' -f 1"
-        (shell-command-to-string)
-        (split-string "\n")
-        (reverse)
-        (cdr)
-        (reverse)
-        (cl-sort (lambda (a b)
-                   (cond ((string-match-p "^eDP" a) a)
-                         ((string-match-p "^eDP" b) b)
-                         (t a))))))
-
-  (defun position-screen (screen relative-to)
-    (interactive (cl-destructuring-bind (primary . secondary) (my/get-screens)
-                   (list (completing-read "Which screen? " secondary)
-                         (completing-read "Against which screen? " (cons primary secondary)))))
-    (let ((response (completing-read (format "Resolution for %s? " screen) '("2560x1440" "1920x1080" "3840x2160") nil t "^"))
-          (pos (completing-read "Position? " '("left-of" "above") nil t "^")))
-      (shell-command (format "xrandr --output %s --mode %s --%s %s" screen response pos relative-to))))
-
-  (defun my/setup-screens ()
-    (interactive)
-    (cl-destructuring-bind (primary . secondaries) (my/get-screens)
-      (loop for secondary in secondaries
-            do (when (y-or-n-p (format "Monitor %s detected. Setup? " secondary))
-                 (position-screen secondary primary))))
-    (setup-workspace-monitors)
-    (setup-wallpaper))
-
-  (defun my/disconnect-screen (screen)
-    (interactive (list (let ((screens (cdr (my/get-screens))))
-                         (or (and (zerop (1- (length screens)))
-                                  (car screens))
-                             (completing-read "Which screen? " (cdr (my/get-screens)))))))
-    (shell-command (format "xrandr --output %s --off" screen))
-    (setq exwm-randr-workspace-monitor-plist nil)
-    (setq my/monitor-secondary nil)
-    (exwm-randr-refresh)
-    (setup-wallpaper))
-
+  (require 'exwm-screens)
   (add-hook 'exwm-init-hook 'my/setup-screens)
 
   (define-minor-mode exwm-presentation-mode
@@ -665,53 +613,6 @@
 * exwm-edit
 #+begin_src emacs-lisp
   (use-package exwm-edit)
-#+end_src
-* workspace manipulation
-#+begin_src emacs-lisp
-  (setq exwm-workspace-show-all-buffers t
-        exwm-layout-show-all-buffers t)
-
-  (let ((monitors (my/get-screens)))
-    (setq exwm-workspace-number (length monitors)))
-
-  (defvar exwm-randr/current-offset 0)
-
-  (defun setup-workspace-monitors ()
-    (setq exwm-randr/current-offset 0)
-    (setq exwm-randr-workspace-monitor-plist
-          (loop for m in (my/get-screens)
-                for i from 0
-                collect i
-                collect m)))
-
-  (defun my/get-next-workspace-number ()
-    (-> exwm-workspace-current-index
-        1+
-        (mod 2)))
-
-  (defun my/next-workspace ()
-    (interactive)
-    (exwm-workspace-switch (my/get-next-workspace-number)))
-
-  (exwm-global-set-key (kbd "<s-tab>") #'my/next-workspace)
-
-  (defun my/swap-screens ()
-    (interactive)
-    (clj-swap exwm-randr/current-offset
-              (lambda (x)
-                (mod (1+ x)
-                     2)))
-    (let ((monitors (my/get-screens)))
-      (setq exwm-randr-workspace-monitor-plist
-            (loop for i from 0 below exwm-workspace-number
-                  for m = (nth (mod (+ i exwm-randr/current-offset)
-                                    exwm-workspace-number)
-                               monitors)
-                  collect i
-                  collect m)))
-    (exwm-randr-refresh)
-    (exwm-workspace-switch (mod (1- exwm-workspace-current-index)
-                                2)))
 #+end_src
 * Floating windows don't need that many faces ^_^
 #+begin_src emacs-lisp

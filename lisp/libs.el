@@ -18,6 +18,8 @@
 (require 'org-delay)
 (require 'clojure-swap)
 
+(require 'face-copier)
+
 ;; Buggy overall, not needed cause of workgroups2.el
 ;; (require 'exwm-workspace-counsel)
 

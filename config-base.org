@@ -146,7 +146,6 @@
 *** doom-modeline
 #+begin_src emacs-lisp
   (use-package doom-modeline)
-  (use-package smart-mode-line)
   (use-package all-the-icons)
 
   (load-theme 'smart-mode-line-dark)

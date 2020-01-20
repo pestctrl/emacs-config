@@ -551,6 +551,34 @@
                                                 (:name "Today" :time-grid t
                                                        :and (:not (:and (:not (:scheduled today)
                                                                               :not (:deadline today)))))))))))
+          ("D" "dev-without-active"
+           ((org-ql-block '(and (tags "dev")
+                                (tags "refile"))
+                          ((org-ql-block-header "Refile tasks")))
+            (my/org-ql-stuck-projects "dev"
+                                      ((org-ql-block-header "Stuck Projects")
+                                       (org-ql-indent-levels t)))
+            (my/org-ql-active-projects "dev"
+                                       ((org-ql-block-header "Active Projects")
+                                        (org-ql-indent-levels t)))
+            (org-ql-block '(and (tags "dev")
+                                (todo "WAIT"))
+                          ((org-ql-block-header "Waiting tasks")))
+            (org-ql-block '(and (tags "dev")
+                                (todo "NEXT"))
+                          ((org-ql-block-header "Things to do")))
+            (agenda ""
+                    ((org-agenda-span 'day)
+                     (org-agenda-tag-filter-preset (quote ("+dev")))
+                     (org-agenda-skip-deadline-if-done t)
+                     (org-agenda-skip-scheduled-if-done t)
+                     (org-super-agenda-groups '((:name "The Plan" :tag "PLAN")
+                                                (:name "Overdue" :and (:deadline past :log nil))
+                                                (:name "Upcoming" :deadline future)
+                                                (:name "Should do" :and (:scheduled past :log nil))
+                                                (:name "Today" :time-grid t
+                                                       :and (:not (:and (:not (:scheduled today)
+                                                                              :not (:deadline today)))))))))))
           ("h" "Dev Hold and Delay"
            ((org-ql-block '(and (tags "dev")
                                 (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
@@ -584,10 +612,10 @@
             (org-agenda-skip-scheduled-if-done t)
             (org-agenda-skip-deadline-if-done t)))
           ("al" "Last week" agenda ""
-           ((org-agenda-overriding-arguments (list nil (my/this-or-last-saturday) 
+           ((org-agenda-overriding-arguments (list nil (my/last-or-last-last-saturday)
                                                    9))
             (org-agenda-tag-filter-preset (quote ("+dev")))))
-          ("ad" "Dev agenda" agenda ""
+          ("aD" "Dev agenda" agenda ""
            ((org-agenda-skip-function 'my/agenda-custom-skip)
             (org-agenda-span 'day)
             (org-agenda-tag-filter-preset (quote ("+dev")))
@@ -699,6 +727,12 @@
                    (if (string= "6" (format-time-string "%u"))
                        "."
                      "-sat")))
+
+  (defun my/last-or-last-last-saturday ()
+    (org-read-date nil nil
+                  (if (<= 6 (string-to-number (format-time-string "%u")))
+                      "-2sat"
+                    "-sat")))
 
   ;; (pop org-agenda-custom-commands)
 #+end_src

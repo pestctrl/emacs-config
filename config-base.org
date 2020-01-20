@@ -1520,6 +1520,8 @@
          (lambda ()
            (add-hook 'before-save-hook 'gofmt-before-save)
            (setq indent-tabs-mode nil)))
+  ;; This is for lsp to work
+  (add-to-list 'exec-path "~/go/bin/")
 #+END_SRC
 ** Elpy
 #+BEGIN_SRC emacs-lisp
@@ -2212,6 +2214,11 @@
   (add-hook 'inferior-lisp-mode-hook #'inferior-slime-mode)
 
   (setq inferior-lisp-program "/usr/bin/sbcl")
+
+  (defun slime-switch-lisps (lisp)
+    (interactive (list (completing-read "Which lisp? "
+                                        '("sbcl" "ecl" "cmucl" "clozure-cl"))))
+    (setq inferior-lisp-program lisp))
 
   (let ((clhs-file "~/quicklisp/clhs-use-local.el"))
     (if (file-exists-p clhs-file)

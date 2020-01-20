@@ -828,42 +828,54 @@
 ** Ledger mode
 #+BEGIN_SRC emacs-lisp
   (use-package ledger-mode
-    :mode "\\.dat\\'")
-
-  (defconst new-report-str (concat "%(binary) -f %(ledger-file) --cleared-format "
-                                   "'%(justify(scrub(get_at(display_total, 0)), 16, 16 + int(prepend_width), true, color))"
-                                   "  %(justify(scrub(get_at(display_total, 1)), 18, 36 + int(prepend_width), true, color))"
-                                   "  %(justify(scrub(get_at(display_total, 0) - get_at(display_total, 1)), 18, 36 + int(prepend_width), true, color))"
-                                   "    %(latest_cleared ? format_date(latest_cleared) : \"         \")"
-                                   "    %(!options.flat ? depth_spacer : \"\")%-(ansify_if(partial_account(options.flat), blue if color))\\n"
+    :mode "\\.dat\\'"
+    :config
+    (defconst new-report-str (concat "%(binary) -f %(ledger-file) --cleared-format "
+                                     "'%(justify(scrub(get_at(display_total, 0)), 16, 16 + int(prepend_width), true, color))"
+                                     "  %(justify(scrub(get_at(display_total, 1)), 18, 36 + int(prepend_width), true, color))"
+                                     "  %(justify(scrub(get_at(display_total, 0) - get_at(display_total, 1)), 18, 36 + int(prepend_width), true, color))"
+                                     "    %(latest_cleared ? format_date(latest_cleared) : \"         \")"
+                                     "    %(!options.flat ? depth_spacer : \"\")%-(ansify_if(partial_account(options.flat), blue if color))\\n"
                                    "%/%$1  %$2  %$3    %$4\\n"
                                    "%/%(prepend_width ? \" \" * int(prepend_width) : \"\")----------------    ----------------    ----------------    ---------\\n'"
                                    " cleared"))
 
-  (setq ledger-reports
-        `(("account" "%(binary) -f %(ledger-file) reg %(account)")
-          ("bal" "%(binary) -f %(ledger-file) bal")
-          ("reg" "%(binary) -f %(ledger-file) reg")
-          ("cleared" ,new-report-str)
-          ;; ("cleared" "%(binary) -f %(ledger-file) cleared")
-          ("expmonth" "%(binary) -f %(ledger-file) -M reg Expenses")
-          ("owedmom" "%(binary) -f %(ledger-file) reg Liabilities")
-          ("progress" "%(binary) -f %(ledger-file) reg Assets Equity Liabilities")
-          ;; ("food" "%(binary) -f %(ledger-file) --add-budget reg Assets")
-          ("payee" "%(binary) -f %(ledger-file) reg @%(payee)")))
+    (setq ledger-reports
+          `(("account" "%(binary) -f %(ledger-file) reg %(account)")
+            ("bal" "%(binary) -f %(ledger-file) bal")
+            ("reg" "%(binary) -f %(ledger-file) reg")
+            ("cleared" ,new-report-str)
+            ;; ("cleared" "%(binary) -f %(ledger-file) cleared")
+            ("expmonth" "%(binary) -f %(ledger-file) -M reg Expenses")
+            ("owedmom" "%(binary) -f %(ledger-file) reg Liabilities")
+            ("progress" "%(binary) -f %(ledger-file) reg Assets Equity Liabilities")
+            ;; ("food" "%(binary) -f %(ledger-file) --add-budget reg Assets")
+            ("payee" "%(binary) -f %(ledger-file) reg @%(payee)")))
 
-  (setq dynamic-reports
-        '(("budgetcal" "%(binary) -f ~/MEGA/org/entries/food.ledger --daily --add-budget reg Expenses")))
+    (setq dynamic-reports
+          '(("budgetcal" "%(binary) -f ~/MEGA/org/entries/food.ledger --daily --add-budget reg Expenses")))
 
-  (defun ledger-dynamic-report ()
-    (interactive)
-    (let* ((ledger-reports dynamic-reports)
-           (report-name (ledger-report-read-name)))
-      (ledger-report report-name nil)))
+    (defun ledger-dynamic-report ()
+      (interactive)
+      (let* ((ledger-reports dynamic-reports)
+             (report-name (ledger-report-read-name)))
+        (ledger-report report-name nil)))
 
-  (setq ledger-reconcile-buffer-line-format
-        "%(date)s %-4(code)s %-30(payee)s %-30(account)s %15(amount)s\n")
+    (setq ledger-reconcile-buffer-line-format
+          "%(date)s %-4(code)s %-30(payee)s %-30(account)s %15(amount)s\n"))
+
 #+END_SRC
+*** Reconciliation accept "^" at front
+#+begin_src emacs-lisp
+  (defun ledger-reconcile-check-ignore-carrot (orig account)
+    (funcall orig (if (= ?^ (aref account 0))
+                      (substring account 1)
+                    account)))
+
+  (advice-add #'ledger-reconcile-check-valid-account
+              :around
+              #'ledger-reconcile-check-ignore-carrot)
+#+end_src
 * Email
 ** general-options
 #+begin_src emacs-lisp
@@ -936,66 +948,72 @@
 #+END_SRC
 ** notmuch
 #+begin_src emacs-lisp
-  (use-package notmuch)
-
-  (custom-set-faces
-   '(notmuch-tree-match-tree-face ((t (:family "DejaVu Sans Mono"))) t)
-   '(notmuch-tree-no-match-tree-face ((t (:family "DejaVu Sans Mono"))) t))
-
-  (set-face-attribute 'notmuch-search-unread-face nil :foreground "white")
-  (set-face-attribute 'notmuch-message-summary-face nil :background "steel blue" :foreground "snow")
-
-  (setq notmuch-search-oldest-first nil
-        notmuch-saved-searches
-        '((:name "inbox" :query "tag:inbox" :key "i")
-          (:name "inbox today" :query "date:7d.. tag:inbox" :key "t")
-          (:name "work" :query "tag:work" :key "w")
-          (:name "mailing lists" :query "tag:mlist" :key "m")
-          (:name "recruiting" :query "tag:recruiting" :key "r")
-          (:name "unread" :query "tag:unread" :key "u")
-          (:name "flagged" :query "tag:flagged" :key "f")
-          (:name "cs" :query "tag:cs" :key "c")
-          (:name "receipts" :query "tag:receipts" :key "R")
-          ;; (:name "sent" :query "tag:sent" :key "s")
-          ;; (:name "drafts" :query "tag:draft" :key "d")
-          (:name "all mail" :query "*" :key "a")))
-
   (setq mail-specify-envelope-from t
         message-sendmail-envelope-from 'header
         mail-envelope-from 'header)
 
-  (defun my/choose-email-address-and-send ()
-    (interactive)
-    (let ((resp (completing-read "Which email? " '("bchu3@cougarnet.uh.edu" "bensonchu457@gmail.com") nil t "^")))
-      (setq smtpmail-smtp-server
-            (if (string= resp "bensonchu457@gmail.com")
-                "smtp.gmail.com"
-              "smtp.office365.com"))
-      (notmuch-mua-send-and-exit)))
+  (use-package notmuch
+    :commands notmuch
+    :bind (:map notmuch-message-mode-map
+                ("C-c C-c" . #'my/choose-email-address-and-send)
+                :map notmuch-search-mode-map
+                ("d" . #'my/notmuch-delete-mail)
+                ("u" . #'my/undelete-mail)
+                ("f" . #'my/recruiting-mail)
+                ("<mouse-1>" . nil)
+                :map notmuch-tree-mode-map
+                ("N" . #'notmuch-tree-next-sibling)
+                ("P" . #'notmuch-tree-prev-sibling)
+                ("t" . #'notmuch-tree-toggle-folding-thread)
+                ("S-SPC" . #'notmuch-tree-scroll-message-window-back))
+    :config
+    (custom-set-faces
+     '(notmuch-tree-match-tree-face ((t (:family "DejaVu Sans Mono"))) t)
+     '(notmuch-tree-no-match-tree-face ((t (:family "DejaVu Sans Mono"))) t))
+    (set-face-attribute 'notmuch-search-unread-face nil :foreground "white")
+    (set-face-attribute 'notmuch-message-summary-face nil :background "steel blue" :foreground "snow")
 
-  (define-key notmuch-message-mode-map (kbd "C-c C-c") #'my/choose-email-address-and-send)
+    (setq notmuch-search-oldest-first nil
+          notmuch-saved-searches
+          '((:name "inbox" :query "tag:inbox" :key "i")
+            (:name "inbox today" :query "date:7d.. tag:inbox" :key "t")
+            (:name "work" :query "tag:work" :key "w")
+            (:name "mailing lists" :query "tag:mlist" :key "m")
+            (:name "recruiting" :query "tag:recruiting" :key "r")
+            (:name "unread" :query "tag:unread" :key "u")
+            (:name "flagged" :query "tag:flagged" :key "f")
+            (:name "cs" :query "tag:cs" :key "c")
+            (:name "receipts" :query "tag:receipts" :key "R")
+            ;; (:name "sent" :query "tag:sent" :key "s")
+            ;; (:name "drafts" :query "tag:draft" :key "d")
+            (:name "all mail" :query "*" :key "a")))
 
-  (defun my/notmuch-delete-mail ()
-    (interactive)
-    (notmuch-search-tag '("+deleted"))
-    (notmuch-search-next-thread))
+    (defun my/choose-email-address-and-send ()
+      (interactive)
+      (let ((resp (completing-read "Which email? " '("bchu3@cougarnet.uh.edu" "bensonchu457@gmail.com") nil t "^")))
+        (setq smtpmail-smtp-server
+              (if (string= resp "bensonchu457@gmail.com")
+                  "smtp.gmail.com"
+                "smtp.office365.com"))
+        (notmuch-mua-send-and-exit)))
 
-  (defun my/undelete-mail ()
-    (interactive)
-    (notmuch-search-tag '("-deleted")))
+    (defun my/notmuch-delete-mail ()
+      (interactive)
+      (notmuch-search-tag '("+deleted"))
+      (notmuch-search-next-thread))
 
-  (defun my/recruiting-mail ()
-    (interactive)
-    (notmuch-search-tag '("-inbox" "+recruiting"))
-    (notmuch-search-next-thread))
+    (defun my/undelete-mail ()
+      (interactive)
+      (notmuch-search-tag '("-deleted")))
 
-  (define-key 'notmuch-search-mode-map (kbd "d") #'my/notmuch-delete-mail)
-  (define-key 'notmuch-search-mode-map (kbd "u") #'my/undelete-mail)
-  (define-key 'notmuch-search-mode-map (kbd "f") #'my/recruiting-mail)
-  (define-key 'notmuch-search-mode-map (kbd "<mouse-1>") nil)
+    (defun my/recruiting-mail ()
+      (interactive)
+      (notmuch-search-tag '("-inbox" "+recruiting"))
+      (notmuch-search-next-thread))
 
-  (add-to-list 'notmuch-tagging-keys
-               '("r" ("-inbox" "+recruiting") "Recruiting"))
+    (add-to-list 'notmuch-tagging-keys
+                 '("r" ("-inbox" "+recruiting") "Recruiting")))
+
 #+end_src
 *** Code Snippet from Julien Masson for tree-folding in notmuch-tree 
 #+begin_src emacs-lisp
@@ -1125,13 +1143,6 @@
                          (< l (length (notmuch-tree-get-prop :tree-status)))))))
     (when (window-live-p notmuch-tree-message-window)
       (notmuch-tree-show-message-in)))
-
-  (define-key notmuch-tree-mode-map (kbd "C-n") 'notmuch-tree-next-sibling)
-  (define-key notmuch-tree-mode-map (kbd "C-p") 'notmuch-tree-prev-sibling)
-#+end_src
-*** Scroll up in tree view
-#+begin_src emacs-lisp
-  (define-key notmuch-tree-mode-map (kbd "S-SPC") 'notmuch-tree-scroll-message-window-back)
 #+end_src
 ** mu4e
 #+BEGIN_SRC emacs-lisp#
@@ -1526,18 +1537,20 @@
 #+END_SRC
 ** Web-mode
 #+BEGIN_SRC emacs-lisp
-  (use-package web-mode)
-  (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.cshtml\\'" . web-mode))
-
-  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-  (setq web-mode-auto-close-style 2)
+  (use-package web-mode
+    :commands web-mode
+    :init
+    (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.cshtml\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+    :config
+    (setq web-mode-auto-close-style 2))
 #+END_SRC
 ** Processing
 #+BEGIN_SRC emacs-lisp

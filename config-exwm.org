@@ -19,6 +19,69 @@
   (require 'exwm-randr)
   (exwm-randr-enable)
 #+END_SRC
+* Startup
+   
+** Emacs server, startup programs, wallpaper
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'exwm-init-hook 'server-start)
+
+  ; Reminder: Hooks execute in order. Make sure megasync launches after systemtray is enabled
+  (add-hook 'exwm-init-hook 'call-startup-programs)
+
+
+  (define-minor-mode exwm-presentation-mode
+    "Make both screen outputs display the same thing"
+    nil nil nil
+    (cond (exwm-presentation-mode
+           (cl-destructuring-bind (primary . secondary) (my/get-screens)
+             (shell-command
+              (format "xrandr --output %s --mode 1920x1080 --same-as %s"
+               (car secondary)
+               primary))
+             (setq exwm-randr-workspace-monitor-plist nil)
+             (exwm-randr-refresh)))
+          (t
+           (my/setup-screens))))
+  (require 'exwm-screens)
+  (add-hook 'exwm-init-hook 'my/setup-screens)
+#+END_SRC
+
+** System tray, display time, display battery, display hard-drive-space
+#+BEGIN_SRC emacs-lisp   
+  (require 'exwm-systemtray)
+  (exwm-systemtray-enable)
+  (setq display-time-day-and-date t)
+
+  (defvar my/exclude-buffer-modes '(helm-major-mode messages-buffer-mode special-mode))
+
+  (defun my-buffer-predicate (buf)
+    (with-current-buffer buf
+      (if (memq major-mode my/exclude-buffer-modes)
+          nil
+        (exwm-layout--other-buffer-predicate buf))))
+
+  (add-hook 'exwm-init-hook
+            (lambda ()
+              (interactive) 
+              (modify-all-frames-parameters
+       '((buffer-predicate . my-buffer-predicate)))))
+
+  ;; Display hard drive space
+  (add-hook 'display-time-hook 'update-hard-drive-space-string)
+
+  (display-time-mode)
+  (display-battery-mode)
+  (display-hard-drive-space-mode)
+#+END_SRC
+* Shutdown
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'exwm-exit-hook 'org-save-all-org-buffers)
+  ;;(add-hook 'exwm-exit-hook 'save-org-agenda-files)
+  (eval-after-load "term"
+    '(progn 
+       (define-key term-raw-map (kbd "C-c C-y") 'term-paste)
+       (define-key term-raw-map (kbd "M-x") 'helm-M-x)))
+#+END_SRC
 * e2wm
 #+begin_src emacs-lisp
   (use-package e2wm
@@ -534,70 +597,6 @@
   ))
 #+END_SRC
 
-* Startup
-   
-** Emacs server, startup programs, wallpaper
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'exwm-init-hook 'server-start)
-
-  ; Reminder: Hooks execute in order. Make sure megasync launches after systemtray is enabled
-  (add-hook 'exwm-init-hook 'call-startup-programs)
-
-
-  (define-minor-mode exwm-presentation-mode
-    "Make both screen outputs display the same thing"
-    nil nil nil
-    (cond (exwm-presentation-mode
-           (cl-destructuring-bind (primary . secondary) (my/get-screens)
-             (shell-command
-              (format "xrandr --output %s --mode 1920x1080 --same-as %s"
-               (car secondary)
-               primary))
-             (setq exwm-randr-workspace-monitor-plist nil)
-             (exwm-randr-refresh)))
-          (t
-           (my/setup-screens))))
-  (require 'exwm-screens)
-  (add-hook 'exwm-init-hook 'my/setup-screens)
-#+END_SRC
-
-** System tray, display time, display battery, display hard-drive-space
-#+BEGIN_SRC emacs-lisp   
-  (require 'exwm-systemtray)
-  (exwm-systemtray-enable)
-  (setq display-time-day-and-date t)
-
-  (defvar my/exclude-buffer-modes '(helm-major-mode messages-buffer-mode special-mode))
-
-  (defun my-buffer-predicate (buf)
-    (with-current-buffer buf
-      (if (memq major-mode my/exclude-buffer-modes)
-          nil
-        (exwm-layout--other-buffer-predicate buf))))
-
-  (add-hook 'exwm-init-hook
-            (lambda ()
-              (interactive) 
-              (modify-all-frames-parameters
-       '((buffer-predicate . my-buffer-predicate)))))
-
-  ;; Display hard drive space
-  (add-hook 'display-time-hook 'update-hard-drive-space-string)
-
-  (display-time-mode)
-  (display-battery-mode)
-  (display-hard-drive-space-mode)
-#+END_SRC
-
-* Shutdown
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'exwm-exit-hook 'org-save-all-org-buffers)
-  ;;(add-hook 'exwm-exit-hook 'save-org-agenda-files)
-  (eval-after-load "term"
-    '(progn 
-       (define-key term-raw-map (kbd "C-c C-y") 'term-paste)
-       (define-key term-raw-map (kbd "M-x") 'helm-M-x)))
-#+END_SRC
 * Xephyr launches in tiling-mode
 #+BEGIN_SRC emacs-lisp
   (setq exwm-manage-configurations `(((equal exwm-class-name "Xephyr")

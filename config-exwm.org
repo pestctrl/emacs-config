@@ -222,8 +222,8 @@ g    (interactive (list (read-program)))
 #+BEGIN_SRC emacs-lisp
   (add-hook 'exwm-init-hook 'server-start)
 
-  ; Reminder: Hooks execute in order. Make sure megasync launches after systemtray is enabled
-  (add-hook 'exwm-init-hook 'call-startup-programs)
+  ;; Reminder: Hooks execute in order. Make sure megasync launches after systemtray is enabled
+  ;; (add-hook 'exwm-init-hook 'call-startup-programs)
 
   (require 'exwm-screens)
   (add-hook 'exwm-init-hook 'my/setup-screens)
@@ -264,11 +264,11 @@ g    (interactive (list (read-program)))
        '((buffer-predicate . my-buffer-predicate)))))
 
   ;; Display hard drive space
-  (add-hook 'display-time-hook 'update-hard-drive-space-string)
+  ;; (add-hook 'display-time-hook 'update-hard-drive-space-string)
 
   (display-time-mode)
   (display-battery-mode)
-  (display-hard-drive-space-mode)
+  ;; (display-hard-drive-space-mode)
 #+END_SRC
 * Shutdown
 #+BEGIN_SRC emacs-lisp

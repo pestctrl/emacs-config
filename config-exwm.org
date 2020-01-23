@@ -19,6 +19,81 @@
   (require 'exwm-randr)
   (exwm-randr-enable)
 #+END_SRC
+* Helper functions
+#+BEGIN_SRC emacs-lisp
+  (setq i3-string "Xephyr -br -ac -noreset -resizeable -screen 1920x1080 :8 & sleep 1s; DISPLAY=:8 i3")
+  (setq xfce4-string "Xephyr -br -ac -noreset -resizeable -screen 1920x1080 :8 & sleep 1s; DISPLAY=:8 xfce4-session")
+  (setq kde-string "Xephyr -br -ac -noreset -resizeable -screen 1920x1080 :8 & sleep 1s; DISPLAY=:8 startkde")
+  (setq kde+exwm-string "Xephyr -br -ac -noreset -resizeable -screen 1920x1080 :8 & sleep 1s; DISPLAY=:8 KDEWM=/usr/bin/emacs startkde")
+  (defvar exwm-startup-programs
+    '("megasync"
+      "deadd-notification-center"
+      "/usr/lib/kdeconnectd"
+      ("compton -f -i .7 -b")
+      ;; ("compton -f -i .7 -b --backend glx --blur-background --blur-method kawase --blur-strength 2")
+      ("/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1")
+      ("/usr/lib/notification-daemon-1.0/notification-daemon")
+      ("nm-applet")
+      ))
+  (defvar hard-drive-space "")
+
+  (defun launch-i3 ()
+    (interactive)
+    (launch-program i3-string))
+
+  (defun launch-xfce ()
+    (interactive)
+    (launch-program xfce4-string))
+
+  (defun launch-kde ()
+    (interactive)
+    (launch-program kde-string))
+
+  (defun launch-kde+emacs ()
+    (interactive)
+    (launch-program kde-string))
+
+  (defun lock-screen ()
+    (interactive)
+    (shell-command "~/Github/my-projects/i3lock-fancy/i3lock-fancy & disown"))
+
+  (setq enable-recursive-minibuffers t)
+  (defun counsel-shell-command ()
+    "Forward to `shell-command'."
+    (interactive)
+    (ivy-read "Shell Command: "
+              shell-command-history
+              :caller 'counsel-shell-command))
+
+  (defun dmenu-run ()
+    (interactive)
+    (shell-command "dmenu" nil "dmenu_run -b"))
+
+  (defun call-startup-programs ()
+    (dolist (program exwm-startup-programs)
+      (if (listp program)
+        (launch-program (car program) (cadr program))
+        (launch-program program))))
+
+  (defun get-hard-drive-space ()
+    (shell-command-to-string "df -h -P -l / | tail -n 1 | tr -s ' ' | cut -d ' ' -f 4"))
+
+  (defun update-hard-drive-space-string ()
+    (setq hard-drive-space
+          (let ((space-left (get-hard-drive-space)))
+            (propertize (concat " "
+                                (substring space-left
+                                           0
+                                           (1- (length space-left))))
+                        'face 'sml/time))))
+
+  (defun display-hard-drive-space-mode ()
+    (if (not (member 'hard-drive-space
+                     global-mode-string))
+        (add-to-list 'global-mode-string
+                     'hard-drive-space
+                     t)))
+#+END_SRC
 * Startup
    
 ** Emacs server, startup programs, wallpaper
@@ -28,6 +103,8 @@
   ; Reminder: Hooks execute in order. Make sure megasync launches after systemtray is enabled
   (add-hook 'exwm-init-hook 'call-startup-programs)
 
+  (require 'exwm-screens)
+  (add-hook 'exwm-init-hook 'my/setup-screens)
 
   (define-minor-mode exwm-presentation-mode
     "Make both screen outputs display the same thing"
@@ -42,8 +119,6 @@
              (exwm-randr-refresh)))
           (t
            (my/setup-screens))))
-  (require 'exwm-screens)
-  (add-hook 'exwm-init-hook 'my/setup-screens)
 #+END_SRC
 
 ** System tray, display time, display battery, display hard-drive-space
@@ -491,81 +566,6 @@
   (advice-add 'exwm-workspace--prompt-for-workspace
               :override
               #'prompt-workspace)
-#+END_SRC
-* Helper functions
-#+BEGIN_SRC emacs-lisp
-  (setq i3-string "Xephyr -br -ac -noreset -resizeable -screen 1920x1080 :8 & sleep 1s; DISPLAY=:8 i3")
-  (setq xfce4-string "Xephyr -br -ac -noreset -resizeable -screen 1920x1080 :8 & sleep 1s; DISPLAY=:8 xfce4-session")
-  (setq kde-string "Xephyr -br -ac -noreset -resizeable -screen 1920x1080 :8 & sleep 1s; DISPLAY=:8 startkde")
-  (setq kde+exwm-string "Xephyr -br -ac -noreset -resizeable -screen 1920x1080 :8 & sleep 1s; DISPLAY=:8 KDEWM=/usr/bin/emacs startkde")
-  (defvar exwm-startup-programs
-    '("megasync"
-      "deadd-notification-center"
-      "/usr/lib/kdeconnectd"
-      ("compton -f -i .7 -b")
-      ;; ("compton -f -i .7 -b --backend glx --blur-background --blur-method kawase --blur-strength 2")
-      ("/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1")
-      ("/usr/lib/notification-daemon-1.0/notification-daemon")
-      ("nm-applet")
-      ))
-  (defvar hard-drive-space "")
-
-  (defun launch-i3 ()
-    (interactive)
-    (launch-program i3-string))
-
-  (defun launch-xfce ()
-    (interactive)
-    (launch-program xfce4-string))
-
-  (defun launch-kde ()
-    (interactive)
-    (launch-program kde-string))
-
-  (defun launch-kde+emacs ()
-    (interactive)
-    (launch-program kde-string))
-
-  (defun lock-screen ()
-    (interactive)
-    (shell-command "~/Github/my-projects/i3lock-fancy/i3lock-fancy & disown"))
-
-  (setq enable-recursive-minibuffers t)
-  (defun counsel-shell-command ()
-    "Forward to `shell-command'."
-    (interactive)
-    (ivy-read "Shell Command: "
-              shell-command-history
-              :caller 'counsel-shell-command))
-
-  (defun dmenu-run ()
-    (interactive)
-    (shell-command "dmenu" nil "dmenu_run -b"))
-
-  (defun call-startup-programs ()
-    (dolist (program exwm-startup-programs)
-      (if (listp program)
-        (launch-program (car program) (cadr program))
-        (launch-program program))))
-
-  (defun get-hard-drive-space ()
-    (shell-command-to-string "df -h -P -l / | tail -n 1 | tr -s ' ' | cut -d ' ' -f 4"))
-
-  (defun update-hard-drive-space-string ()
-    (setq hard-drive-space
-          (let ((space-left (get-hard-drive-space)))
-            (propertize (concat " "
-                                (substring space-left
-                                           0
-                                           (1- (length space-left))))
-                        'face 'sml/time))))
-
-  (defun display-hard-drive-space-mode ()
-    (if (not (member 'hard-drive-space
-                     global-mode-string))
-        (add-to-list 'global-mode-string
-                     'hard-drive-space
-                     t)))
 #+END_SRC
 * Simulation keys
 #+BEGIN_SRC emacs-lisp

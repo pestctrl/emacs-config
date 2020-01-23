@@ -543,8 +543,6 @@
   ; Reminder: Hooks execute in order. Make sure megasync launches after systemtray is enabled
   (add-hook 'exwm-init-hook 'call-startup-programs)
 
-  ;;(require 'exwm-screens)
-  ;;(add-hook 'exwm-init-hook 'my/setup-screens)
 
   (define-minor-mode exwm-presentation-mode
     "Make both screen outputs display the same thing"
@@ -559,6 +557,8 @@
              (exwm-randr-refresh)))
           (t
            (my/setup-screens))))
+  (require 'exwm-screens)
+  (add-hook 'exwm-init-hook 'my/setup-screens)
 #+END_SRC
 
 ** System tray, display time, display battery, display hard-drive-space

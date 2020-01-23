@@ -8,6 +8,17 @@
   (add-to-list 'load-path
                "~/.emacs.d/submodule/xelb")
 #+end_src
+* Meta
+#+BEGIN_SRC emacs-lisp
+  (require 'exwm)
+  (require 'exwm-config)
+  (exwm-config-default)
+#+END_SRC
+* Multimonitor support
+#+BEGIN_SRC emacs-lisp
+  (require 'exwm-randr)
+  (exwm-randr-enable)
+#+END_SRC
 * e2wm
 #+begin_src emacs-lisp
   (use-package e2wm
@@ -19,12 +30,6 @@
     :init
     (desktop-environment-mode))
 #+end_src
-* Meta
-#+BEGIN_SRC emacs-lisp
-  (require 'exwm)
-  (require 'exwm-config)
-  (exwm-config-default)
-#+END_SRC
 * Naming Windows
 #+BEGIN_SRC emacs-lisp
   (defvar my/window-name nil)
@@ -361,16 +366,11 @@
       (exwm-input--release-keyboard exwm--id)))
 
 
-  (advice-add #'exwm-layout-set-fullscreen :override #'my/exwm-layout-set-fullscreen)
+   ;; (advice-add #'exwm-layout-set-fullscreen :override #'my/exwm-layout-set-fullscreen)
 #+end_src
 * Switch window
 #+BEGIN_SRC emacs-lisp
   (setq switch-window-input-style 'minibuffer)
-#+END_SRC
-* Multimonitor support
-#+BEGIN_SRC emacs-lisp
-  (require 'exwm-randr)
-  (exwm-randr-enable)
 #+END_SRC
 * Keybindings
 #+BEGIN_SRC emacs-lisp

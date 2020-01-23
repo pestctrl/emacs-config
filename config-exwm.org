@@ -1,5 +1,13 @@
 #+PROPERTY: header-args :tangle "~/.emacs.d/config-exwm.el" :comments both
 
+* First in load path
+#+begin_src emacs-lisp
+  (add-to-list 'load-path
+               "~/.emacs.d/submodule/exwm")
+
+  (add-to-list 'load-path
+               "~/.emacs.d/submodule/xelb")
+#+end_src
 * e2wm
 #+begin_src emacs-lisp
   (use-package e2wm
@@ -13,7 +21,7 @@
 #+end_src
 * Meta
 #+BEGIN_SRC emacs-lisp
-  (use-package exwm)
+  (require 'exwm)
   (require 'exwm-config)
   (exwm-config-default)
 #+END_SRC
@@ -372,7 +380,6 @@
   (exwm-global-set-key (kbd "s-l") #'lock-screen)
   (exwm-global-set-key (kbd "s-c") #'org-capture)
   (exwm-global-set-key (kbd "s-n") #'switch-window)
-  (exwm-global-set-key (kbd "s-k") (lambda () (interactive) (kill-buffer (current-buffer))))
   (exwm-global-set-key (kbd "s-z") #'resize-window)
   (exwm-global-set-key (kbd "s-s") #'youtube-split)
   (exwm-global-set-key (kbd "s-n") #'switch-to-next-buffer)
@@ -536,8 +543,8 @@
   ; Reminder: Hooks execute in order. Make sure megasync launches after systemtray is enabled
   (add-hook 'exwm-init-hook 'call-startup-programs)
 
-  (require 'exwm-screens)
-  (add-hook 'exwm-init-hook 'my/setup-screens)
+  ;;(require 'exwm-screens)
+  ;;(add-hook 'exwm-init-hook 'my/setup-screens)
 
   (define-minor-mode exwm-presentation-mode
     "Make both screen outputs display the same thing"

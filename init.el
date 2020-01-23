@@ -64,6 +64,31 @@
  (expand-file-name "my-redefs.org"
                    user-emacs-directory))
 
+(defun test-monitor ()
+  (interactive)
+  (shell-command "xrandr --output DP1 --mode 1920x1080 --above eDP1"))
+
+(defun 2k ()
+  (interactive)
+  (shell-command "xrandr --output DP1 --mode 2560x1440 --above eDP1"))
+
+(defun top ()
+  (interactive)
+  (shell-command "xrandr --output DP1 --above eDP1"))
+
+(defun bottom ()
+  (interactive)
+  (shell-command "xrandr --output DP1 --below eDP1"))
+
+(defun left ()
+  (interactive)
+  (shell-command "xrandr --output DP1 --left-of eDP1"))
+
+(defun right ()
+  (interactive)
+  (shell-command "xrandr --output DP1 --right-of eDP1"))
+
+
 (setq my/finished t)
 ;; Testing pull from windows
 ;; This is a test comment

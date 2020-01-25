@@ -283,15 +283,6 @@
 (define-key *root-map* (kbd "r") 'exwmx-name-buffer)
 (define-key *root-map* (kbd ")") (lambda () (interactive) (leaving-computer) (shell-command "sleep 2s ; xset dpms force off")))
 
-(define-prefix-command '*window-map*)
-(define-key *root-map* (kbd "w") '*window-map*)
-(define-key *window-map* (kbd "y") 'youtube-split)
-(define-key *window-map* (kbd "Y") 'big-youtube-split)
-(define-key *window-map* (kbd "j") 'side-bottom-window)
-(define-key *window-map* (kbd "h") 'side-left-window)
-(define-key *window-map* (kbd "l") 'side-right-window)
-(define-key *window-map* (kbd "d") 'window-toggle-side-windows)
-
 (define-prefix-command '*firefox-map*)
 (define-key *firefox-map* (kbd "c") (quickrun-lambda "google-chrome-stable" "chrome"))
 (define-key *firefox-map* (kbd "f") (quickrun-lambda "firefox" "firefox"))

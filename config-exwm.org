@@ -82,11 +82,6 @@
        (define-key term-raw-map (kbd "C-c C-y") 'term-paste)
        (define-key term-raw-map (kbd "M-x") 'helm-M-x)))
 #+END_SRC
-* e2wm
-#+begin_src emacs-lisp
-  (use-package e2wm
-    :bind (("M-+" . e2wm:start-management)))
-#+end_src
 * desktop-environment
 #+begin_src emacs-lisp
   (use-package desktop-environment
@@ -301,15 +296,6 @@
 #+BEGIN_SRC emacs-lisp
   (setq wallpaper-path "/home/benson/.emacs.d/res/digital_space_universe_4k_8k-wide.jpg")
 #+END_SRC
-* Volume
-#+BEGIN_SRC emacs-lisp
-  (use-package volume)
-  (define-key *root-map* (kbd "v") 'volume)
-#+END_SRC
-* exwm-edit
-#+begin_src emacs-lisp
-  (use-package exwm-edit)
-#+end_src
 * Floating windows don't need that many faces ^_^
 #+begin_src emacs-lisp
   (def-face-copier1 my/frame-dont-copy-faces (sym)
@@ -329,4 +315,17 @@
 * 
 #+begin_src emacs-lisp
   (exwm-global-set-key (kbd "s-b") #'wg-undo-wconfig-change)
+* e2wm
+#+begin_src emacs-lisp
+  (use-package e2wm
+    :bind (("M-+" . e2wm:start-management)))
 #+end_src
+* exwm-edit
+#+begin_src emacs-lisp
+  (use-package exwm-edit)
+#+end_src
+* Volume
+#+BEGIN_SRC emacs-lisp
+  (use-package volume)
+  (define-key *root-map* (kbd "v") 'volume)
+#+END_SRC

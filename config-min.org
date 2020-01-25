@@ -190,7 +190,7 @@
 
   ;; I like my unicode to be monospace too, so I use these
   (set-fontset-font t 'unicode (font-spec :size 10 :name "FontAwesome"))
-  (set-fontset-font t 'unicode (font-spec :size 16 :name "DejaVu Sans Mono"))
+  (set-fontset-font t 'unicode (font-spec :size 15 :name "DejaVu Sans Mono"))
 #+end_src
 * buffer navigation
 #+begin_src emacs-lisp

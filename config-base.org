@@ -2121,7 +2121,7 @@
           (iwc-switch-to-wc . nil)
           (t               . ivy-posframe-display-at-window-top-center)))
 
-  (ivy-posframe-mode 1)
+  ;; (ivy-posframe-mode 1)
 
   (defun disable-ivy-posframe-on-exwm-windows (orig &rest args)
     (if (not (eq major-mode 'exwm-mode))

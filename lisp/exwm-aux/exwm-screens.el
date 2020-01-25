@@ -40,6 +40,8 @@
                        ((string-match-p "^eDP" b) nil)
                        (t nil))))))
 
+(setq exwm-workspace-number (length (my/get-screens)))
+
 (defun position-screen (screen relative-to)
   (interactive (cl-destructuring-bind (primary . secondary) (my/get-screens)
                  (list (completing-read "Which screen? " secondary)

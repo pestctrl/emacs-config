@@ -114,13 +114,13 @@
             nil))
   (exwmx-quickrun command))
 
-
 (add-hook 'exwm-manage-finish-hook 'exwm-rename-buffer)
 
 (defun launch-program-with-name (cmd name)
   (interactive)
-  (when name (setq my/window-name name))
-  (start-process-shell-command cmd nil cmd))
+  (let ((name (or name cmd)))
+    (setq my/window-name name)
+    (start-process-shell-command cmd nil cmd)))
 
 (defun exwm-rename-buffer ()
   (interactive)

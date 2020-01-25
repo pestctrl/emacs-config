@@ -168,44 +168,6 @@
 #+BEGIN_SRC emacs-lisp
   (use-package rjsx-mode)
 #+END_SRC
-* Golang
-#+BEGIN_SRC emacs-lisp
-  (use-package go-mode)
-  (add-hook 'go-mode-hook
-         (lambda ()
-           (add-hook 'before-save-hook 'gofmt-before-save nil t)
-           (setq indent-tabs-mode nil)))
-  ;; This is for lsp to work
-  (add-to-list 'exec-path "~/go/bin/")
-#+END_SRC
-* Elpy
-#+BEGIN_SRC emacs-lisp
-  (use-package elpy)
-  (elpy-enable)
-#+END_SRC
-* EIN
-#+BEGIN_SRC emacs-lisp
-  (use-package ein)
-  (add-to-list 'exec-path
-               "/home/benson/anaconda3/bin/")
-#+END_SRC
-* Web-mode
-#+BEGIN_SRC emacs-lisp
-  (use-package web-mode
-    :commands web-mode
-    :init
-    (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.cshtml\\'" . web-mode))
-    (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-    :config
-    (setq web-mode-auto-close-style 2))
-#+END_SRC
 * Processing
 #+BEGIN_SRC emacs-lisp
   (use-package processing-mode)
@@ -232,10 +194,6 @@
 #+begin_src emacs-lisp
   (use-package indent-guide)
   ;(indent-guide-global-mode)
-#+end_src
-* rust cargo
-#+begin_src emacs-lisp
-  (use-package cargo)
 #+end_src
 * maven support
 #+begin_src emacs-lisp

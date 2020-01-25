@@ -279,6 +279,52 @@
     :config
     (slime-setup '(slime-fancy slime-asdf slime-company)))
 #+END_SRC
+** rust
+#+begin_src emacs-lisp
+  (use-package cargo)
+  (use-package rust-mode)
+  (use-package rustic)
+#+end_src
+** golang
+#+begin_src emacs-lisp
+  (use-package go-mode
+    :hook (go-mode . (lambda ()
+                       (add-hook 'before-save-hook 'gofmt-before-save nil t)
+                       (setq indent-tabs-mode nil)))
+    :config
+    ;; This is for lsp to work
+    (add-to-list 'exec-path "~/go/bin/"))
+#+end_src
+** python
+#+begin_src emacs-lisp
+  (use-package elpy)
+  (elpy-enable)
+  (use-package ein)
+  (add-to-list 'exec-path
+               "/home/benson/anaconda3/bin/")
+#+end_src
+** web stuff
+#+begin_src emacs-lisp
+  (use-package web-mode
+    :commands web-mode
+    :init
+    (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.cshtml\\'" . web-mode))
+    (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+    :config
+    (setq web-mode-auto-close-style 2))
+
+  (use-package js2-mode
+    :commands js2-mode
+    :init
+    (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode)))
+#+end_src
 * colorful compilation buffer
 #+begin_src emacs-lisp
   (require 'ansi-color)

@@ -1,11 +1,7 @@
-* helpful
-#+begin_src emacs-lisp
-  (use-package helpful)
-  (global-set-key (kbd "C-h f") #'helpful-function)
-  (global-set-key (kbd "C-h v") #'helpful-variable)
-  (global-set-key (kbd "C-h k") #'helpful-key)
-#+end_src
-* ledger
+#+PROPERTY: header-args :tangle "~/.emacs.d/config-ext.el" :comments both
+
+* Various tools
+** ledger
 #+begin_src emacs-lisp
   (use-package ledger-mode
     :mode "\\.dat\\'"
@@ -44,7 +40,7 @@
     (setq ledger-reconcile-buffer-line-format
           "%(date)s %-4(code)s %-30(payee)s %-30(account)s %15(amount)s\n"))
 #+end_src
-* encryption
+** encryption
 #+begin_src emacs-lisp
   (require 'epa-file)
   (epa-file-enable)
@@ -56,7 +52,7 @@
   (setq auth-source-debug t)
   (setq auth-sources '((:source "~/.emacs.d/secrets/.authinfo.gpg")))
 #+end_src
-* email
+** email
 #+begin_src emacs-lisp
   (setq user-mail-address "bensonchu457@gmail.com"
         user-full-name "Benson Chu")
@@ -138,7 +134,7 @@
     '(require 'notmuch-fold))
 
 #+end_src
-* erc
+** erc
 #+begin_src emacs-lisp
   (use-package erc)
   (use-package erc-hl-nicks)

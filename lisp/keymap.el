@@ -31,3 +31,4 @@
 (define-key *root-map* (kbd "RET") 'dired-jump)
 (define-key *root-map* (kbd "C-b") 'previous-buffer)
 
+(provide 'keymap)

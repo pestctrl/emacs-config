@@ -64,7 +64,7 @@
                    user-emacs-directory))
 
 (org-babel-load-file
- (expand-file-name "config-aux.org"
+ (expand-file-name "config-ext.org"
                    user-emacs-directory))
 
 (org-babel-load-file

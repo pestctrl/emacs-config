@@ -1,0 +1,248 @@
+* helpful
+#+begin_src emacs-lisp
+  (use-package helpful)
+  (global-set-key (kbd "C-h f") #'helpful-function)
+  (global-set-key (kbd "C-h v") #'helpful-variable)
+  (global-set-key (kbd "C-h k") #'helpful-key)
+#+end_src
+* ledger
+#+begin_src emacs-lisp
+  (use-package ledger-mode
+    :mode "\\.dat\\'"
+    :config
+    (defconst new-report-str (concat "%(binary) -f %(ledger-file) --cleared-format "
+                                     "'%(justify(scrub(get_at(display_total, 0)), 16, 16 + int(prepend_width), true, color))"
+                                     "  %(justify(scrub(get_at(display_total, 1)), 18, 36 + int(prepend_width), true, color))"
+                                     "  %(justify(scrub(get_at(display_total, 0) - get_at(display_total, 1)), 18, 36 + int(prepend_width), true, color))"
+                                     "    %(latest_cleared ? format_date(latest_cleared) : \"         \")"
+                                     "    %(!options.flat ? depth_spacer : \"\")%-(ansify_if(partial_account(options.flat), blue if color))\\n"
+                                   "%/%$1  %$2  %$3    %$4\\n"
+                                   "%/%(prepend_width ? \" \" * int(prepend_width) : \"\")----------------    ----------------    ----------------    ---------\\n'"
+                                   " cleared"))
+
+    (setq ledger-reports
+          `(("account" "%(binary) -f %(ledger-file) reg %(account)")
+            ("bal" "%(binary) -f %(ledger-file) bal")
+            ("reg" "%(binary) -f %(ledger-file) reg")
+            ("cleared" ,new-report-str)
+            ;; ("cleared" "%(binary) -f %(ledger-file) cleared")
+            ("expmonth" "%(binary) -f %(ledger-file) -M reg Expenses")
+            ("owedmom" "%(binary) -f %(ledger-file) reg Liabilities")
+            ("progress" "%(binary) -f %(ledger-file) reg Assets Equity Liabilities")
+            ;; ("food" "%(binary) -f %(ledger-file) --add-budget reg Assets")
+            ("payee" "%(binary) -f %(ledger-file) reg @%(payee)")))
+
+    (setq dynamic-reports
+          '(("budgetcal" "%(binary) -f ~/MEGA/org/entries/food.ledger --daily --add-budget reg Expenses")))
+
+    (defun ledger-dynamic-report ()
+      (interactive)
+      (let* ((ledger-reports dynamic-reports)
+             (report-name (ledger-report-read-name)))
+        (ledger-report report-name nil)))
+
+    (setq ledger-reconcile-buffer-line-format
+          "%(date)s %-4(code)s %-30(payee)s %-30(account)s %15(amount)s\n"))
+#+end_src
+* encryption
+#+begin_src emacs-lisp
+  (require 'epa-file)
+  (epa-file-enable)
+  (setq epa-pinentry-mode 'loopback)
+  (setq epa-file-cache-passphrase-for-symmetric-encryption t)
+  (setenv "GPG_AGENT_INFO" nil)
+
+  (setq epg-gpg-program "gpg2")
+  (setq auth-source-debug t)
+  (setq auth-sources '((:source "~/.emacs.d/secrets/.authinfo.gpg")))
+#+end_src
+* email
+#+begin_src emacs-lisp
+  (setq user-mail-address "bensonchu457@gmail.com"
+        user-full-name "Benson Chu")
+
+  (setq smtpmail-smtp-server "smtp.gmail.com"
+        smtpmail-smtp-service 587
+        send-mail-function 'smtpmail-send-it
+        message-send-mail-function 'smtpmail-send-it)
+
+  (mailcap-add "text/html" "/usr/bin/xdg-open %s ")
+
+  (setq mail-specify-envelope-from t
+        message-sendmail-envelope-from 'header
+        mail-envelope-from 'header)
+
+  (use-package notmuch
+    :commands notmuch
+    :bind (:map notmuch-message-mode-map
+                ("C-c C-c" . #'my/choose-email-address-and-send)
+                :map notmuch-search-mode-map
+                ("d" . #'my/notmuch-delete-mail)
+                ("u" . #'my/undelete-mail)
+                ("f" . #'my/recruiting-mail)
+                ("<mouse-1>" . nil)
+                :map notmuch-tree-mode-map
+                ("N" . #'notmuch-tree-next-sibling)
+                ("P" . #'notmuch-tree-prev-sibling)
+                ("t" . #'notmuch-tree-toggle-folding-thread)
+                ("S-SPC" . #'notmuch-tree-scroll-message-window-back))
+    :config
+    (custom-set-faces
+     '(notmuch-tree-match-tree-face ((t (:family "DejaVu Sans Mono"))) t)
+     '(notmuch-tree-no-match-tree-face ((t (:family "DejaVu Sans Mono"))) t))
+    (set-face-attribute 'notmuch-search-unread-face nil :foreground "white")
+    (set-face-attribute 'notmuch-message-summary-face nil :background "steel blue" :foreground "snow")
+
+    (setq notmuch-search-oldest-first nil
+          notmuch-saved-searches
+          '((:name "inbox" :query "tag:inbox" :key "i")
+            (:name "inbox today" :query "date:7d.. tag:inbox" :key "t")
+            (:name "work" :query "tag:work" :key "w")
+            (:name "mailing lists" :query "tag:mlist" :key "m")
+            (:name "recruiting" :query "tag:recruiting" :key "r")
+            (:name "unread" :query "tag:unread" :key "u")
+            (:name "flagged" :query "tag:flagged" :key "f")
+            (:name "cs" :query "tag:cs" :key "c")
+            (:name "receipts" :query "tag:receipts" :key "R")
+            ;; (:name "sent" :query "tag:sent" :key "s")
+            ;; (:name "drafts" :query "tag:draft" :key "d")
+            (:name "all mail" :query "*" :key "a")))
+
+    (defun my/choose-email-address-and-send ()
+      (interactive)
+      (let ((resp (completing-read "Which email? " '("bchu3@cougarnet.uh.edu" "bensonchu457@gmail.com") nil t "^")))
+        (setq smtpmail-smtp-server
+              (if (string= resp "bensonchu457@gmail.com")
+                  "smtp.gmail.com"
+                "smtp.office365.com"))
+        (notmuch-mua-send-and-exit)))
+
+    (defun my/notmuch-delete-mail ()
+      (interactive)
+      (notmuch-search-tag '("+deleted"))
+      (notmuch-search-next-thread))
+
+    (defun my/undelete-mail ()
+      (interactive)
+      (notmuch-search-tag '("-deleted")))
+
+    (defun my/recruiting-mail ()
+      (interactive)
+      (notmuch-search-tag '("-inbox" "+recruiting"))
+      (notmuch-search-next-thread))
+
+    (add-to-list 'notmuch-tagging-keys
+                 '("r" ("-inbox" "+recruiting") "Recruiting")))
+
+  (eval-after-load 'notmuch
+    '(require 'notmuch-fold))
+
+#+end_src
+* erc
+#+begin_src emacs-lisp
+  (use-package erc)
+  (use-package erc-hl-nicks)
+  (use-package erc-colorize)
+  (require 'netrc)
+  (erc-hl-nicks-mode)
+  (erc-colorize-mode)
+  (setq erc-user-full-name "Benson Chu")
+  (setq erc-kill-buffer-on-part t)
+  (setq erc-autojoin-channels-alist
+        '(("freenode.net" "#emacs" "#org-mode"
+           ;; "##linux" "#compilers" "#pltclub" 
+           ;; "##cs" "##computerscience" "##programming" "#lisp" "##lisp"
+           ;; "#sbcl" "#ecl"
+           )))
+
+  (defun get-authinfo (host port)
+    (let* ((netrc (netrc-parse (expand-file-name "~/.emacs.d/secrets/.authinfo.gpg")))
+           (hostentry (netrc-machine netrc host port)))
+      (when hostentry (netrc-get hostentry "password"))))
+
+  (defun freenode-connect (nick password)
+    (erc :server "irc.freenode.net" :port 6667
+         :password password :nick nick))
+
+  (defun irc-connect ()
+    (interactive)
+    (when (y-or-n-p "Connect to IRC? ")
+      (freenode-connect "pest-ctrl" (get-authinfo "irc.freenode.net" "6667"))))
+#+end_src
+* pdf-tools use isearch
+#+BEGIN_SRC emacs-lisp
+  (use-package pdf-tools)
+  (pdf-tools-install)
+  (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
+  (define-key pdf-view-mode-map (kbd "d") (lambda () (interactive) (pdf-view-next-line-or-next-page 8)))
+  (define-key pdf-view-mode-map (kbd "u") (lambda () (interactive) (pdf-view-previous-line-or-previous-page 8)))
+#+END_SRC
+* freezing time
+#+begin_src emacs-lisp
+  (defvar my/frozen-time nil)
+
+  (defvar my/format-time-string-function nil)
+
+  (defun my/current-time ()
+    my/frozen-time)
+
+  (defun my/format-time-string (original format-string &optional time zone)
+    (apply original
+           format-string
+           (if time
+               time
+             my/frozen-time)
+           zone))
+
+  (defun my/decode-time (original &optional time zone)
+    (apply original
+           (if time
+               time
+             my/frozen-time)
+           zone))
+
+  ;; Change and freeze time
+  (defun za-warudo ()
+    "Freeze `current-time' at the current active or inactive timestamp. If point
+  is not on a timestamp, the function prompts for one. If time is not specified,
+  either by the timstamp under point or prompt, the time defaults to the
+  current HH:MM of today at the selected date."
+    (interactive)
+    (let* ((org-read-date-prefer-future nil)
+           (time (org-read-date t 'totime nil "Input freeze time: ")))
+      (setq my/frozen-time (append time '(0 0)))
+      (advice-add #'current-time :override #'my/current-time)
+      (advice-add #'format-time-string :around #'my/format-time-string)
+      (advice-add #'decode-time :around #'my/decode-time)
+      (set-face-background 'fringe "firebrick2")
+      (message "Toki yo tomare")))
+
+  (define-key *root-map* (kbd "C-z") 'za-warudo)
+
+  ;; Release changed / frozen time
+  (defun un-za-warudo ()
+    "Release the time frozen by `freeze-time'."
+    (interactive)
+    (advice-remove #'current-time #'my/current-time)
+    (advice-remove #'format-time-string #'my/format-time-string)
+    (advice-remove #'decode-time #'my/decode-time)
+    (setq my/frozen-time nil)
+    (set-face-background 'fringe nil)
+    (message "Soshite, toki wa ugoki dasu"))
+
+  (define-key *root-map* (kbd "C-r") 'un-za-warudo)
+#+end_src
+* New
+** transpose-frame
+#+begin_src emacs-lisp
+  (use-package transpose-frame)
+#+end_src
+** e2wm
+#+begin_src emacs-lisp
+  (use-package e2wm
+    :bind (("M-+" . e2wm:start-management)))
+#+end_src
+** exwm-edit
+#+begin_src emacs-lisp
+  (use-package exwm-edit)
+#+end_src

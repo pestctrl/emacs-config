@@ -96,21 +96,6 @@
 
   (require 'exwm-systemtray)
   (exwm-systemtray-enable)
-
-  ;; I don't really want to see these buffers 
-  (defvar my/exclude-buffer-modes '(helm-major-mode messages-buffer-mode special-mode))
-
-  (defun my-buffer-predicate (buf)
-    (with-current-buffer buf
-      (if (memq major-mode my/exclude-buffer-modes)
-          nil
-        (exwm-layout--other-buffer-predicate buf))))
-
-  (add-hook 'exwm-init-hook
-            (lambda ()
-              (interactive) 
-              (modify-all-frames-parameters
-               '((buffer-predicate . my-buffer-predicate)))))
 #+end_src
 * keybindings
 #+begin_src emacs-lisp
@@ -372,6 +357,9 @@
   (add-hook 'emacs-lisp-mode-hook
             'auto-highlight-symbol-mode)
 
+  ;; wgrep
+  (use-package wgrep)
+
   ;; Use cursors, sooo good
   (use-package multiple-cursors)
 
@@ -613,7 +601,6 @@
 #+end_src
 ** wgrep
 #+begin_src emacs-lisp
-  (use-package wgrep)
 #+end_src
 ** Query replace rx
 #+begin_src emacs-lisp

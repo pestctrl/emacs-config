@@ -40,3 +40,19 @@
   ;; Need my tags
   (require 'exwm-tag)
 #+end_src
+* Don't show these buffers in buffer-list
+#+begin_src emacs-lisp
+(defvar my/exclude-buffer-modes '(helm-major-mode messages-buffer-mode special-mode))
+
+(defun my-buffer-predicate (buf)
+  (with-current-buffer buf
+    (if (memq major-mode my/exclude-buffer-modes)
+        nil
+      (exwm-layout--other-buffer-predicate buf))))
+
+(add-hook 'exwm-init-hook
+          (lambda ()
+            (interactive) 
+            (modify-all-frames-parameters
+             '((buffer-predicate . my-buffer-predicate)))))
+#+end_src

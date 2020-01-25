@@ -1479,7 +1479,7 @@
     ("S" mc/skip-to-previous-like-this)
     ("q" nil))
 
-  (global-set-key (kbd "C-c m") '*multiple-cursors-map*)
+  (exwm-global-set-key (kbd "C-c m") '*multiple-cursors-map*)
 #+end_src
 ** Setup-dev-environment
 #+begin_src emacs-lisp

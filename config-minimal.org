@@ -1,0 +1,453 @@
+#+PROPERTY: header-args :tangle "~/.emacs.d/config-minimal.el" :comments both
+
+* misc emacs settings
+#+begin_src emacs-lisp
+  ;; Custom file should be in custom.el
+  (setq custom-file "~/.emacs.d/custom.el")
+  (load custom-file 'noerror)
+  (setq backup-directory-alist `(("." . ,(concat user-emacs-directory "backups"))))
+
+  ;; Don't fricken suspend emacs
+  (global-set-key (kbd "C-z") nil)
+#+end_src
+* exwm
+#+begin_src emacs-lisp
+  ;; This will be the hardest to write :/
+  (use-package exwm)
+  (use-package exwm-x)
+
+  ;; System tray
+  (require 'exwm-systemtray)
+  (exwm-systemtray-enable)
+
+  ;; Multi monitor support
+  (require 'exwm-randr)
+  (exwm-enable)
+  (exwm-randr-enable)
+
+  ;; This is a new-frame hack. Don't copy faces for floating windows
+  (require 'face-copier)
+
+  (def-face-copier1 my/frame-dont-copy-faces (sym)
+    (let ((name (symbol-name sym)))
+      (string-match-p "^doom-.*" name))
+    mode-line
+    mode-line-inactive)
+
+  (defun my/exwm-floating--advise-make-frame (orig id)
+    (override1-face my/frame-dont-copy-faces
+      (funcall orig id)))
+
+  (advice-add #'exwm-floating--set-floating
+              :around
+              #'my/exwm-floating--advise-make-frame)
+
+  (def-face-copier x-show-tip-faces (sym)
+    nil
+    tooltip)
+
+  (defun dont-copy-faces-for-x-show-tip (orig &rest args)
+    (override1-face x-show-tip-faces
+      (apply orig args)))
+
+  (advice-add #'x-show-tip
+              :around
+              #'dont-copy-faces-for-x-show-tip)
+
+  ;; Actually launch programs
+  (require 'exwm-launch-program)
+  (define-key *root-map* (kbd "C-p") #'launch-program)
+
+  ;; Volume control
+  (use-package volume
+    :bind (:map *root-map*
+                ("v" . #'volume)))
+#+end_src
+* theme
+#+begin_src emacs-lisp
+  ;; Disable tool and menu bar, keep the fringe though
+  (tool-bar-mode -1)
+  (menu-bar-mode -1)
+  (scroll-bar-mode -1)
+  (fringe-mode '(10 . 0))
+
+  ;; I like the general feel of calm forest, but...
+  (use-package color-theme-modern)
+  (load-theme 'calm-forest t)
+  ;; I don't like the shade of green for the foreground and the shade of
+  ;; gray for the background. This overrides those
+  (load-theme 'dark-default)
+
+  ;; Need to configure all-the-icons so that mode-line doesn't look fat
+  ;; and ugly
+  (use-package all-the-icons)
+  (set-face-attribute 'mode-line nil :height 100)
+  (set-face-attribute 'mode-line-inactive nil :height 100)
+  (setq all-the-icons-scale-factor 1.0)
+
+  ;; The most efficient cool looking modeline I've
+  ;; found. Faster than even smart-mode-line
+  (use-package doom-modeline)
+
+  (setq doom-modeline-height 24)
+
+  (doom-modeline-mode)
+
+  ;; Modeline display useful information
+  (display-battery-mode t)
+  (display-time-mode t)
+  (setq display-time-day-and-date t)
+
+  ;; Roboto mono is nice
+  (when (member "Roboto Mono" (font-family-list))
+    (add-to-list 'initial-frame-alist '(font . "RobotoMono-10"))
+    (add-to-list 'default-frame-alist '(font . "RobotoMono-10")))
+
+  ;; I like my unicode to be monospace too, so I use these
+  (set-fontset-font t 'unicode (font-spec :size 10 :name "FontAwesome"))
+  (set-fontset-font t 'unicode (font-spec :size 16 :name "DejaVu Sans Mono"))
+#+end_src
+* navigation
+#+begin_src emacs-lisp
+  ;; Allow minibuffer-ception
+  (setq enable-recursive-minibuffers t)
+
+  ;; I like ido for most things
+  (require 'ido)
+  (ido-mode t)
+
+  ;; But I've grown occustomed to ivy for M-x
+  (use-package ivy)
+  (ivy-mode t)
+
+  ;; These commands don't need a carrot(^) at the beginning, usually I
+  ;; don't need a starting string when doing these
+  (add-to-list 'ivy-initial-inputs-alist '(org-refile . ""))
+  (add-to-list 'ivy-initial-inputs-alist '(org-agenda-refile . ""))
+  (add-to-list 'ivy-initial-inputs-alist '(org-capture-refile . ""))
+  (add-to-list 'ivy-initial-inputs-alist '(counsel-M-x . ""))
+
+  (global-set-key (kbd "M-x") 'counsel-M-x)
+  (global-set-key (kbd "C-c C-r") 'ivy-resume)
+  (define-key ivy-minibuffer-map (kbd "<return>") 'ivy-alt-done)
+  (define-key ivy-minibuffer-map (kbd "C-<return>") 'ivy-done)
+
+  ;; Scrollkeeper is helpful for scrolling up and down
+  (use-package scrollkeeper)
+  (global-set-key (kbd "C-v") 'scrollkeeper-down)
+  (global-set-key (kbd "M-v") 'scrollkeeper-up)
+#+end_src
+* dired
+#+begin_src emacs-lisp
+  ;; I like dired+'s formatting for listing files
+  (add-to-list 'load-path
+                 "~/.emacs.d/submodule/dired-plus")
+  (require 'dired+)
+  (setq dired-listing-switches "-al  --group-directories-first --sort=extension")
+  (setq diredp-hide-details-initially-flag nil)
+  (setq diredp-hide-details-propagate-flag nil)
+
+  ;; diredx lets me hide stuff I don't want to see
+  (require 'dired-x)
+  (setq-default dired-omit-files-p t)
+  (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
+
+  ;; Useful for traversing folders
+  (use-package dired-subtree)
+
+  (define-key dired-mode-map (kbd "i") 'dired-subtree-insert)
+  (define-key dired-mode-map (kbd "I") 'dired-subtree-remove)
+#+end_src
+* emacs lisp
+#+begin_src emacs-lisp
+  ;; These are the programming facilities I like the most for a minimal
+  ;; setup for emacs-lisp programming
+
+  ;; Autocompletion
+  (use-package company)
+  (setq company-idle-delay 0.2)
+  (add-hook 'emacs-lisp-mode-hook 'company-mode)
+
+  ;; Magit
+  (use-package magit)
+  (global-set-key (kbd "C-x g") 'magit-status)
+  (global-set-key (kbd "C-x M-g") 'magit-dispatch)
+
+  ;; Paredit
+  (use-package paredit)
+  (add-hook 'emacs-lisp-mode-hook 'paredit-mode)
+
+  ;; Paren highlighting
+  (show-paren-mode t)
+
+  ;; Rainbow parens
+  (use-package rainbow-delimiters)
+  (rainbow-delimiters-mode t)
+  (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode)
+
+  (let ((rainbow-purple  "#9E1CB2")
+        (rainbow-blue    "#1194f6")
+        (rainbow-green   "#47B04B")
+        (rainbow-yellow  "#FFED18")
+        (rainbow-orange  "#E7B500")
+        (rainbow-red     "#C90067")
+        (rainbow-7       "#00AA5D")
+        (rainbow-8       "#FE7380"))
+    (set-face-attribute 'rainbow-delimiters-depth-1-face  t :foreground rainbow-purple)
+    (set-face-attribute 'rainbow-delimiters-depth-2-face  t :foreground rainbow-green)
+    (set-face-attribute 'rainbow-delimiters-depth-3-face  t :foreground rainbow-blue)
+    (set-face-attribute 'rainbow-delimiters-depth-4-face  t :foreground rainbow-red)
+    (set-face-attribute 'rainbow-delimiters-depth-5-face  t :foreground rainbow-yellow)
+    (set-face-attribute 'rainbow-delimiters-depth-6-face  t :foreground rainbow-blue)
+    (set-face-attribute 'rainbow-delimiters-depth-7-face  t :foreground rainbow-red)
+    (set-face-attribute 'rainbow-delimiters-depth-8-face  t :foreground rainbow-8)
+    (set-face-attribute 'rainbow-delimiters-depth-9-face  t :foreground rainbow-purple))
+
+  ;; Macroexpander
+  (use-package macrostep)
+
+  (define-key macrostep-keymap (kbd "C-c C-c") nil)
+
+  (define-key macrostep-keymap (kbd "DEL") nil)
+  (define-key macrostep-keymap (kbd "c") nil)
+  (define-key macrostep-keymap (kbd "u") nil)
+  (define-key macrostep-keymap (kbd "C-c q") #'macrostep-collapse)
+
+  (define-key macrostep-keymap (kbd "RET") nil)
+  (define-key macrostep-keymap (kbd "e") nil)
+  (define-key emacs-lisp-mode-map (kbd "C-c e") #'macrostep-expand)
+
+
+  (define-key macrostep-keymap (kbd "n") nil)
+  (define-key macrostep-keymap (kbd "C-c C-n") #'macrostep-next-macro)
+
+  (define-key macrostep-keymap (kbd "p") nil)
+  (define-key macrostep-keymap (kbd "C-c C-p") #'macrostep-prev-macro)
+
+  ;; Auto highlighting of symbols
+  (use-package auto-highlight-symbol)
+  (add-hook 'emacs-lisp-mode-hook
+            'auto-highlight-symbol-mode)
+
+  ;; Use cursors, sooo good
+  (use-package multiple-cursors)
+
+  (define-prefix-command '*multiple-cursors-map*)
+  (define-key *multiple-cursors-map* (kbd "a") 'mc/mark-all-like-this)
+  (define-key *multiple-cursors-map* (kbd "A") 'mc/vertical-align)
+  (define-key *multiple-cursors-map* (kbd "SPC") 'mc/vertical-align-with-space)
+  (define-key *multiple-cursors-map* (kbd "n") 'mc/insert-numbers)
+
+  (defhydra mc-interactive (*multiple-cursors-map* "i")
+    "For those looping commands"
+      ("n" mc/mark-next-like-this)
+      ("p" mc/mark-previous-like-this)
+      ("s" mc/skip-to-next-like-this)
+      ("S" mc/skip-to-previous-like-this)
+      ("q" nil))
+
+  (global-set-key (kbd "C-c m") '*multiple-cursors-map*)
+
+  ;; Space and tab configuration
+  (setq default-tab-width 4)
+  (setq-default indent-tabs-mode nil)
+  (setq-default tab-width 4)
+
+  ;; If I have to switch to viewing tabs
+  (defun my/TABS (num)
+    (interactive "p")
+    (setq tab-width (if (= num 1)
+                        8
+                      num)))
+
+  ;; Eval buffer, slime-ism
+  (define-key emacs-lisp-mode-map (kbd "C-c C-k") #'eval-buffer)
+#+end_src
+* ibuffer
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-x C-b") 'ibuffer)
+
+  (require 'ibuf-ext)
+
+  (add-to-list 'ibuffer-never-show-predicates
+               '(lambda (buf)
+                  (with-current-buffer buf
+                    (eq major-mode 'helm-major-mode))))
+
+  (setq ibuffer-saved-filter-groups
+        '(("default"
+           ("X-Windows"       (mode . exwm-mode))
+           ("Terminals"       (mode . term-mode))
+           ("emacs-config"    (not (or (mode . magit-status-mode)
+                                       (not (or (filename . ".emacs.d")
+                                                (filename . "emacs-config"))))))
+           ("code-aux"        (or (mode . slime-repl-mode)
+                                  (mode . magit-status-mode)
+                                  (mode . ein:notebooklist-mode)
+                                  (mode . cider-repl-mode)
+                                  (mode . comint-mode)
+                                  (mode . makefile-gmake-mode)))
+           ("code"            (or (mode . clojure-mode)
+                                  (mode . csharp-mode)
+                                  (mode . c++-mode)
+                                  (mode . c-mode)
+                                  (mode . scala-mode)
+                                  (mode . emacs-lisp-mode)
+                                  (mode . java-mode)
+                                  (mode . js-mode)
+                                  (mode . python-mode)
+                                  (mode . ng2-ts-mode)
+                                  (mode . lisp-mode)
+                                  (mode . ein:notebook-multilang-mode)))
+           ("web"             (or (mode . web-mode)
+                                  (mode . mhtml-mode)
+                                  (mode . js2-mode)
+                                  (mode . css-mode)))
+           ("Org Mode"        (not or (not mode . org-mode)
+                                   (directory-name . "agenda")))
+           ("text"            (filename . "\\.txt"))
+           ("pdfs"            (or (mode . doc-view-mode)
+                                  (mode . pdf-view-mode)))
+           ("Agenda Buffers"  (mode . org-agenda-mode))
+           ("Agenda Files"    (mode . org-mode))
+           ("folders"         (mode . dired-mode))
+           ("Help"            (or (name . "\*Help\*")
+                                  (name . "\*Apropos\*")
+                                  (name . "\*info\*"))))))
+
+  (setq ibuffer-show-empty-filter-groups nil)
+
+  (add-hook 'ibuffer-mode-hook
+            '(lambda ()
+               (ibuffer-switch-to-saved-filter-groups "default")
+               (ibuffer-do-sort-by-alphabetic)
+               ;; (ibuffer-auto-mode)
+               ))
+
+  (eval-after-load "ibuf-ext"
+    '(define-ibuffer-filter directory-name
+         "Filter files in the agenda folder"
+       (:description "agenda")
+       (and (buffer-file-name buf) 
+            (string-match qualifier
+                          (buffer-file-name buf)))))
+#+end_src
+* useful tools
+** org-mode
+ #+begin_src emacs-lisp
+   (require 'org)
+   (setq org-use-speed-commands t)
+ #+end_src
+*** Indent look
+#+begin_src emacs-lisp
+  (setq org-startup-indented t)
+
+  (defun my/org-indent-prefixes ()
+    "Compute prefix strings for regular text and headlines."
+    (setq org-indent--heading-line-prefixes
+          (make-vector org-indent--deepest-level nil))
+    (setq org-indent--inlinetask-line-prefixes
+          (make-vector org-indent--deepest-level nil))
+    (setq org-indent--text-line-prefixes
+          (make-vector org-indent--deepest-level nil))
+    (dotimes (n org-indent--deepest-level)
+      (let ((indentation (if (<= n 1) 0
+                           (* (1- org-indent-indentation-per-level)
+                              (1- n)))))
+        ;; Headlines line prefixes.
+        (let ((heading-prefix ""))
+          (aset org-indent--heading-line-prefixes
+                n
+                (org-add-props heading-prefix nil 'face 'org-indent))
+          ;; Inline tasks line prefixes
+          (aset org-indent--inlinetask-line-prefixes
+                n
+                (cond ((<= n 1) "")
+                      ((bound-and-true-p org-inlinetask-show-first-star)
+                       (concat org-indent-inlinetask-first-star
+                               (substring heading-prefix 1)))
+                      (t (org-add-props heading-prefix nil 'face 'org-indent)))))
+        ;; Text line prefixes.
+        (aset org-indent--text-line-prefixes
+              n
+              (org-add-props
+                  (concat (make-string (if (< n 2) n
+                                         (1+ indentation)) ?\s)
+                          (and (> n 0)
+                               (char-to-string org-indent-boundary-char)))
+                  nil 'face 'org-indent)))))
+
+
+  (advice-add #'org-indent--compute-prefixes
+              :override
+              #'my/org-indent-prefixes)
+#+end_src
+** terminal
+#+begin_src emacs-lisp
+  (use-package vterm
+    :commands vterm
+    :bind (:map vterm-mode-map
+                ("C-t" . nil)
+                :map *root-map*
+                ("c" . #'find-vterm))
+    :config
+    (setq ansi-color-names-vector
+          ["black" "red3" "green3" "yellow3" "DodgerBlue2" "magenta3" "cyan3" "gray90"])
+
+    (defun find-vterm ()
+      (interactive)
+      (if-let (b (get-buffer "vterm"))
+          (switch-to-buffer b)
+        (vterm))))
+#+end_src
+** ledger
+#+begin_src emacs-lisp
+  (use-package ledger-mode
+    :mode "\\.dat\\'"
+    :config
+    (defconst new-report-str (concat "%(binary) -f %(ledger-file) --cleared-format "
+                                     "'%(justify(scrub(get_at(display_total, 0)), 16, 16 + int(prepend_width), true, color))"
+                                     "  %(justify(scrub(get_at(display_total, 1)), 18, 36 + int(prepend_width), true, color))"
+                                     "  %(justify(scrub(get_at(display_total, 0) - get_at(display_total, 1)), 18, 36 + int(prepend_width), true, color))"
+                                     "    %(latest_cleared ? format_date(latest_cleared) : \"         \")"
+                                     "    %(!options.flat ? depth_spacer : \"\")%-(ansify_if(partial_account(options.flat), blue if color))\\n"
+                                   "%/%$1  %$2  %$3    %$4\\n"
+                                   "%/%(prepend_width ? \" \" * int(prepend_width) : \"\")----------------    ----------------    ----------------    ---------\\n'"
+                                   " cleared"))
+
+    (setq ledger-reports
+          `(("account" "%(binary) -f %(ledger-file) reg %(account)")
+            ("bal" "%(binary) -f %(ledger-file) bal")
+            ("reg" "%(binary) -f %(ledger-file) reg")
+            ("cleared" ,new-report-str)
+            ;; ("cleared" "%(binary) -f %(ledger-file) cleared")
+            ("expmonth" "%(binary) -f %(ledger-file) -M reg Expenses")
+            ("owedmom" "%(binary) -f %(ledger-file) reg Liabilities")
+            ("progress" "%(binary) -f %(ledger-file) reg Assets Equity Liabilities")
+            ;; ("food" "%(binary) -f %(ledger-file) --add-budget reg Assets")
+            ("payee" "%(binary) -f %(ledger-file) reg @%(payee)")))
+
+    (setq dynamic-reports
+          '(("budgetcal" "%(binary) -f ~/MEGA/org/entries/food.ledger --daily --add-budget reg Expenses")))
+
+    (defun ledger-dynamic-report ()
+      (interactive)
+      (let* ((ledger-reports dynamic-reports)
+             (report-name (ledger-report-read-name)))
+        (ledger-report report-name nil)))
+
+    (setq ledger-reconcile-buffer-line-format
+          "%(date)s %-4(code)s %-30(payee)s %-30(account)s %15(amount)s\n"))
+#+end_src
+** encryption
+#+begin_src emacs-lisp
+  (require 'epa-file)
+  (epa-file-enable)
+  (setq epa-pinentry-mode 'loopback)
+  (setq epa-file-cache-passphrase-for-symmetric-encryption t)
+  (setenv "GPG_AGENT_INFO" nil)
+
+  (setq epg-gpg-program "gpg2")
+  (setq auth-source-debug t)
+  (setq auth-sources '((:source "~/.emacs.d/secrets/.authinfo.gpg")))
+#+end_src

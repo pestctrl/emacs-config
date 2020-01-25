@@ -50,13 +50,16 @@
 
 (defun my/setup-screens ()
   (interactive)
-  (cl-destructuring-bind (primary . secondaries) (my/get-screens)
-    (loop for secondary in secondaries
-          do (when (y-or-n-p (format "Monitor %s detected.  Setup? " secondary))
-               (position-screen secondary primary))))
-  (setup-workspace-monitors)
-  (setup-wallpaper)
-  (exwm-workspace-after-monitor-change))
+  (let ((count 1))
+    (cl-destructuring-bind (primary . secondaries) (my/get-screens)
+      (loop for secondary in secondaries
+            do (when (y-or-n-p (format "Monitor %s detected.  Setup? " secondary))
+                 (position-screen secondary primary)
+                 (incf count))))
+    (setup-workspace-monitors)
+    (setup-wallpaper)
+    (setq exwm-workspace-number count)
+    (exwm-workspace-after-monitor-change)))
 
 (defun my/disconnect-screen (screen)
   (interactive (list (let ((screens (cdr (my/get-screens))))

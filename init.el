@@ -44,51 +44,31 @@
   (use-package exwm)
   (setq exwm-input-global-keys nil))
 
-(load-file "~/.emacs.d/lisp/keymap.el")
-
-(when (and (eq 'x window-system)
-           my/enable-exwm)
-  (org-babel-load-file
-   (expand-file-name "config-exwm.org"
-                     user-emacs-directory)))
+(require 'keymap)
 
 (org-babel-load-file
- (expand-file-name "config-base.org"
+ (expand-file-name "config-minimal.org"
                    user-emacs-directory))
 
-(org-babel-load-file
- (expand-file-name "config-org.org"
-                   user-emacs-directory))
+;; (when (and (eq 'x window-system)
+;;           my/enable-exwm)
+;;  (org-babel-load-file
+;;   (expand-file-name "config-exwm.org"
+;;                     user-emacs-directory)))
 
-(org-babel-load-file
- (expand-file-name "my-redefs.org"
-                   user-emacs-directory))
+;; (org-babel-load-file
+;; (expand-file-name "config-base.org"
+;;                   user-emacs-directory))
 
-(defun test-monitor ()
-  (interactive)
-  (shell-command "xrandr --output DP1 --mode 1920x1080 --above eDP1"))
+;; (org-babel-load-file
+;; (expand-file-name "config-org.org"
+;;                   user-emacs-directory))
 
-(defun 2k ()
-  (interactive)
-  (shell-command "xrandr --output DP1 --mode 2560x1440 --above eDP1"))
-
-(defun top ()
-  (interactive)
-  (shell-command "xrandr --output DP1 --above eDP1"))
-
-(defun bottom ()
-  (interactive)
-  (shell-command "xrandr --output DP1 --below eDP1"))
-
-(defun left ()
-  (interactive)
-  (shell-command "xrandr --output DP1 --left-of eDP1"))
-
-(defun right ()
-  (interactive)
-  (shell-command "xrandr --output DP1 --right-of eDP1"))
-
+;; (org-babel-load-file
+;; (expand-file-name "my-redefs.org"
+;;                   user-emacs-directory))
 
 (setq my/finished t)
 ;; Testing pull from windows
 ;; This is a test comment
+

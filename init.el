@@ -50,7 +50,7 @@
 ;; experience. Only SUPER stable stuff goes in this file, and should
 ;; rarely be modified
 (org-babel-load-file
- (expand-file-name "config-minimal.org"
+ (expand-file-name "config-min.org"
                    user-emacs-directory))
 
 ;; Load additional exwm stuff that changes constantly
@@ -58,18 +58,18 @@
  (expand-file-name "config-exwm.org"
                    user-emacs-directory))
 
-;; Next most important thing would be 
-(org-babel-load-file
- (expand-file-name "config-org.org"
-                   user-emacs-directory))
+;; These are less important when it comes to debugging emacs itself
+;; (org-babel-load-file
+;;  (expand-file-name "config-org.org"
+;;                    user-emacs-directory))
 
-(org-babel-load-file
- (expand-file-name "config-ext.org"
-                   user-emacs-directory))
+;; (org-babel-load-file
+;;  (expand-file-name "config-ext.org"
+;;                    user-emacs-directory))
 
-(org-babel-load-file
- (expand-file-name "my-redefs.org"
-                   user-emacs-directory))
+;; (org-babel-load-file
+;;  (expand-file-name "my-redefs.org"
+;;                    user-emacs-directory))
 
 (setq my/finished t)
 ;; Testing pull from windows

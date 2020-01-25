@@ -1,4 +1,4 @@
-#+PROPERTY: header-args :tangle "~/.emacs.d/config-minimal.el" :comments both
+#+PROPERTY: header-args :tangle "~/.emacs.d/config-min.el" :comments both
 
 * misc emacs settings
 #+begin_src emacs-lisp
@@ -193,6 +193,7 @@
 
   ;; But I've grown occustomed to ivy for M-x
   (use-package ivy)
+  (use-package counsel)
   (ivy-mode t)
 
   ;; These commands don't need a carrot(^) at the beginning, usually I
@@ -203,6 +204,7 @@
   (add-to-list 'ivy-initial-inputs-alist '(counsel-M-x . ""))
 
   (global-set-key (kbd "M-x") 'counsel-M-x)
+  (global-set-key (kbd "C-x b") 'counsel-switch-buffer)
   (global-set-key (kbd "C-c C-r") 'ivy-resume)
   (define-key ivy-minibuffer-map (kbd "<return>") 'ivy-alt-done)
   (define-key ivy-minibuffer-map (kbd "C-<return>") 'ivy-done)
@@ -574,7 +576,7 @@
 ** terminal
 #+begin_src emacs-lisp
   (use-package vterm
-    :commands vterm
+    :commands vterm find-vterm
     :bind (:map vterm-mode-map
                 ("C-t" . nil)
                 :map *root-map*
@@ -582,9 +584,9 @@
     :config
     (setq ansi-color-names-vector
           ["black" "red3" "green3" "yellow3" "DodgerBlue2" "magenta3" "cyan3" "gray90"])
-  
+
     (set-face-attribute 'term-bold       t :weight 'bold)
-    (set-face-attribute 'term-color-blue t :background "dodger blue" :foreground "dodger blue")
+    (set-face-attribute 'vterm-color-blue t :foreground "DodgerBlue2")
 
     (defun find-vterm ()
       (interactive)

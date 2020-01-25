@@ -56,3 +56,10 @@
             (modify-all-frames-parameters
              '((buffer-predicate . my-buffer-predicate)))))
 #+end_src
+* switch-window
+#+begin_src emacs-lisp
+  (use-package switch-window)
+  (setq switch-window-shortcut-style 'qwerty)
+  (setq switch-window-qwerty-shortcuts
+        '("a" "o" "e" "u" "i" "d" "h" "t" "n" "s"))
+#+end_src

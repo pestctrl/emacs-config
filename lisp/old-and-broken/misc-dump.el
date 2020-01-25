@@ -1,9 +1,9 @@
-;;; exwm-tag-presets.el ---  -*- lexical-binding: t -*-
+;;; misc-dump.el ---  -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2020 Benson Chu
 
 ;; Author: Benson Chu <bensonchu457@gmail.com>
-;; Created: [2020-01-23 08:11]
+;; Created: [2020-01-25 09:15]
 
 ;; This file is not part of GNU Emacs
 
@@ -24,7 +24,14 @@
 
 ;;; Code:
 
-(require 'exwm-tag)
+(defun dmenu-run ()
+  (interactive)
+  (shell-command "dmenu" nil "dmenu_run -b"))
 
-(provide 'exwm-tag-presets)
-;;; exwm-tag-presets.el ends here
+(add-hook 'exwm-manage-finish-hook
+          (lambda ()
+            (when (and exwm-class-name (string= exwm-class-name "Emacs"))
+              (exwm-input-set-local-simulation-keys nil))))
+
+(provide 'misc-dump)
+;;; misc-dump.el ends here

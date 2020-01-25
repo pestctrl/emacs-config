@@ -18,6 +18,7 @@
 
   ;; Undo tree is useful
   (use-package undo-tree)
+  (global-undo-tree-mode t)
 
   ;; Beacon-mode
   (use-package beacon)

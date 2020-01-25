@@ -1,19 +1,5 @@
 #+PROPERTY: header-args :tangle "~/.emacs.d/config-exwm.el" :comments both
 
-* exwm-background
-#+begin_src emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/submodule/exwm-background/")
-  (require 'exwm-background)
-  (define-key *window-map* (kbd "t") 'exwm-background/window-transparency-hydra/body)
-  (setq window-system-default-frame-alist `((x . ((alpha . (,exwm-background/current-transparency . 50))))))
-  (exwm-global-set-key (kbd "s-v") #'exwm-background/toggle-viewing-background)
-  (exwm-global-set-key (kbd "s-b") #'exwm-background/exwm-background-window) ;; TODO: Fix keybinding
-  ;; (define-key desktop-environment-mode-map (kbd "<S-XF86MonBrightnessDown>") #'exwm-background/decrease-transparency)
-  ;; (define-key desktop-environment-mode-map (kbd "<S-XF86MonBrightnessUp>") #'exwm-background/increase-transparency)
-  (define-key *window-map* (kbd "b") #'exwm-background/exwm-background-window)
-  (define-key *root-map* (kbd "k") #'exwm-background/exwm-send-key-to-background)
-  (define-key *root-map* (kbd "C-k") #'exwm-background/exwm-send-key-to-background-loop)
-#+end_src
 * window manipulation
 #+begin_src emacs-lisp
   ;; The prefix
@@ -34,6 +20,20 @@
     (interactive)
     (let ((win (selected-window)))
       (set-window-dedicated-p win (not (window-dedicated-p win)))))
+#+end_src
+* exwm-background
+#+begin_src emacs-lisp
+  (add-to-list 'load-path "~/.emacs.d/submodule/exwm-background/")
+  (require 'exwm-background)
+  (define-key *window-map* (kbd "t") 'exwm-background/window-transparency-hydra/body)
+  (setq window-system-default-frame-alist `((x . ((alpha . (,exwm-background/current-transparency . 50))))))
+  (exwm-global-set-key (kbd "s-v") #'exwm-background/toggle-viewing-background)
+  (exwm-global-set-key (kbd "s-b") #'exwm-background/exwm-background-window) ;; TODO: Fix keybinding
+  ;; (define-key desktop-environment-mode-map (kbd "<S-XF86MonBrightnessDown>") #'exwm-background/decrease-transparency)
+  ;; (define-key desktop-environment-mode-map (kbd "<S-XF86MonBrightnessUp>") #'exwm-background/increase-transparency)
+  (define-key *window-map* (kbd "b") #'exwm-background/exwm-background-window)
+  (define-key *root-map* (kbd "k") #'exwm-background/exwm-send-key-to-background)
+  (define-key *root-map* (kbd "C-k") #'exwm-background/exwm-send-key-to-background-loop)
 #+end_src
 * tags
 #+begin_src emacs-lisp

@@ -124,7 +124,7 @@
 
 (defun exwm-rename-buffer ()
   (interactive)
-  (when my/window-name
+  (let ((my/window-name (or my/window-name exwm-class-name)))
     (exwm-workspace-rename-buffer my/window-name)
     (setq-local exwm-instance-name my/window-name)
     (setq my/window-name nil)))

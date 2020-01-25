@@ -58,13 +58,13 @@
  (expand-file-name "config-exwm.org"
                    user-emacs-directory))
 
+(org-babel-load-file
+ (expand-file-name "config-ext.org"
+                   user-emacs-directory))
+
 ;; These are less important when it comes to debugging emacs itself
 ;; (org-babel-load-file
 ;;  (expand-file-name "config-org.org"
-;;                    user-emacs-directory))
-
-;; (org-babel-load-file
-;;  (expand-file-name "config-ext.org"
 ;;                    user-emacs-directory))
 
 ;; (org-babel-load-file

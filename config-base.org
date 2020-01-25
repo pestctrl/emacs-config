@@ -148,8 +148,6 @@
   (use-package doom-modeline)
   (use-package all-the-icons)
 
-  (load-theme 'smart-mode-line-dark)
-
   (set-face-attribute 'mode-line nil :height 100)
   (set-face-attribute 'mode-line-inactive nil :height 100)
   (setq all-the-icons-scale-factor 1.0)

@@ -269,10 +269,21 @@
   ;; These are the programming facilities I like the most for a minimal
   ;; setup for emacs-lisp programming
 
+  ;; Errors
+  (use-package flycheck)
+  (add-to-list 'display-buffer-alist
+               `(,(rx bos "*Flycheck errors*" eos)
+                 (display-buffer-reuse-window
+                  display-buffer-in-side-window)
+                 (side            . bottom)
+                 (reusable-frames . visible)
+                 (window-height   . 0.10)))
+
   ;; Autocompletion
   (use-package company)
   (setq company-idle-delay 0.2)
   (add-hook 'emacs-lisp-mode-hook 'company-mode)
+  (add-hook 'lisp-mode-hook 'company-mode)
 
   ;; Magit
   (use-package magit)
@@ -452,6 +463,17 @@
   ;; expand-region
   (use-package expand-region)
   (global-set-key (kbd "C-'") 'er/expand-region)
+
+  ;; Banner comments
+  (use-package banner-comment
+    :commands banner-comment
+    :bind (("C-c h" . #'banner-comment)))
+
+  (add-hook 'lisp-mode-hook
+            (lambda () (setq comment-start ";; ")))
+
+  (add-hook 'emacs-lisp-mode-hook
+            (lambda () (setq comment-start ";; ")))
 #+end_src
 * ibuffer
 #+begin_src emacs-lisp

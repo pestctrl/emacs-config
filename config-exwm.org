@@ -1,314 +1,5 @@
 #+PROPERTY: header-args :tangle "~/.emacs.d/config-exwm.el" :comments both
 
-* First in load path
-#+begin_src emacs-lisp
-  (add-to-list 'load-path
-               "~/.emacs.d/submodule/exwm")
-
-  (add-to-list 'load-path
-               "~/.emacs.d/submodule/xelb")
-#+end_src
-* Meta
-#+BEGIN_SRC emacs-lisp
-  (require 'exwm)
-  (require 'exwm-config)
-  (exwm-config-default)
-#+END_SRC
-* Multimonitor support
-#+BEGIN_SRC emacs-lisp
-  (require 'exwm-randr)
-  (exwm-randr-enable)
-#+END_SRC
-* Startup
-   
-** Emacs server, startup programs, wallpaper
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'exwm-init-hook 'server-start)
-
-  ;; Reminder: Hooks execute in order. Make sure megasync launches after systemtray is enabled
-  (require 'exwm-startup)
-  (add-hook 'exwm-init-hook 'call-startup-programs)
-
-  (require 'exwm-screens)
-  (add-hook 'exwm-init-hook 'my/setup-screens)
-
-  (define-minor-mode exwm-presentation-mode
-    "Make both screen outputs display the same thing"
-    nil nil nil
-    (cond (exwm-presentation-mode
-           (cl-destructuring-bind (primary . secondary) (my/get-screens)
-             (shell-command
-              (format "xrandr --output %s --mode 1920x1080 --same-as %s"
-               (car secondary)
-               primary))
-             (setq exwm-randr-workspace-monitor-plist nil)
-             (exwm-randr-refresh)))
-          (t
-           (my/setup-screens))))
-#+END_SRC
-
-** System tray, display time, display battery, display hard-drive-space
-#+BEGIN_SRC emacs-lisp   
-  (require 'exwm-systemtray)
-  (exwm-systemtray-enable)
-  (setq display-time-day-and-date t)
-
-  (defvar my/exclude-buffer-modes '(helm-major-mode messages-buffer-mode special-mode))
-
-  (defun my-buffer-predicate (buf)
-    (with-current-buffer buf
-      (if (memq major-mode my/exclude-buffer-modes)
-          nil
-        (exwm-layout--other-buffer-predicate buf))))
-
-  (add-hook 'exwm-init-hook
-            (lambda ()
-              (interactive) 
-              (modify-all-frames-parameters
-       '((buffer-predicate . my-buffer-predicate)))))
-
-  ;; Display hard drive space
-  ;; (add-hook 'display-time-hook 'update-hard-drive-space-string)
-
-  (display-time-mode)
-  (display-battery-mode)
-  ;; (display-hard-drive-space-mode)
-#+END_SRC
-* Shutdown
-#+BEGIN_SRC emacs-lisp
-  (add-hook 'exwm-exit-hook 'org-save-all-org-buffers)
-  ;;(add-hook 'exwm-exit-hook 'save-org-agenda-files)
-  (eval-after-load "term"
-    '(progn 
-       (define-key term-raw-map (kbd "C-c C-y") 'term-paste)
-       (define-key term-raw-map (kbd "M-x") 'helm-M-x)))
-#+END_SRC
-* desktop-environment
-#+begin_src emacs-lisp
-  (use-package desktop-environment
-    :init
-    (desktop-environment-mode))
-#+end_src
-* window-map
-#+begin_src emacs-lisp
-  (define-prefix-command '*window-map*)
-  (define-key *root-map* (kbd "w") '*window-map*)
-  (define-key *window-map* (kbd "y") 'youtube-split)
-  (define-key *window-map* (kbd "Y") 'big-youtube-split)
-  (define-key *window-map* (kbd "j") 'side-bottom-window)
-  (define-key *window-map* (kbd "h") 'side-left-window)
-  (define-key *window-map* (kbd "l") 'side-right-window)
-  (define-key *window-map* (kbd "d") 'window-toggle-side-windows)
-#+end_src
-* Youtube split
-#+BEGIN_SRC emacs-lisp
-  (defun youtube-split (arg)
-    (interactive "P")
-    (let ((buf (get-buffer "youtube"))
-          (back (current-buffer)))
-      (delete-other-windows)
-      (if buf 
-          (switch-to-buffer buf)
-        (when arg
-          (launch-program-with-name "firefox" "youtube")))
-      (side-window-op 'left 472 buf)
-      (switch-to-buffer back)))
-
-  (defun big-youtube-split (arg)
-    (interactive "P")
-    (delete-other-windows)
-    (let ((buf (get-buffer "youtube")))
-      (if buf
-          (switch-to-buffer buf)
-        (when arg
-          (launch-program-with-name "firefox" "youtube")))
-      (side-window-op 'left 630 buf)))
-
-  (defun side-window-op (side &optional size buffer)
-    (let ((prev-win (selected-window))
-          (win (display-buffer-in-side-window
-                (or buffer (current-buffer))
-                `((side . ,side)))))
-      (select-window win)
-      (set-window-dedicated-p win t)
-      (set-window-parameter win 'no-delete-other-windows t)
-      (when size
-        (window-resize win (- size (window-pixel-width)) t nil t))
-      (select-window prev-win)))
-
-  (defun side-left-window ()
-    (interactive)
-    (side-window-op 'left))
-
-  (defun side-right-window ()
-    (interactive)
-    (side-window-op 'right))
-
-  (defun side-bottom-window ()
-    (interactive)
-    (side-window-op 'bottom))
-
-  (setq window-sides-vertical t)
-#+END_SRC
-* toggle dedicated
-#+begin_src emacs-lisp
-  (defun my/toggle-dedicated-window ()
-    (interactive)
-    (let ((win (selected-window)))
-      (set-window-dedicated-p win (not (window-dedicated-p win)))))
-#+end_src
-* This is so that I can send fullscreen windows to the back
-#+begin_src emacs-lisp
-  (cl-defun my/exwm-layout-set-fullscreen (&optional id)
-    "Make window ID fullscreen."
-    (interactive)
-    (exwm--log "id=#x%x" (or id 0))
-    (unless (and (or id (derived-mode-p 'exwm-mode))
-                 (not (exwm-layout--fullscreen-p)))
-      (cl-return-from exwm-layout-set-fullscreen))
-    (with-current-buffer (if id (exwm--id->buffer id) (window-buffer))
-      ;; Expand the X window to fill the whole screen.
-      (with-slots (x y width height) (exwm-workspace--get-geometry exwm--frame)
-        (exwm--set-geometry exwm--id x y width height))
-      ;; Raise the X window.
-      (xcb:+request exwm--connection
-          (make-instance 'xcb:ConfigureWindow
-                         :window exwm--id
-                         :value-mask (logior xcb:ConfigWindow:BorderWidth
-                                             xcb:ConfigWindow:StackMode)
-                         :border-width 0
-                         :stack-mode xcb:StackMode:Above))
-      (xcb:+request exwm--connection
-          (make-instance 'xcb:ewmh:set-_NET_WM_STATE
-                         :window exwm--id
-                         :data (vector xcb:Atom:_NET_WM_STATE_FULLSCREEN)))
-      (xcb:flush exwm--connection)
-      ;;(set-window-dedicated-p (get-buffer-window) t)
-      (cl-pushnew xcb:Atom:_NET_WM_STATE_FULLSCREEN exwm--ewmh-state)
-      (exwm-input--release-keyboard exwm--id)))
-
-
-  (advice-add #'exwm-layout-set-fullscreen :override #'my/exwm-layout-set-fullscreen)
-#+end_src
-* Switch window
-#+BEGIN_SRC emacs-lisp
-  (setq switch-window-input-style 'minibuffer)
-#+END_SRC
-* Keybindings
-#+BEGIN_SRC emacs-lisp
-  (use-package transpose-frame)
-
-  (exwm-global-set-key (kbd "s-r") #'exwm-reset)
-  (exwm-global-set-key (kbd "s-l") #'lock-screen)
-  (exwm-global-set-key (kbd "s-c") #'org-capture)
-  (exwm-global-set-key (kbd "s-n") #'switch-window)
-  (exwm-global-set-key (kbd "s-z") #'resize-window)
-  (exwm-global-set-key (kbd "s-s") #'youtube-split)
-  (exwm-global-set-key (kbd "s-n") #'switch-to-next-buffer)
-  (exwm-global-set-key (kbd "s-p") #'switch-to-prev-buffer)
-  (exwm-global-set-key (kbd "s-a") #'my/toggle-keyboard)
-  (exwm-global-set-key my/keymap-key '*root-map*)
-
-  (exwm-global-set-key (kbd "s-h") 'windmove-left)
-  (exwm-global-set-key (kbd "s-l") 'windmove-right)
-  (define-key desktop-environment-mode-map (kbd "s-l") nil)
-
-  (defun dvorak? ()
-    (string-match-p "de(neo_dvorak)" 
-                    (shell-command-to-string "setxkbmap -v | grep symbols")))
-
-  (defun set-keyboard (layout)
-    (shell-command (format "setxkbmap %s" layout)))
-
-  (defun my/toggle-keyboard ()
-    (interactive)
-    (if (dvorak?)
-        (set-keyboard "us")
-      (set-keyboard "de neo_dvorak")))
-
-  ;; Don't do this one, causes blinking
-  (global-set-key (kbd "C-x p") 'launch-program)
-  ;; These have issues, presumably utf8 or something
-  (global-set-key (kbd "M-…") 'multi-term)
-  (global-set-key (kbd "C-ü") 'undo-tree-undo)
-
-  (defun prompt-workspace (&optional prompt)
-    "Prompt for a workspace, returning the workspace frame."
-    (exwm-workspace--update-switch-history)
-    (let* ((current-idx (exwm-workspace--position exwm-workspace--current))
-           (history-add-new-input nil)  ;prevent modifying history
-           (history-idx (read-from-minibuffer
-                         (or prompt "Workspace: ")
-                         (elt exwm-workspace--switch-history current-idx)
-                         exwm-workspace--switch-map nil
-                         `(exwm-workspace--switch-history . ,current-idx)))
-           (workspace-idx (mod (1- (cl-position history-idx exwm-workspace--switch-history
-                                                :test #'equal)) 
-                               10)))
-      (elt exwm-workspace--list workspace-idx)))
-
-  (advice-add 'exwm-workspace--prompt-for-workspace
-              :override
-              #'prompt-workspace)
-#+END_SRC
-* Simulation keys
-#+BEGIN_SRC emacs-lisp
-  (setq exwm-input-simulation-keys
-   '(
-      ;; movement
-      ([?\C-b] . left)
-      ([?\M-b] . C-left)
-      ([?\C-f] . right)
-      ([?\M-f] . C-right)
-      ([?\C-p] . up)
-      ([?\C-n] . down)
-      ([?\C-a] . home)
-      ([?\C-e] . end)
-      ([?\M-v] . prior)
-      ([?\C-v] . next)
-      ([?\C-d] . delete)
-      ([?\M-d] . backspace)
-      ([?\C-k] . (S-end delete))
-      ;; cut/paste.
-      ([?\C-w] . ?\C-x)
-      ([?\M-w] . ?\C-c)
-      ([?\C-y] . ?\C-v)
-      ;; search
-      ([?\C-s] . ?\C-f)
-      ([?\C-.] . ?\C-w)
-      ([?\C-/] . ?\C-z)
-      ([?\M-s] . ?\C-s)))
-#+END_SRC
-
-* Xephyr launches in tiling-mode
-#+BEGIN_SRC emacs-lisp
-  (setq exwm-manage-configurations `(((equal exwm-class-name "Xephyr")
-                                      floating nil 
-                                      char-mode t
-                                      fullscreen t)
-                                     ((equal exwm-class-name "plasmashell")
-                                      floating t)))
-#+END_SRC
-* Floating windows don't need that many faces ^_^
-#+begin_src emacs-lisp
-  (def-face-copier1 my/frame-dont-copy-faces (sym)
-    (let ((name (symbol-name sym)))
-      (string-match-p "^doom-.*" name))
-    mode-line
-    mode-line-inactive)
-
-  (defun my/exwm-floating--advise-make-frame (orig id)
-    (override1-face my/frame-dont-copy-faces
-      (funcall orig id)))
-
-  (advice-add #'exwm-floating--set-floating
-              :around
-              #'my/exwm-floating--advise-make-frame)
-#+end_src
-* tagging
-#+begin_src emacs-lisp
-(require 'exwm-tag)
-#+end_src
 * exwm-background
 #+begin_src emacs-lisp
   (add-to-list 'load-path "~/.emacs.d/submodule/exwm-background/")
@@ -317,23 +8,35 @@
   (setq window-system-default-frame-alist `((x . ((alpha . (,exwm-background/current-transparency . 50))))))
   (exwm-global-set-key (kbd "s-v") #'exwm-background/toggle-viewing-background)
   (exwm-global-set-key (kbd "s-b") #'exwm-background/exwm-background-window) ;; TODO: Fix keybinding
-  (define-key desktop-environment-mode-map (kbd "<S-XF86MonBrightnessDown>") #'exwm-background/decrease-transparency)
-  (define-key desktop-environment-mode-map (kbd "<S-XF86MonBrightnessUp>") #'exwm-background/increase-transparency)
+  ;; (define-key desktop-environment-mode-map (kbd "<S-XF86MonBrightnessDown>") #'exwm-background/decrease-transparency)
+  ;; (define-key desktop-environment-mode-map (kbd "<S-XF86MonBrightnessUp>") #'exwm-background/increase-transparency)
   (define-key *window-map* (kbd "b") #'exwm-background/exwm-background-window)
   (define-key *root-map* (kbd "k") #'exwm-background/exwm-send-key-to-background)
   (define-key *root-map* (kbd "C-k") #'exwm-background/exwm-send-key-to-background-loop)
 #+end_src
-* e2wm
+* window manipulation
 #+begin_src emacs-lisp
-  (use-package e2wm
-    :bind (("M-+" . e2wm:start-management)))
+  ;; The prefix
+  (define-prefix-command '*window-map*)
+  (define-key *root-map* (kbd "w") '*window-map*)
+
+  ;; Side-window stuff
+  (use-package resize-window)
+  (require 'side-window-split)
+  (define-key *window-map* (kbd "j") 'side-bottom-window)
+  (define-key *window-map* (kbd "h") 'side-left-window)
+  (define-key *window-map* (kbd "l") 'side-right-window)
+  (define-key *window-map* (kbd "d") 'window-toggle-side-windows)
+  (define-key *window-map* (kbd "r") 'resize-window)
+
+  ;; Dedicated window
+  (defun my/toggle-dedicated-window ()
+    (interactive)
+    (let ((win (selected-window)))
+      (set-window-dedicated-p win (not (window-dedicated-p win)))))
 #+end_src
-* exwm-edit
+* tags
 #+begin_src emacs-lisp
-  (use-package exwm-edit)
+  ;; Need my tags
+  (require 'exwm-tag)
 #+end_src
-* Volume
-#+BEGIN_SRC emacs-lisp
-  (use-package volume)
-  (define-key *root-map* (kbd "v") 'volume)
-#+END_SRC

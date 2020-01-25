@@ -46,27 +46,30 @@
 
 (require 'keymap)
 
+;; It is imperative that this be loaded for a nice emacs
+;; experience. Only SUPER stable stuff goes in this file, and should
+;; rarely be modified
 (org-babel-load-file
  (expand-file-name "config-minimal.org"
                    user-emacs-directory))
 
-;; (when (and (eq 'x window-system)
-;;           my/enable-exwm)
-;;  (org-babel-load-file
-;;   (expand-file-name "config-exwm.org"
-;;                     user-emacs-directory)))
+;; Load additional exwm stuff that changes constantly
+(org-babel-load-file
+ (expand-file-name "config-exwm.org"
+                   user-emacs-directory))
 
-;; (org-babel-load-file
-;; (expand-file-name "config-base.org"
-;;                   user-emacs-directory))
+;; Next most important thing would be 
+(org-babel-load-file
+ (expand-file-name "config-org.org"
+                   user-emacs-directory))
 
-;; (org-babel-load-file
-;; (expand-file-name "config-org.org"
-;;                   user-emacs-directory))
+(org-babel-load-file
+ (expand-file-name "config-aux.org"
+                   user-emacs-directory))
 
-;; (org-babel-load-file
-;; (expand-file-name "my-redefs.org"
-;;                   user-emacs-directory))
+(org-babel-load-file
+ (expand-file-name "my-redefs.org"
+                   user-emacs-directory))
 
 (setq my/finished t)
 ;; Testing pull from windows

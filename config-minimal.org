@@ -9,6 +9,24 @@
 
   ;; Don't fricken suspend emacs
   (global-set-key (kbd "C-z") nil)
+
+  ;; Minibuffer reading
+  (setq switch-window-input-style 'minibuffer)
+
+  ;; Help window select stuff
+  (setq help-window-select t)
+
+  ;; Undo tree is useful
+  (use-package undo-tree)
+
+  ;; Beacon-mode
+  (use-package beacon)
+  (beacon-mode 1)
+  (setq beacon-blink-delay 0.1)
+  (setq beacon-color "#006400")
+
+  ;; Use my fork of chinese-etzy
+  (load-file "~/.emacs.d/my-etzy.el")
 #+end_src
 * exwm
 #+begin_src emacs-lisp
@@ -62,9 +80,79 @@
   (use-package volume
     :bind (:map *root-map*
                 ("v" . #'volume)))
+
+  ;; Shut down
+  (add-hook 'exwm-exit-hook 'org-save-all-org-buffers)
+
+  ;; Startup programs
+  (add-hook 'exwm-init-hook 'server-start)
+
+  ;; Reminder: Hooks execute in order. Make sure megasync launches after systemtray is enabled
+  (require 'exwm-startup)
+  (add-hook 'exwm-init-hook 'call-startup-programs)
+
+  (require 'exwm-screens)
+  (add-hook 'exwm-init-hook 'my/setup-screens)
+
+  (require 'exwm-systemtray)
+  (exwm-systemtray-enable)
+
+  ;; I don't really want to see these buffers 
+  (defvar my/exclude-buffer-modes '(helm-major-mode messages-buffer-mode special-mode))
+
+  (defun my-buffer-predicate (buf)
+    (with-current-buffer buf
+      (if (memq major-mode my/exclude-buffer-modes)
+          nil
+        (exwm-layout--other-buffer-predicate buf))))
+
+  (add-hook 'exwm-init-hook
+            (lambda ()
+              (interactive) 
+              (modify-all-frames-parameters
+               '((buffer-predicate . my-buffer-predicate)))))
+#+end_src
+* keybindings
+#+begin_src emacs-lisp
+  (defun lock-screen ()
+    (interactive)
+    (shell-command "~/Github/my-projects/i3lock-fancy/i3lock-fancy & disown"))
+
+  (exwm-global-set-key (kbd "s-r") #'exwm-reset)
+  (require 'keyboard-toggle)
+  (exwm-global-set-key (kbd "s-a") #'my/toggle-keyboard)
+
+  (setq exwm-input-simulation-keys
+        '(;; movement
+          ([?\C-b] . left)
+          ([?\M-b] . C-left)
+          ([?\C-f] . right)
+          ([?\M-f] . C-right)
+          ([?\C-p] . up)
+          ([?\C-n] . down)
+          ([?\C-a] . home)
+          ([?\C-e] . end)
+          ([?\M-v] . prior)
+          ([?\C-v] . next)
+          ([?\C-d] . delete)
+          ([?\M-d] . backspace)
+          ([?\C-k] . (S-end delete))
+          ;; cut/paste.
+          ([?\C-w] . ?\C-x)
+          ([?\M-w] . ?\C-c)
+          ([?\C-y] . ?\C-v)
+          ;; search
+          ([?\C-s] . ?\C-f)
+          ([?\C-.] . ?\C-w)
+          ([?\C-/] . ?\C-z)
+          ([?\M-s] . ?\C-s)))
 #+end_src
 * theme
 #+begin_src emacs-lisp
+  ;; dashboard looks cool
+  (use-package dashboard)
+  (setq fancy-splash-image "~/.emacs.d/res/icon.png")
+
   ;; Disable tool and menu bar, keep the fringe though
   (tool-bar-mode -1)
   (menu-bar-mode -1)
@@ -97,6 +185,8 @@
   (display-battery-mode t)
   (display-time-mode t)
   (setq display-time-day-and-date t)
+  (require 'display-hard-drive-space-mode)
+  (display-hard-drive-space-mode)
 
   ;; Roboto mono is nice
   (when (member "Roboto Mono" (font-family-list))
@@ -107,7 +197,7 @@
   (set-fontset-font t 'unicode (font-spec :size 10 :name "FontAwesome"))
   (set-fontset-font t 'unicode (font-spec :size 16 :name "DejaVu Sans Mono"))
 #+end_src
-* navigation
+* buffer navigation
 #+begin_src emacs-lisp
   ;; Allow minibuffer-ception
   (setq enable-recursive-minibuffers t)
@@ -136,6 +226,14 @@
   (use-package scrollkeeper)
   (global-set-key (kbd "C-v") 'scrollkeeper-down)
   (global-set-key (kbd "M-v") 'scrollkeeper-up)
+
+  ;; Word navigation
+  (global-set-key (kbd "M-f") 'forward-to-word)
+  (global-set-key (kbd "M-F") 'forward-word)
+
+  ;; Goto-char
+  (use-package iy-go-to-char
+    :bind (("M-m" . #'iy-go-to-char)))
 #+end_src
 * dired
 #+begin_src emacs-lisp
@@ -158,6 +256,26 @@
   (define-key dired-mode-map (kbd "i") 'dired-subtree-insert)
   (define-key dired-mode-map (kbd "I") 'dired-subtree-remove)
 #+end_src
+* w3m
+#+begin_src emacs-lisp
+  ;; Remove when Emacs 27 releases
+  (setq w3m-use-tabs nil)
+  (use-package w3m)
+
+  (defun dired-browse-with-w3m (arg)
+    (interactive "P")
+    (let ((browse-url-browser-function (if arg
+                                           (symbol-function browse-url-browser-function)
+                                         #'w3m-browse-url)))
+      (browse-url-of-dired-file)))
+
+  (define-key dired-mode-map (kbd "W") 'dired-browse-with-w3m)
+
+  (exwm-global-set-key (kbd "C-c g")
+          (lambda ()
+            (interactive)
+            (w3m-goto-url "https://google.com")))
+#+end_src
 * emacs lisp
 #+begin_src emacs-lisp
   ;; These are the programming facilities I like the most for a minimal
@@ -170,8 +288,33 @@
 
   ;; Magit
   (use-package magit)
+  (use-package magit-popup)
+   (use-package magit-todos)
   (global-set-key (kbd "C-x g") 'magit-status)
   (global-set-key (kbd "C-x M-g") 'magit-dispatch)
+
+  ;; Push all branches
+  (defun my/magit-push-all ()
+    "Push all branches."
+    (interactive)
+    (magit-run-git-async "push" "-v"
+                         (magit-read-remote "Remote")
+                         "--all"))
+
+  (transient-append-suffix 'magit-push "m"
+    '("a" "all remotes" my/magit-push-all))
+
+  ;; Magit uses ediff
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain)
+
+  (defun ediff-copy-both-to-C ()
+    (interactive)
+    (ediff-copy-diff ediff-current-difference nil 'C nil
+                     (concat
+                      (ediff-get-region-contents ediff-current-difference 'A ediff-control-buffer)
+                      (ediff-get-region-contents ediff-current-difference 'B ediff-control-buffer))))
+  (defun add-d-to-ediff-mode-map () (define-key ediff-mode-map "d" 'ediff-copy-both-to-C))
+  (add-hook 'ediff-keymap-setup-hook 'add-d-to-ediff-mode-map)
 
   ;; Paredit
   (use-package paredit)
@@ -262,12 +405,85 @@
 
   ;; Eval buffer, slime-ism
   (define-key emacs-lisp-mode-map (kbd "C-c C-k") #'eval-buffer)
+
+  ;; Make scratch buffers out of nowhere!
+  (defun scratch-buffer ()
+    (interactive)
+    (let ((count 0))
+      (while (get-buffer (format "*scratch%d*" count))
+        (incf count))
+      (switch-to-buffer (get-buffer-create (format "*scratch%d*" count)))
+      (lisp-interaction-mode)
+      (insert (substitute-command-keys initial-scratch-message))))
+
+  ;; Eval and replace
+  (defun my/eval-and-replace ()
+    "Replace the preceding sexp with its value."
+    (interactive)
+    (backward-kill-sexp)
+    (condition-case nil
+        (prin1 (eval (read (current-kill 0)))
+               (current-buffer))
+      (error (message "Invalid expression")
+             (insert (current-kill 0)))))
+
+  (define-key emacs-lisp-mode-map (kbd "C-c C-e") 'my/eval-and-replace)
+
+  ;; Use cider's eval expression
+  (use-package cider)
+  (autoload 'cider--make-result-overlay "cider-overlays")
+
+  (defun endless/eval-overlay (value point)
+    (cider--make-result-overlay (format "%S" value)
+      :where point
+      :duration 'command)
+    ;; Preserve the return value.
+    value)
+
+  (advice-add 'eval-region :around
+              (lambda (f beg end &rest r)
+                (endless/eval-overlay
+                 (apply f beg end r)
+                 end)))
+
+  (advice-add 'eval-last-sexp :filter-return
+              (lambda (r)
+                (endless/eval-overlay r (point))))
+
+  (advice-add 'eval-defun :filter-return
+              (lambda (r)
+                (endless/eval-overlay
+                 r
+                 (save-excursion
+                   (end-of-defun)
+                   (point)))))
+
+  ;; expand-region
+  (use-package expand-region)
+  (global-set-key (kbd "C-'") 'er/expand-region)
 #+end_src
 * ibuffer
 #+begin_src emacs-lisp
   (global-set-key (kbd "C-x C-b") 'ibuffer)
 
+  (setq ibuffer-show-empty-filter-groups nil)
+
+  (add-hook 'ibuffer-mode-hook
+            '(lambda ()
+               (ibuffer-switch-to-saved-filter-groups "default")
+               (ibuffer-do-sort-by-alphabetic)
+               ;; (ibuffer-auto-mode)
+               ))
+
   (require 'ibuf-ext)
+
+  (eval-after-load "ibuf-ext"
+    '(define-ibuffer-filter directory-name
+         "Filter files in the agenda folder"
+       (:description "agenda")
+       (and (buffer-file-name buf) 
+            (string-match qualifier
+                          (buffer-file-name buf)))))
 
   (add-to-list 'ibuffer-never-show-predicates
                '(lambda (buf)
@@ -314,28 +530,13 @@
            ("Help"            (or (name . "\*Help\*")
                                   (name . "\*Apropos\*")
                                   (name . "\*info\*"))))))
-
-  (setq ibuffer-show-empty-filter-groups nil)
-
-  (add-hook 'ibuffer-mode-hook
-            '(lambda ()
-               (ibuffer-switch-to-saved-filter-groups "default")
-               (ibuffer-do-sort-by-alphabetic)
-               ;; (ibuffer-auto-mode)
-               ))
-
-  (eval-after-load "ibuf-ext"
-    '(define-ibuffer-filter directory-name
-         "Filter files in the agenda folder"
-       (:description "agenda")
-       (and (buffer-file-name buf) 
-            (string-match qualifier
-                          (buffer-file-name buf)))))
 #+end_src
 * useful tools
 ** org-mode
  #+begin_src emacs-lisp
    (require 'org)
+
+   (setq org-src-window-setup 'current-window)
    (setq org-use-speed-commands t)
  #+end_src
 *** Indent look
@@ -393,6 +594,9 @@
     :config
     (setq ansi-color-names-vector
           ["black" "red3" "green3" "yellow3" "DodgerBlue2" "magenta3" "cyan3" "gray90"])
+  
+    (set-face-attribute 'term-bold       t :weight 'bold)
+    (set-face-attribute 'term-color-blue t :background "dodger blue" :foreground "dodger blue")
 
     (defun find-vterm ()
       (interactive)
@@ -400,54 +604,29 @@
           (switch-to-buffer b)
         (vterm))))
 #+end_src
-** ledger
+** posting source code
 #+begin_src emacs-lisp
-  (use-package ledger-mode
-    :mode "\\.dat\\'"
-    :config
-    (defconst new-report-str (concat "%(binary) -f %(ledger-file) --cleared-format "
-                                     "'%(justify(scrub(get_at(display_total, 0)), 16, 16 + int(prepend_width), true, color))"
-                                     "  %(justify(scrub(get_at(display_total, 1)), 18, 36 + int(prepend_width), true, color))"
-                                     "  %(justify(scrub(get_at(display_total, 0) - get_at(display_total, 1)), 18, 36 + int(prepend_width), true, color))"
-                                     "    %(latest_cleared ? format_date(latest_cleared) : \"         \")"
-                                     "    %(!options.flat ? depth_spacer : \"\")%-(ansify_if(partial_account(options.flat), blue if color))\\n"
-                                   "%/%$1  %$2  %$3    %$4\\n"
-                                   "%/%(prepend_width ? \" \" * int(prepend_width) : \"\")----------------    ----------------    ----------------    ---------\\n'"
-                                   " cleared"))
+  (use-package webpaste)
 
-    (setq ledger-reports
-          `(("account" "%(binary) -f %(ledger-file) reg %(account)")
-            ("bal" "%(binary) -f %(ledger-file) bal")
-            ("reg" "%(binary) -f %(ledger-file) reg")
-            ("cleared" ,new-report-str)
-            ;; ("cleared" "%(binary) -f %(ledger-file) cleared")
-            ("expmonth" "%(binary) -f %(ledger-file) -M reg Expenses")
-            ("owedmom" "%(binary) -f %(ledger-file) reg Liabilities")
-            ("progress" "%(binary) -f %(ledger-file) reg Assets Equity Liabilities")
-            ;; ("food" "%(binary) -f %(ledger-file) --add-budget reg Assets")
-            ("payee" "%(binary) -f %(ledger-file) reg @%(payee)")))
-
-    (setq dynamic-reports
-          '(("budgetcal" "%(binary) -f ~/MEGA/org/entries/food.ledger --daily --add-budget reg Expenses")))
-
-    (defun ledger-dynamic-report ()
-      (interactive)
-      (let* ((ledger-reports dynamic-reports)
-             (report-name (ledger-report-read-name)))
-        (ledger-report report-name nil)))
-
-    (setq ledger-reconcile-buffer-line-format
-          "%(date)s %-4(code)s %-30(payee)s %-30(account)s %15(amount)s\n"))
+  (setq webpaste-paste-confirmation t)
+  (setq webpaste-provider-priority '("ix.io"))
 #+end_src
-** encryption
+** wgrep
 #+begin_src emacs-lisp
-  (require 'epa-file)
-  (epa-file-enable)
-  (setq epa-pinentry-mode 'loopback)
-  (setq epa-file-cache-passphrase-for-symmetric-encryption t)
-  (setenv "GPG_AGENT_INFO" nil)
-
-  (setq epg-gpg-program "gpg2")
-  (setq auth-source-debug t)
-  (setq auth-sources '((:source "~/.emacs.d/secrets/.authinfo.gpg")))
+  (use-package wgrep)
+#+end_src
+** Query replace rx
+#+begin_src emacs-lisp
+  (defun my/query-replace-rx (&rest _)
+    "Call `query-replace-regexp', reading regexp in `rx' syntax.
+    Automatically wraps in parens and adds `seq' to the beginning of
+    the form."
+    (interactive)
+    (cl-letf (((symbol-function #'query-replace-read-from) (lambda (&rest _)
+                                                             (--> (read-string "rx form: ")
+                                                                  (concat "'(seq " it ")")
+                                                                  (read it)
+                                                                  (cadr it)
+                                                                  (rx-to-string it)))))
+      (call-interactively #'query-replace-regexp)))
 #+end_src

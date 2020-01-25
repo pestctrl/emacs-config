@@ -24,6 +24,7 @@
 
 ;;; Code:
 (use-package exwm-x)
+(use-package hydra)
 (require 'my-exwmx-quickrun)
 (require 'exwmx-appconfig)
 
@@ -105,6 +106,9 @@
   ("k" (lambda () (interactive) (shell-command "clementine --volume-up")))
   ("K" (lambda () (interactive) (shell-command "clementine --volume-increase-by 25")))
   ("q" nil))
+
+(add-to-list 'hydra-props-alist
+             '(clementine-volume-hydra :verbosity 0))
 
 (provide 'exwm-tag)
 ;;; exwm-tag.el ends here

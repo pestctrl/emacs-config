@@ -71,5 +71,19 @@
   (exwm-randr-refresh)
   (setup-wallpaper))
 
+(define-minor-mode exwm-presentation-mode
+  "Make both screen outputs display the same thing"
+  nil nil nil
+  (cond (exwm-presentation-mode
+         (cl-destructuring-bind (primary . secondary) (my/get-screens)
+           (shell-command
+            (format "xrandr --output %s --mode 1920x1080 --same-as %s"
+                    (car secondary)
+                    primary))
+           (setq exwm-randr-workspace-monitor-plist nil)
+           (exwm-randr-refresh)))
+        (t
+         (my/setup-screens))))
+
 (provide 'exwm-screens)
 ;;; exwm-screens.el ends here

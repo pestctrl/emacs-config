@@ -232,6 +232,65 @@
 
   (define-key *root-map* (kbd "C-r") 'un-za-warudo)
 #+end_src
+* Programming stuff
+** lsp
+#+begin_src emacs-lisp
+  (use-package lsp-mode
+    :commands lsp)
+
+  (use-package lsp-ui
+    :after lsp-mode
+    :bind (:map lsp-mode-map
+                ("M-." . #'lsp-ui-peek-find-definitions)
+                ("M-?" . #'lsp-ui-peek-find-references)
+                ("M-," . #'lsp-ui-peek-jump-backward)
+                ("M-p" . #'lsp-ui-peek-jump-forward))
+    :hook (lsp-mode . lsp-ui-mode)
+    :config
+    (setq lsp-ui-flycheck-enable t)
+    (setq lsp-ui-flycheck-live-reporting t))
+
+  (use-package dap-mode
+    :hook ((java-mode . dap-mode)
+           (java-mode . dap-ui-mode))
+    :bind (:map dap-mode-map
+                ("C-c h" . #'dap-hydra)
+                ("C-c b" . #'dap-breakpoint-toggle)
+                ("C-c d r" . #'dap-java-debug)
+                ("C-c d m" . #'dap-java-debug-test-class)
+                ("C-c r t" . #'mvn-test)))
+#+end_src
+** Slime mode
+#+BEGIN_SRC emacs-lisp
+  (use-package slime
+    :commands slime slime-switch-lisps
+    :hook ((inferior-lisp-mode . inferior-slime-mode))
+    :config
+    (setq inferior-lisp-program "/usr/bin/sbcl")
+
+    (defun slime-switch-lisps (lisp)
+      (interactive (list (completing-read "Which lisp? "
+                                          '("sbcl" "ecl" "cmucl" "clozure-cl"))))
+      (setq inferior-lisp-program lisp))
+
+    (let ((clhs-file "~/quicklisp/clhs-use-local.el"))
+      (if (file-exists-p clhs-file)
+          (load-file clhs-file)
+        (warn "clhs not installed. Please install"))))
+
+  (use-package slime-company
+    :after slime company
+    :config
+    (slime-setup '(slime-fancy slime-asdf slime-company)))
+#+END_SRC
+* colorful compilation buffer
+#+begin_src emacs-lisp
+  (require 'ansi-color)
+  (defun colorize-compilation-buffer ()
+    (let ((buffer-read-only nil))
+      (ansi-color-apply-on-region (point-min) (point-max))))
+  (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
+#+end_src
 * New
 ** transpose-frame
 #+begin_src emacs-lisp

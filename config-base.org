@@ -1020,28 +1020,6 @@
 
   (define-key *root-map* (kbd "p") '*profiler-map*)
 #+end_src
-** Slime mode
-#+BEGIN_SRC emacs-lisp
-  (use-package slime)
-  (use-package slime-company)
-
-  (add-hook 'lisp-mode-hook #'slime-mode)
-  (add-hook 'inferior-lisp-mode-hook #'inferior-slime-mode)
-
-  (setq inferior-lisp-program "/usr/bin/sbcl")
-
-  (defun slime-switch-lisps (lisp)
-    (interactive (list (completing-read "Which lisp? "
-                                        '("sbcl" "ecl" "cmucl" "clozure-cl"))))
-    (setq inferior-lisp-program lisp))
-
-  (let ((clhs-file "~/quicklisp/clhs-use-local.el"))
-    (if (file-exists-p clhs-file)
-        (load-file clhs-file)
-      (warn "clhs not installed. Please install")))
-
-  (slime-setup '(slime-fancy slime-asdf slime-company))
-#+END_SRC
 ** Google Translate
 #+begin_src emacs-lisp
   (use-package google-translate)

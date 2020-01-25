@@ -115,6 +115,7 @@
   (exwm-global-set-key (kbd "s-r") #'exwm-reset)
   (require 'keyboard-toggle)
   (exwm-global-set-key (kbd "s-a") #'my/toggle-keyboard)
+  (exwm-global-set-key (kbd "s-o") #'other-window)
 
   (setq exwm-input-simulation-keys
         '(;; movement
@@ -213,7 +214,7 @@
   (add-to-list 'ivy-initial-inputs-alist '(counsel-M-x . ""))
 
   (global-set-key (kbd "M-x") 'counsel-M-x)
-  (global-set-key (kbd "C-x b") 'counsel-switch-buffer)
+  (global-set-key (kbd "C-x b") 'ivy-switch-buffer)
   (global-set-key (kbd "C-c C-r") 'ivy-resume)
   (define-key ivy-minibuffer-map (kbd "<return>") 'ivy-alt-done)
   (define-key ivy-minibuffer-map (kbd "C-<return>") 'ivy-done)
@@ -267,10 +268,10 @@
 
   (define-key dired-mode-map (kbd "W") 'dired-browse-with-w3m)
 
-  (exwm-global-set-key (kbd "C-c g")
-          (lambda ()
-            (interactive)
-            (w3m-goto-url "https://google.com")))
+  (global-set-key (kbd "C-c g")
+                  (lambda ()
+                    (interactive)
+                    (w3m-goto-url "https://google.com")))
 #+end_src
 * emacs lisp
 #+begin_src emacs-lisp

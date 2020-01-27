@@ -36,6 +36,7 @@
        (setq hard-drive-space)))
 
 (define-minor-mode display-hard-drive-space-mode
+  nil nil nil
   :global t
   (cond (display-hard-drive-space-mode
          (add-to-list 'global-mode-string 'hard-drive-space t)

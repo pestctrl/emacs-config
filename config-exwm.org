@@ -63,3 +63,17 @@
   (setq switch-window-qwerty-shortcuts
         '("a" "o" "e" "u" "i" "d" "h" "t" "n" "s"))
 #+end_src
+* restart emacs custom
+#+begin_src emacs-lisp
+  (defun my/exwm-restart ()
+    "Restart EXWM."
+    (interactive)
+    (exwm--log)
+    (when (exwm--confirm-kill-emacs "[EXWM] Restart? " 'no-check)
+      (let* ((attr (process-attributes (emacs-pid)))
+             (args (cdr (assq 'args attr)))
+             (ppid (cdr (assq 'ppid attr)))
+             (pargs (cdr (assq 'args (process-attributes ppid)))))
+        (shell-command "emacs & disown")
+        (kill-emacs))))
+#+end_src

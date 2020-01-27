@@ -63,13 +63,13 @@
                    user-emacs-directory))
 
 ;; These are less important when it comes to debugging emacs itself
-;; (org-babel-load-file
-;;  (expand-file-name "config-org.org"
-;;                    user-emacs-directory))
+(org-babel-load-file
+ (expand-file-name "config-org.org"
+                   user-emacs-directory))
 
-;; (org-babel-load-file
-;;  (expand-file-name "my-redefs.org"
-;;                    user-emacs-directory))
+(org-babel-load-file
+ (expand-file-name "my-redefs.org"
+                   user-emacs-directory))
 
 (setq my/finished t)
 ;; Testing pull from windows

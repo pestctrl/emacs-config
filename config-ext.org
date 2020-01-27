@@ -38,7 +38,13 @@
         (ledger-report report-name nil)))
 
     (setq ledger-reconcile-buffer-line-format
-          "%(date)s %-4(code)s %-30(payee)s %-30(account)s %15(amount)s\n"))
+          "%(date)s %-4(code)s %-30(payee)s %-30(account)s %15(amount)s\n")
+
+    (defun ledger-account-check-dont-include-regexp (orig account)
+      (when (= (aref account 0)
+               ?^)
+        (setq account
+              (substring account 1)))))
 #+end_src
 ** encryption
 #+begin_src emacs-lisp
@@ -333,6 +339,21 @@
       (ansi-color-apply-on-region (point-min) (point-max))))
   (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
 #+end_src
+* Various common files
+#+begin_src emacs-lisp
+  (use-package csv-mode
+    :commands csv-mode
+    :init
+    (add-to-list 'auto-mode-alist
+                 '("\\.csv$" . csv-mode)))
+
+  (use-package yaml-mode
+    :commands yaml-mode
+    :init
+    (add-to-list 'auto-mode-alist
+                 '("\\.yaml$" . yaml-mode)
+                 '("\\.yml$" . yaml-mode)))
+#+end_src
 * New
 ** transpose-frame
 #+begin_src emacs-lisp
@@ -347,3 +368,52 @@
 #+begin_src emacs-lisp
   (use-package exwm-edit)
 #+end_src
+** Youtube-dl
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'load-path "~/.emacs.d/submodule/youtube-dl-emacs/")
+  (require 'youtube-dl)
+
+  (defun youtube-dl-song (url)
+    (interactive
+     (list (read-from-minibuffer
+            "URL: " (or (thing-at-point 'url)
+                        (when interprogram-paste-function
+                          (funcall interprogram-paste-function))))))
+    (async-shell-command (format "youtube-dl -x -f \"bestaudio[ext=m4a]\" \"%s\"; tageditor -s album=\"youtube-dl\" -f *.m4a" url)))
+#+END_SRC
+** set-default-directory
+#+begin_src emacs-lisp
+  (defun set-default-directory (dir)
+    (interactive "f")
+    (setq default-directory dir))
+#+end_src
+** World time include Taiwan
+#+begin_src emacs-lisp
+  (setq display-time-world-list
+        '(("America/Chicago" "Houston")
+          ("Asia/Taipei" "Taiwan")))
+#+end_src
+** auto-save files in same directory
+#+begin_src emacs-lisp
+  (setq backup-directory-alist `(("." . "~/.emacs.d/backups/")))
+
+  (setq make-backup-files t               ; backup of a file the first time it is saved.
+        backup-by-copying t               ; don't clobber symlinks
+        version-control t                 ; version numbers for backup files
+        kept-old-versions 6               ; oldest versions to keep when a new numbered backup is made (default: 2)
+        kept-new-versions 9               ; newest versions to keep when a new numbered backup is made (default: 2)
+        auto-save-default t               ; auto-save every buffer that visits a file
+        auto-save-timeout 20              ; number of seconds idle time before auto-save (default: 30)
+        auto-save-interval 200            ; number of keystrokes between auto-saves (default: 300)
+        )
+#+end_src
+** Scroll interval
+#+BEGIN_SRC emacs-lisp
+  (setq scroll-margin 1
+        hscroll-margin 2
+        hscroll-step 1
+        scroll-conservatively 101
+        scroll-preserve-screen-position t
+        mouse-wheel-scroll-amount '(3)
+        mouse-wheel-progressive-speed nil)
+#+END_SRC

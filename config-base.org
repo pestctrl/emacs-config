@@ -134,12 +134,6 @@
   (evil-set-initial-state 'help-mode 'emacs)
   (evil-mode 1)
 #+END_SRC
-** Ace window
-#+BEGIN_SRC emacs-lisp
-  (use-package switch-window)
-  (global-set-key (kbd "C-x o") 'switch-window)
-  (exwm-global-set-key (kbd "s-o") 'other-window)
-#+END_SRC
 ** Ace jump
 #+BEGIN_SRC emacs-lisp
   (use-package ace-jump-mode)
@@ -673,19 +667,6 @@
 
 #+END_SRC
 * New
-** Youtube-dl
-#+BEGIN_SRC emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/submodule/youtube-dl-emacs/")
-  (require 'youtube-dl)
-
-  (defun youtube-dl-song (url)
-    (interactive
-     (list (read-from-minibuffer
-            "URL: " (or (thing-at-point 'url)
-                        (when interprogram-paste-function
-                          (funcall interprogram-paste-function))))))
-    (async-shell-command (format "youtube-dl -x -f \"bestaudio[ext=m4a]\" \"%s\"; tageditor -s album=\"youtube-dl\" -f *.m4a" url)))
-#+END_SRC
 ** Time to game!
 #+BEGIN_SRC emacs-lisp
   (defvar my/games '("desmume" "mednaffe" "dolphin-emu" "m64py" "citra-qt" "steam " "th12"))
@@ -710,16 +691,6 @@
   (add-hook 'css-mode-hook 'skewer-css-mode)
   (add-hook 'html-mode-hook 'skewer-html-mode)
 #+END_SRC
-** Scroll interval
-#+BEGIN_SRC emacs-lisp
-  (setq scroll-margin 1
-        hscroll-margin 2
-        hscroll-step 1
-        scroll-conservatively 101
-        scroll-preserve-screen-position t
-        mouse-wheel-scroll-amount '(3)
-        mouse-wheel-progressive-speed nil)
-#+END_SRC
 ** AUR PKGBUILD
 #+BEGIN_SRC emacs-lisp
   (use-package pkgbuild-mode)
@@ -740,29 +711,6 @@
     (setq org-bullets-bullet-list (quote ("  ")))
     (buffer-face-set '(:family "ETBookOT")))
 #+END_SRC
-** re-builder specify read method
-#+begin_src emacs-lisp
-  (require 're-builder)
-  (setq reb-re-syntax 'string)
-#+end_src
-** set-default-directory
-#+begin_src emacs-lisp
-  (defun set-default-directory (dir)
-    (interactive "f")
-    (setq default-directory dir))
-#+end_src
-** World time include Taiwan
-#+begin_src emacs-lisp
-  ;; (("America/Los_Angeles" "Seattle")
-  ;;  ("America/New_York" "New York")
-  ;;  ("Europe/London" "London")
-  ;;  ("Europe/Paris" "Paris")
-  ;;  ("Asia/Calcutta" "Bangalore")
-  ;;  ("Asia/Tokyo" "Tokyo"))
-  (setq display-time-world-list
-        '(("America/Chicago" "Houston")
-          ("Asia/Taipei" "Taiwan")))
-#+end_src
 ** arch-linux
 #+begin_src emacs-lisp
   (use-package arch-packer)
@@ -781,15 +729,6 @@
 #+begin_src emacs-lisp
   (use-package wtf)
 
-#+end_src
-** auto-save files in same directory
-#+begin_src emacs-lisp
-  (setq backup-directory-alist `(("." . "~/.emacs.d/backups/")))
-  (setq backup-by-copying t)
-#+end_src
-** csv-mode
-#+begin_src emacs-lisp
-  (use-package csv-mode)
 #+end_src
 ** kdeconnect
 #+begin_src emacs-lisp

@@ -28,6 +28,10 @@
 
   ;; Use my fork of chinese-etzy
   (load-file "~/.emacs.d/my-etzy.el")
+
+  ;; If I ever decide to turn on display-lines-mode, use relative line
+  ;; numbering
+  (setq display-line-numbers-type 'relative)
 #+end_src
 * exwm
 #+begin_src emacs-lisp
@@ -483,6 +487,10 @@
 
   (add-hook 'emacs-lisp-mode-hook
             (lambda () (setq comment-start ";; ")))
+
+  ;; re-builder
+  (require 're-builder)
+  (setq reb-re-syntax 'rx)
 #+end_src
 * ibuffer
 #+begin_src emacs-lisp

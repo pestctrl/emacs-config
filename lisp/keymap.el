@@ -27,8 +27,12 @@
 (define-key *root-map* (kbd "C") 'org-resolve-clocks)
 (define-key *root-map* (kbd "j") 'org-clock-goto)
 (define-key *root-map* (kbd "o") 'switch-window)
-(define-key *root-map* (kbd "n") 'toggle-notifications)
 (define-key *root-map* (kbd "RET") 'dired-jump)
 (define-key *root-map* (kbd "C-b") 'previous-buffer)
+
+(defun toggle-notifications ()
+  (interactive)
+  (shell-command "kill -s USR1 $(pidof deadd-notification-center)"))
+(define-key *root-map* (kbd "n") 'toggle-notifications)
 
 (provide 'keymap)

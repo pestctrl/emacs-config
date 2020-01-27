@@ -78,6 +78,8 @@
 
 (define-todo-keyword "INACT" 'legacy :color "dark gray")
 
+(define-todo-keyword "BACKLOG" 'legacy :color "dark gray" :key ?b)
+
 (finish-active-type 'legacy)
 
 (define-todo-keyword "ABANDON" 'legacy :color "dark gray" :recordstr "@/!")

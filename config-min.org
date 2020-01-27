@@ -36,79 +36,82 @@
 * exwm
 #+begin_src emacs-lisp
   ;; This will be the hardest to write :/
-  (use-package exwm)
-  (use-package exwm-x)
+  (when (and (eq 'x window-system)
+             my/enable-exwm
+             (not my/is-wsl))
+    (use-package exwm)
+    (use-package exwm-x)
 
-  ;; System tray
-  (require 'exwm-systemtray)
-  (exwm-systemtray-enable)
+    ;; System tray
+    (require 'exwm-systemtray)
+    (exwm-systemtray-enable)
 
-  ;; Multi monitor support
-  (require 'exwm-randr)
-  (exwm-enable)
-  (exwm-randr-enable)
+    ;; Multi monitor support
+    (require 'exwm-randr)
+    (exwm-enable)
+    (exwm-randr-enable)
 
-  ;; This is a new-frame hack. Don't copy faces for floating windows
-  (require 'face-copier)
+    ;; This is a new-frame hack. Don't copy faces for floating windows
+    (require 'face-copier)
 
-  (def-face-copier1 my/frame-dont-copy-faces (sym)
-    (let ((name (symbol-name sym)))
-      (string-match-p "^doom-.*" name))
-    mode-line
-    mode-line-inactive)
+    (def-face-copier1 my/frame-dont-copy-faces (sym)
+      (let ((name (symbol-name sym)))
+        (string-match-p "^doom-.*" name))
+      mode-line
+      mode-line-inactive)
 
-  (defun my/exwm-floating--advise-make-frame (orig id)
-    (override1-face my/frame-dont-copy-faces
-      (funcall orig id)))
+    (defun my/exwm-floating--advise-make-frame (orig id)
+      (override1-face my/frame-dont-copy-faces
+        (funcall orig id)))
 
-  (advice-add #'exwm-floating--set-floating
-              :around
-              #'my/exwm-floating--advise-make-frame)
+    (advice-add #'exwm-floating--set-floating
+                :around
+                #'my/exwm-floating--advise-make-frame)
 
-  (def-face-copier x-show-tip-faces (sym)
-    nil
-    tooltip)
+    (def-face-copier x-show-tip-faces (sym)
+      nil
+      tooltip)
 
-  (defun dont-copy-faces-for-x-show-tip (orig &rest args)
-    (override1-face x-show-tip-faces
-      (apply orig args)))
+    (defun dont-copy-faces-for-x-show-tip (orig &rest args)
+      (override1-face x-show-tip-faces
+        (apply orig args)))
 
-  (advice-add #'x-show-tip
-              :around
-              #'dont-copy-faces-for-x-show-tip)
+    (advice-add #'x-show-tip
+                :around
+                #'dont-copy-faces-for-x-show-tip)
 
-  ;; Actually launch programs
-  (require 'exwm-launch-program)
-  (define-key *root-map* (kbd "C-p") #'launch-program)
+    ;; Actually launch programs
+    (require 'exwm-launch-program)
+    (define-key *root-map* (kbd "C-p") #'launch-program)
 
-  ;; Volume control
-  (use-package volume
-    :bind (:map *root-map*
-                ("v" . #'volume)))
+    ;; Volume control
+    (use-package volume
+      :bind (:map *root-map*
+                  ("v" . #'volume)))
 
-  ;; Shut down
-  (add-hook 'exwm-exit-hook 'org-save-all-org-buffers)
+    ;; Shut down
+    (add-hook 'exwm-exit-hook 'org-save-all-org-buffers)
 
-  ;; Startup programs
-  (add-hook 'exwm-init-hook 'server-start)
+    ;; Startup programs
+    (add-hook 'exwm-init-hook 'server-start)
 
-  ;; Reminder: Hooks execute in order. Make sure megasync launches after systemtray is enabled
-  (require 'exwm-startup)
-  (add-hook 'exwm-init-hook 'call-startup-programs)
+    ;; Reminder: Hooks execute in order. Make sure megasync launches after systemtray is enabled
+    (require 'exwm-startup)
+    (add-hook 'exwm-init-hook 'call-startup-programs)
 
-  (require 'exwm-screens)
-  (add-hook 'exwm-init-hook 'my/setup-screens)
+    (require 'exwm-screens)
+    (add-hook 'exwm-init-hook 'my/setup-screens)
 
-  (require 'exwm-systemtray)
-  (exwm-systemtray-enable)
+    (require 'exwm-systemtray)
+    (exwm-systemtray-enable)
 
-  ;; This lets me do rapid emacs iteration
-  (defun ignore-emacs ()
-    (when (and exwm-class-name (string= exwm-class-name "Emacs"))
-      (call-interactively #'exwm-input-release-keyboard)))
+    ;; This lets me do rapid emacs iteration
+    (defun ignore-emacs ()
+      (when (and exwm-class-name (string= exwm-class-name "Emacs"))
+        (call-interactively #'exwm-input-release-keyboard)))
 
-  (add-hook 'exwm-manage-finish-hook
-            #'ignore-emacs)
+    (add-hook 'exwm-manage-finish-hook
+              #'ignore-emacs))
 #+end_src
 * keybindings
 #+begin_src emacs-lisp

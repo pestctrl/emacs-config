@@ -26,6 +26,8 @@
 
 (setq use-package-always-ensure t)
 
+(defvar my/is-wsl nil)
+
 (defvar my/enable-exwm t)
 
 ;; Add my modules
@@ -40,7 +42,8 @@
 (require 'libs)
 
 (when (and (eq 'x window-system)
-           my/enable-exwm)
+           my/enable-exwm
+           (not my/is-wsl))
   (use-package exwm)
   (setq exwm-input-global-keys nil))
 
@@ -54,9 +57,12 @@
                    user-emacs-directory))
 
 ;; Load additional exwm stuff that changes constantly
-(org-babel-load-file
- (expand-file-name "config-exwm.org"
-                   user-emacs-directory))
+(when (and (eq 'x window-system)
+           my/enable-exwm
+           (not my/is-wsl))
+  (org-babel-load-file
+   (expand-file-name "config-exwm.org"
+                     user-emacs-directory)))
 
 (org-babel-load-file
  (expand-file-name "config-ext.org"

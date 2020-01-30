@@ -125,31 +125,6 @@
 #+BEGIN_SRC emacs-lisp
   (use-package yaml-mode)
 #+END_SRC
-* Rainbow delimiters
-#+begin_src emacs-lisp
-  (use-package rainbow-delimiters)
-  (rainbow-delimiters-mode)
-  (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
-  (add-hook 'org-mode-hook #'rainbow-delimiters-mode)
-
-  (let ((rainbow-purple  "#9E1CB2")
-        (rainbow-blue  "#1194f6")
-        (rainbow-green  "#47B04B")
-        (rainbow-yellow  "#FFED18")
-        (rainbow-orange  "#E7B500")
-        (rainbow-red  "#C90067")
-        (rainbow-7  "#00AA5D")
-        (rainbow-8  "#FE7380"))
-    (set-face-attribute 'rainbow-delimiters-depth-1-face  t :foreground rainbow-purple)
-    (set-face-attribute 'rainbow-delimiters-depth-2-face  t :foreground rainbow-green)
-    (set-face-attribute 'rainbow-delimiters-depth-3-face  t :foreground rainbow-blue)
-    (set-face-attribute 'rainbow-delimiters-depth-4-face  t :foreground rainbow-red)
-    (set-face-attribute 'rainbow-delimiters-depth-5-face  t :foreground rainbow-yellow)
-    (set-face-attribute 'rainbow-delimiters-depth-6-face  t :foreground rainbow-blue)
-    (set-face-attribute 'rainbow-delimiters-depth-7-face  t :foreground rainbow-red)
-    (set-face-attribute 'rainbow-delimiters-depth-8-face  t :foreground rainbow-8)
-    (set-face-attribute 'rainbow-delimiters-depth-9-face  t :foreground rainbow-purple))
-#+end_src
 * C#
 #+BEGIN_SRC emacs-lisp
   (use-package csharp-mode)

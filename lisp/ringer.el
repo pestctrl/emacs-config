@@ -26,11 +26,13 @@
 
 (defvar current-system-clock nil)
 
+(defvar system-clock-time 60)
+
 (define-minor-mode system-clock-mode
   nil nil nil nil
   :global t
   (cond (system-clock-mode
-         (setq current-system-clock (run-at-time nil 5 (lambda () (interactive) (let ((visible-bell t)) (ding))))))
+         (setq current-system-clock (run-at-time nil system-clock-time (lambda () (interactive) (let ((visible-bell t)) (ding))))))
         (t
          (cancel-timer current-system-clock))))
 

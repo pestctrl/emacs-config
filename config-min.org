@@ -351,15 +351,15 @@
         (rainbow-red     "#C90067")
         (rainbow-7       "#00AA5D")
         (rainbow-8       "#FE7380"))
-    (set-face-attribute 'rainbow-delimiters-depth-1-face  t :foreground rainbow-purple)
-    (set-face-attribute 'rainbow-delimiters-depth-2-face  t :foreground rainbow-green)
-    (set-face-attribute 'rainbow-delimiters-depth-3-face  t :foreground rainbow-blue)
-    (set-face-attribute 'rainbow-delimiters-depth-4-face  t :foreground rainbow-red)
-    (set-face-attribute 'rainbow-delimiters-depth-5-face  t :foreground rainbow-yellow)
-    (set-face-attribute 'rainbow-delimiters-depth-6-face  t :foreground rainbow-blue)
-    (set-face-attribute 'rainbow-delimiters-depth-7-face  t :foreground rainbow-red)
-    (set-face-attribute 'rainbow-delimiters-depth-8-face  t :foreground rainbow-8)
-    (set-face-attribute 'rainbow-delimiters-depth-9-face  t :foreground rainbow-purple))
+    (set-face-attribute 'rainbow-delimiters-depth-1-face nil :foreground rainbow-purple)
+    (set-face-attribute 'rainbow-delimiters-depth-2-face nil :foreground rainbow-green)
+    (set-face-attribute 'rainbow-delimiters-depth-3-face nil :foreground rainbow-blue)
+    (set-face-attribute 'rainbow-delimiters-depth-4-face nil :foreground rainbow-red)
+    (set-face-attribute 'rainbow-delimiters-depth-5-face nil :foreground rainbow-yellow)
+    (set-face-attribute 'rainbow-delimiters-depth-6-face nil :foreground rainbow-blue)
+    (set-face-attribute 'rainbow-delimiters-depth-7-face nil :foreground rainbow-red)
+    (set-face-attribute 'rainbow-delimiters-depth-8-face nil :foreground rainbow-8)
+    (set-face-attribute 'rainbow-delimiters-depth-9-face nil :foreground rainbow-purple))
 
   ;; Macroexpander
   (use-package macrostep)
@@ -628,8 +628,8 @@
     (setq ansi-color-names-vector
           ["black" "red3" "green3" "yellow3" "DodgerBlue2" "magenta3" "cyan3" "gray90"])
 
-    (set-face-attribute 'term-bold       t :weight 'bold)
-    (set-face-attribute 'vterm-color-blue t :foreground "DodgerBlue2")
+    (set-face-attribute 'term-bold        nil :weight 'bold)
+    (set-face-attribute 'vterm-color-blue nil :foreground "DodgerBlue2")
 
     (defun find-vterm ()
       (interactive)

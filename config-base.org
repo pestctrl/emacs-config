@@ -100,14 +100,14 @@
 #+BEGIN_SRC emacs-lisp
   (use-package helm)
   (require 'helm-config)
-  ;(helm-mode 1)
-  ;(setq ivy-initial-inputs-alist nil)
+  ;; (helm-mode 1)
+  ;; (setq ivy-initial-inputs-alist nil)
   (use-package smex)
   (use-package counsel)
 
-  ;(advice-add 'ivy-completion-in-region :before (lambda (start end collection &optional predicate) (insert " ")))
+  ;; (advice-add 'ivy-completion-in-region :before (lambda (start end collection &optional predicate) (insert " ")))
 
-  ;;   (global-set-key (kbd "C-x b") 'counsel-switch-buffer)
+  ;; (global-set-key (kbd "C-x b") 'counsel-switch-buffer)
 #+END_SRC
 *** f3 helm
 #+begin_src emacs-lisp

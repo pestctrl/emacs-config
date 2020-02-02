@@ -35,4 +35,7 @@
   (shell-command "kill -s USR1 $(pidof deadd-notification-center)"))
 (define-key *root-map* (kbd "n") 'toggle-notifications)
 
+(when (<= emacs-major-version 27)
+  (require 'switch-tabs))
+
 (provide 'keymap)

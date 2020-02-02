@@ -58,3 +58,6 @@
 [submodule "submodule/emacs-piper"]
 	path = submodule/emacs-piper
 	url = https://gitlab.com/howardabrams/emacs-piper
+[submodule "submodule/helm-twitch"]
+	path = submodule/helm-twitch
+	url = https://github.com/atheriel/helm-twitch

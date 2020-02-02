@@ -620,9 +620,10 @@
 ** terminal
 #+begin_src emacs-lisp
   (use-package vterm
-    :commands vterm find-vterm
+    :commands vterm find-vterm vterm-kill
     :bind (:map vterm-mode-map
                 ("C-t" . nil)
+                ("C-d" . #'vterm-kill)
                 :map *root-map*
                 ("c" . #'find-vterm))
     :config
@@ -636,7 +637,17 @@
       (interactive)
       (if-let (b (get-buffer "vterm"))
           (switch-to-buffer b)
-        (vterm))))
+        (vterm)))
+
+    (defun vterm-kill ()
+      (interactive)
+      (vterm-send-C-d)
+      (sit-for 0.1)
+      (let ((process (get-buffer-process (current-buffer))))
+        (when (not (and process
+                        (memq (process-status process) '(run stop open listen))
+                        (process-query-on-exit-flag process)))
+          (kill-buffer (current-buffer))))))
 #+end_src
 ** posting source code
 #+begin_src emacs-lisp

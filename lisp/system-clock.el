@@ -1,4 +1,4 @@
-;;; ringer.el --- This is my system interrupt -*- lexical-binding: t -*-
+;;; system-clock.el --- This is my system interrupt -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2020 Benson Chu
 
@@ -26,7 +26,7 @@
 
 (defvar current-system-clock nil)
 
-(defvar system-clock-time 60)
+(defvar system-clock-time 5)
 
 (define-minor-mode system-clock-mode
   nil nil nil nil
@@ -36,5 +36,14 @@
         (t
          (cancel-timer current-system-clock))))
 
-(provide 'ringer)
-;;; ringer.el ends here
+(defun activate-system-clock (seconds)
+  (interactive "p")
+  (when system-clock-mode
+    (system-clock-mode nil))
+  (setq system-clock-time seconds)
+  (system-clock-mode))
+
+(define-key *root-map* (kbd "S") #'activate-system-clock)
+
+(provide 'system-clock)
+;;; system-clock.el ends here

@@ -31,7 +31,8 @@
  
  '(default ((t (:background "gray8" :foreground "#70FF00"))))
  '(mode-line-inactive ((t :foreground "gray60" :background "#404045" :inverse-video nil)))
- '(mode-line     ((t :foreground "gray60" :background "black" :inverse-video nil))))
+ '(mode-line     ((t :foreground "gray60" :background "black" :inverse-video nil)))
+ '(eldoc-highlight-function-argument ((t :foreground "dodger blue"))))
 
 ;;###autoload
 (when load-file-name

@@ -477,8 +477,9 @@
                    (point)))))
 
   ;; expand-region
-  (use-package expand-region)
-  (global-set-key (kbd "C-'") 'er/expand-region)
+  (use-package expand-region
+    :commands er/expand-region
+    :bind (("M-E" . #'er/expand-region)))
 
   ;; Banner comments
   (use-package banner-comment

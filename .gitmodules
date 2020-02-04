@@ -61,3 +61,6 @@
 [submodule "submodule/helm-twitch"]
 	path = submodule/helm-twitch
 	url = https://github.com/atheriel/helm-twitch
+[submodule "submodule/emacs-application-framework"]
+	path = submodule/emacs-application-framework
+	url = https://github.com/manateelazycat/emacs-application-framework

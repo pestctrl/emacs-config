@@ -48,7 +48,8 @@
     (when (y-or-n-p (format "Close tab \"%s\"? "
                             old-name))
       (tab-bar-close-tab)
-      (switch-or-create-tab))))
+      (when (<= 2 (length (funcall tab-bar-tabs-function)))
+        (switch-or-create-tab)))))
 
 (defun tab-bar-report ()
   (interactive)

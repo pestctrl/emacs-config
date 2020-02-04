@@ -306,7 +306,7 @@
   (elpy-enable)
   (use-package ein)
   (add-to-list 'exec-path
-               "/home/benson/anaconda3/bin/")
+               "/home/benson/anaconda3/bin/" t)
 #+end_src
 ** web stuff
 #+begin_src emacs-lisp

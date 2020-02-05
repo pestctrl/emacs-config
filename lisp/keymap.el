@@ -9,13 +9,13 @@
 (exwm-global-set-key (kbd "s-k") (lambda () (interactive) (kill-buffer (current-buffer))))
 
 (cond (my/is-wsl
-       (defconst my/keymap-key (kbd "C-t"))
-       (when (boundp 'exwm-input-prefix-keys)
-	 (add-to-list 'exwm-input-prefix-keys ?\C-t)))
-      (t
        (defconst my/keymap-key (kbd "C-m"))
        (when (boundp 'exwm-input-prefix-keys)
-	 (add-to-list 'exwm-input-prefix-keys ?\C-m))))
+	     (add-to-list 'exwm-input-prefix-keys ?\C-m)))
+      (t
+       (defconst my/keymap-key (kbd "C-t"))
+       (when (boundp 'exwm-input-prefix-keys)
+	     (add-to-list 'exwm-input-prefix-keys ?\C-t))))
 
 ;; Disable C-t for all others
 (with-eval-after-load "vterm"

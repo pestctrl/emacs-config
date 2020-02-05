@@ -8,11 +8,16 @@
 (exwm-global-set-key (kbd "M-T") 'flop-frame)
 (exwm-global-set-key (kbd "s-k") (lambda () (interactive) (kill-buffer (current-buffer))))
 
-(defconst my/keymap-key (kbd "C-t"))
+(cond (my/is-wsl
+       (defconst my/keymap-key (kbd "C-t"))
+       (add-to-list 'exwm-input-prefix-keys ?\C-t))
+      (t
+       (defconst my/keymap-key (kbd "C-m"))
+       (add-to-list 'exwm-input-prefix-keys ?\C-m)))
 
 ;; Disable C-t for all others
 (with-eval-after-load "vterm"
-  (define-key vterm-mode-map (kbd "C-t") nil))
+  (define-key vterm-mode-map my/keymap-key nil))
 (with-eval-after-load "ibuf-ext"
   (define-key ibuffer-mode-map my/keymap-key nil))
 (with-eval-after-load "dired"

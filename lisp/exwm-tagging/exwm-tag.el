@@ -51,8 +51,6 @@
 
 ;; Add these hooks in a suitable place (e.g., as done in exwm-config-default)
 
-(add-to-list 'exwm-input-prefix-keys ?\C-t)
-
 (defun simulate-C-t (arg)
   (interactive "P")
   (if (eq major-mode 'exwm-mode)

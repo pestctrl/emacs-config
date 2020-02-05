@@ -10,10 +10,12 @@
 
 (cond (my/is-wsl
        (defconst my/keymap-key (kbd "C-t"))
-       (add-to-list 'exwm-input-prefix-keys ?\C-t))
+       (when (boundp 'exwm-input-prefix-keys)
+	 (add-to-list 'exwm-input-prefix-keys ?\C-t)))
       (t
        (defconst my/keymap-key (kbd "C-m"))
-       (add-to-list 'exwm-input-prefix-keys ?\C-m)))
+       (when (boundp 'exwm-input-prefix-keys)
+	 (add-to-list 'exwm-input-prefix-keys ?\C-m))))
 
 ;; Disable C-t for all others
 (with-eval-after-load "vterm"
@@ -24,7 +26,7 @@
   (define-key dired-mode-map my/keymap-key nil))
 
 (define-prefix-command '*root-map*)
-(exwm-global-set-key (kbd "C-t") '*root-map*)
+(exwm-global-set-key my/keymap-key '*root-map*)
 
 (define-key *root-map* (kbd "C-n") 'switch-window)
 (define-key *root-map* (kbd "i") 'org-mru-clock-in)

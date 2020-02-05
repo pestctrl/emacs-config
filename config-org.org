@@ -81,7 +81,7 @@
   (setq org-re-reveal-root "file:///home/benson/.reveal.js")
 #+end_src
 *** Old ox-reveal package
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp#
   (add-to-list 'load-path
                "~/.emacs.d/submodule/org-reveal")
   (require 'ox-reveal)

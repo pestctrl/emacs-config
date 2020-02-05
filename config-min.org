@@ -253,7 +253,7 @@
 
   ;; diredx lets me hide stuff I don't want to see
   (require 'dired-x)
-  (setq-default dired-omit-files-p t)
+  (add-hook 'dired-mode-hook (lambda () (dired-omit-mode)))
   (setq dired-omit-files (concat dired-omit-files "\\|^\\..+$"))
 
   ;; Useful for traversing folders

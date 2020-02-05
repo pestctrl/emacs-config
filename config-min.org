@@ -58,7 +58,8 @@
       (let ((name (symbol-name sym)))
         (string-match-p "^doom-.*" name))
       mode-line
-      mode-line-inactive)
+      mode-line-inactive
+      variable-pitch)
 
     (defun my/exwm-floating--advise-make-frame (orig id)
       (override1-face my/frame-dont-copy-faces

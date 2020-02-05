@@ -34,6 +34,7 @@
     "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
     "/usr/lib/notification-daemon-1.0/notification-daemon"
     "nm-applet"
+    "pactl upload-sample /usr/share/sounds/gnome/default/alerts/drip.ogg beep; pactl load-module module-x11-bell sample=beep; xset b 100"
     ))
 
 (defun call-startup-programs ()

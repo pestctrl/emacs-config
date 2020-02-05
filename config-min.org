@@ -647,7 +647,8 @@
       (vterm-wait-to-kill (current-buffer) 10))
   
     (defun vterm-wait-to-kill (buffer n)
-      (when (< 0 n)
+      (when (and (< 0 n)
+                 (buffer-live-p buffer))
         (sit-for 0.1)
         (let ((process (get-buffer-process (current-buffer))))
           (if (not (and process

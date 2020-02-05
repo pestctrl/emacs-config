@@ -67,7 +67,8 @@
                exwm--floating-frame)
       (exwm-floating-hide))
     (if buffer
-        (exwm-workspace-switch-to-buffer buffer)
+        (let ((exwm-layout-show-all-buffers nil))
+          (exwm-workspace-switch-to-buffer buffer))
       (when cmd
         (launch-program-with-name cmd (plist-get ruler :instance))))))
 

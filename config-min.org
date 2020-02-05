@@ -643,12 +643,17 @@
     (defun vterm-kill ()
       (interactive)
       (vterm-send-C-d)
-      (sit-for 0.1)
-      (let ((process (get-buffer-process (current-buffer))))
-        (when (not (and process
+      (vterm-wait-to-kill (current-buffer) 10))
+  
+    (defun vterm-wait-to-kill (buffer n)
+      (when (< 0 n)
+        (sit-for 0.1)
+        (let ((process (get-buffer-process (current-buffer))))
+          (if (not (and process
                         (memq (process-status process) '(run stop open listen))
                         (process-query-on-exit-flag process)))
-          (kill-buffer (current-buffer))))))
+              (kill-buffer buffer)
+            (run-at-time 0.1 nil #'vterm-wait-to-kill buffer (1- n)))))))
 #+end_src
 ** posting source code
 #+begin_src emacs-lisp

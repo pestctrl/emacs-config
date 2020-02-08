@@ -59,7 +59,8 @@
         (string-match-p "^doom-.*" name))
       mode-line
       mode-line-inactive
-      variable-pitch)
+      variable-pitch
+      diredp-file-suffix)
 
     (defun my/exwm-floating--advise-make-frame (orig id)
       (override1-face my/frame-dont-copy-faces

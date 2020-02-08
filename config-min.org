@@ -458,7 +458,6 @@
     (cider--make-result-overlay (format "%S" value)
       :where point
       :duration 'command)
-    ;; Preserve the return value.
     value)
 
   (advice-add 'eval-region :around

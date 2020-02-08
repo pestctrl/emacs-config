@@ -260,8 +260,8 @@
   ;; Useful for traversing folders
   (use-package dired-subtree)
 
-  (define-key dired-mode-map (kbd "i") 'dired-subtree-insert)
-  (define-key dired-mode-map (kbd "I") 'dired-subtree-remove)
+  (define-key dired-mode-map (kbd "<tab>") 'dired-subtree-insert)
+  (define-key dired-mode-map (kbd "<backtab>") 'dired-subtree-remove)
 #+end_src
 * w3m
 #+begin_src emacs-lisp

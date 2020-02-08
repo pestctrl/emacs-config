@@ -949,16 +949,6 @@
 
   (setq browse-url-browser-function #'browse-url-firefox)
 #+end_src
-** Profiler Keymap
-#+begin_src emacs-lisp
-  (define-prefix-command '*profiler-map*)
-
-  (define-key *profiler-map* (kbd "s") #'profiler-start)
-  (define-key *profiler-map* (kbd "r") #'profiler-report)
-  (define-key *profiler-map* (kbd "S") #'profiler-stop)
-
-  (define-key *root-map* (kbd "p") '*profiler-map*)
-#+end_src
 ** Google Translate
 #+begin_src emacs-lisp
   (use-package google-translate)

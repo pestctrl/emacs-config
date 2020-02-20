@@ -202,6 +202,21 @@
   ;; I like my unicode to be monospace too, so I use these
   (set-fontset-font t 'unicode (font-spec :size 10 :name "FontAwesome"))
   (set-fontset-font t 'unicode (font-spec :size 15 :name "DejaVu Sans Mono"))
+
+  (defun my/reading-color ()
+    (interactive)
+    (face-remap-add-relative 'default :foreground "WhiteSmoke"))
+
+  (add-hook 'Man-mode-hook
+            #'my/reading-color)
+
+  (add-hook 'w3m-mode-hook
+            #'my/reading-color)
+
+  ;; (custom-set-faces
+  ;;  '(default ((t (:family "ETBookOT" :foundry "QUQA" 
+  ;;                :slant normal :weight normal :height 120 
+  ;;                :width normal :spacing 90)))))
 #+end_src
 * buffer navigation
 #+begin_src emacs-lisp

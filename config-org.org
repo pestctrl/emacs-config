@@ -1487,3 +1487,56 @@
               :around
               #'dont-copy-faces-for-x-show-tip)
 #+end_src
+* org-wiki
+#+begin_src emacs-lisp
+  (require 'org-wiki)
+  (setq org-wiki-location-list
+        '("~/MEGA/org/wiki"))
+
+  (setq org-wiki-template
+        "#+TITLE: %n\n#+DESCRIPTION:\n#+KEYWORDS:\n#+STARTUP:  content\n\n\n- Related: \n\n* Backlinks\n#+STARTUP: folded\n\n* %n\n")
+
+  (defun org-wiki-insert-backlink (back-from back-to)
+    (let ((wiki-link (format "[[wiki:%s][%s]]"
+                             back-to back-to))
+          (file (save-window-excursion (org-wiki--open-page back-from)
+                                       (current-buffer))))
+      (with-current-buffer file
+        (beginning-of-buffer)
+        (when (not (save-excursion
+                     (search-forward wiki-link nil t)))
+          (search-forward "* Backlinks")
+          (forward-line 2)
+          (beginning-of-line)
+          (insert "- " wiki-link "\n")
+          (save-buffer)))))
+
+
+  (defun my/org-wiki-insert-new ()
+    (interactive)
+    (let ((page-name (read-string  "Page: ")))
+      (save-excursion (insert (org-make-link-string (concat "wiki:" page-name)
+                                                    page-name
+                                                    )))
+      (org-wiki-insert-backlink
+       page-name
+       (org-wiki--current-page))))
+
+  (advice-add #'org-wiki-insert-new
+              :override
+              #'my/org-wiki-insert-new)
+
+  (defun my/org-wiki-insert-link ()
+    "Insert a Wiki link at point for a existing page."
+    (interactive)
+    (org-wiki--helm-selection
+     (lambda (page)
+       (insert (org-wiki--make-link page))
+       (org-wiki-insert-backlink
+        page
+        (org-wiki--current-page)))))
+
+  (advice-add #'org-wiki-insert-link
+              :override
+              #'my/org-wiki-insert-link)
+#+end_src

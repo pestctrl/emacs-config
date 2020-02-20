@@ -193,9 +193,11 @@
   (display-hard-drive-space-mode)
 
   ;; Roboto mono is nice
-  (when (member "Roboto Mono" (font-family-list))
-    (add-to-list 'initial-frame-alist '(font . "RobotoMono-10"))
-    (add-to-list 'default-frame-alist '(font . "RobotoMono-10")))
+  (when (member "Roboto Mono" (font-family-list)))
+
+  (set-face-attribute 'default nil :font "RobotoMono-10")
+  (set-face-attribute 'fixed-pitch nil :font "RobotoMono-10")
+  ;;(set-face-attribute 'variable-pitch nil :font '(:family "ETBookOT"))
 
   ;; I like my unicode to be monospace too, so I use these
   (set-fontset-font t 'unicode (font-spec :size 10 :name "FontAwesome"))

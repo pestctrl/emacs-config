@@ -161,7 +161,7 @@
   (tool-bar-mode -1)
   (menu-bar-mode -1)
   (scroll-bar-mode -1)
-  (fringe-mode '(10 . 0))
+  (fringe-mode '(10 . 10))
 
   ;; I like the general feel of calm forest, but...
   (use-package color-theme-modern)

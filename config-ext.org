@@ -467,3 +467,9 @@
 
   (define-key *root-map* (kbd "p") '*profiler-map*)
 #+end_src
+** Open dev workspace
+#+begin_src emacs-lisp
+  (defun open-dev-workspace ()
+    (interactive)
+    (dired "~/big_files/workspace"))
+#+end_src

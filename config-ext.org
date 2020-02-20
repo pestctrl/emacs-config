@@ -487,3 +487,7 @@
               :around
               #'helpful--navigate-view-mode)
 #+end_src
+** man select window
+#+begin_src emacs-lisp
+  (setq Man-notify-method 'aggressive)
+#+end_src

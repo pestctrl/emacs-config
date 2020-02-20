@@ -365,7 +365,7 @@
 #+end_src
 ** exwm-edit
 #+begin_src emacs-lisp
-  (use-package exwm-edit)
+  ;; (use-package exwm-edit)
 #+end_src
 ** Youtube-dl
 #+BEGIN_SRC emacs-lisp

@@ -1487,6 +1487,27 @@
               :around
               #'dont-copy-faces-for-x-show-tip)
 #+end_src
+* turn into tickle
+#+begin_src emacs-lisp
+  (defun my/tickle-todo ()
+    (interactive)
+    (org-agenda-todo "TICKLER")
+    (org-agenda-schedule))
+
+  (define-key org-agenda-mode-map (kbd "T") #'my/tickle-todo)
+#+end_src
+* org-src dont ask
+#+begin_src emacs-lisp
+  (setq org-src-ask-before-returning-to-edit-buffer
+        nil)
+#+end_src
+* olivetti
+#+begin_src emacs-lisp
+  (use-package olivetti
+    :commands olivetti-mode
+    :config
+    (setq-default olivetti-body-width 120))
+#+end_src
 * org-wiki
 #+begin_src emacs-lisp
   (require 'org-wiki)

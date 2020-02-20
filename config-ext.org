@@ -473,3 +473,17 @@
     (interactive)
     (dired "~/big_files/workspace"))
 #+end_src
+** Helpful view-mode
+#+begin_src emacs-lisp
+  (defun helpful--navigate-view-mode (orig button)
+    (let ((w (window-parameter (selected-window) 'quit-restore)))
+      (funcall orig button)
+      (view-mode)
+      (setq-local view-exit-action
+                  `(lambda (&rest args)
+                     (set-window-parameter (selected-window) 'quit-restore ',w)))))
+
+  (advice-add #'helpful--navigate
+              :around
+              #'helpful--navigate-view-mode)
+#+end_src

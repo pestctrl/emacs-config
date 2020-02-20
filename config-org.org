@@ -551,6 +551,22 @@
                                                 (:name "Today" :time-grid t
                                                        :and (:not (:and (:not (:scheduled today)
                                                                               :not (:deadline today)))))))))))
+          ("M" "Minimal"
+           ((agenda ""
+                    ((org-agenda-span 'day)
+                     (org-agenda-tag-filter-preset (quote ("+dev")))
+                     (org-agenda-skip-deadline-if-done t)
+                     (org-agenda-skip-scheduled-if-done t)
+                     (org-agenda-skip-function (lambda ()
+                                                 (when (string= "TICKLER" (org-get-todo-state))
+                                                   (outline-next-heading))))
+                     (org-super-agenda-groups '((:name "The Plan" :tag "PLAN")
+                                                (:name "Overdue" :and (:deadline past :log nil))
+                                                (:name "Upcoming" :deadline future)
+                                                (:name "Should do" :and (:scheduled past :log nil))
+                                                (:name "Today" :time-grid t
+                                                       :and (:not (:and (:not (:scheduled today)
+                                                                              :not (:deadline today)))))))))))
           ("D" "dev-without-active"
            ((org-ql-block '(and (tags "dev")
                                 (tags "refile"))
@@ -642,7 +658,7 @@
                         (org-agenda-sorting-strategy
                          '(category-keep))))
             (tags-todo "-REFILE-HOLD+TODO+sandbox/WAIT"
-                       (;(org-agenda-skip-function 'my/only-next-projects-and-tasks)
+                       (;;(org-agenda-skip-function 'my/only-next-projects-and-tasks)
                         (org-agenda-overriding-header "Tasks in other courts")
                         (org-tags-match-list-sublevels t)))
             ;;(org-ql-agenda-function "")

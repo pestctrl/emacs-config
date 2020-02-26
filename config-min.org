@@ -583,6 +583,19 @@
            ("Help"            (or (name . "\*Help\*")
                                   (name . "\*Apropos\*")
                                   (name . "\*info\*"))))))
+
+  (defun ibuffer-find-file-with-ido ()
+    "Like `find-file', but default to the directory of the buffer at point."
+    (interactive)
+    (let ((completing-read-function #'ido-completing-read)
+          (default-directory (let ((buf (ibuffer-current-buffer)))
+                               (if (buffer-live-p buf)
+                                   (with-current-buffer buf
+                                     default-directory)
+                                 default-directory))))
+      (call-interactively #'ido-find-file)))
+
+  (define-key ibuffer-mode-map (kbd "C-x C-f") #'ibuffer-find-file-with-ido)
 #+end_src
 * useful tools
 ** org-mode

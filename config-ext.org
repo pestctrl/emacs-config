@@ -261,6 +261,73 @@
                 ("C-c d m" . #'dap-java-debug-test-class)
                 ("C-c r t" . #'mvn-test)))
 #+end_src
+** c++
+#+begin_src emacs-lisp
+  (use-package ccls
+    :hook
+    ((c-mode c++-mode objc-mode) .
+     (lambda () (let ((project-root (projectile-project-p)))
+                  (when (and project-root
+                             (file-readable-p (concat project-root "/compile_commands.json")))
+                    (require 'ccls) (lsp)))))
+    :config
+    (setq ccls-sem-highlight-method 'font-lock-mode)
+    (when (not (memq window-system '(mac ns)))
+      (setq ccls-executable "/db/sds/packages2/ccls/ccls")))
+#+end_src
+** Projectile
+#+begin_src emacs-lisp
+  (use-package projectile
+    :defer 5
+    :bind-keymap ("C-c p" . projectile-command-map)
+    :init   (progn
+              (setq projectile-enable-caching nil)
+              (setq projectile-git-submodule-command nil)
+              (setq projectile-completion-system 'ivy)
+
+              ;; (setq counsel-projectile-switch-project-action 'projectile-vc)
+              (setq projectile-switch-project-action 'projectile-dired)
+              (setq projectile-require-project-root t))
+    :config
+    (projectile-mode)
+
+    ;; Provide my own projectile-compile-project which uses
+    ;; cca/projectile-compilation-dir instead of projectile-compilation-dir.
+    (defvar cca/projectile-compilation-hash (make-hash-table :test 'equal)
+      "Has of project roots to compilation directories")
+
+    (defun cca/projectile-get-compilation-dir (key_dir)
+      "Get the compilation directory associated with the specified root directory"
+      (gethash key_dir cca/projectile-compilation-hash))
+
+    (defun cca/projectile-set-compilation-dir (key_dir value)
+      "Set the compilation directory for the specified root directory"
+      (puthash key_dir value cca/projectile-compilation-hash))
+
+    (defun cca/projectile-compilation-dir()
+      "Prompts the user for a directory relative to the project root
+  and returns the absolute path. It also stores the relative path
+  from the current project root into projectile-compilation-dir."
+      (let* ((root (projectile-project-root))
+             (base-compilation-dir (or (cca/projectile-get-compilation-dir root) root))
+             (full-compilation-dir (expand-file-name
+                                    (read-directory-name "Build directory: " base-compilation-dir))))
+        (setq projectile-project-compilation-dir (file-relative-name full-compilation-dir root))
+        (cca/projectile-set-compilation-dir root full-compilation-dir)))
+
+    (defun projectile-compile-project (arg)
+      "Run project compilation command.
+
+  Normally you'll be prompted for a compilation command, unless
+  variable `compilation-read-command'.  You can force the prompt
+  with a prefix ARG."
+      (interactive "P")
+      (let ((command (projectile-compilation-command (cca/projectile-compilation-dir))))
+        (projectile--run-project-cmd command projectile-compilation-cmd-map
+                                     :show-prompt arg
+                                     :prompt-prefix "Compile command: "
+                                     :save-buffers t))))
+#+end_src
 ** Slime mode
 #+BEGIN_SRC emacs-lisp
   (use-package slime

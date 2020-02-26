@@ -234,6 +234,8 @@
   (use-package ivy)
   (use-package counsel)
   (ivy-mode t)
+  ;; This lets counsel-M-x keep history 
+  (use-package smex)
 
   ;; These commands don't need a carrot(^) at the beginning, usually I
   ;; don't need a starting string when doing these
@@ -706,9 +708,22 @@
           (with-current-buffer b
             (rename-buffer (concat (alist-get 'name (tab-bar--current-tab))
                                    "-term"))))))
+
     (advice-add #'tab-bar-rename-tab
                 :around
-                #'rename-vterm-with-tab))
+                #'rename-vterm-with-tab)
+
+    (defun close-vterm-with-tab (orig)
+      (let ((current-tab-name (alist-get 'name (tab-bar--current-tab))))
+        (when (funcall orig)
+          (when-let (b (get-buffer (concat current-tab-name "-term")))
+            (with-current-buffer b
+              (vterm-kill))))))
+  
+    ;; (advice-add #'close-tab-switch
+    ;;             :around
+    ;;             #'close-vterm-with-tab)
+    )
 #+end_src
 ** posting source code
 #+begin_src emacs-lisp

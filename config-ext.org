@@ -500,3 +500,7 @@
 
   (global-set-key (kbd "C-c C-v") #'view-file)
 #+end_src
+** rmsbolt
+#+begin_src emacs-lisp
+(use-package rmsbolt)
+#+end_src

@@ -79,6 +79,7 @@
                           `(and (tags ,tag)
                                 (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
                                 (my/top-level)
+                                (not (property "DELAYED"))
                                 (or (eq 'stuck (opr/type-of-task))
                                     (eq 'stuck (opr/type-of-project))))
                           :action 'element-with-markers

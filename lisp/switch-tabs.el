@@ -24,6 +24,8 @@
 
 ;;; Code:
 
+(defvar show-tab-bar-new-tab nil)
+
 (defun switch-or-create-tab ()
   (interactive)
   (let* ((current-tab (alist-get 'name (tab-bar--current-tab)))
@@ -39,7 +41,8 @@
     (if tab-index
         (tab-bar-select-tab (1+ tab-index))
       (tab-bar-new-tab)
-      (tab-bar-mode -1)
+      (when (not show-tab-bar-new-tab)
+        (tab-bar-mode -1))
       (tab-bar-rename-tab tab-name))))
 
 (defun close-tab-switch ()
@@ -60,10 +63,19 @@
                            (funcall tab-bar-tabs-function)
                            ", "))))
 
+(define-prefix-command '*tab-map*)
+
 (define-key *root-map* (kbd "b") #'switch-or-create-tab)
 (define-key *root-map* (kbd "R") #'tab-bar-rename-tab)
 (define-key *root-map* (kbd "q") #'close-tab-switch)
 (define-key *root-map* (kbd "T") #'tab-bar-report)
+(define-key *root-map* (kbd "t") '*tab-map*)
+
+(define-key *tab-map* (kbd "h") (lambda () (interactive) (tab-bar-move-tab -1)))
+(define-key *tab-map* (kbd "l") (lambda () (interactive) (tab-bar-move-tab 1)))
+
+(define-key *tab-map* (kbd "n") #'tab-bar-switch-to-next-tab)
+(define-key *tab-map* (kbd "p") #'tab-bar-switch-to-prev-tab)
 
 (tab-bar-rename-tab "scratch1")
 

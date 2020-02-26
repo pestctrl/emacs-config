@@ -24,6 +24,10 @@
 (require 'org)
 (require 'use-package)
 
+;; On TI VNC machine
+(when (string-match-p "ti\.com" (getenv "https_proxy"))
+  (setq epg-pinentry-mode nil))
+
 (setq use-package-always-ensure t)
 
 (defvar my/is-wsl nil)

@@ -546,7 +546,8 @@
   (setq ibuffer-saved-filter-groups
         '(("default"
            ("X-Windows"       (mode . exwm-mode))
-           ("Terminals"       (mode . term-mode))
+           ("Terminals"       (or (mode . vterm-mode)
+                                  (mode . term-mode)))
            ("emacs-config"    (not (or (mode . magit-status-mode)
                                        (not (or (filename . ".emacs.d")
                                                 (filename . "emacs-config"))))))
@@ -681,7 +682,18 @@
                         (memq (process-status process) '(run stop open listen))
                         (process-query-on-exit-flag process)))
               (kill-buffer buffer)
-            (run-at-time 0.1 nil #'vterm-wait-to-kill buffer (1- n)))))))
+            (run-at-time 0.1 nil #'vterm-wait-to-kill buffer (1- n))))))
+
+    (defun rename-vterm-with-tab (orig name &optional arg)
+      (let ((current-tab-name (alist-get 'name (tab-bar--current-tab))))
+        (funcall orig name arg)
+        (when-let (b (get-buffer (concat current-tab-name "-term")))
+          (with-current-buffer b
+            (rename-buffer (concat (alist-get 'name (tab-bar--current-tab))
+                                   "-term"))))))
+    (advice-add #'tab-bar-rename-tab
+                :around
+                #'rename-vterm-with-tab))
 #+end_src
 ** posting source code
 #+begin_src emacs-lisp

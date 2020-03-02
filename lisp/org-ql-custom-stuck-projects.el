@@ -76,7 +76,9 @@
          (org-todo-keywords-1 '("EMPTY" "ONE" "META" "META1" "TODO"))
          (items (mapcan #'my/get-project-stuck-displayables
                         (org-ql-select org-agenda-files
-                          `(and (tags ,tag)
+                          `(and ,@(when (and tag
+                                             (not (zerop (length tag))))
+                                    '((tags ,tag)))
                                 (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
                                 (my/top-level)
                                 (not (property "DELAYED"))
@@ -125,7 +127,9 @@
          (org-todo-keywords-1 '("EMPTY" "META" "META1" "ONE" "TODO" ))
          (items (mapcan #'my/get-project-active-displayables
                         (org-ql-select org-agenda-files
-                          `(and (tags ,tag)
+                          `(and ,@(when (and tag
+                                             (not (zerop (length tag))))
+                                    '((tags ,tag)))
                                 (not (tags "short"))
                                 (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
                                 (my/top-level)

@@ -660,7 +660,6 @@
     :commands vterm find-vterm vterm-kill
     :bind (:map vterm-mode-map
                 ("C-t" . nil)
-                ("C-d" . #'vterm-kill)
                 :map *root-map*
                 ("c" . #'find-vterm))
     :config
@@ -685,21 +684,9 @@
             (switch-to-buffer b)
           (vterm))))
 
-    (defun vterm-kill ()
-      (interactive)
-      (vterm-send-C-d)
-      (vterm-wait-to-kill (current-buffer) 10))
-
-    (defun vterm-wait-to-kill (buffer n)
-      (when (and (< 0 n)
-                 (buffer-live-p buffer))
-        (sit-for 0.1)
-        (let ((process (get-buffer-process (current-buffer))))
-          (if (not (and process
-                        (memq (process-status process) '(run stop open listen))
-                        (process-query-on-exit-flag process)))
-              (kill-buffer buffer)
-            (run-at-time 0.1 nil #'vterm-wait-to-kill buffer (1- n))))))
+    (add-hook 'vterm-exit-functions
+              (lambda (buf com)
+                (kill-buffer buf)))
 
     (defun rename-vterm-with-tab (orig name &optional arg)
       (let ((current-tab-name (alist-get 'name (tab-bar--current-tab))))
@@ -718,12 +705,11 @@
         (when (funcall orig)
           (when-let (b (get-buffer (concat current-tab-name "-term")))
             (with-current-buffer b
-              (vterm-kill))))))
-  
-    ;; (advice-add #'close-tab-switch
-    ;;             :around
-    ;;             #'close-vterm-with-tab)
-    )
+              (vterm-send-C-d))))))
+
+    (advice-add #'close-tab-switch
+                :around
+                #'close-vterm-with-tab))
 #+end_src
 ** posting source code
 #+begin_src emacs-lisp

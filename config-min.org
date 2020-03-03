@@ -194,11 +194,12 @@
 
   ;; Roboto mono is nice
   (when (member "Roboto Mono" (font-family-list))
-    (set-face-attribute 'default nil :font "RobotoMono-10")
-    (set-face-attribute 'fixed-pitch nil :font "RobotoMono-10"))
+    (set-face-attribute 'default nil :font "RobotoMono" :height 100)
+    (set-face-attribute 'fixed-pitch nil :font "RobotoMono" :height 100))
 
   (when (member "Liberation Serif" (font-family-list))
-    (set-face-attribute 'variable-pitch nil :font "LiberationSerif-10"))
+    (set-face-attribute 'variable-pitch nil :font "LiberationSerif" :height 130
+                        :width 'normal))
   ;;(set-face-attribute 'variable-pitch nil :font '(:family "ETBookOT"))
 
   ;; I like my unicode to be monospace too, so I use these

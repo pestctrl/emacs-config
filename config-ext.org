@@ -272,8 +272,10 @@
                     (require 'ccls) (lsp)))))
     :config
     (setq ccls-sem-highlight-method 'font-lock-mode)
-    (when (not (memq window-system '(mac ns)))
-      (setq ccls-executable "/db/sds/packages2/ccls/ccls")))
+    (when-let (l (getenv "https_proxy"))
+      (when (and (string-match-p "ti\.com" l)
+                 (not (memq window-system '(mac ns))))
+        (setq ccls-executable "/db/sds/packages2/ccls/ccls"))))
 #+end_src
 ** Projectile
 #+begin_src emacs-lisp

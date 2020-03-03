@@ -26,6 +26,9 @@
 ;; New stuff, may not stick around
 (require 'org-ql-custom-stuck-projects)
 
+;; I would like the library of alexandria
+(require 'subr-x)
+
 (add-to-list 'custom-theme-load-path "~/.emacs.d/lisp/themes")
 
 (provide 'libs)

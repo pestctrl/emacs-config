@@ -23,19 +23,9 @@
 
 (require 'org)
 (require 'use-package)
-
-;; On TI VNC machine
-(when (string-match-p "ti\.com" (getenv "https_proxy"))
-  (setq epg-pinentry-mode nil))
-
 (setq use-package-always-ensure t)
 
-(defvar my/is-wsl nil)
-
-(defvar my/enable-exwm t)
-
 ;; Add my modules
-
 (add-to-list 'load-path "~/.emacs.d/lisp")
 (let ((default-directory  "~/.emacs.d/lisp/"))
   (normal-top-level-add-subdirs-to-load-path))
@@ -44,6 +34,14 @@
   (normal-top-level-add-subdirs-to-load-path))
 
 (require 'libs)
+
+(defvar my/is-wsl nil)
+(defvar my/enable-exwm t)
+
+;; On TI VNC machine
+(when-let (l (getenv "https_proxy"))
+  (when (string-match-p "ti\.com" l)
+    (setq epg-pinentry-mode nil)))
 
 (when (and (eq 'x window-system)
            my/enable-exwm

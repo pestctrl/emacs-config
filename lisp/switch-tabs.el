@@ -52,7 +52,8 @@
                             old-name))
       (tab-bar-close-tab)
       (when (<= 2 (length (funcall tab-bar-tabs-function)))
-        (switch-or-create-tab)))))
+        (switch-or-create-tab))
+      t)))
 
 (defun tab-bar-report ()
   (interactive)

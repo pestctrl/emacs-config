@@ -625,7 +625,7 @@
             (org-agenda-finalize-hook '(org-agenda-add-separater-between-project))))
           ("a" . "Agendas")
           ("aa" "Regular Agenda" agenda "")
-          ("ad" "Agenda 1 day" agenda ""
+          ("at" "Agenda Today" agenda ""
            ((org-agenda-span 'day)))
           ("aw" "Weekly view" agenda ""
            ((org-agenda-overriding-arguments (list nil (my/this-or-last-saturday) 
@@ -637,7 +637,7 @@
            ((org-agenda-overriding-arguments (list nil (my/last-or-last-last-saturday)
                                                    9))
             (org-agenda-tag-filter-preset (quote ("+dev")))))
-          ("aD" "Dev agenda" agenda ""
+          ("ad" "Dev agenda" agenda ""
            ((org-agenda-skip-function 'my/agenda-custom-skip)
             (org-agenda-span 'day)
             (org-agenda-tag-filter-preset (quote ("+dev")))
@@ -1631,4 +1631,14 @@
                              (funcall deft-parse-title-function
                                       (substring contents begin (match-end 0))))))
                      (org-roam--get-title-or-slug file))))
+#+end_src
+* Variable pitch org-mode
+#+begin_src emacs-lisp
+  ;; (mapcar
+  ;;  (lambda (face)
+  ;;    (set-face-attribute face nil :inherit 'fixed-pitch))
+  ;;  '(org-block org-block-begin-line org-block-end-line org-code
+  ;;              org-document-info-keyword org-done org-formula org-indent
+  ;;              org-meta-line org-special-keyword org-table org-todo
+  ;;              org-verbatim org-date org-drawer))
 #+end_src

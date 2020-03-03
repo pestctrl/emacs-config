@@ -369,8 +369,7 @@
 
   ;; Rainbow parens
   (use-package rainbow-delimiters)
-  (rainbow-delimiters-mode t)
-  (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode)
+  (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
 
   (let ((rainbow-purple  "#9E1CB2")
         (rainbow-blue    "#1194f6")
@@ -413,7 +412,7 @@
 
   ;; Auto highlighting of symbols
   (use-package auto-highlight-symbol)
-  (add-hook 'emacs-lisp-mode-hook
+  (add-hook 'prog-mode-hook
             'auto-highlight-symbol-mode)
 
   ;; wgrep

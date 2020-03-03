@@ -153,8 +153,10 @@
               (let ((display '()))
                 (olc/todo-children
                   (let ((type (opr/get-type)))
-                    (when (and (eq 'project (opr/get-type))
-                               (eq 'active (opr/type-of-project 'active)))
+                    (when (or (and (eq 'task (opr/get-type))
+                                   (string= "WAIT" (org-get-todo-state)))
+                           (and (eq 'project (opr/get-type))
+                                   (eq 'active (opr/type-of-project 'active))))
                       (let ((res (-> (point)
                                      (org-element-headline-parser)
                                      (org-ql--add-markers)

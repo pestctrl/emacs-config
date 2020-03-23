@@ -26,6 +26,8 @@
 (require 'org)
 (require 'org-agenda)
 (require 'org-project)
+(require 'org-ql)
+(require 'org-ql-search)
 
 (defun my/top-level ()
   (save-excursion

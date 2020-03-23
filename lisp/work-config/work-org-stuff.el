@@ -106,5 +106,67 @@
 (add-hook 'org-trigger-hook
           #'unwait-unblock-tasks)
 
+
+;; (defvar bootstrap-version)
+;; (let ((bootstrap-file
+;;        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+;;       (bootstrap-version 5))
+;;   (unless (file-exists-p bootstrap-file)
+;;     (with-current-buffer
+;;         (url-retrieve-synchronously
+;;          "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+;;          'silent 'inhibit-cookies)
+;;       (goto-char (point-max))
+;;       (eval-print-last-sexp)))
+;;   (load bootstrap-file nil 'nomessage))
+
+;; (use-package org-roam
+;;   :after org
+;;   :hook 
+;;   (after-init . org-roam-mode)
+;;   :straight (:host github :repo "jethrokuan/org-roam" :branch "develop")
+;;   :custom
+;;   (org-roam-directory "~/org/org-roam/")
+;;   :bind (:map org-roam-mode-map
+;;               (("C-c n l" . org-roam)
+;;                ("C-c n f" . org-roam-find-file)
+;;                ("C-c n g" . org-roam-show-graph))
+;;               :map org-mode-map
+;;               (("C-c n i" . org-roam-insert))))
+
+;; (org-roam-mode t)
+
+;; (use-package el-patch
+;;   :straight (:host github
+;;                    :repo "raxod502/el-patch"
+;;                    :branch "develop"))
+
+;; (eval-when-compile
+;;   (require 'el-patch))
+
+;; (use-package deft
+;;   :after org
+;;   :bind
+;;   ("C-c n d" . deft)
+;;   :custom
+;;   (deft-recursive t)
+;;   (deft-use-filter-string-for-filename t)
+;;   (deft-default-extension "org")
+;;   (deft-directory "~/org/org-roam/")
+;;   :config/el-patch
+;;   (defun deft-parse-title (file contents)
+;;     "Parse the given FILE and CONTENTS and determine the title.
+;; If `deft-use-filename-as-title' is nil, the title is taken to
+;; be the first non-empty line of the FILE.  Else the base name of the FILE is
+;; used as title."
+;;     (el-patch-swap (if deft-use-filename-as-title
+;;                        (deft-base-filename file)
+;;                      (let ((begin (string-match "^.+$" contents)))
+;;                        (if begin
+;;                            (funcall deft-parse-title-function
+;;                                     (substring contents begin (match-end 0))))))
+;;                    (org-roam--get-title-or-slug file))))
+
+
 (provide 'work-org-stuff)
 ;;; work-org-stuff.el ends here

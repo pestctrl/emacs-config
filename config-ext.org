@@ -281,7 +281,7 @@
 #+begin_src emacs-lisp
   (use-package projectile
     :defer 5
-    :bind-keymap ("C-c p" . projectile-command-map)
+    :bind-keymap ("C-c C-p" . projectile-command-map)
     :init   (progn
               (setq projectile-enable-caching nil)
               (setq projectile-git-submodule-command nil)

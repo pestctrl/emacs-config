@@ -47,7 +47,7 @@
 (defun my/get-next-workspace-number ()
   (-> exwm-workspace-current-index
       1+
-      (mod 2)))
+      (mod exwm-workspace-number)))
 
 (defun my/next-workspace ()
   (interactive)

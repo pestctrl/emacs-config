@@ -1,61 +1,77 @@
 ;; This buffer is for text that is not saved, and for Lisp evaluation.
 ;; To create a file, visit it with C-x C-f and enter text in its buffer.
 
+(defvar self-chat-num 0)
+(defvar self-chat-last nil)
+(defvar self-chat-last2 nil)
 (defvar self-chat-highlights nil)
-
-(defface sc-tau-face3 `((t (:foreground "turquoise1"))) "")
-(setq sc-tau-face 'sc-tau-face3)
-(defface sc-arc-face `((t (:foreground "gold"))) "")
-(setq sc-arc-face 'sc-arc-face)
-(defface sc-tom-face `((t (:foreground "rosy brown"))) "")
-(setq sc-tom-face 'sc-tom-face)
-(defface sc-dan-face `((t (:foreground "spring green"))) "")
-(setq sc-dan-face 'sc-dan-face)
-(defface sc-ver-face `((t (:foreground "white"))) "")
-(setq sc-ver-face 'sc-ver-face)
-(defface sc-coop-face4 `((t (:foreground "cornsilk"))) "")
-(setq sc-coop-face 'sc-coop-face4)
-
-(setq self-chat-highlights
-      '(
-        ("^> Tau:.*$" . sc-tau-face)
-        ("^> Arc:.*$" . sc-arc-face)
-        ("^> Tom:.*$" . sc-tom-face)
-        ("^> Dan:.*$" . sc-dan-face)
-        ("^> Ver:.*$" . sc-ver-face)
-        ("^> Coop:.*$" . sc-coop-face)
-        ))
+(defvar self-chat-alist nil)
 
 (define-derived-mode self-chat-mode fundamental-mode "self-chat"
   "This is a mode where I become crazy and talk to myself."
-  (setq font-lock-defaults '(self-chat-highlights)))
+  (setq font-lock-defaults '(self-chat-highlights))
+  (call-interactively #'choose-user/body))
 
 (define-key self-chat-mode-map (kbd "RET") #'self-chat-insert-next)
-
-(defvar self-chat-num 0)
-
-(defvar self-chat-alist
-  '((0 . "Tau")
-    (1 . "Arc")
-    (2 . "Tom")
-    (3 . "Dan")
-    (4 . "Ver")
-    (5 . "Coop")))
 
 (defun self-chat-insert-next ()
   (interactive)
   (call-interactively #'newline)
   (call-interactively #'newline)
-  (insert "> ")
-  (call-interactively #'choose-name/body))
+  (call-interactively #'user-chat/body))
 
+(defun chat-pre ()
+  (when (and self-chat-last
+             (not (= self-chat-num self-chat-last)))
+    (setq self-chat-last2 self-chat-last
+          self-chat-last self-chat-num))
+  (insert "> "))
 
-(defhydra choose-name (:exit t)
-  ""
-  ("RET" nil "Same")
-  ("t" (insert (alist-get 0 self-chat-alist) ": ") "Tau")
-  ("a" (insert (alist-get 1 self-chat-alist) ": ") "Arc")
-  ("T" (insert (alist-get 2 self-chat-alist) ": ") "Tom")
-  ("d" (insert (alist-get 3 self-chat-alist) ": ") "Dan")
-  ("v" (insert (alist-get 4 self-chat-alist) ": ") "Ver")
-  ("c" (insert (alist-get 5 self-chat-alist) ": ") "Coop"))
+(defun chat-post ()
+  (insert (alist-get self-chat-num self-chat-alist) ": "))
+
+(defmacro define-users (list)
+  `(progn
+     (setq self-chat-num 0
+           self-chat-last nil
+           self-chat-last2 nil
+           self-chat-highlights nil
+           self-chat-alist nil)
+     (defhydra user-chat (:exit t
+                          :body-pre (chat-pre)
+                          :after-exit (chat-post))
+       ""
+       ("RET" nil "Same")
+       ("TAB" (setq self-chat-num self-chat-last2) "Switch")
+       ,@(let ((num 0))
+           (mapcar #'(lambda (triple)
+                       (let ((name (car triple))
+                             (key (cadr triple)))
+                         (prog1 `(,key (setq self-chat-num ,num) ,name)
+                           (incf num))))
+                   list))
+       ("r" (setq self-chat-num (random ,(length list))) "Random"))
+     ,@(let ((num 0))
+         (mapcan #'(lambda (triple)
+                     (let* ((name (car triple))
+                            (color (caddr triple))
+                            (face-sym (intern (format "sc-%s-face" (downcase name)))))
+                       (prog1`((add-to-list 'self-chat-alist
+                                            '(,num . ,name))
+                               (defface ,face-sym '((t (:foreground ,color))) ,(concat name
+                                                                                       "'s face for self-chat-mode"))
+                               (defvar ,face-sym ',face-sym)
+                               (add-to-list 'self-chat-highlights
+                                            '(,(format "^> %s:.*$" name) . ,face-sym)))
+                             (incf num))))
+                 list))))
+
+(define-users (("Tau" "t" "turquoise1")
+               ("Arc" "a" "gold")
+               ("Tom" "T" "rosy brown")
+               ("Dan" "d" "spring green")
+               ("Ver" "v" "white")
+               ("Coop" "c" "cornsilk")
+               ("Everyone" "e" "pale green")))
+
+(provide 'self-talk-mode)

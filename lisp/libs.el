@@ -20,6 +20,9 @@
 
 (require 'face-copier)
 
+;; Self talking
+(require 'self-talk-mode)
+
 ;; Buggy overall, not needed cause of workgroups2.el
 ;; (require 'exwm-workspace-counsel)
 

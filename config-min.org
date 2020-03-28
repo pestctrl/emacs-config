@@ -60,7 +60,9 @@
       mode-line
       mode-line-inactive
       variable-pitch
-      diredp-file-suffix)
+      diredp-file-suffix
+      font-lock-type-face
+      vterm-color-default)
 
     (defun my/exwm-floating--advise-make-frame (orig id)
       (override1-face my/frame-dont-copy-faces

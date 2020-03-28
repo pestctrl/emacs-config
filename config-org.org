@@ -924,8 +924,8 @@
       (re-search-forward "Reviews")))
 
   (defun aux-get-week-string ()
-    (let ((this (plist-get org-capture-plist :start-week))
-          (last (format-time-string "%V")))
+    (let ((last (plist-get org-capture-plist :start-week))
+          (this (format-time-string "%V")))
       (if (string= this last)
           (concat "Week " this)
         (concat "Weeks " last "-" this))))

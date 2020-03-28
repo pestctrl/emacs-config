@@ -78,7 +78,7 @@
                         (org-ql-select org-agenda-files
                           `(and ,@(when (and tag
                                              (not (zerop (length tag))))
-                                    '((tags ,tag)))
+                                    `((tags ,tag)))
                                 (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
                                 (my/top-level)
                                 (not (property "DELAYED"))
@@ -157,7 +157,7 @@
                         (org-ql-select org-agenda-files
                           `(and ,@(when (and tag
                                              (not (zerop (length tag))))
-                                    '((tags ,tag)))
+                                    `((tags ,tag)))
                                 (not (tags "short"))
                                 (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
                                 (my/top-level)

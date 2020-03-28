@@ -46,7 +46,7 @@
   (interactive (cl-destructuring-bind (primary . secondary) (my/get-screens)
                  (list (completing-read "Which screen? " secondary)
                        (completing-read "Against which screen? " (cons primary secondary)))))
-  (let ((response (completing-read (format "Resolution for %s? " screen) '("2560x1440" "1920x1080" "3840x2160") nil t "^"))
+  (let ((response (completing-read (format "Resolution for %s? " screen) '("2560x1440" "1920x1080" "3840x2160" "1680x1050") nil t "^"))
         (pos (completing-read "Position? " '("left-of" "above") nil t "^")))
     (shell-command (format "xrandr --output %s --mode %s --%s %s" screen response pos relative-to))))
 

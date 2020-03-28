@@ -1643,3 +1643,12 @@
   ;;              org-meta-line org-special-keyword org-table org-todo
   ;;              org-verbatim org-date org-drawer))
 #+end_src
+* Ediffing with org mode
+#+begin_src emacs-lisp
+  (with-eval-after-load 'outline
+    (add-hook 'ediff-prepare-buffer-hook #'org-show-all))
+#+end_src
+* ctrl-k
+#+begin_src emacs-lisp
+(setq org-ctrl-k-protect-subtree t)
+#+end_src

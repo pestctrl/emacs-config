@@ -1,63 +1,69 @@
+(require 'org)
+(require 'org-project)
+
+(defvar org-tests-directory "~/.emacs.d/tests/files/")
+(defvar org-disabled-tests '())
+
+(defmacro org-test/parents-should (file &rest body)
+  (declare (indent defun))
+  (let ((file (expand-file-name file org-tests-directory))
+        (buffer-gensym (gensym "buffer")))
+    `(progn
+       ,@(progn
+           (save-window-excursion
+             (let ((buffer (find-file-noselect file)))
+               (prog1 (with-current-buffer buffer
+                        (beginning-of-buffer)
+                        (when (not (org-at-heading-p ))
+                          (outline-next-heading))
+                        (cl-loop until (eobp)
+                                 for test-name = (intern (replace-regexp-in-string " " "-" (org-get-heading t nil t t)))
+                                 if (member "disabled" (org-get-tags))
+                                 do (add-to-list 'org-disabled-tests
+                                                 test-name)
+                                 else
+                                 when (not (member test-name org-disabled-tests))
+                                 collect `(ert-deftest ,test-name ()
+                                            (let ((,buffer-gensym (find-file-noselect ,file)))
+                                              (with-current-buffer ,buffer-gensym
+                                                (goto-char ,(point))
+                                                ,@body)
+                                              (kill-buffer ,buffer-gensym)))
+                                 do (org-end-of-subtree t t)))
+                 (kill-buffer buffer))))))))
 
 (ert-deftest canary-test ()
   (should t))
 
-(defvar tests-directory "~/.emacs.d/tests/files/")
+(org-test/parents-should "seq-stuck.org"
+  (should (eq 'stuck (opr/type-of-project))))
 
-(defmacro define-org-file-point-test (test-name file point func)
-  `(ert-deftest ,test-name ()
-     (let ((to-be-removed (find-file-noselect ,file)))
-       (with-current-buffer to-be-removed
-         (org-cycle '(64))
-         (goto-char ,point)
-         (let ((r (org-entry-get (point) "RESULT")))
-           (should (eq (and r (intern r))
-                       (funcall ,func))))))))
+(org-test/parents-should "seq-active.org"
+  (should (eq 'active (opr/type-of-project))))
 
-(defmacro org-test-function-on-file-individual (func file)
-  (declare (indent defun))
-  (let ((file (expand-file-name file tests-directory)))
-    `(let ((count 0)
-           (buf (find-file-noselect ,file)))
-       (with-current-buffer buf
-         (goto-char (point-min))
-         (while (not (eobp))
-           (when (org-entry-get (point) "TEST")
-             (let ((test-name (intern (format "test%d-%s" count (symbol-name ,func))))
-                   (p (point)))
-               (define-org-file-point-test test-name ,file p ,func))
-             (incf count))
-           (outline-next-heading))))))
+(org-test/parents-should "seq-invis.org"
+  (should (eq 'invis (opr/type-of-project))))
 
-(defmacro org-test-function-on-file-individual (func file)
-  (declare (indent defun))
-  (let ((file (expand-file-name file tests-directory)))
-    `(progn
-       ,@(mapcar
-          (lambda (p)
-            (let ((test-name (intern (format "test%d-%s" p (symbol-name (cadr func))))))
-              `(define-org-file-point-test ,test-name ,file ,p ,func)))
-          (get-all-points-that-require-tests file)))))
+(org-test/parents-should "meta-stuck-base.org"
+  (should (eq 'stuck (opr/type-of-project))))
 
-(defun get-all-points-that-require-tests (file)
-  (let ((visited? (get-file-buffer file))
-        (buff (find-file-noselect file))
-        (res '()))
-    (with-current-buffer buff
-      (goto-char (point-min))
-      (while (not (eobp))
-        (when (org-entry-get (point) "TEST")
-          (push (point) res))
-        (outline-next-heading)))
-    (unless visited?
-      (kill-buffer buff))
-    res))
+(org-test/parents-should "meta-active-base.org"
+  (should (eq 'active (opr/type-of-project))))
 
+(org-test/parents-should "meta-ambiguous.org"
+  (should
+   (let ((opr/meta-active-if-one-active nil))
+     (eq 'stuck (opr/type-of-project))))
+  (should
+   (let ((opr/meta-active-if-one-active t))
+     (eq 'active (opr/type-of-project)))))
 
-(org-test-function-on-file-individual #'my/no-children "children.org")
+(org-test/parents-should "empty-stuck.org"
+  (should (eq 'stuck (opr/type-of-project))))
 
-(defun my/get-project-type-ambiguous-stuck ()
-  (my/get-project-type buffer-file-name (point) t))
+(org-test/parents-should "empty-invis.org"
+  (should (eq 'invis (opr/type-of-project))))
 
-(org-test-function-on-file-individual #'my/get-project-type-ambiguous-stuck
-  "~/.emacs.d/tests/files/projects.org")
+(ert-run-tests-interactively t)
+
+;; (progn (setq org-disabled-tests nil) (mapcar (lambda (sym) (put sym 'ert--test nil)) (apropos-internal "" #'ert-test-boundp)))

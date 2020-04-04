@@ -1,0 +1,10 @@
+* EMPTY should be invisible if has one active tasks
+** TASK Active task
+SCHEDULED: <1997-01-01 Wed>
+** TASK Next task
+** TASK Next task
+* META What should meta do if active-if-one-active is nil and there is one stuck and one active TASK 
+** TASK Active task
+SCHEDULED: <1997-01-01 Wed>
+SCHEDULED: <2020-04-03 Fri>
+** TASK Next task

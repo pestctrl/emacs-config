@@ -1,0 +1,5 @@
+* META should behave certain ways depending on the value of opr active if one active
+** META Stuck project
+** META Active project
+*** TASK Active task
+SCHEDULED: <1997-01-01 Wed>

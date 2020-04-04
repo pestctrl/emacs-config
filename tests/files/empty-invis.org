@@ -1,0 +1,4 @@
+* EMPTY should be invisible if no tasks
+* EMPTY should be invisible if has active tasks
+** TASK Active task
+SCHEDULED: <1997-01-01 Wed>

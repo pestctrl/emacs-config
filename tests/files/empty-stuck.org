@@ -1,0 +1,10 @@
+* EMPTY should be stuck if there is any stuck task
+** TASK Next task
+* EMPTY should be stuck if there all stuck tasks or headings
+** TASK Next task
+** Resources
+* EMPTY should be stuck if multiple stuck tasks and headings
+** TASK Next task
+** TASK Next task 2
+** Resources
+** Notes

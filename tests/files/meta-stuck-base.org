@@ -1,0 +1,10 @@
+* META should be stuck if no children
+* META should be stuck if no todo children
+** Resources
+* META should be stuck if no scheduled or deadline tasks
+** TASK Next task
+* META should be stuck if all unactive tasks and non-todo headings
+** Resources
+** TASK Next task
+* META should be stuck if stuck subproject
+** META Stuck subproject

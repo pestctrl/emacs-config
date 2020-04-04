@@ -1,0 +1,10 @@
+* META should be active if one scheduled task and nothing else
+** TASK Active task
+SCHEDULED: <1997-01-01 Wed>
+* META should be active if one task with deadline and nothing else
+** TASK Active task
+DEADLINE: <1997-01-01 Wed>
+* META should be active if has one active subproject and nothing else
+** META Subproject
+*** TASK Active task
+SCHEDULED: <1997-01-01 Wed>

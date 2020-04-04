@@ -1,0 +1,16 @@
+
+* SEQ should be active if one scheduled task
+** TASK Active Task
+SCHEDULED: <1997-01-01 Wed>
+* SEQ should be active if one deadline task
+** TASK Active Task
+DEADLINE: <1997-01-01 Wed>
+* SEQ should be active if has one active task even when have stuck tasks
+** TASK Active Task
+SCHEDULED: <1997-01-01 Wed>
+** TASK Next Task
+* SEQ should be active if subproject is active
+** SEQ Sub-project
+*** TASK Active Task
+SCHEDULED: <1997-01-01 Wed>
+** TASK Next Task

@@ -10,7 +10,7 @@
 (define-derived-mode self-chat-mode fundamental-mode "self-chat"
   "This is a mode where I become crazy and talk to myself."
   (setq font-lock-defaults '(self-chat-highlights))
-  (call-interactively #'choose-user/body))
+  (call-interactively #'user-chat/body))
 
 (define-key self-chat-mode-map (kbd "RET") #'self-chat-insert-next)
 
@@ -21,8 +21,8 @@
   (call-interactively #'user-chat/body))
 
 (defun chat-pre ()
-  (when (and self-chat-last
-             (not (= self-chat-num self-chat-last)))
+  (when (or (not self-chat-last)
+            (not (= self-chat-num self-chat-last)))
     (setq self-chat-last2 self-chat-last
           self-chat-last self-chat-num))
   (insert "> "))

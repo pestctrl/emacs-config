@@ -26,7 +26,7 @@
 
 (require 'opr-util)
 
-(define-todo-keyword "STUFF" 'task :color "goldenrod" :key ?s)
+(define-todo-keyword "STUFF" 'task :color "goldenrod" :key ?S)
 
 (define-todo-keyword "FUTURE" 'task :color "medium spring green" :key ?f)
 
@@ -37,8 +37,6 @@
 (define-todo-keyword "NEXT" 'task :key ?n :color "cyan")
 
 (define-todo-keyword "WAIT" 'task :color "yellow" :key ?w :recordstr "@/!")
-
-(define-todo-keyword "HALT" 'task :color "red" :key ?H :recordstr "@/!")
 
 (finish-active-type 'task)
 
@@ -59,8 +57,10 @@
       ("NEXT" 'active)
       ("DONE" 'done)
       ("COMPLETE" 'done)
-      ("HALT" 'stuck)
-      ("WAIT" 'active)
+      ("WAIT" (if (when-let (d (org-entry-get (point) "SCHEDULED"))
+                    (org-time> d (org-matcher-time "<now>")))
+                  'active
+                'wait))
       (_ (when (or (member state opr/strict-tasks)
                    (and (member state opr/ambiguous)
                         (eq 'task

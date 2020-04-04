@@ -26,11 +26,13 @@
 
 (require 'opr-util)
 
+(defvar opr/meta-active-if-one-active nil)
+
 ;; Context sensitive
 (define-todo-keyword "META" 'project :color "white" :key ?m)
 
-(defun meta-status? (&optional greedy-active)
-  (if greedy-active
+(defun meta-status? (&optional active-if-one-active)
+  (if (or opr/meta-active-if-one-active active-if-one-active)
       (if (or (olc/any-todo-children? 
                 (eq 'active (opr/type-of-task)))
               (olc/any-todo-children?
@@ -50,18 +52,14 @@
         'stuck
       'active)))
 
-(define-todo-keyword "META1" 'project :color "white" :key ?1)
-
-(defun meta1-status? ()
+(defun seq-status? ()
   (if (olc/any-todo-children?
         (or (eq 'active (opr/type-of-task))
             (eq 'active (opr/type-of-project))))
       'active
     'stuck))
 
-(define-todo-keyword "SEQ" 'project :color "white" :key ?S)
-
-(defalias 'seq-status? #'meta1-status?)
+(define-todo-keyword "SEQ" 'project :color "white" :key ?s)
 
 (define-todo-keyword "EMPTY" 'project :color "white" :key ?e)
 
@@ -102,7 +100,6 @@
                (pcase state
                  ("EMPTY" (empty-status?))
                  ("SEQ" (seq-status?))
-                 ("META1" (meta1-status?))
                  ("META" (meta-status? greedy-active))
                  ("ONE" (when (eq 'project (opr/ambiguous-task-or-project))
                           (meta1-status?)))

@@ -66,7 +66,7 @@
                                           (reverse))))
                              (setf display (append res display)))))
                         ('task
-                         (when (and include-tasks (eq 'stuck (opr/type-of-task)))
+                         (when (and include-tasks (member (opr/type-of-task) '(stuck wait)))
                            (push (org-ql--add-markers (org-element-headline-parser (point)))
                                  display))))))
                   (reverse display))))))))

@@ -558,7 +558,19 @@
                                                        :and (:not (:and (:not (:scheduled today)
                                                                               :not (:deadline today)))))))))))
           ("M" "Minimal"
-           ((agenda ""
+           ((org-ql-block '(and (tags "dev")
+                                (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
+                                (my/top-level)
+                                (property "DELAYED")
+                                (org-time< (property "DELAYED") (org-matcher-time "<now>")))
+                          ((org-ql-block-header "Previously Delayed")))
+            (my/org-ql-stuck-projects "dev"
+                                      ((org-ql-block-header "Stuck Projects")
+                                       (org-ql-indent-levels t)))
+            (my/org-ql-active-projects "dev"
+                                       ((org-ql-block-header "Active Projects")
+                                        (org-ql-indent-levels t)))
+            (agenda ""
                     ((org-agenda-span 'day)
                      (org-agenda-tag-filter-preset (quote ("+dev")))
                      (org-agenda-skip-deadline-if-done t)

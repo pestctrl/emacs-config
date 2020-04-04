@@ -35,6 +35,7 @@
     "/usr/lib/notification-daemon-1.0/notification-daemon"
     "nm-applet"
     "start-pulseaudio-x11;pactl upload-sample /usr/share/sounds/gnome/default/alerts/drip.ogg beep; pactl load-module module-x11-bell sample=beep; xset b 100"
+    "gitwatch -r origin -b laptop -m 'Gitwatch commit: %d' ~/MEGA/org/2019-05-agenda"
     ))
 
 (defun call-startup-programs ()

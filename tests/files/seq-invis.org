@@ -1,6 +1,4 @@
 * SEQ should be invisible if there is a wait task in the future
 ** WAIT Waiting task
 SCHEDULED: <3000-01-01 Wed>
-* SEQ I dont want to see a project when the last task is to close it out or mail something out or something
-** 
 

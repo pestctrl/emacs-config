@@ -30,7 +30,7 @@
   (interactive)
   (let* ((current-tab (alist-get 'name (tab-bar--current-tab)))
          (tab-name
-          (->> (funcall tab-bar-tabs-function)
+          (->> (tab-bar--tabs-recent)
                (mapcar #'(lambda (tab)
                            (alist-get 'name tab)))
                (remove-if #'(lambda (tab-name)
@@ -44,6 +44,15 @@
       (when (not show-tab-bar-new-tab)
         (tab-bar-mode -1))
       (tab-bar-rename-tab tab-name))))
+
+(defun last-tab ()
+  (interactive)
+  (->> (tab-bar--tabs-recent)
+       (car)
+       (alist-get 'name)
+       (tab-bar--tab-index-by-name)
+       (1+)
+       (tab-bar-select-tab)))
 
 (defun close-tab-switch ()
   (interactive)
@@ -77,6 +86,7 @@
 
 (define-key *tab-map* (kbd "n") #'tab-bar-switch-to-next-tab)
 (define-key *tab-map* (kbd "p") #'tab-bar-switch-to-prev-tab)
+(define-key *tab-map* (kbd "t") #'last-tab)
 
 (tab-bar-rename-tab "scratch1")
 

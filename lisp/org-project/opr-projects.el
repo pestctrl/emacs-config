@@ -57,7 +57,11 @@
         (or (eq 'active (opr/type-of-task))
             (eq 'active (opr/type-of-project))))
       'active
-    'stuck))
+    (if (olc/any-todo-children?
+          (or (eq 'wait-active (opr/type-of-task))
+              (eq 'invis (opr/type-of-project))))
+      'invis
+      'stuck)))
 
 (define-todo-keyword "SEQ" 'project :color "white" :key ?s)
 
@@ -102,9 +106,9 @@
                  ("SEQ" (seq-status?))
                  ("META" (meta-status? greedy-active))
                  ("ONE" (when (eq 'project (opr/ambiguous-task-or-project))
-                          (meta1-status?)))
+                          (seq-status?)))
                  ("TODO" (when (eq 'project (opr/ambiguous-task-or-project))
-                           (meta1-status?)))))))))))
+                           (seq-status?)))))))))))
 
 (provide 'opr-projects)
 ;;; opr-projects.el ends here

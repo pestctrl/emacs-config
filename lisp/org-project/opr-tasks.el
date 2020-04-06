@@ -58,8 +58,8 @@
       ("DONE" 'done)
       ("COMPLETE" 'done)
       ("WAIT" (if (when-let (d (org-entry-get (point) "SCHEDULED"))
-                    (org-time> d (org-matcher-time "<now>")))
-                  'active
+                    (org-time> d (org-matcher-time "<yesterday>")))
+                  'wait-active
                 'wait))
       (_ (when (or (member state opr/strict-tasks)
                    (and (member state opr/ambiguous)

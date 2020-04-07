@@ -504,9 +504,10 @@
     :bind (("M-E" . #'er/expand-region)))
 
   ;; Banner comments
-  (use-package banner-comment
-    :commands banner-comment
-    :bind (("C-c h" . #'banner-comment)))
+  (unless my/at-ti
+     (use-package banner-comment
+       :commands banner-comment
+       :bind (("C-c h" . #'banner-comment))))
 
   (add-hook 'lisp-mode-hook
             (lambda () (setq comment-start ";; ")))

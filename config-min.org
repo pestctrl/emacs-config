@@ -505,8 +505,47 @@
 
   ;; Banner comments
   (use-package banner-comment
-    :commands banner-comment
-    :bind (("C-c h" . #'banner-comment)))
+    :commands my/banner-comment
+    :bind (("C-c h" . #'my/banner-comment))
+    :config
+    (defun my/banner-comment ()
+      (interactive)
+      (save-excursion
+        (save-restriction
+          (beginning-of-line)
+          (forward-to-indentation 0)
+          (let ((banner-width (- (or banner-comment-width
+                                     comment-fill-column
+                                     fill-column)
+                                 (current-column)))
+                (comment-start (or banner-comment-start comment-start))
+                (comment-end (or banner-comment-end comment-end)))
+            (narrow-to-region (point) (line-end-position))
+            ;; re search to extract existing into: pre(97), text(98), post(99)
+            (when (re-search-forward
+                   (format
+                    "\\(?97:^\\(%s\\|\\)%s\\)\\(?98:.*?\\)\\(?99:%s\\(%s\\|%s\\|\\)\\)$"
+                    (or comment-start-skip (regexp-quote (string-trim comment-start)))
+                    banner-comment-char-match
+                    banner-comment-char-match
+                    (regexp-quote (string-trim comment-start))
+                    (or comment-end-skip (regexp-quote (string-trim comment-start)))))
+              (let ((remaining-width (- banner-width
+                                        (length comment-start)
+                                        (length (match-string 98))
+                                        (length comment-end))))
+                (when (< remaining-width 0)
+                  (error "Text too wide for banner comment"))
+                (replace-match ;; replace everything before
+                 comment-start
+                 nil nil nil 97)
+                (replace-match ;; replace everything after
+                 (concat
+                  (if (string-empty-p (match-string 98))
+                      (make-string remaining-width banner-comment-char)
+                    (make-string remaining-width ? ))
+                  comment-end)
+                 nil nil nil 99))))))))
 
   (add-hook 'lisp-mode-hook
             (lambda () (setq comment-start ";; ")))

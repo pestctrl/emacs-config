@@ -75,6 +75,8 @@
  (expand-file-name "config-org.org"
                    user-emacs-directory))
 
+(require 'my-org)
+
 (org-babel-load-file
  (expand-file-name "my-redefs.org"
                    user-emacs-directory))

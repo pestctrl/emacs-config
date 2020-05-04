@@ -1010,10 +1010,6 @@
 #+begin_src emacs-lisp
 (setq org-ctrl-k-protect-subtree t)
 #+end_src
-* Lisp modules
-#+begin_src emacs-lisp
-(require 'my-org-agenda-commands)
-#+end_src
 * Restriction from org-agenda
 #+begin_src emacs-lisp
   (define-key org-agenda-mode-map (kbd "N") #'(lambda ()

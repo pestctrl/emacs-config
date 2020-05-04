@@ -1018,3 +1018,81 @@
                                                 (org-agenda-redo)))
   (define-key org-agenda-mode-map (kbd "U") #'org-agenda-remove-restriction-lock)
 #+end_src
+* Org mode magit update commands
+#+begin_src emacs-lisp
+  (when (executable-find "~/bin/gitwatch")
+    (defun start-gitwatch ()
+      (interactive)
+      (if (and gitwatch-process
+               (process-live-p gitwatch-process))
+          (message "gitwatch already exists")
+        (setq gitwatch-process
+              (start-process-shell-command "gitwatch"
+                                           nil
+                                           "~/bin/gitwatch -r origin -b laptop -m 'Gitwatch commit: %d' ~/MEGA/org/2019-05-agenda"))))
+    (defun kill-gitwatch ()
+      (interactive)
+      (when (and gitwatch-process
+                 (process-live-p gitwatch-process))
+        (kill-process gitwatch-process)))
+
+    (defvar gitwatch-process nil)
+
+    (add-to-list 'emacs-startup-hook
+                 #'start-gitwatch))
+
+  (defvar magit-sentinel-after-function nil)
+
+  (defun magit-sentinel-after (&rest args)
+    (while
+        (when-let (fun (pop magit-sentinel-after-function))
+          (funcall fun)
+          t)))
+
+  (advice-add #'magit-process-sentinel
+              :after
+              #'magit-sentinel-after)
+
+  (defun org-update-main ()
+    (interactive)
+    (let ((default-directory "~/MEGA/org/2019-05-agenda"))
+      (kill-gitwatch)
+      ;; Make sure local changes are committed
+      (when (magit-changed-files "HEAD")
+        (magit-stage-modified t)
+        (magit-commit-create `("-m" ,(format "Pre-merge commit: %s" (format-time-string "%D %T")))))
+      ;; Update all submodules
+      (shell-command "git submodule foreach git pull origin master")
+      (when (magit-changed-files "HEAD")
+        (magit-stage-modified t)
+        (magit-commit-create `("-m" ,(format "Updated submodules: %s" (format-time-string "%D %T")))))
+      ;; Do a fetch
+      (push #'org-update-initiate-merge magit-sentinel-after-function)
+      (magit-run-git-async '("fetch" "--all"))))
+
+  (defun org-update-initiate-merge ()
+    ;; Check if mobile has updated
+    (let ((base (vc-git-mergebase "laptop" "origin/mobile"))
+          (laptop (vc-git--rev-parse "laptop"))
+          (origin-mobile (vc-git--rev-parse "origin/mobile")))
+      ;; If so, turn off gitwatch and initiate a merge.
+      (when (and (not (string= base laptop))
+                 (not (string= base origin-mobile)))
+        (add-hook 'git-commit-post-finish-hook ;;magit-post-commit-hook
+                  #'org-update-post-commit)
+        (magit-merge-plain "origin/mobile"))))
+
+  (defun org-update-post-commit ()
+    ;; After merge, do a push to both laptop and mobile
+    ;; Also restart gitwatch
+    (call-interactively #'magit-push-current-to-upstream)
+    (magit-push-current "origin/mobile" nil)
+    (start-gitwatch)
+    (remove-hook 'git-commit-post-finish-hook
+                 #'org-update-post-commit))
+
+  (magit-run-git-async '("fetch" "--all"))
+
+  ;; (setq debug-the-process (magit-run-git-async '("fetch" "--all")
+  ;;                                              :sentinel '(lambda (process event) (message "Done"))))
+#+end_src

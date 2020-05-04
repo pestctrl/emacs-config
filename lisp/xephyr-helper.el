@@ -47,11 +47,15 @@
   (interactive)
   (launch-program kde-string))
 
-(setq exwm-manage-configurations `(((equal exwm-class-name "Xephyr")
-                                    floating nil 
-                                    char-mode t
-                                    fullscreen t)
-                                   ((equal exwm-class-name "plasmashell")
-                                    floating t)))
+(add-to-list 'exwm-manage-configurations
+             '((equal exwm-class-name "Xephyr")
+               floating nil 
+               char-mode t
+               fullscreen t))
+
+(add-to-list 'exwm-manage-configurations
+             ((equal exwm-class-name "plasmashell")
+              floating t))
+
 (provide 'xephyr-helper)
 ;;; xephyr-helper.el ends here

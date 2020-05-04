@@ -366,5 +366,89 @@
         (message "Warn : open org-agenda buffer first.")))))
 ;; (pop org-agenda-custom-commands)
 
+(advice-add #'org-agenda-follow-mode
+            :before
+            #'my/org-agenda-follow-mode)
+
+(defun my/org-agenda-get-name ()
+  (-> (rx "*Org Agenda("
+          (group (+? anything))
+          (or ")"
+              (and
+               ":"
+               (one-or-more anything)))
+          "*")
+      (s-match-strings-all (buffer-name))
+      (cadar)
+      (assoc org-agenda-custom-commands)
+      (cadr)))
+
+(defun my/org-agenda-follow-mode ()
+  (if org-agenda-follow-mode
+      (advice-unadvice #'org-agenda-do-context-action)
+    (pcase (my/org-agenda-get-name)
+      ("\tReviews" (advice-add #'org-agenda-show
+                               :override
+                               #'my/org-agenda-show-review))
+      ("\tReviews and Journals" (advice-add #'org-agenda-show
+                                            :override
+                                            #'my/org-agenda-show-journal))
+      ("\tDev" (advice-add #'org-agenda-show
+                           :override
+                           #'my/org-agenda-show-project))
+      (_ (advice-unadvice #'org-agenda-show)))))
+
+(defun advice-unadvice (sym)
+  "Remove all advices from symbol SYM."
+  (interactive "aFunction symbol: ")
+  (advice-mapc (lambda (advice _props) (advice-remove sym advice)) sym))
+
+(defun my/org-agenda-show-project (&optional full-entry)
+  "Display the Org file which contains the item at point.
+      With prefix argument FULL-ENTRY, make the entire entry visible
+      if it was hidden in the outline."
+  (interactive "P")
+  (let ((win (selected-window)))
+    (org-agenda-goto t)
+    (org-narrow-to-subtree)
+    (org-flag-subtree t)
+    (call-interactively 'outline-show-branches)
+    (org-hide-archived-subtrees (point-min) (point-max))
+    (select-window win)))
+
+(defun my/org-agenda-show-review (&optional full-entry)
+  "Display the Org file which contains the item at point.
+      With prefix argument FULL-ENTRY, make the entire entry visible
+      if it was hidden in the outline."
+  (interactive "P")
+  (let ((win (selected-window)))
+    (org-agenda-goto t)
+    (org-narrow-to-subtree)
+    (org-flag-subtree t)
+    (call-interactively 'org-show-entry)
+    (org-hide-archived-subtrees (point-min) (point-max))
+    (select-window win)))
+
+(defun my/org-agenda-show-journal (&optional full-entry)
+  "Display the Org file which contains the item at point.
+      With prefix argument FULL-ENTRY, make the entire entry visible
+      if it was hidden in the outline."
+  (interactive "P")
+  (let ((win (selected-window)))
+    (org-agenda-goto t)
+    (org-narrow-to-subtree)
+    (org-flag-subtree t)
+    (call-interactively 'org-show-all)
+    (org-hide-archived-subtrees (point-min) (point-max))
+    (select-window win)))
+
+(defun org-agenda-goto-disable-follow (&optional highlight)
+  (interactive)
+  (when org-agenda-follow-mode
+    (org-agenda-follow-mode))
+  (org-agenda-goto highlight))
+
+(define-key org-agenda-mode-map (kbd "<tab>") #'org-agenda-goto-disable-follow)
+
 (provide 'my-org-agenda-commands)
 ;;; my-org-agenda-commands.el ends here

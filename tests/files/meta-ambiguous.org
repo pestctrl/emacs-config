@@ -3,3 +3,7 @@
 ** META Active project
 *** TASK Active task
 SCHEDULED: <1997-01-01 Wed>
+* META ambiguous behavior should also apply to tasks
+** TASK Task 1
+** TASK Task 2
+SCHEDULED: <2020-04-18 Sat>

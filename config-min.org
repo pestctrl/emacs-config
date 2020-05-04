@@ -359,8 +359,11 @@
   (add-hook 'ediff-keymap-setup-hook 'add-d-to-ediff-mode-map)
 
   ;; Paredit
-  (use-package paredit)
-  (add-hook 'emacs-lisp-mode-hook 'paredit-mode)
+  (use-package paredit
+    :bind (:map paredit-mode-map
+                ("M-?" . nil))
+    :hook ((emacs-lisp-mode . paredit-mode)
+           (lisp-mode . paredit-mode)))
 
   ;; Paren highlighting
   (show-paren-mode t)

@@ -46,10 +46,7 @@
   (let ((marker (org-element-property :org-marker element)))
     (with-current-buffer (marker-buffer marker)
       (goto-char marker)
-      (let* ((state (org-get-todo-state))
-             (include-tasks (or (not (string= state "META"))
-                                (not (olc/any-todo-children?
-                                       (eq 'active (opr/type-of-task)))))))
+      (let* ((state (org-get-todo-state)))
         (if (member state '("EMPTY"))
             (list element)
           (cons element
@@ -66,41 +63,55 @@
                                           (reverse))))
                              (setf display (append res display)))))
                         ('task
-                         (when (and include-tasks (member (opr/type-of-task) '(stuck wait)))
+                         (when (member (opr/type-of-task) '(stuck wait))
                            (push (org-ql--add-markers (org-element-headline-parser (point)))
                                  display))))))
                   (reverse display))))))))
 
 (defun my/org-ql-stuck-projects (tag)
-  (let* ((from (org-agenda-files nil 'ifmode))
-         (org-todo-keywords-1 '("EMPTY" "ONE" "META" "META1" "TODO"))
-         (items (mapcan #'my/get-project-stuck-displayables
-                        (org-ql-select org-agenda-files
-                          `(and ,@(when (and tag
-                                             (not (zerop (length tag))))
-                                    `((tags ,tag)))
-                                (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
-                                (my/top-level)
-                                (not (property "DELAYED"))
-                                (or (eq 'stuck (opr/type-of-task))
-                                    (eq 'stuck (opr/type-of-project))))
-                          :action 'element-with-markers
-                          :sort 'todo))))
-    (org-agenda-prepare)
-    ;; FIXME: `org-agenda--insert-overriding-header' is from an Org version newer than
-    ;; I'm using.  Should probably declare it as a minimum Org version after upgrading.
-    ;;  (org-agenda--insert-overriding-header (or org-ql-block-header (org-ql-agenda--header-line-format from query)))
-    (insert (org-add-props org-ql-block-header 
-                nil 'face 'org-agenda-structure 'org-agenda-type 'search) "\n")
-    ;; Calling `org-agenda-finalize' should be unnecessary, because in a "series" agenda,
-    ;; `org-agenda-multi' is bound non-nil, in which case `org-agenda-finalize' does nothing.
-    ;; But we do call `org-agenda-finalize-entries', which allows `org-super-agenda' to work.
-    (let ((org-agenda-sorting-strategy-selected '(category-keep) ))
-      (->> items
-           (-map #'org-ql-view--format-element)
-           org-agenda-finalize-entries
-           insert))
-    (insert "\n")))
+  (let (narrow-p old-beg old-end)
+    (when-let* ((from (pcase org-agenda-overriding-restriction
+                        ('nil (org-agenda-files nil 'ifmode))
+                        ('file (get 'org-agenda-files 'org-restrict))
+                        ('subtree (prog1 org-agenda-restrict
+                                    (with-current-buffer org-agenda-restrict
+                                      ;; Narrow the buffer; remember to widen it later.
+                                      (setf old-beg (point-min) old-end (point-max)
+                                            narrow-p t)
+                                      (narrow-to-region org-agenda-restrict-begin org-agenda-restrict-end)))))))
+      (let* ((org-todo-keywords-1 '("EMPTY" "ONE" "META" "META1" "TODO"))
+             (items (mapcan #'my/get-project-stuck-displayables
+                            (org-ql-select from
+                              `(and ,@(when (and tag
+                                                 (not (zerop (length tag))))
+                                        `((tags ,tag)))
+                                    (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
+                                    (my/top-level)
+                                    (not (property "DELAYED"))
+                                    (or (eq 'stuck (opr/type-of-task))
+                                        (eq 'stuck (opr/type-of-project))))
+                              :action 'element-with-markers
+                              :narrow narrow-p
+                              :sort 'todo))))
+        (when narrow-p
+          ;; Restore buffer's previous restrictions.
+          (with-current-buffer from
+            (narrow-to-region old-beg old-end)))
+        (org-agenda-prepare)
+        ;; FIXME: `org-agenda--insert-overriding-header' is from an Org version newer than
+        ;; I'm using.  Should probably declare it as a minimum Org version after upgrading.
+        ;;  (org-agenda--insert-overriding-header (or org-ql-block-header (org-ql-agenda--header-line-format from query)))
+        (insert (org-add-props org-ql-block-header 
+                    nil 'face 'org-agenda-structure 'org-agenda-type 'search) "\n")
+        ;; Calling `org-agenda-finalize' should be unnecessary, because in a "series" agenda,
+        ;; `org-agenda-multi' is bound non-nil, in which case `org-agenda-finalize' does nothing.
+        ;; But we do call `org-agenda-finalize-entries', which allows `org-super-agenda' to work.
+        (let ((org-agenda-sorting-strategy-selected '(category-keep) ))
+          (->> items
+               (-map #'org-ql-view--format-element)
+               org-agenda-finalize-entries
+               insert))
+        (insert "\n")))))
 
 ;; (defun my/org-ql-stuck-projects (tag)
 ;;   (let* ((from (org-agenda-files nil 'ifmode))
@@ -151,36 +162,53 @@
                 (reverse display)))))))
 
 (defun my/org-ql-active-projects (tag)
-  (let* ((from (org-agenda-files nil 'ifmode))
-         (org-todo-keywords-1 '("EMPTY" "META" "META1" "ONE" "TODO" ))
-         (items (mapcan #'my/get-project-active-displayables
-                        (org-ql-select org-agenda-files
-                          `(and ,@(when (and tag
-                                             (not (zerop (length tag))))
-                                    `((tags ,tag)))
-                                (not (tags "short"))
-                                (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
-                                (my/top-level)
-                                (or (eq 'active (opr/type-of-task))
-                                    (eq 'active (opr/type-of-project 'active))))
-                          :action 'element-with-markers
-                          :sort 'todo
-                          ))))
-    (org-agenda-prepare)
-    ;; FIXME: `org-agenda--insert-overriding-header' is from an Org version newer than
-    ;; I'm using.  Should probably declare it as a minimum Org version after upgrading.
-    ;;  (org-agenda--insert-overriding-header (or org-ql-block-header (org-ql-agenda--header-line-format from query)))
-    (insert (org-add-props org-ql-block-header 
-                nil 'face 'org-agenda-structure 'org-agenda-type 'search) "\n")
-    ;; Calling `org-agenda-finalize' should be unnecessary, because in a "series" agenda,
-    ;; `org-agenda-multi' is bound non-nil, in which case `org-agenda-finalize' does nothing.
-    ;; But we do call `org-agenda-finalize-entries', which allows `org-super-agenda' to work.
-    (let ((org-agenda-sorting-strategy-selected '(category-keep) ))
-      (->> items
-           (-map #'org-ql-view--format-element)
-           org-agenda-finalize-entries
-           insert))
-    (insert "\n")))
+  (let (narrow-p old-beg old-end)
+    (let* ((from (or (pcase org-agenda-overriding-restriction
+                        ('nil (org-agenda-files nil 'ifmode))
+                        ('file (get 'org-agenda-files 'org-restrict))
+                        ('subtree (prog1 org-agenda-restrict
+                                    (with-current-buffer org-agenda-restrict
+                                      ;; Narrow the buffer; remember to widen it later.
+                                      (setf old-beg (point-min) old-end (point-max)
+                                            narrow-p t)
+                                      (narrow-to-region org-agenda-restrict-begin org-agenda-restrict-end)))))
+                     (org-agenda-files nil 'ifmode)))
+           (org-todo-keywords-1 '("EMPTY" "META" "META1" "ONE" "TODO" ))
+           (items (mapcan #'my/get-project-active-displayables
+                          (org-ql-select from
+                            `(and ,@(when (and tag
+                                               (not (zerop (length tag))))
+                                      `((tags ,tag)))
+                                  (not (tags "short"))
+                                  (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
+                                  (my/top-level)
+                                  (or (eq 'active (opr/type-of-task))
+                                      (eq 'active (opr/type-of-project 'active))))
+                            :action 'element-with-markers
+                            :narrow narrow-p
+                            :sort 'todo))))
+      
+      (when narrow-p
+        ;; Restore buffer's previous restrictions.
+        (with-current-buffer from
+          (narrow-to-region old-beg old-end)))
+      (org-agenda-prepare)
+      ;; FIXME: `org-agenda--insert-overriding-header' is from an Org version newer than
+      ;; I'm using.  Should probably declare it as a minimum Org version after upgrading.
+      ;;  (org-agenda--insert-overriding-header (or org-ql-block-header (org-ql-agenda--header-line-format from query)))
+      (insert (org-add-props org-ql-block-header 
+                  nil 'face 'org-agenda-structure 'org-agenda-type 'search) "\n")
+      ;; Calling `org-agenda-finalize' should be unnecessary, because in a "series" agenda,
+      ;; `org-agenda-multi' is bound non-nil, in which case `org-agenda-finalize' does nothing.
+      ;; But we do call `org-agenda-finalize-entries', which allows `org-super-agenda' to work.
+      (let ((org-agenda-sorting-strategy-selected '(category-keep) ))
+        (->> items
+             (-map #'org-ql-view--format-element)
+             org-agenda-finalize-entries
+             insert))
+      (insert "\n"))))
+
+(defun my/org-ql-get-restriciton ())
 
 ;; (test-stuck-projects)
 

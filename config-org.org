@@ -1664,3 +1664,11 @@
 #+begin_src emacs-lisp
 (setq org-ctrl-k-protect-subtree t)
 #+end_src
+* Restriction from org-agenda
+#+begin_src emacs-lisp
+  (define-key org-agenda-mode-map (kbd "N") #'(lambda ()
+                                                (interactive)
+                                                (org-agenda-set-restriction-lock-from-agenda nil)
+                                                (org-agenda-redo)))
+  (define-key org-agenda-mode-map (kbd "U") #'org-agenda-remove-restriction-lock)
+#+end_src

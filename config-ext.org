@@ -20,6 +20,7 @@
           `(("account" "%(binary) -f %(ledger-file) reg %(account)")
             ("bal" "%(binary) -f %(ledger-file) bal")
             ("reg" "%(binary) -f %(ledger-file) reg")
+            ("equity" "%(binary) -f %(ledger-file) bal ^Exp ^RE ^Rev")
             ("cleared" ,new-report-str)
             ;; ("cleared" "%(binary) -f %(ledger-file) cleared")
             ("expmonth" "%(binary) -f %(ledger-file) -M reg Expenses")

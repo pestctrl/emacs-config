@@ -65,7 +65,9 @@
                    (and (member state opr/ambiguous)
                         (eq 'task
                             (opr/ambiguous-task-or-project))))
-           (if (member "_invis_" (org-get-tags))
+           (if (or (member "_invis_" (org-get-tags))
+                   (when-let (d (org-entry-get (point) "DELAYED"))
+                     (org-time> d (org-matcher-time "<now>"))))
                'invis
              (pcase state
                ("TASK" (if (or (org-get-deadline-time (point))

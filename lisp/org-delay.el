@@ -44,7 +44,8 @@
                    nil nil nil
                    "Delay until when?")))
               (formatted (format "<%s>" new-time)))
-         (if (eq 'task (opr/get-type))
+         (if (and (eq 'task (opr/get-type))
+                  (org-entry-get (point) "SCHEDULED"))
              (org-schedule arg new-time)
            (org-entry-put (point) "DELAYED" formatted)
            (format "Delayed until %s" formatted)))))))

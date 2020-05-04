@@ -40,15 +40,14 @@
           'active
         'stuck)
     (if (or
-         ;; No active tasks? Stuck if no other projects!
-         (and (not (olc/any-todo-children?
-                     (eq 'active (opr/type-of-task))))
-              (not
-               (olc/any-todo-children?
-                 (eq 'project (opr/get-type)))))
-         ;; Have a stuck project? Stuck! 
-         (and (olc/any-todo-children?
-                (eq 'stuck (opr/type-of-project)))))
+         (olc/any-todo-children?
+           (or
+            ;; Any stuck task? Stuck!
+            (eq 'stuck (opr/type-of-task))
+            ;; Have a stuck project? Stuck! 
+            (eq 'stuck (opr/type-of-project))))
+         ;; No todo children? Stuck!
+         (not (olc/any-todo-children? t)))
         'stuck
       'active)))
 

@@ -260,5 +260,20 @@
 
 (add-hook 'org-capture-before-finalize-hook 'my/org-board-prompt)
 
+;; New Note-taking capture template
+(defvar org-notes-current-file nil)
+
+(add-to-list 'org-capture-templates
+             '("n" "\tNotes" entry (function org-notes-find-file)
+               "* %A\n%?"))
+
+(defun org-notes-find-file ()
+  (when (or current-prefix-arg
+            (not org-notes-current-file))
+    (setq org-notes-current-file
+          (read-file-name "Notes file? ")))
+  (find-file org-notes-current-file)
+  (end-of-buffer))
+
 (provide 'my-org-capture-templates)
 ;;; my-org-capture-templates.el ends here

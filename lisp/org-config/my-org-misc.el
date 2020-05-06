@@ -24,7 +24,11 @@
 
 ;;; Code:
 
+(setq org-agenda-skip-deadline-if-done t
+      org-agenda-skip-scheduled-if-done t)
 
+(setq org-tags-match-list-sublevels 'indented)
+(setq org-agenda-span 'day)
 
 (provide 'my-org-misc)
 ;;; my-org-misc.el ends here

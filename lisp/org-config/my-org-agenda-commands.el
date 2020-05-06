@@ -59,10 +59,7 @@
                   ((org-ql-block-header "Things to do")))
     (agenda ""
             ((org-agenda-skip-function 'my/agenda-custom-skip)
-             (org-agenda-span 'day)
              (org-agenda-tag-filter-preset (quote (,(concat "+" tag))))
-             (org-agenda-skip-deadline-if-done t)
-             (org-agenda-skip-scheduled-if-done t)
              (org-super-agenda-groups '((:name "Dev things" :file-path "dev.org")
                                         (:name "Overdue" :and (:deadline past :log nil))
                                         (:name "Upcoming" :deadline future)
@@ -120,17 +117,15 @@
                               (todo "NEXT"))
                         ((org-ql-block-header "Things to do")))
           (agenda ""
-                  ((org-agenda-span 'day)
-                   (org-agenda-tag-filter-preset (quote ("+dev")))
-                   (org-agenda-skip-deadline-if-done t)
-                   (org-agenda-skip-scheduled-if-done t)
+                  ((org-agenda-tag-filter-preset (quote ("+dev")))
                    (org-super-agenda-groups '((:name "The Plan" :tag "PLAN")
                                               (:name "Overdue" :and (:deadline past :log nil))
                                               (:name "Upcoming" :deadline future)
                                               (:name "Should do" :and (:scheduled past :log nil))
                                               (:name "Today" :time-grid t
                                                      :and (:not (:and (:not (:scheduled today)
-                                                                            :not (:deadline today)))))))))))
+                                                                            :not (:deadline today))))))))))
+         ((org-agenda-start-with-log-mode '(closed))))
         ("M" "\tMinimal"
          ((org-ql-block '(and (tags "dev")
                               (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
@@ -145,10 +140,7 @@
                                      ((org-ql-block-header "Active Projects")
                                       (org-ql-indent-levels t)))
           (agenda ""
-                  ((org-agenda-span 'day)
-                   (org-agenda-tag-filter-preset (quote ("+dev")))
-                   (org-agenda-skip-deadline-if-done t)
-                   (org-agenda-skip-scheduled-if-done t)
+                  ((org-agenda-tag-filter-preset (quote ("+dev")))
                    (org-agenda-skip-function (lambda ()
                                                (when (string= "TICKLER" (org-get-todo-state))
                                                  (outline-next-heading))))
@@ -158,7 +150,8 @@
                                               (:name "Should do" :and (:scheduled past :log nil))
                                               (:name "Today" :time-grid t
                                                      :and (:not (:and (:not (:scheduled today)
-                                                                            :not (:deadline today)))))))))))
+                                                                            :not (:deadline today))))))))))
+         ((org-agenda-start-with-log-mode '(closed))))
         ("D" "\tdev-without-active"
          ((org-ql-block '(and (tags "dev")
                               (tags "refile"))
@@ -176,10 +169,7 @@
                               (todo "NEXT"))
                         ((org-ql-block-header "Things to do")))
           (agenda ""
-                  ((org-agenda-span 'day)
-                   (org-agenda-tag-filter-preset (quote ("+dev")))
-                   (org-agenda-skip-deadline-if-done t)
-                   (org-agenda-skip-scheduled-if-done t)
+                  ((org-agenda-tag-filter-preset (quote ("+dev")))
                    (org-super-agenda-groups '((:name "The Plan" :tag "PLAN")
                                               (:name "Overdue" :and (:deadline past :log nil))
                                               (:name "Upcoming" :deadline future)
@@ -202,34 +192,27 @@
         ("n" "\tNext Tasks List" tags-todo "-REFILE-HOLD-WAIT"
          ((org-agenda-skip-function 'my/show-next-tasks-and-standalone-tasks)
           (org-agenda-overriding-header "Next Tasks list")
-          (org-tags-match-list-sublevels t)
           (org-agenda-sorting-strategy '(deadline-up))))
         ("L" "\tLeaf Task List" tags-todo "-REFILE-HOLD-WAIT"
          ((org-agenda-skip-function 'my/show-leaf-tasks)
-          (org-tags-match-list-sublevels 'indented)
           (org-agenda-overriding-header "Next Tasks list")
           (org-agenda-finalize-hook '(org-agenda-add-separater-between-project))))
         ("a" . "\tAgendas")
         ("aa" "\tRegular Agenda" agenda "")
         ("at" "\tAgenda Today" agenda ""
-         ((org-agenda-span 'day)))
+         ())
         ("aw" "\tWeekly view" agenda ""
          ((org-scheduled-past-days 0)
-          (org-agenda-overriding-arguments (list nil (my/this-or-last-saturday)
-                                                 9))
-          (org-agenda-tag-filter-preset (quote ("+dev")))
-          (org-agenda-skip-scheduled-if-done t)
-          (org-agenda-skip-deadline-if-done t)))
+          (org-agenda-overriding-arguments
+           (list nil (my/this-or-last-saturday) 9))
+          (org-agenda-tag-filter-preset (quote ("+dev")))))
         ("al" "\tLast week" agenda ""
          ((org-agenda-overriding-arguments (list nil (my/last-or-last-last-saturday)
                                                  9))
           (org-agenda-tag-filter-preset (quote ("+dev")))))
         ("ad" "\tDev agenda" agenda ""
          ((org-agenda-skip-function 'my/agenda-custom-skip)
-          (org-agenda-span 'day)
           (org-agenda-tag-filter-preset (quote ("+dev")))
-          (org-agenda-skip-deadline-if-done t)
-          (org-agenda-skip-scheduled-if-done t)
           (org-super-agenda-groups '((:name "The Plan" :tag "PLAN")
                                      (:name "Overdue" :and (:deadline past :log nil))
                                      (:name "Upcoming" :deadline future)
@@ -246,21 +229,16 @@
                      ((org-agenda-overriding-header "Refile tasks")))
           (tags-todo "+sandbox"
                      ((org-agenda-overriding-header "Stuck Projects")
-                      (org-tags-match-list-sublevels 'indented)
                       (org-agenda-skip-function 'my/show-stuck-projects)
                       (org-agenda-sorting-strategy
                        '(category-keep))))
           (tags-todo "-REFILE-HOLD+TODO+sandbox/WAIT"
                      (;;(org-agenda-skip-function 'my/only-next-projects-and-tasks)
-                      (org-agenda-overriding-header "Tasks in other courts")
-                      (org-tags-match-list-sublevels t)))
+                      (org-agenda-overriding-header "Tasks in other courts")))
           ;;(org-ql-agenda-function "")
           (agenda ""
                   ((org-agenda-skip-function 'my/agenda-custom-skip)
-                   (org-agenda-span 'day)
                    (org-agenda-tag-filter-preset (quote ("+sandbox")))
-                   (org-agenda-skip-deadline-if-done t)
-                   (org-agenda-skip-scheduled-if-done t)
                    (org-super-agenda-groups '((:name "Overdue" :and (:deadline past :log nil ))
                                               (:name "Upcoming" :deadline future)
                                               (:name "Should do" :and (:scheduled past :log nil ))
@@ -316,9 +294,8 @@
         ("fc" "\tComms" tags-todo "datetime"
          ((org-agenda-overriding-header "Comms")))
         ("fC" "\tLook at clocking" agenda ""
-         ((org-agenda-span 'day)
-          (org-agenda-start-with-log-mode '(closed clock))
-          (org-agenda-clockreport-mode t)))
+         (          (org-agenda-start-with-log-mode '(closed clock))
+                    (org-agenda-clockreport-mode t)))
         ("fj" "\tReviews and Journals" tags "LEVEL=3&ITEM={Review for}|LEVEL=3&journal"
          ((org-agenda-files '(,(my/org-file "entries/reviews.gpg") 
                               ,(my/org-file "entries/journal.gpg")))
@@ -341,9 +318,9 @@
 
 (defun my/last-or-last-last-saturday ()
   (org-read-date nil nil
-                (if (<= 6 (string-to-number (format-time-string "%u")))
-                    "-2sat"
-                  "-sat")))
+                 (if (<= 6 (string-to-number (format-time-string "%u")))
+                     "-2sat"
+                   "-sat")))
 
 (defun cfw:open-org-2week-calendar (&rest args)
   "Open an org schedule calendar in the new buffer."

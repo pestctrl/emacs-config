@@ -142,16 +142,6 @@
   (use-package org)
   (require 'org-agenda)
 
-  (global-set-key "\C-cl" 'org-store-link)
-  (global-set-key "\C-cc" 'org-capture)
-  (global-set-key (kbd "<f5>") 'org-agenda)
-  (global-set-key (kbd "C-x C-o") 'org-agenda)
-  (define-key org-agenda-mode-map (kbd "a") 'org-agenda)
-
-  (setq org-src-window-setup 'current-window)
-
-  (setq org-list-allow-alphabetical t)  
-
   ;; This is for safety
   (define-key org-mode-map (kbd "C-S-<backspace>") 
     (lambda (arg)
@@ -170,62 +160,6 @@
       (message (format "This subtree has %d characters. " (- (region-end) (region-beginning))))))
 
   (define-key org-agenda-mode-map (kbd "C") #'my/org-count-subtree-characters)
-#+end_src
-
-* My Template
-#+BEGIN_SRC emacs-lisp
-  (add-to-list 'org-structure-template-alist
-               '("sv" . "src :results value"))
-  (add-to-list 'org-structure-template-alist
-               '("so" . "src :results output"))
-#+END_SRC
-* Face
-#+BEGIN_SRC emacs-lisp
-  (when (and (not (eq system-type 'windows-nt))
-             (find-font (font-spec :name "Font Awesome 5 Free")))
-    (setq org-ellipsis " "))
-#+END_SRC
-* Variables
-#+begin_src emacs-lisp
-  (setq org-log-done 'time)
-  (setq org-agenda-window-setup 'current-window)
-  (setq org-agenda-restore-windows-after-quit t)
-
-  (setq org-agenda-sticky t)
-
-  ;;(org-agenda-load-file-list)
-
-  ;; Targets include this file and any file contributing to the agenda - up to 9 levels deep
-  (setq org-refile-targets `((nil :maxlevel . 9)
-                             (my/all-agenda-files :maxlevel . 9)
-                             ("~/MEGA/org/entries/panic.org" :maxlevel . 9)))
-
-  (setq org-refile-use-cache t)
-
-  (setq org-refile-target-verify-function
-        (lambda () 
-          (let ((tags (org-get-tags-at)))
-            (and (not (member "ARCHIVE" tags))
-                 (not (equal "DONE" (org-get-todo-state)))))))
-
-  (setq org-agenda-show-future-repeats nil)
-
-  ;; Use full outline paths for refile targets - we file directly with IDO
-  (setq org-refile-use-outline-path 'file)
-
-  ;; Targets complete directly with IDO
-  (setq org-outline-path-complete-in-steps nil)
-
-  ;; Allow refile to create parent tasks with confirmation
-  (setq org-refile-allow-creating-parent-nodes (quote confirm))
-
-  ;; Use the current window for indirect buffer display
-  (setq org-indirect-buffer-display 'current-window)
-
-  ;; Do not dim blocked tasks
-  (setq org-agenda-dim-blocked-tasks nil)
-
-  (setq org-agenda-compact-blocks t)
 #+end_src
 * Tag hierarchy
 #+begin_src emacs-lisp
@@ -414,18 +348,8 @@
 #+begin_src emacs-lisp
   ;; TODO
 #+end_src
-* empty lines
-#+begin_src emacs-lisp
-  (setq org-cycle-separator-lines 0)
-#+end_src
-* invisibel
-#+begin_src emacs-lisp
-  (setq org-catch-invisible-edits 'show-and-error)
-#+end_src
 * link abbreviation
 #+begin_src emacs-lisp
-  (setq org-link-abbrev-alist 
-        '(("youtube" . "https://youtube.com/watch?v=")))
 #+end_src
 * refile to datetree
 #+begin_src emacs-lisp
@@ -598,10 +522,6 @@
   (setq org-now-location
         nil)
 #+end_src
-* org-use-speed-commands
-#+begin_src emacs-lisp
-  (setq org-use-speed-commands t)
-#+end_src
 * new headline set property
 #+begin_src emacs-lisp
   (defun my/org-set-created-property (&rest args)
@@ -647,12 +567,6 @@
             (forward-line))))))
 
   (add-hook 'org-agenda-finalize-hook #'org-agenda-delete-empty-compact-blocks)
-#+end_src
-* org-mode faces
-#+begin_src emacs-lisp
-  (set-face-attribute 'org-agenda-date-today nil :inherit 'org-agenda-date :foreground "cyan" :slant 'italic :weight 'bold :height 1.1)
-  (set-face-attribute 'org-agenda-structure  nil :foreground "LightSkyBlue" :box '(:line-width 1 :color "grey75" :style released-button))
-  (set-face-attribute 'org-ellipsis          nil :foreground "turquoise" :underline nil)
 #+end_src
 * org-notmuch
 #+begin_src emacs-lisp
@@ -714,18 +628,6 @@
               :before
               #'my/archive-remove-all-sibling)
 #+end_src
-* org agenda start on saturday
-#+begin_src emacs-lisp
-  (setq org-agenda-start-on-weekday 6)
-#+end_src
-* org mode startup
-#+begin_src emacs-lisp
-  (with-eval-after-load 'org
-    (setq org-startup-indented t) ; Enable `org-indent-mode' by default
-    (add-hook 'org-mode-hook #'visual-line-mode)
-    (add-hook 'org-mode-hook #'auto-fill-mode))
-#+end_src
-
 * Learning chinese, setup org-drill
 #+begin_src emacs-lisp
   (use-package org-drill)
@@ -758,49 +660,6 @@
                  (file ,(my/org-file "templates/daily-plan.org"))))
 #+end_src
 
-* My org-indent look
-#+begin_src emacs-lisp
-  (defun my/org-indent-prefixes ()
-    "Compute prefix strings for regular text and headlines."
-    (setq org-indent--heading-line-prefixes
-          (make-vector org-indent--deepest-level nil))
-    (setq org-indent--inlinetask-line-prefixes
-          (make-vector org-indent--deepest-level nil))
-    (setq org-indent--text-line-prefixes
-          (make-vector org-indent--deepest-level nil))
-    (dotimes (n org-indent--deepest-level)
-      (let ((indentation (if (<= n 1) 0
-                           (* (1- org-indent-indentation-per-level)
-                              (1- n)))))
-        ;; Headlines line prefixes.
-        (let ((heading-prefix ""))
-          (aset org-indent--heading-line-prefixes
-                n
-                (org-add-props heading-prefix nil 'face 'org-indent))
-          ;; Inline tasks line prefixes
-          (aset org-indent--inlinetask-line-prefixes
-                n
-                (cond ((<= n 1) "")
-                      ((bound-and-true-p org-inlinetask-show-first-star)
-                       (concat org-indent-inlinetask-first-star
-                               (substring heading-prefix 1)))
-                      (t (org-add-props heading-prefix nil 'face 'org-indent)))))
-        ;; Text line prefixes.
-        (aset org-indent--text-line-prefixes
-              n
-              (org-add-props
-                  (concat (make-string (if (< n 2) n
-                                         (1+ indentation)) ?\s)
-                          (and (> n 0)
-                               (char-to-string org-indent-boundary-char)))
-                  nil 'face 'org-indent)))))
-
-
-  (advice-add #'org-indent--compute-prefixes
-              :override
-              #'my/org-indent-prefixes)
-#+end_src
-
 * Insert inactive timestamp after last org-datetree--find-create
 #+begin_src emacs-lisp
   (defun org-datetree--find-create-add-timestamp (regex-template year &optional month day insert)
@@ -820,10 +679,6 @@
               #'org-datetree--find-create-add-timestamp)
 #+end_src
 
-* repeat to previous state
-#+begin_src emacs-lisp
-  (setq org-todo-repeat-to-state t)
-#+end_src
 * I'm bored
 #+begin_src emacs-lisp
   (defun im-bored ()
@@ -859,11 +714,6 @@
     (org-agenda-schedule))
 
   (define-key org-agenda-mode-map (kbd "T") #'my/tickle-todo)
-#+end_src
-* org-src dont ask
-#+begin_src emacs-lisp
-  (setq org-src-ask-before-returning-to-edit-buffer
-        nil)
 #+end_src
 * olivetti
 #+begin_src emacs-lisp
@@ -1000,15 +850,6 @@
   ;;              org-document-info-keyword org-done org-formula org-indent
   ;;              org-meta-line org-special-keyword org-table org-todo
   ;;              org-verbatim org-date org-drawer))
-#+end_src
-* Ediffing with org mode
-#+begin_src emacs-lisp
-  (with-eval-after-load 'outline
-    (add-hook 'ediff-prepare-buffer-hook #'org-show-all))
-#+end_src
-* ctrl-k
-#+begin_src emacs-lisp
-(setq org-ctrl-k-protect-subtree t)
 #+end_src
 * Restriction from org-agenda
 #+begin_src emacs-lisp

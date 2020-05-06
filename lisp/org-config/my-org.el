@@ -23,8 +23,9 @@
 ;;; Commentary:
 
 ;;; Code:
-
+(require 'org)
 (require 'my-org-misc)
+(require 'my-org-indent)
 (require 'my-org-agenda-commands)
 (require 'my-org-capture-templates)
 

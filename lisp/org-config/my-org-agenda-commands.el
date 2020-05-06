@@ -23,6 +23,7 @@
 ;;; Commentary:
 
 ;;; Code:
+(require 'my-org-agenda-misc)
 
 (add-to-list 'load-path 
              "~/.emacs.d/submodule/org-ql")
@@ -370,9 +371,12 @@
       ("\tReviews and Journals" (advice-add #'org-agenda-show
                                             :override
                                             #'my/org-agenda-show-journal))
-      ("\tDev" (advice-add #'org-agenda-show
-                           :override
-                           #'my/org-agenda-show-project))
+      ("\tDev" (advice-add #'org-agenda-show
+                            :override
+                            #'my/org-agenda-show-project))
+      ("\tMinimal" (advice-add #'org-agenda-show
+                               :override
+                               #'my/org-agenda-show-project))
       (_ (advice-unadvice #'org-agenda-show)))))
 
 (defun advice-unadvice (sym)

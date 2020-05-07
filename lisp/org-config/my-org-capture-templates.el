@@ -23,6 +23,8 @@
 ;;; Commentary:
 
 ;;; Code:
+(require 'my-org-agenda-files)
+
 (setq org-capture-templates
       `(("t" ,(format "%s\tTodo" (all-the-icons-octicon "inbox" :face 'all-the-icons-yellow :v-adjust 0.01))
          entry (file ,(my/agenda-file "refile.org"))

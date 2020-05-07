@@ -23,7 +23,9 @@
 ;;; Commentary:
 
 ;;; Code:
+(require 'my-org-agenda-files)
 (require 'my-org-agenda-misc)
+(require 'my-org-tags)
 
 (add-to-list 'load-path 
              "~/.emacs.d/submodule/org-ql")

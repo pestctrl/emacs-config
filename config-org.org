@@ -1,5 +1,8 @@
 #+PROPERTY: header-args :tangle "~/.emacs.d/config-org.el" :comments both
-
+* Need this for base config
+#+begin_src emacs-lisp
+(require 'my-org-agenda-files)
+#+end_src
 * Plugins
 ** fstree
 #+BEGIN_SRC emacs-lisp
@@ -249,16 +252,6 @@
   (setq org-now-location
         nil)
 #+end_src
-* org-agenda base folder
-#+begin_src emacs-lisp
-  (defconst my/org-folder "~/MEGA/org")
-  (defconst my/agenda-folder (expand-file-name "2019-05-agenda" my/org-folder))
-
-  (defun my/org-file (str)
-    (expand-file-name str my/org-folder))
-  (defun my/agenda-file (str)
-    (expand-file-name str my/agenda-folder))
-#+end_src
 * Keybindings
 #+begin_src emacs-lisp
   (use-package org)
@@ -282,78 +275,6 @@
       (message (format "This subtree has %d characters. " (- (region-end) (region-beginning))))))
 
   (define-key org-agenda-mode-map (kbd "C") #'my/org-count-subtree-characters)
-#+end_src
-* Tag hierarchy
-#+begin_src emacs-lisp
-  (setq org-tag-alist
-        '((:startgrouptag)
-          ("all" . nil)
-          (:grouptags)
-          ("time" . nil)
-          ("nontime" . nil)
-          (:endgrouptag)
-          (:startgrouptag)
-          ("time" . nil)
-          (:grouptags)
-          ("prod" . ?1)
-          (:endgrouptag)
-          (:startgrouptag)
-          ("nontime" . nil)
-          (:grouptags)
-          ("sandbox" . ?3)
-          (:endgrouptag)
-          (:startgrouptag)
-          ("sandbox" . ?3)
-          (:grouptags)
-          ("dev" . ?2)
-          ("people" . nil)
-          (:endgrouptag)
-          (:startgroup . nil)
-          ("short" . ?s)
-          ("long" . ?l)
-          (:endgroup . nil)
-          (:startgroup . nil)
-          ("watch" . ?w)
-          ("read" . ?r)
-          (:endgroup . nil)
-          (:startgroup . nil)
-          ("grow" . ?g)
-          ("rest" . ?R)
-          (:endgroup . nil)
-          (:startgroup . nil)
-          ("active" . ?a)
-          ("idle" . ?i)
-          (:endgroup . nil)
-          ;; (:startgrouptag)
-          ;; ("online")
-          ;; (:grouptags)
-          ;; ("article")
-          ;; (:endgrouptag)
-          ;; (:startgrouptag)
-          ;; ("read")
-          ;; (:grouptags)
-          ;; ("article")
-          ;; (:endgrouptag)
-          (:startgrouptag)
-          ("active")
-          (:grouptags)
-          ("prog")
-          (:endgrouptag)
-          (:startgrouptag)
-          ("people" . nil)
-          (:grouptags)
-          ("family" . nil)
-          (:endgrouptag)
-          ))
-
-
-  (setq org-agenda-hide-tags-regexp
-        (mapconcat #'identity (list "time" "nontime" "prod" "dev" "sandbox"
-                                    "refile"
-                                    "short" "long" "watch" "read" "grow" "rest" "active" "idle")
-                   "\\|"))
-
-  (defconst category-tags '("computers"))
 #+end_src
 * More alternative views
 #+begin_src emacs-lisp
@@ -469,9 +390,6 @@
 * Parallel org-tags-views
 #+begin_src emacs-lisp
   ;; TODO
-#+end_src
-* link abbreviation
-#+begin_src emacs-lisp
 #+end_src
 * refile to datetree
 #+begin_src emacs-lisp
@@ -844,7 +762,7 @@
   (define-key org-agenda-mode-map (kbd "U") #'org-agenda-remove-restriction-lock)
 #+end_src
 * Org mode magit update commands
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp#
   (when (executable-find "~/bin/gitwatch")
     (defun start-gitwatch ()
       (interactive)

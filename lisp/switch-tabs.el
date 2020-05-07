@@ -26,18 +26,17 @@
 
 (defvar show-tab-bar-new-tab nil)
 
-(defun switch-or-create-tab ()
-  (interactive)
-  (let* ((current-tab (alist-get 'name (tab-bar--current-tab)))
-         (tab-name
-          (->> (tab-bar--tabs-recent)
-               (mapcar #'(lambda (tab)
-                           (alist-get 'name tab)))
-               (remove-if #'(lambda (tab-name)
-                              (string= tab-name current-tab)))
-               (ido-completing-read (format "Switch to tab (%s): "
-                                            current-tab))))
-         (tab-index (tab-bar--tab-index-by-name tab-name)))
+(defun switch-or-create-tab (tab-name)
+  (interactive
+   (list (let ((current-tab (alist-get 'name (tab-bar--current-tab))))
+           (->> (tab-bar--tabs-recent)
+                (mapcar #'(lambda (tab)
+                            (alist-get 'name tab)))
+                (remove-if #'(lambda (tab-name)
+                               (string= tab-name current-tab)))
+                (ido-completing-read (format "Switch to tab (%s): "
+                                             current-tab))))))
+  (let ((tab-index (tab-bar--tab-index-by-name tab-name)))
     (if tab-index
         (tab-bar-select-tab (1+ tab-index))
       (tab-bar-new-tab)
@@ -61,7 +60,7 @@
                             old-name))
       (tab-bar-close-tab)
       (when (<= 2 (length (funcall tab-bar-tabs-function)))
-        (switch-or-create-tab))
+        (switch-or-create-tab "scratch"))
       t)))
 
 (defun tab-bar-report ()

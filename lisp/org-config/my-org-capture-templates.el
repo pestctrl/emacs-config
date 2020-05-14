@@ -124,22 +124,23 @@
 
 (defvar my/review-date-old nil)
 (defun setup-automatic-review ()
-  ;; Check for older review
-  (when (and (file-exists-p "~/.emacs.d/review-incomplete.el")
-             (y-or-n-p "Woah, we found an incomplete review. Would you like to use that date as the start date? "))
-    (shell-command "mv ~/.emacs.d/review-incomplete.el ~/.emacs.d/last-review.el"))
-  ;; Setup current review
-  (let* ((date (org-read-date nil nil (get-last-review-date)))
-         (week (format "%02d" 
-                       (org-days-to-iso-week
-                        (org-time-string-to-absolute date)))))
-    (output-incomplete-date)
-    (setq my/review-date-old date)
-    (setq my/review-visibility-level 6)
-    (org-capture-put :start-date date)
-    (org-capture-put :start-week week)
-    (goto-char (point-min))
-    (re-search-forward "Reviews")))
+  (unless current-prefix-arg
+    ;; Check for older review
+    (when (and (file-exists-p "~/.emacs.d/review-incomplete.el")
+               (y-or-n-p "Woah, we found an incomplete review. Would you like to use that date as the start date? "))
+      (shell-command "mv ~/.emacs.d/review-incomplete.el ~/.emacs.d/last-review.el"))
+    ;; Setup current review
+    (let* ((date (org-read-date nil nil (get-last-review-date)))
+           (week (format "%02d" 
+                         (org-days-to-iso-week
+                          (org-time-string-to-absolute date)))))
+      (output-incomplete-date)
+      (setq my/review-date-old date)
+      (setq my/review-visibility-level 6)
+      (org-capture-put :start-date date)
+      (org-capture-put :start-week week)
+      (goto-char (point-min))
+      (re-search-forward "Reviews"))))
 
 (defun aux-get-week-string ()
   (let ((last (plist-get org-capture-plist :start-week))

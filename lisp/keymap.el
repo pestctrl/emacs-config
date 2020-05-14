@@ -1,21 +1,21 @@
 (defmacro exwm-global-set-key (keybinding function)
   `(progn
-     (when (boundp 'exwm-input-global-keys)
-         (add-to-list 'exwm-input-global-keys
-                      (cons ,keybinding ,function)))
+     (use-package exwm
+       :config
+       (add-to-list 'exwm-input-global-keys
+                    (cons ,keybinding ,function)))
      (global-set-key ,keybinding ,function)))
 
 (exwm-global-set-key (kbd "M-T") 'flop-frame)
 (exwm-global-set-key (kbd "s-k") (lambda () (interactive) (kill-buffer (current-buffer))))
 
-(cond (my/is-wsl
-       (defconst my/keymap-key (kbd "C-m"))
-       (when (boundp 'exwm-input-prefix-keys)
-	     (add-to-list 'exwm-input-prefix-keys ?\C-m)))
-      (t
-       (defconst my/keymap-key (kbd "C-t"))
-       (when (boundp 'exwm-input-prefix-keys)
-	     (add-to-list 'exwm-input-prefix-keys ?\C-t))))
+(ec/load-or-ask-key my/keymap-key
+                    my/keymap-key-key
+                    "What would you like *root-map* to be bound to?")
+
+(use-package exwm
+  :config
+  (add-to-list 'exwm-input-prefix-keys my/keymap-key-key))
 
 ;; Disable C-t for all others
 (with-eval-after-load "vterm"

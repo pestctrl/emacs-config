@@ -31,7 +31,6 @@
 (require 'cl)
 (require 'org)
 (require 'org-loop)
-(require 'fireorg)
 
 ;; Utilities that will help with the rest of the code.
 
@@ -58,26 +57,6 @@
 
 ;; Actual user functions
 
-(defun op/youtube-loop ()
-  (interactive)
-  (let ((ff (get-buffer "fireorg")))
-    (if (null ff)
-        (progn
-          (fireorg/make-fireorg-window)
-          (run-with-timer 4 nil 'op/youtube-loop))
-      (let ((org (find-file-noselect (my/agenda-file "refile.org"))))
-        (fireorg/setup org ff
-          ;; Goto youtube node
-          (beginning-of-buffer)
-          (search-forward "Youtube Videos: ")
-          (org-back-to-heading)
-          ;; Loop through the children
-          (ol/children
-           (fireorg/open-link ff
-             (when (op/lenient-y-or-n-p "Refile this one?")
-               (process-youtube-headline)
-               (org-get-last-sibling)))))))))
-
 (defun process-youtube-headline ()
   (interactive)
   (op/org-add-tag "watch")
@@ -96,31 +75,6 @@
         (op/org-add-tag "rest")
         (op/refile-to-location (my/agenda-file "eternal.org")
                                "Entertaining YouTube Videos")))))
-
-(defun op/get-rid-of-entertaining-youtube-videos ()
-  (interactive)
-  (let ((ff (get-buffer "fireorg")))
-    (if (null ff)
-        (progn
-          (fireorg/make-fireorg-window)
-          (run-with-timer 4 nil 'op/get-rid-of-entertaining-youtube-videos))
-      (let ((org (find-file-noselect (my/agenda-file "refile.org"))))
-        (fireorg/setup org ff
-          (beginning-of-buffer)
-          (search-forward "Youtube Videos: ")
-          (org-back-to-heading)
-
-          (ol/children
-           (fireorg/open-link ff
-             (when (not (op/lenient-y-or-n-p "Educational?"))
-               (save-excursion
-                 (save-window-excursion
-                   (op/org-add-tag "watch")
-                   (org-todo "TODO")
-                   (op/org-add-tag "rest")
-                   (op/refile-to-location (my/agenda-file "eternal.org")
-                                          "Entertaining YouTube Videos")))
-               (org-get-last-sibling)))))))))
 
 (defun op/insert-category-heading (point heading-name)
   (let* ((uuid (get-random-uuid))
@@ -206,37 +160,87 @@
          (when-let (location (alist-get category db))
            (op/refile-to-point (buffer-file-name) location)))))))
 
-(defun fireorg/org-sort-subtree (org)
-  (interactive (list (current-buffer)))
-  (let ((ff (get-buffer "fireorg")))
-    (if (null ff)
-        (progn
-          (fireorg/make-fireorg-window)
-          (run-with-timer 4 nil 'fireorg/org-sort-subtree org))
-      (fireorg/setup org ff
-        (let ((db '((1-undecided . nil)))
-              (beg (ol/get-bot-marker))
-              (path (org-get-outline-path t)))
-          (org-set-tags (delete "sorting" (org-get-tags nil t)))
-          (ols/children
-            (if (member "sorting" (org-get-tags))
-                (let* ((heading (org-get-heading t t t t))
-                       (index-of (string-match-p ":" heading))
-                       (category (intern (substring heading 0 index-of))))
-                  (forward-char)
-                  (setf (alist-get category db)
-                        (point-marker))
-                  nil)
+
+(use-package exwm
+  :config
+  (require 'fireorg)
+
+  (defun op/youtube-loop ()
+    (interactive)
+    (let ((ff (get-buffer "fireorg")))
+      (if (null ff)
+          (progn
+            (fireorg/make-fireorg-window)
+            (run-with-timer 4 nil 'op/youtube-loop))
+        (let ((org (find-file-noselect (my/agenda-file "refile.org"))))
+          (fireorg/setup org ff
+            ;; Goto youtube node
+            (beginning-of-buffer)
+            (search-forward "Youtube Videos: ")
+            (org-back-to-heading)
+            ;; Loop through the children
+            (ol/children
               (fireorg/open-link ff
-                (let* ((category-name (completing-read "Category? " (sort (mapcar #'car db) #'ivy-string<)))
-                       (category (intern category-name))
-                       (entry (assoc category db)))
-                  (unless entry ;; New category! 
-                    (let ((refile-location (op/insert-category-heading beg category-name)))
-                      (setf (alist-get category db)
-                            refile-location)))
-                  (when-let (location (alist-get category db))
-                    (op/refile-to-point (buffer-file-name) location)))))))))))
+                (when (op/lenient-y-or-n-p "Refile this one?")
+                  (process-youtube-headline)
+                  (org-get-last-sibling)))))))))
+
+  (defun op/get-rid-of-entertaining-youtube-videos ()
+    (interactive)
+    (let ((ff (get-buffer "fireorg")))
+      (if (null ff)
+          (progn
+            (fireorg/make-fireorg-window)
+            (run-with-timer 4 nil 'op/get-rid-of-entertaining-youtube-videos))
+        (let ((org (find-file-noselect (my/agenda-file "refile.org"))))
+          (fireorg/setup org ff
+            (beginning-of-buffer)
+            (search-forward "Youtube Videos: ")
+            (org-back-to-heading)
+
+            (ol/children
+              (fireorg/open-link ff
+                (when (not (op/lenient-y-or-n-p "Educational?"))
+                  (save-excursion
+                    (save-window-excursion
+                      (op/org-add-tag "watch")
+                      (org-todo "TODO")
+                      (op/org-add-tag "rest")
+                      (op/refile-to-location (my/agenda-file "eternal.org")
+                                             "Entertaining YouTube Videos")))
+                  (org-get-last-sibling)))))))))
+
+  (defun fireorg/org-sort-subtree (org)
+    (interactive (list (current-buffer)))
+    (let ((ff (get-buffer "fireorg")))
+      (if (null ff)
+          (progn
+            (fireorg/make-fireorg-window)
+            (run-with-timer 4 nil 'fireorg/org-sort-subtree org))
+        (fireorg/setup org ff
+          (let ((db '((1-undecided . nil)))
+                (beg (ol/get-bot-marker))
+                (path (org-get-outline-path t)))
+            (org-set-tags (delete "sorting" (org-get-tags nil t)))
+            (ols/children
+              (if (member "sorting" (org-get-tags))
+                  (let* ((heading (org-get-heading t t t t))
+                         (index-of (string-match-p ":" heading))
+                         (category (intern (substring heading 0 index-of))))
+                    (forward-char)
+                    (setf (alist-get category db)
+                          (point-marker))
+                    nil)
+                (fireorg/open-link ff
+                  (let* ((category-name (completing-read "Category? " (sort (mapcar #'car db) #'ivy-string<)))
+                         (category (intern category-name))
+                         (entry (assoc category db)))
+                    (unless entry ;; New category! 
+                      (let ((refile-location (op/insert-category-heading beg category-name)))
+                        (setf (alist-get category db)
+                              refile-location)))
+                    (when-let (location (alist-get category db))
+                      (op/refile-to-point (buffer-file-name) location))))))))))))
 
 ;; (defun op/open-loop ()
 ;;   (interactive)
@@ -257,8 +261,6 @@
 ;;         (switch-window))
 ;;       (org-end-of-subtree t t)
 ;;       (exwm-background/exwm-input--fake-key-to-window id ?\C-w))))
-
-(global-set-key (kbd "<insert>") (lambda () (interactive) (start-process-shell-command "refile-open" nil (format "firefox -P youtube \"%s\"" "https://www.youtube.com/watch?v=Ml8axytjAbA"))))
 
 (provide 'org-process)
 ;; org-process.el ends here

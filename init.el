@@ -1,4 +1,4 @@
-(setq package-list '(org use-package))
+(setq package-list '(org use-package exwm))
 ;; list the repositories containing them
 (setq package-archives '(("melpa" . "http://melpa.org/packages/")
                          ("org" . "https://orgmode.org/elpa/")
@@ -35,19 +35,14 @@
 
 (require 'libs)
 
-(defvar my/is-wsl nil)
-(defvar my/enable-exwm t)
+(ec/load-or-ask-pred my/is-wsl "Are you running Emacs in WSL?")
+(ec/load-or-ask-pred my/enable-exwm "Do you want to load EXMW?")
+(ec/load-or-ask-pred my/at-ti "Are you at TI for work?")
+
+(setq my/enable-exwm (and my/enable-exwm (eq 'x window-system)))
 
 ;; On TI VNC machine
-(when-let (l (getenv "https_proxy"))
-  (when (string-match-p "ti\.com" l)
-    (setq epg-pinentry-mode nil)))
-
-(when (and (eq 'x window-system)
-           my/enable-exwm
-           (not my/is-wsl))
-  (use-package exwm)
-  (setq exwm-input-global-keys nil))
+(when my/at-ti (setq epg-pinentry-mode nil))
 
 (require 'keymap)
 
@@ -59,9 +54,8 @@
                    user-emacs-directory))
 
 ;; Load additional exwm stuff that changes constantly
-(when (and (eq 'x window-system)
-           my/enable-exwm
-           (not my/is-wsl))
+(use-package exwm
+  :config 
   (org-babel-load-file
    (expand-file-name "config-exwm.org"
                      user-emacs-directory)))
@@ -81,6 +75,10 @@
  (expand-file-name "my-redefs.org"
                    user-emacs-directory))
 
+(when my/enable-exwm
+  (require 'exwm))
+
 (setq my/finished t)
 ;; Testing pull from windows
 
+(put 'narrow-to-region 'disabled nil)

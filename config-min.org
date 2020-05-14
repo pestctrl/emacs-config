@@ -2,9 +2,6 @@
 
 * misc emacs settings
 #+begin_src emacs-lisp
-  ;; Custom file should be in custom.el
-  (setq custom-file "~/.emacs.d/custom.el")
-  (load custom-file 'noerror)
   (setq backup-directory-alist `(("." . ,(concat user-emacs-directory "backups"))))
 
   ;; Don't fricken suspend emacs
@@ -36,10 +33,8 @@
 * exwm
 #+begin_src emacs-lisp
   ;; This will be the hardest to write :/
-  (when (and (eq 'x window-system)
-             my/enable-exwm
-             (not my/is-wsl))
-    (use-package exwm)
+  (use-package exwm
+    :config
     (use-package exwm-x)
 
     ;; System tray

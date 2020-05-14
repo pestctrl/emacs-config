@@ -17,6 +17,7 @@
 (require 'org-project)
 (require 'org-delay)
 (require 'clojure-swap)
+(require 'emacs-custom-load-or-ask)
 
 (require 'face-copier)
 

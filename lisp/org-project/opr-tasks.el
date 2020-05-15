@@ -36,7 +36,7 @@
 
 (define-todo-keyword "NEXT" 'task :key ?n :color "cyan")
 
-(define-todo-keyword "WAIT" 'task :color "yellow" :key ?w :recordstr "@/!")
+(define-todo-keyword "WAIT" 'task :color "yellow" :key ?w :recordstr "!")
 
 (finish-active-type 'task)
 

@@ -71,16 +71,6 @@
                                                :and (:not (:and (:not (:scheduled today)
                                                                       :not (:deadline today)))))))))))
 
-(defconst my/non-agenda-files
-  `(,(my/org-file "entries/reviews.gpg") 
-    ,(my/agenda-file "datetree.org") 
-    ,(my/agenda-file "reference.org") 
-    ,(my/org-file "entries/journal.gpg")))
-
-(defconst my/all-agenda-files
-  (cons (my/agenda-file "eternal.org")
-        org-agenda-files))
-
 (defun my/valid-todo ()
   (let (seen-non-todo)
     (save-excursion 

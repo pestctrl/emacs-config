@@ -31,5 +31,15 @@
 (defun my/agenda-file (str)
   (expand-file-name str my/agenda-folder))
 
+(defconst my/non-agenda-files
+  `(,(my/org-file "entries/reviews.gpg") 
+    ,(my/agenda-file "datetree.org") 
+    ,(my/agenda-file "reference.org") 
+    ,(my/org-file "entries/journal.gpg")))
+
+(defconst my/all-agenda-files
+  (cons (my/agenda-file "eternal.org")
+        org-agenda-files))
+
 (provide 'my-org-agenda-files)
 ;;; my-org-agenda-files.el ends here

@@ -108,6 +108,7 @@
             (:name "work" :query "tag:work" :key "w")
             (:name "mailing lists" :query "tag:mlist" :key "m")
             (:name "emacs-devel" :query "tag:emacs-devel" :key "e")
+            (:name "org-mode" :query "tag:org-mode" :key "o")
             (:name "recruiting" :query "tag:recruiting" :key "r")
             (:name "unread" :query "tag:unread" :key "u")
             (:name "flagged" :query "tag:flagged" :key "f")

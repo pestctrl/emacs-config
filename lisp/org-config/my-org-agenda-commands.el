@@ -215,7 +215,6 @@
                                                                    :not (:deadline today)))))))))
         ("p" . "\tProd")
         ("pa" "\tAll" ,(production-agenda "time"))
-        ("pw" "\twork" ,(production-agenda "work"))
         ("ps" "\tschool" ,(production-agenda "school"))
         ("g" ,(format "%s\tGeneral View" (all-the-icons-material "all_inclusive" :face 'all-the-icons-cyan-alt))
          ((tags-todo "+sandbox+refile"

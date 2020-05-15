@@ -23,13 +23,11 @@
 ;;; Commentary:
 
 ;;; Code:
-(require 'exwm-tag)
-
 (defvar exwm-startup-programs
   '("megasync"
     "deadd-notification-center"
     "/usr/lib/kdeconnectd"
-    "compton -f -i .7 -b"
+    ("compton" "compton -f -i .7 -b")
     ;; ("compton -f -i .7 -b --backend glx --blur-background --blur-method kawase --blur-strength 2")
     "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
     "/usr/lib/notification-daemon-1.0/notification-daemon"
@@ -40,8 +38,8 @@
 (defun call-startup-programs ()
   (dolist (program exwm-startup-programs)
     (if (listp program)
-        (launch-program (car program) (cadr program))
-      (launch-program program))))
+        (start-process-shell-command (car program) nil (cadr program))
+      (start-process-shell-command (file-name-nondirectory program) nil program))))
 
 (provide 'exwm-startup)
 ;;; exwm-startup.el ends here

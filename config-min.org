@@ -49,35 +49,36 @@
     ;; This is a new-frame hack. Don't copy faces for floating windows
     (require 'face-copier)
 
-    (def-face-copier1 my/frame-dont-copy-faces (sym)
-      (let ((name (symbol-name sym)))
-        (string-match-p "^doom-.*" name))
-      mode-line
-      mode-line-inactive
-      variable-pitch
-      diredp-file-suffix
-      font-lock-type-face
-      vterm-color-default)
+    (unless (eq 'hash-table (type-of face-new-frame-defaults))
+      (def-face-copier1 my/frame-dont-copy-faces (sym)
+        (let ((name (symbol-name sym)))
+          (string-match-p "^doom-.*" name))
+        mode-line
+        mode-line-inactive
+        variable-pitch
+        diredp-file-suffix
+        font-lock-type-face
+        vterm-color-default)
 
-    (defun my/exwm-floating--advise-make-frame (orig id)
-      (override1-face my/frame-dont-copy-faces
-        (funcall orig id)))
+      (defun my/exwm-floating--advise-make-frame (orig id)
+        (override1-face my/frame-dont-copy-faces
+          (funcall orig id)))
 
-    (advice-add #'exwm-floating--set-floating
-                :around
-                #'my/exwm-floating--advise-make-frame)
+      (advice-add #'exwm-floating--set-floating
+                  :around
+                  #'my/exwm-floating--advise-make-frame)
 
-    (def-face-copier x-show-tip-faces (sym)
-      nil
-      tooltip)
+      (def-face-copier x-show-tip-faces (sym)
+        nil
+        tooltip)
 
-    (defun dont-copy-faces-for-x-show-tip (orig &rest args)
-      (override1-face x-show-tip-faces
-        (apply orig args)))
+      (defun dont-copy-faces-for-x-show-tip (orig &rest args)
+        (override1-face x-show-tip-faces
+          (apply orig args)))
 
-    (advice-add #'x-show-tip
-                :around
-                #'dont-copy-faces-for-x-show-tip)
+      (advice-add #'x-show-tip
+                  :around
+                  #'dont-copy-faces-for-x-show-tip))
 
     ;; Actually launch programs
     (require 'exwm-launch-program)

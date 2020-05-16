@@ -592,21 +592,24 @@
 #+end_src
 * org-noter
 #+begin_src emacs-lisp
-  (use-package org-noter)
-  (when (featurep 'exwm)
+  (use-package org-noter
+    :config
+    (unless (eq 'hash-table (type-of face-new-frame-defaults))
+      (def-face-copier x-show-tip-faces (sym)
+        nil
+        tooltip)
+
+      (defun dont-copy-faces-for-x-show-tip (orig &rest args)
+        (override1-face x-show-tip-faces
+          (apply orig args)))
+
+      (advice-add #'x-show-tip
+                  :around
+                  #'dont-copy-faces-for-x-show-tip)))
+
+  (use-package exwm
+    :config
     (setq org-noter-always-create-frame nil))
-
-  (def-face-copier x-show-tip-faces (sym)
-    nil
-    tooltip)
-
-  (defun dont-copy-faces-for-x-show-tip (orig &rest args)
-    (override1-face x-show-tip-faces
-      (apply orig args)))
-
-  (advice-add #'x-show-tip
-              :around
-              #'dont-copy-faces-for-x-show-tip)
 #+end_src
 * turn into tickle
 #+begin_src emacs-lisp

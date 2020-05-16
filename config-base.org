@@ -948,66 +948,6 @@
 #+begin_src emacs-lisp
   (use-package google-translate)
 #+end_src
-** ivy-posframe
-#+begin_src emacs-lisp
-  (use-package ivy-posframe)
-  ;; (setq ivy-posframe-parameters '((parent-frame t)))
-  ;; Different command can use different display function.
-  (setq ivy-posframe-display-functions-alist
-        '((swiper          . ivy-posframe-display-at-frame-center)
-          (complete-symbol . ivy-posframe-display-at-point)
-          (iwc-switch-to-wc . nil)
-          (t               . ivy-posframe-display-at-window-top-center)))
-
-  ;; (ivy-posframe-mode 1)
-
-  (defun disable-ivy-posframe-on-exwm-windows (orig &rest args)
-    (if (not (eq major-mode 'exwm-mode))
-        (apply orig args)
-      (letf (((symbol-function 'display-graphic-p) (lambda (&optional display) nil)))
-        (apply orig args))))
-
-  ;; (def-face-copier my/posframe-faces (sym)
-  ;;   (let ((name (symbol-name sym)))
-  ;;     (string-match-p "^ivy-.*"
-  ;;                     name)))
-
-  (advice-add #'ivy-posframe--read
-              :around
-              #'disable-ivy-posframe-on-exwm-windows)
-
-  (defun ivy-posframe-display-at-window-top-center (str)
-    (ivy-posframe--display str #'posframe-poshandler-window-top-center))
-
-  (defun posframe-poshandler-window-top-center (info)
-    "Posframe's position handler.
-
-    Get a position which let posframe stay onto current window's
-    center.  The structure of INFO can be found in docstring
-    of `posframe-show'."
-    (let* ((frame-width (plist-get info :parent-frame-width))
-           (window-left (plist-get info :parent-window-left))
-           (window-top (plist-get info :parent-window-top))
-           (window-width (plist-get info :parent-window-width))
-           (posframe-width (plist-get info :posframe-width)))
-      (cons (min (- frame-width posframe-width)
-                 (+ window-left (max 0
-                                     (/ (- window-width posframe-width) 2))))
-            (+ window-top 50))))
-
-  (use-package ivy-rich)
-  (ivy-rich-mode 1)
-
-  (setq ivy-posframe-min-height 0)
-  ;; (setq ivy-posframe-height 24)
-
-  ;; (setq ivy-height-alist
-  ;;       '((t . 24)))
-  ;; (setq ivy-posframe-height-alist
-  ;;       '((counsel-M-x . 8)
-  ;;         (t . 24)))
-  ;; '((swiper . 24)))
-#+end_src
 ** read-identifier too slow
 #+begin_src emacs-lisp
   (add-to-list 'xref-prompt-for-identifier

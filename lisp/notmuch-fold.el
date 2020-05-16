@@ -7,7 +7,7 @@
 
 ;; Faces for overlays
 (defface notmuch-tree-overlay-fold-face
-  '((t :inherit 'font-lock-keyword-face))
+  '((t :inherit font-lock-keyword-face))
   "Default face used to display `notmuch-tree-overlay-string'"
   :group 'notmuch-tree
   :group 'notmuch-faces)

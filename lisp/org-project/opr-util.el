@@ -50,7 +50,7 @@
                   (list todo-keyword-str))))
   (when color
     (add-to-list 'org-todo-keyword-faces
-                 `(,str :foreground ,color :weight bold :inherit 'fixed-pitch)))
+                 `(,str :foreground ,color :weight bold :inherit fixed-pitch)))
   (pcase type
     ('ambiguous (add-to-list 'opr/ambiguous
                              str))

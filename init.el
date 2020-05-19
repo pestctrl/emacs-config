@@ -82,3 +82,4 @@
 ;; Testing pull from windows
 
 (put 'narrow-to-region 'disabled nil)
+(put 'list-timers 'disabled nil)

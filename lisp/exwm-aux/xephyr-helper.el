@@ -54,8 +54,8 @@
                fullscreen t))
 
 (add-to-list 'exwm-manage-configurations
-             ((equal exwm-class-name "plasmashell")
-              floating t))
+             '((equal exwm-class-name "plasmashell")
+               floating t))
 
 (provide 'xephyr-helper)
 ;;; xephyr-helper.el ends here

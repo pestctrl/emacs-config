@@ -204,6 +204,7 @@
   ;; I like my unicode to be monospace too, so I use these
   (set-fontset-font t 'unicode (font-spec :size 10 :name "FontAwesome"))
   (set-fontset-font t 'unicode (font-spec :size 15 :name "DejaVu Sans Mono"))
+  (set-fontset-font t 'unicode (font-spec :size 18 :name "Baekmuk Gulim"))
 
   (defun my/reading-color ()
     (interactive)

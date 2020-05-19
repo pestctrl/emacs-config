@@ -94,7 +94,7 @@
             #'notmuch-tree-clean-up-overlays)
 
 (defun advice-replace-forward-line-with-next-line (orig &rest args)
-  (letf (((symbol-function 'forward-line) (symbol-function 'next-line)))
+  (cl-letf (((symbol-function 'forward-line) (symbol-function 'next-line)))
     (apply orig args)))
 
 ;; Needed for n and p to work
@@ -106,15 +106,18 @@
             :around
             #'advice-replace-forward-line-with-next-line)
 
-
 (defun notmuch-tree-next-sibling ()
   (interactive)
-  (let ((l (length (notmuch-tree-get-prop :tree-status))))
+  (let ((l (length (notmuch-tree-get-prop :tree-status)))
+        (orig (point)))
     (while (progn (next-line)
                   (and (not (bobp))
-                       (< l (length (notmuch-tree-get-prop :tree-status)))))))
-  (when (window-live-p notmuch-tree-message-window)
-    (notmuch-tree-show-message-in)))
+                       (> (length (notmuch-tree-get-prop :tree-status)) l))))
+    (if (= l (length (notmuch-tree-get-prop :tree-status)))
+        (when (window-live-p notmuch-tree-message-window)
+          (notmuch-tree-show-message-in))
+      (goto-char orig)
+      (message "No next sibling"))))
 
 (defun notmuch-tree-prev-sibling ()
   (interactive)
@@ -124,6 +127,41 @@
                        (< l (length (notmuch-tree-get-prop :tree-status)))))))
   (when (window-live-p notmuch-tree-message-window)
     (notmuch-tree-show-message-in)))
+
+(defun notmuch-tree-unfold-all ()
+  (interactive)
+  (mapcar #'(lambda (overlay)
+              (notmuch-tree-remove-overlay overlay))
+          notmuch-tree-overlays))
+
+(advice-add #'notmuch-refresh-this-buffer
+            :before
+            #'notmuch-tree-unfold-all)
+
+(defmacro notmuch-let-range (var1 var2 &rest body)
+  (declare (indent 2))
+  `(cl-multiple-value-bind (,var1 ,var2) (notmuch-tree-sub-thread-range)
+     ,@body))
+
+(defun notmuch-tree-explore-here ()
+  (interactive)
+  (notmuch-let-range start end
+    (when-let (overlay (notmuch-tree-find-overlay (current-buffer) start end))
+      (notmuch-tree-remove-overlay overlay)))
+  (save-excursion
+    (let ((l (length (notmuch-tree-get-prop :tree-status))))
+      (while (progn (next-line)
+                    (< l (length (notmuch-tree-get-prop :tree-status))))
+        (notmuch-let-range start end
+            (unless (= start end)
+              (unless (notmuch-tree-find-overlay (current-buffer) start end)
+                (notmuch-tree-add-overlay start end))))))))
+
+(defun notmuch-tree-up-thread ()
+  (interactive)
+  (let ((l (1- (length (notmuch-tree-get-prop :tree-status)))))
+    (while (progn (previous-line)
+                  (< l (length (notmuch-tree-get-prop :tree-status)))))))
 
 (provide 'notmuch-fold)
 

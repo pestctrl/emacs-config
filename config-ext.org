@@ -85,29 +85,43 @@
     :bind (:map notmuch-message-mode-map
                 ("C-c C-c" . #'my/choose-email-address-and-send)
                 :map notmuch-search-mode-map
+                ("z" . #'notmuch-search-tree-current-thread)
                 ("d" . #'my/notmuch-delete-mail)
                 ("u" . #'my/undelete-mail)
                 ("f" . #'my/recruiting-mail)
                 ("<mouse-1>" . nil)
                 :map notmuch-tree-mode-map
+                ("<tab>" . #'notmuch-tree-explore-here)
+                ("d" . #'my/notmuch-delete-mail)
+                ("U" . #'notmuch-tree-unfold-all)
+                ("u" . #'notmuch-tree-up-thread)
                 ("N" . #'notmuch-tree-next-sibling)
                 ("P" . #'notmuch-tree-prev-sibling)
                 ("t" . #'notmuch-tree-toggle-folding-thread)
                 ("S-SPC" . #'notmuch-tree-scroll-message-window-back))
     :config
+    (require 'notmuch-tree)
+    (require 'notmuch-fold)
     (custom-set-faces
      '(notmuch-tree-match-tree-face ((t (:family "DejaVu Sans Mono"))) t)
      '(notmuch-tree-no-match-tree-face ((t (:family "DejaVu Sans Mono"))) t))
     (set-face-attribute 'notmuch-search-unread-face nil :foreground "white")
     (set-face-attribute 'notmuch-message-summary-face nil :background "steel blue" :foreground "snow")
+    (add-to-list 'notmuch-search-line-faces
+                 '("deleted" . font-lock-comment-face))
+
+    (defun notmuch-search-tree-current-thread ()
+      (interactive)
+      (notmuch-tree (notmuch-search-find-thread-id)))
 
     (setq notmuch-search-oldest-first nil
           notmuch-saved-searches
           '((:name "inbox" :query "tag:inbox" :key "i")
-            (:name "inbox today" :query "date:7d.. tag:inbox" :key "t")
+            (:name "inbox today" :query "date:7d.. and tag:inbox" :key "t")
             (:name "work" :query "tag:work" :key "w")
             (:name "mailing lists" :query "tag:mlist" :key "m")
-            (:name "emacs-devel" :query "tag:emacs-devel" :key "e")
+            (:name "emacs-devel" :query "tag:emacs-devel and date:30d.." :key "e")
+            (:name "emacs bugs" :query "tag:bug-gnu-emacs and date:30d.." :key "E")
             (:name "org-mode" :query "tag:org-mode" :key "o")
             (:name "recruiting" :query "tag:recruiting" :key "r")
             (:name "unread" :query "tag:unread" :key "u")
@@ -142,11 +156,16 @@
       (notmuch-search-next-thread))
 
     (add-to-list 'notmuch-tagging-keys
-                 '("r" ("-inbox" "+recruiting") "Recruiting")))
+                 '("r" ("-inbox" "+recruiting") "Recruiting"))
 
-  (eval-after-load 'notmuch
-    '(require 'notmuch-fold))
-
+    (defun run-offlineimap ()
+      (interactive)
+      (set-process-sentinel
+       (start-process-shell-command "offlineimap" nil "offlineimap")
+       #'(lambda (process event)
+           (when (string-match "^finished" event)
+             (message "Offlineimap finished")
+             (run-with-timer 300 nil #'run-offlineimap))))))
 #+end_src
 ** erc
 #+begin_src emacs-lisp

@@ -2,6 +2,7 @@
 /*.elc
 \#*\#
 *~
+custom.el
 
 /transient
 /.sx

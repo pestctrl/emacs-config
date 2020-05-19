@@ -663,3 +663,13 @@
     ;; '((swiper . 24)))
     )
 #+end_src
+** Elfeed
+#+begin_src emacs-lisp#
+  (require 'elfeed)
+  (setq elfeed-use-curl t)
+  (elfeed-set-timeout 36000)
+  (setq elfeed-curl-extra-arguments '("--insecure"))
+
+  ;; enable elfeed-protocol
+  (elfeed-protocol-enable)
+#+end_src

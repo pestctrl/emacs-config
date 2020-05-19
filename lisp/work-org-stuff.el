@@ -29,9 +29,6 @@
 
 (defvar org-ql-indent-levels nil)
 
-(global-set-key (kbd "C-x C-o") #'org-agenda)
-(global-set-key (kbd "C-c c") #'org-capture)
-
 (setq org-agenda-compact-blocks t)
 
 (setq org-capture-templates

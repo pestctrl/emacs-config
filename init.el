@@ -64,6 +64,9 @@
  (expand-file-name "config-ext.org"
                    user-emacs-directory))
 
+;; Load the minimal org config stuff
+(require 'my-org-misc)
+
 ;; These are less important when it comes to debugging emacs itself
 (org-babel-load-file
  (expand-file-name "config-org.org"

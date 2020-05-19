@@ -208,7 +208,8 @@
 
   (defun my/reading-color ()
     (interactive)
-    (face-remap-add-relative 'default :foreground "WhiteSmoke"))
+    (variable-pitch-mode)
+    (face-remap-add-relative 'default :foreground "white smoke"))
 
   (add-hook 'Man-mode-hook
             #'my/reading-color)

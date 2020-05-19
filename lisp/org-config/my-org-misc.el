@@ -26,10 +26,9 @@
 
 (require 'org)
 
-(global-set-key "\C-cl" 'org-store-link)
-(global-set-key "\C-cc" 'org-capture)
-(global-set-key (kbd "<f5>") 'org-agenda)
-(global-set-key (kbd "C-x C-o") 'org-agenda)
+(exwm-global-set-key (kbd "C-x C-o") 'org-agenda)
+(global-set-key (kbd "C-c c") 'org-capture)
+(global-set-key (kbd "C-c l") 'org-store-link)
 
 (define-key org-agenda-mode-map (kbd "a") 'org-agenda)
 
@@ -53,8 +52,6 @@
 (add-to-list 'org-structure-template-alist
              '("so" . "src :results output"))
 
-
-
 (set-face-attribute 'org-agenda-date-today nil :inherit 'org-agenda-date :foreground "cyan" :slant 'italic :weight 'bold :height 1.1)
 (set-face-attribute 'org-agenda-structure  nil :foreground "LightSkyBlue" :box '(:line-width 1 :color "grey75" :style released-button))
 (set-face-attribute 'org-ellipsis          nil :foreground "turquoise" :underline nil)
@@ -71,6 +68,31 @@
       '(("youtube" . "https://youtube.com/watch?v=")))
 
 (setq org-use-speed-commands t)
+
+;;; org-refile configuration
+;; Targets include this file and any file contributing to the agenda - up to 9 levels deep
+(setq org-refile-targets `((nil :maxlevel . 9)
+                           (my/all-agenda-files :maxlevel . 9)
+                           ("~/MEGA/org/entries/panic.org" :maxlevel . 9)))
+
+(setq org-refile-use-cache t)
+
+(setq org-refile-target-verify-function
+      (lambda () 
+        (let ((tags (org-get-tags-at)))
+          (and (not (member "ARCHIVE" tags))
+               (not (equal "DONE" (org-get-todo-state)))))))
+
+(setq org-agenda-show-future-repeats nil)
+
+;; Use full outline paths for refile targets - we file directly with IDO
+(setq org-refile-use-outline-path 'file)
+
+;; Targets complete directly with IDO
+(setq org-outline-path-complete-in-steps nil)
+
+;; Allow refile to create parent tasks with confirmation
+(setq org-refile-allow-creating-parent-nodes (quote confirm))
 
 (provide 'my-org-misc)
 ;;; my-org-misc.el ends here

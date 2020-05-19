@@ -38,30 +38,6 @@
 
 ;;(org-agenda-load-file-list)
 
-;; Targets include this file and any file contributing to the agenda - up to 9 levels deep
-(setq org-refile-targets `((nil :maxlevel . 9)
-                           (my/all-agenda-files :maxlevel . 9)
-                           ("~/MEGA/org/entries/panic.org" :maxlevel . 9)))
-
-(setq org-refile-use-cache t)
-
-(setq org-refile-target-verify-function
-      (lambda () 
-        (let ((tags (org-get-tags-at)))
-          (and (not (member "ARCHIVE" tags))
-               (not (equal "DONE" (org-get-todo-state)))))))
-
-(setq org-agenda-show-future-repeats nil)
-
-;; Use full outline paths for refile targets - we file directly with IDO
-(setq org-refile-use-outline-path 'file)
-
-;; Targets complete directly with IDO
-(setq org-outline-path-complete-in-steps nil)
-
-;; Allow refile to create parent tasks with confirmation
-(setq org-refile-allow-creating-parent-nodes (quote confirm))
-
 ;; Use the current window for indirect buffer display
 (setq org-indirect-buffer-display 'current-window)
 

@@ -92,14 +92,36 @@
                 ("<mouse-1>" . nil)
                 :map notmuch-tree-mode-map
                 ("<tab>" . #'notmuch-tree-explore-here)
+                ("<down>" . #'notmuch-tree-next-message)
+                ("<up>" . #'notmuch-tree-prev-message)
                 ("d" . #'my/notmuch-delete-mail)
                 ("U" . #'notmuch-tree-unfold-all)
                 ("u" . #'notmuch-tree-up-thread)
                 ("N" . #'notmuch-tree-next-sibling)
                 ("P" . #'notmuch-tree-prev-sibling)
                 ("t" . #'notmuch-tree-toggle-folding-thread)
+                ("F" . #'notmuch-tree-focus)
                 ("S-SPC" . #'notmuch-tree-scroll-message-window-back))
     :config
+    (defun notmuch-tree-message (&optional prev pop-at-end)
+      "Move to the next or previous matching message"
+      (interactive "P")
+      (forward-line (if prev -1 nil))
+      (if pop-at-end
+          (notmuch-tree-quit pop-at-end)
+        (when (window-live-p notmuch-tree-message-window)
+          (notmuch-tree-show-message-in))))
+
+    (defun notmuch-tree-prev-message (&optional pop-at-end)
+      "Move to previous matching message."
+      (interactive "P")
+      (notmuch-tree-message t pop-at-end))
+
+    (defun notmuch-tree-next-message (&optional pop-at-end)
+      "Move to next matching message."
+      (interactive "P")
+      (notmuch-tree-message nil pop-at-end))
+  
     (require 'notmuch-tree)
     (require 'notmuch-fold)
     (custom-set-faces
@@ -110,9 +132,17 @@
     (add-to-list 'notmuch-search-line-faces
                  '("deleted" . font-lock-comment-face))
 
-    (defun notmuch-search-tree-current-thread ()
-      (interactive)
-      (notmuch-tree (notmuch-search-find-thread-id)))
+    (defun notmuch-search-tree-current-thread (arg)
+      (interactive "P")
+      (setq notmuch-tree-show-filter-function (unless arg #'notmuch-tree-hide-dead-trees))
+      (let* ((thread-id (notmuch-search-find-thread-id))
+             (input (notmuch-read-query (concat "Notmuch tree: " thread-id " and "))))
+        (notmuch-tree thread-id (unless (zerop (length input)) input))))
+
+    (defun notmuch-tree-focus (arg)
+      (interactive "P")
+      (setq notmuch-tree-show-filter-function (if (not arg) #'notmuch-tree-hide-dead-trees #'notmuch-tree-show-trail-and-alive-children))
+      (notmuch-tree notmuch-tree-basic-query (notmuch-tree-get-message-id)))
 
     (setq notmuch-search-oldest-first nil
           notmuch-saved-searches

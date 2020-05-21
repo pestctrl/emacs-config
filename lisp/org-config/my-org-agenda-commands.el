@@ -135,7 +135,7 @@
           (agenda ""
                   ((org-agenda-tag-filter-preset (quote ("+dev")))
                    (org-agenda-skip-function (lambda ()
-                                               (when (string= "TICKLER" (org-get-todo-state))
+                                               (when (member (org-get-todo-state) '("HOLD" "TICKLER"))
                                                  (outline-next-heading))))
                    (org-super-agenda-groups '((:name "The Plan" :tag "PLAN")
                                               (:name "Overdue" :and (:deadline past :log nil))

@@ -5,7 +5,9 @@
   (setq backup-directory-alist `(("." . ,(concat user-emacs-directory "backups"))))
 
   ;; Don't fricken suspend emacs
-  (global-set-key (kbd "C-z") nil)
+  (when (eq #'suspend-frame
+            (key-binding (kbd "C-z")))
+    (global-set-key (kbd "C-z") nil))
 
   ;; Minibuffer reading
   (setq switch-window-input-style 'minibuffer)

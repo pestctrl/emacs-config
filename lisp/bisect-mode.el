@@ -12,16 +12,16 @@
 
 (defvar bisect-mode-map nil)
 
-(unless bisect-mode-map)
-(let ((map (make-sparse-keymap)))
-  (define-key map (kbd "u") #'bisect-up-inclusive)
-  (define-key map (kbd "U") #'bisect-up-exclusive)
-  (define-key map (kbd "d") #'bisect-down-inclusive)
-  (define-key map (kbd "D") #'bisect-down-exclusive)
-  (define-key map (kbd "g") #'bisect-goto-current-middle)
-  (define-key map (kbd "C-SPC") #'bisect-middle-overlay-here)
-  (define-key map (kbd "q") #'bisect-mode)
-  (setq bisect-mode-map map))
+(unless bisect-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "u") #'bisect-up-inclusive)
+    (define-key map (kbd "U") #'bisect-up-exclusive)
+    (define-key map (kbd "d") #'bisect-down-inclusive)
+    (define-key map (kbd "D") #'bisect-down-exclusive)
+    (define-key map (kbd "g") #'bisect-goto-current-middle)
+    (define-key map (kbd "C-SPC") #'bisect-middle-here)
+    (define-key map (kbd "q") #'bisect-mode)
+    (setq bisect-mode-map map)))
 
 (defmacro put-arrow-setq (sym point bitmap)
   `(overlay-put (setq ,sym (make-overlay ,point ,point))
@@ -47,9 +47,9 @@
       (put-arrow-setq bisect-top-overlay top right-arrow)
       (put-arrow-setq bisect-bottom-overlay bottom right-arrow)
       (put-arrow-setq bisect-middle-overlay bottom right-triangle))
-    (find-middle)))
+    (bisect-find-middle)))
 
-(defun find-middle ()
+(defun bisect-find-middle ()
   (move-overlay bisect-bottom-overlay bisect-bottom bisect-bottom)
   (move-overlay bisect-top-overlay bisect-top bisect-top)
   (let* ((sum (if bisect-linewise
@@ -65,22 +65,22 @@
 (defun bisect-up-inclusive ()
   (interactive)
   (setq bisect-bottom (overlay-end bisect-middle-overlay))
-  (find-middle))
+  (bisect-find-middle))
 
 (defun bisect-down-inclusive ()
   (interactive)
   (setq bisect-top (overlay-start bisect-middle-overlay))
-  (find-middle))
+  (bisect-find-middle))
 
 (defun bisect-up-exclusive ()
   (interactive)
   (setq bisect-bottom (overlay-start bisect-middle-overlay))
-  (find-middle))
+  (bisect-find-middle))
 
 (defun bisect-down-exclusive ()
   (interactive)
   (setq bisect-top (overlay-end bisect-middle-overlay))
-  (find-middle))
+  (bisect-find-middle))
 
 (defun bisect-middle-here ()
   (interactive)

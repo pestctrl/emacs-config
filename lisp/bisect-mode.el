@@ -1,11 +1,7 @@
-(defvar bisect-top nil)
-(make-variable-buffer-local 'bisect-top)
 (defvar bisect-top-overlay nil)
 (make-variable-buffer-local 'bisect-top-overlay)
 (defvar bisect-middle-overlay nil)
 (make-variable-buffer-local 'bisect-middle-overlay)
-(defvar bisect-bottom nil)
-(make-variable-buffer-local 'bisect-bottom)
 (defvar bisect-bottom-overlay nil)
 (make-variable-buffer-local 'bisect-bottom-overlay)
 (defvar bisect-linewise t)
@@ -23,68 +19,74 @@
     (define-key map (kbd "q") #'bisect-mode)
     (setq bisect-mode-map map)))
 
-(defmacro put-arrow-setq (sym point bitmap)
-  `(overlay-put (setq ,sym (make-overlay ,point ,point))
-                'before-string
-                (propertize "!" 'display
-                            (list 'left-fringe
-                                  ',bitmap)
-                            ;; 'face 'font-lock-comment-face
-                            )))
+(defun move-overlay-to-line (overlay line)
+  (save-excursion
+    (goto-line line)
+    (move-overlay overlay
+                  (point-at-bol)
+                  (point-at-eol))))
+
+(defun bisect-make-overlay (line bitmap)
+  (save-excursion
+    (goto-line line)
+    (let ((overlay (make-overlay (point-at-bol) (point-at-eol))))
+      (overlay-put overlay 'before-string 
+                   (propertize "!" 'display
+                               (list 'left-fringe
+                                     bitmap)))
+      (overlay-put overlay 'face font-lock-comment-face)
+      overlay)))
+
+(defun bisect-overlay-line (overlay &optional eol)
+  (line-number-at-pos
+   (funcall (if eol #'overlay-end #'overlay-start)
+            overlay)))
 
 (define-minor-mode bisect-mode ""
   nil nil
   bisect-mode-map
   (if (not bisect-mode)
       (mapcar #'delete-overlay (list bisect-middle-overlay
-                                   bisect-top-overlay
-                                   bisect-bottom-overlay))
-    (let ((top    (if mark-active (region-beginning) (point-min)))
-          (bottom (if mark-active (region-end)       (point-max))))
+                                     bisect-top-overlay
+                                     bisect-bottom-overlay))
+    (let ((top    (line-number-at-pos (if mark-active (region-beginning) (point-min))))
+          (bottom (line-number-at-pos (if mark-active (region-end)       (point-max)))))
       (when mark-active (call-interactively #'set-mark-command))
-      (setq bisect-top top)
-      (setq bisect-bottom bottom)
-      (put-arrow-setq bisect-top-overlay top right-arrow)
-      (put-arrow-setq bisect-bottom-overlay bottom right-arrow)
-      (put-arrow-setq bisect-middle-overlay bottom right-triangle))
+      (setq bisect-top-overlay (bisect-make-overlay top 'right-arrow))
+      (setq bisect-bottom-overlay (bisect-make-overlay bottom 'right-arrow))
+      (setq bisect-middle-overlay (bisect-make-overlay bottom 'right-triangle)))
     (bisect-find-middle)))
 
 (defun bisect-find-middle ()
-  (move-overlay bisect-bottom-overlay bisect-bottom bisect-bottom)
-  (move-overlay bisect-top-overlay bisect-top bisect-top)
-  (let* ((sum (if bisect-linewise
-                  (+ (line-number-at-pos bisect-top)
-                     (line-number-at-pos bisect-bottom))
-                (+ bisect-top bisect-bottom)))
-         (average (/ sum 2)))
-    (if bisect-linewise
-        (goto-line average)
-      (goto-char average))
+  (let* ((average (/ (+ (bisect-overlay-line bisect-top-overlay)
+                        (bisect-overlay-line bisect-bottom-overlay))
+                     2)))
+    (goto-line average)
     (bisect-middle-here)))
+
+(defun bisect-middle-here ()
+  (interactive)
+  (move-overlay-to-line bisect-middle-overlay (line-number-at-pos)))
 
 (defun bisect-up-inclusive ()
   (interactive)
-  (setq bisect-bottom (overlay-end bisect-middle-overlay))
+  (move-overlay-to-line bisect-bottom-overlay (bisect-overlay-line bisect-middle-overlay))
   (bisect-find-middle))
 
 (defun bisect-down-inclusive ()
   (interactive)
-  (setq bisect-top (overlay-start bisect-middle-overlay))
+  (move-overlay-to-line bisect-top-overlay (bisect-overlay-line bisect-middle-overlay))
   (bisect-find-middle))
 
 (defun bisect-up-exclusive ()
   (interactive)
-  (setq bisect-bottom (overlay-start bisect-middle-overlay))
+  (move-overlay-to-line bisect-bottom-overlay (1- (bisect-overlay-line bisect-middle-overlay)))
   (bisect-find-middle))
 
 (defun bisect-down-exclusive ()
   (interactive)
-  (setq bisect-top (overlay-end bisect-middle-overlay))
+  (move-overlay-to-line bisect-top-overlay (1+ (bisect-overlay-line bisect-middle-overlay)))
   (bisect-find-middle))
-
-(defun bisect-middle-here ()
-  (interactive)
-  (move-overlay bisect-middle-overlay (point-at-bol) (point-at-eol)))
 
 (defun bisect-goto-current-middle ()
   (interactive)

@@ -22,11 +22,11 @@
             ("reg" "%(binary) -f %(ledger-file) reg")
             ("equity" "%(binary) -f %(ledger-file) bal ^Exp ^RE ^Rev")
             ("cleared" ,new-report-str)
-            ;; ("cleared" "%(binary) -f %(ledger-file) cleared")
+            ("last-superfluous" "%(binary) -f %(ledger-file) bal --limit='account =~ /^Exp:(Food|Luxury|NewTech|People)/ && date >= [last month]'")
+            ("superfluous" "%(binary) -f %(ledger-file) reg --limit='account =~ /^Exp:(Food|Luxury|NewTech|People)/'")
             ("expmonth" "%(binary) -f %(ledger-file) -M reg Expenses")
             ("owedmom" "%(binary) -f %(ledger-file) reg Liabilities")
             ("progress" "%(binary) -f %(ledger-file) reg Assets Equity Liabilities")
-            ;; ("food" "%(binary) -f %(ledger-file) --add-budget reg Assets")
             ("payee" "%(binary) -f %(ledger-file) reg @%(payee)")))
 
     (setq dynamic-reports
@@ -45,7 +45,17 @@
       (when (= (aref account 0)
                ?^)
         (setq account
-              (substring account 1)))))
+              (substring account 1))))
+
+    (defun ledger-report-show-monthly-average ()
+      (interactive)
+      (let ((average-string "-A -M -n"))
+        (unless (string-match-p average-string ledger-report-cmd)
+          (setq ledger-report-cmd
+                (concat ledger-report-cmd " " average-string))
+          (ledger-report-redo))))
+
+    (define-key ledger-report-mode-map (kbd "M") #'ledger-report-show-monthly-average))
 #+end_src
 ** Credit Card Statement Macro
 #+begin_src emacs-lisp

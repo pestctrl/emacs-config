@@ -9,28 +9,27 @@
   (let ((file (expand-file-name file org-tests-directory))
         (buffer-gensym (gensym "buffer")))
     `(progn
-       ,@(progn
-           (save-window-excursion
-             (let ((buffer (find-file-noselect file)))
-               (prog1 (with-current-buffer buffer
-                        (beginning-of-buffer)
-                        (when (not (org-at-heading-p ))
-                          (outline-next-heading))
-                        (cl-loop until (eobp)
-                                 for test-name = (intern (replace-regexp-in-string " " "-" (org-get-heading t nil t t)))
-                                 if (member "disabled" (org-get-tags))
-                                 do (add-to-list 'org-disabled-tests
-                                                 test-name)
-                                 else
-                                 when (not (member test-name org-disabled-tests))
-                                 collect `(ert-deftest ,test-name ()
-                                            (let ((,buffer-gensym (find-file-noselect ,file)))
-                                              (with-current-buffer ,buffer-gensym
-                                                (goto-char ,(point))
-                                                ,@body)
-                                              (kill-buffer ,buffer-gensym)))
-                                 do (org-end-of-subtree t t)))
-                 (kill-buffer buffer))))))))
+       ,@(save-window-excursion
+           (let ((buffer (find-file-noselect file)))
+             (prog1 (with-current-buffer buffer
+                      (beginning-of-buffer)
+                      (when (not (org-at-heading-p))
+                        (outline-next-heading))
+                      (cl-loop until (eobp)
+                               for test-name = (intern (replace-regexp-in-string " " "-" (org-get-heading t nil t t)))
+                               if (member "disabled" (org-get-tags))
+                               do (add-to-list 'org-disabled-tests
+                                               test-name)
+                               else
+                               when (not (member test-name org-disabled-tests))
+                               collect `(ert-deftest ,test-name ()
+                                          (let ((,buffer-gensym (find-file-noselect ,file)))
+                                            (with-current-buffer ,buffer-gensym
+                                              (goto-char ,(point))
+                                              ,@body)
+                                            (kill-buffer ,buffer-gensym)))
+                               do (org-end-of-subtree t t)))
+               (kill-buffer buffer)))))))
 
 (ert-deftest canary-test ()
   (should t))

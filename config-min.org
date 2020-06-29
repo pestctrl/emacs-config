@@ -767,3 +767,10 @@
   (global-set-key (kbd "C-h k") #'helpful-key)
   (global-set-key (kbd "C-h o") #'helpful-symbol)
 #+end_src
+** Ace jump
+#+BEGIN_SRC emacs-lisp
+  (use-package ace-jump-mode
+    :bind (("C-c j" . 'ace-jump-line-mode)
+           :map *root-map*
+           ("SPC" . 'ace-jump-mode)))
+#+END_SRC

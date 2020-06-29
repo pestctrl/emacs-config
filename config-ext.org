@@ -86,9 +86,6 @@
                 ("C-c C-c" . #'my/choose-email-address-and-send)
                 :map notmuch-search-mode-map
                 ("z" . #'notmuch-search-tree-current-thread)
-                ("d" . #'my/notmuch-delete-mail)
-                ("u" . #'my/undelete-mail)
-                ("f" . #'my/recruiting-mail)
                 ("<mouse-1>" . nil)
                 :map notmuch-tree-mode-map
                 ("<tab>" . #'notmuch-tree-explore-here)
@@ -103,25 +100,8 @@
                 ("F" . #'notmuch-tree-focus)
                 ("S-SPC" . #'notmuch-tree-scroll-message-window-back))
     :config
-    (defun notmuch-tree-message (&optional prev pop-at-end)
-      "Move to the next or previous matching message"
-      (interactive "P")
-      (forward-line (if prev -1 nil))
-      (if pop-at-end
-          (notmuch-tree-quit pop-at-end)
-        (when (window-live-p notmuch-tree-message-window)
-          (notmuch-tree-show-message-in))))
-
-    (defun notmuch-tree-prev-message (&optional pop-at-end)
-      "Move to previous matching message."
-      (interactive "P")
-      (notmuch-tree-message t pop-at-end))
-
-    (defun notmuch-tree-next-message (&optional pop-at-end)
-      "Move to next matching message."
-      (interactive "P")
-      (notmuch-tree-message nil pop-at-end))
-  
+    (require 'notmuch-nav)
+    (require 'notmuch-tree-hide)
     (require 'notmuch-tree)
     (require 'notmuch-fold)
     (custom-set-faces
@@ -152,6 +132,7 @@
             (:name "mailing lists" :query "tag:mlist" :key "m")
             (:name "emacs-devel" :query "tag:emacs-devel and date:30d.." :key "e")
             (:name "emacs bugs" :query "tag:bug-gnu-emacs and date:30d.." :key "E")
+            (:name "emacs help" :query "tag:help-gnu-emacs and date:30d.." :key "h")
             (:name "org-mode" :query "tag:org-mode" :key "o")
             (:name "recruiting" :query "tag:recruiting" :key "r")
             (:name "unread" :query "tag:unread" :key "u")
@@ -171,23 +152,17 @@
                 "smtp.office365.com"))
         (notmuch-mua-send-and-exit)))
 
-    (defun my/notmuch-delete-mail ()
-      (interactive)
-      (notmuch-search-tag '("+deleted"))
-      (notmuch-search-next-thread))
-
-    (defun my/undelete-mail ()
-      (interactive)
-      (notmuch-search-tag '("-deleted")))
-
-    (defun my/recruiting-mail ()
-      (interactive)
-      (notmuch-search-tag '("-inbox" "+recruiting"))
-      (notmuch-search-next-thread))
-
     (add-to-list 'notmuch-tagging-keys
                  '("r" ("-inbox" "+recruiting") "Recruiting"))
 
+    (setf (cdr (assoc "d" notmuch-tagging-keys))
+          '(("+deleted") "Delete"))
+
+    (advice-add #'notmuch-tag-jump :after #'(lambda (&rest args) (next-line))))
+
+
+  (use-package exwm
+    :config
     (defun run-offlineimap ()
       (interactive)
       (set-process-sentinel
@@ -195,7 +170,10 @@
        #'(lambda (process event)
            (when (string-match "^finished" event)
              (message "Offlineimap finished")
-             (run-with-timer 300 nil #'run-offlineimap))))))
+             (run-with-timer 300 nil #'run-offlineimap)))))
+
+    (add-to-list 'exwm-init-hook
+                 #'run-offlineimap))
 #+end_src
 ** erc
 #+begin_src emacs-lisp

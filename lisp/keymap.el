@@ -8,6 +8,7 @@
 
 (exwm-global-set-key (kbd "M-T") 'flop-frame)
 (exwm-global-set-key (kbd "s-k") (lambda () (interactive) (kill-buffer (current-buffer))))
+(exwm-global-set-key (kbd "M-q") #'bury-buffer)
 
 (ec/load-or-ask-key my/keymap-key
                     my/keymap-key-key

@@ -25,225 +25,189 @@
 ;;; Code:
 (require 'my-org-agenda-files)
 
+;; Defines 3 things:
+;; - #'setup-automatic-review
+;; - #'finalize-review
+;; - #'clear-out-review-files
+(require 'my-org-weekly-review)
+
+(use-package doct)
+
+(defun doct-pad-and-icon-recursive (element)
+  (let* ((name (car element))
+         (plist (cdr element))
+         (icon (or (plist-get plist :icon) ""))
+         (children (plist-get plist :children)))
+    (setq plist (org-plist-delete plist :icon))
+    (when children
+      (-as-> children it
+             (mapcar #'doct-pad-and-icon-recursive
+                     it)
+             (plist-put plist :children it)
+             (setq plist it)))
+    (cons (format "%s\t%s" icon name)
+          plist)))
+
+(defun doct-pad-and-icon-all (orig list)
+  (funcall orig
+           (mapcar #'doct-pad-and-icon-recursive
+                   list)))
+
+(advice-add #'doct :around #'doct-pad-and-icon-all)
+
 (setq org-capture-templates
-      `(("t" ,(format "%s\tTodo" (all-the-icons-octicon "inbox" :face 'all-the-icons-yellow :v-adjust 0.01))
-         entry (file ,(my/agenda-file "refile.org"))
-         "* STUFF %?\n:PROPERTIES:\n:CREATED: %U\n:VIEWING: %a\n:END:")
-        ("r" ,(format "%s\tReviews" (all-the-icons-faicon "share" :face 'all-the-icons-lblue)))
-        ("ra" "\tAutomatic Review" entry (file+function ,(my/org-file "entries/reviews.gpg") setup-automatic-review)
-         (file ,(my/org-file "templates/weekly-review.org")))
-        ("rm" "\tManual Review" entry (file+function ,(my/org-file "entries/reviews.gpg") setup-manual-review)
-         (file ,(my/org-file "templates/weekly-review.org")))
-        ("ro" "\tReorient" entry (file ,(my/org-file "entries/reviews.gpg"))
-         (file ,(my/org-file "templates/reorient.org")))
-        ;; ("rt" "Review Task" entry (file+headline ,(my/org-file "entries/reviews.gpg") "Tasks")
-        ;;  "* TODO %?")
-        ;; ("d" "\tDream" entry (file+olp+datetree ,(my/org-file "entries/dream.org"))
-        ;;  "* %?")
-        ("D" "\tDistracted" entry (file ,(my/agenda-file "dev.org"))
-         "* TODO %?" :clock-in t :clock-resume t)
-        ("T" "\tNew Task" entry (file ,(my/agenda-file "dev.org"))
-         "* TODO %?" :clock-in t :clock-keep t)
-        ("m" ,(format "%s\tMoney" (all-the-icons-material "attach_money" :face 'all-the-icons-lgreen)))
-        ("mc" ,(format "%s\tCredit Card" (all-the-icons-faicon "credit-card" :face 'all-the-icons-blue))
-         plain (file ,(my/org-file "entries/finances/ledger.ledger"))
-         (file ,(my/org-file "templates/credit.ledger")) :unnarrowed t :empty-lines 1)
-        ("mg" "\tGeneral" plain (file ,(my/org-file "entries/finances/ledger.ledger"))
-         (file ,(my/org-file "templates/basic.ledger")) :unnarrowed t :empty-lines 1)
-        ("c" "\tRecord Comms Message" entry (file+olp+datetree ,(my/agenda-file "datetree.org"))
-         "* TODO %?")
-        ("e" "\tEmacs config snippet" entry (file+headline "~/.emacs.d/config-base.org" "New")
-         "* %^{Title}\n#+begin_src emacs-lisp\n %?\n#+end_src")
-        ("j" "\tJournal")
-        ("jd" "\tDecision template" entry (file+olp+datetree ,(my/org-file "entries/journal.gpg"))
-         (file ,(my/org-file "templates/decide.org")))
-        ("je" "\tJournal Entry" entry (file+olp+datetree ,(my/org-file "entries/journal.gpg"))
-         "* %<%R> %?")
-        ("jp" "\tProgramming Interview Prep Journal" entry (file+olp+datetree ,(my/org-file "entries/journal.gpg"))
-         "* ")
-        ("C" "\tCreate checklist")
-        ("Cc" "\tConference Via Bus" entry (file ,(my/agenda-file "dev.org"))
-         (file ,(my/org-file "checklists/conference.org"))
-         :conference/airplane nil)
-        ("Cm" "\tMorning routine" entry (file ,(my/org-file "entries/routines.org"))
-         (file ,(my/org-file "checklists/mornings.org")))
-        ("Cn" "\tNightly routine" entry (file ,(my/org-file "entries/routines.org"))
-         (file ,(my/org-file "checklists/nights.org")))
-        ;; ("y" "Elfeed YouTube" entry (file+olp ,(my/agenda-file "dev.org") "rewards" "Videos")
-        ;;  "* TODO %(identity elfeed-link-org-capture)")
-        ("p" "\tProtocol" entry (file ,(my/agenda-file "refile.org"))
-         "* STUFF %^{Title}\n:PROPERTIES:\n:CREATED: %U\n:URL: %:link\n:END:\n#+begin_example\n%i\n#+end_example\n%?")
-        ("L" "\tProtocol Link" entry (file ,(my/agenda-file "refile.org"))
-         "* STUFF %? [[%:link][%:description]]\n:PROPERTIES:\n:CREATED: %U\n:URL: %:link\n:END:")
-        ("l" "\tAdd to lists conveniently")
-        ("lp" "Plan your day" entry (file+headline ,(my/agenda-file "dev.org") "The Plan")
-         (file ,(my/org-file "templates/daily-plan.org")))
-        ("lc" "\tCringe" entry (file ,(my/org-file "entries/cringe.gpg")) "* %?")
-        ("lm" "\tMental Model" entry (file ,(my/org-file "entries/mental_models.gpg")) "* %?")
-        ("li" "\tImportant Information" entry (file ,(my/org-file "entries/important.gpg")) "* %?")))
+      (doct `(("Todo"
+               :icon ,(all-the-icons-octicon "inbox" :face 'all-the-icons-yellow :v-adjust 0.01)
+               :keys "t"
+               :file ,(my/agenda-file "refile.org")
+               :template "* STUFF %?\n:PROPERTIES:\n:CREATED: %U\n:VIEWING: %a\n:END:")
+              ("Reviews" :keys "r"
+               :icon ,(all-the-icons-faicon "share" :face 'all-the-icons-lblue)
+               :children
+               (("Automatic Review"
+                 :keys "a"
+                 :file ,(my/org-file "entries/reviews.gpg")
+                 :function setup-automatic-review
+                 :before-finalize finalize-review
+                 :after-finalize clear-out-review-files
+                 :template-file ,(my/org-file "templates/weekly-review.org"))
+                ("Manual Review"
+                 :keys "m"
+                 :file ,(my/org-file "entries/reviews.gpg")
+                 :function setup-manual-review
+                 :template-file ,(my/org-file "templates/weekly-review.org"))
+                ("Reorient"
+                 :keys "o"
+                 :file ,(my/org-file "entries/reviews.gpg")
+                 :template-file ,(my/org-file "templates/reorient.org"))))
+              ("Distracted"
+               :file ,(my/agenda-file "dev.org")
+               :keys "D" :clock-in t :clock-resume t
+               :template "* TASK %?")
+              ("New Task" :file ,(my/agenda-file "dev.org")
+               :keys "T" :clock-in t :clock-keep t
+               :template "* TASK %?")
+              ("Money" :keys "m"
+               :icon ,(all-the-icons-material "attach_money" :face 'all-the-icons-lgreen)
+               :children
+               (("Credit Card"
+                 :keys "c"
+                 :icon ,(all-the-icons-faicon "credit-card" :face 'all-the-icons-blue)
+                 :file ,(my/org-file "entries/finances/ledger.ledger")
+                 :unnarrowed t :empty-lines 1 :type plain
+                 :template-file ,(my/org-file "templates/credit.ledger"))
+                ("General" :keys "g"
+                 :unnarrowed t :empty-lines 1 :type plain
+                 :file ,(my/org-file "entries/finances/ledger.ledger")
+                 :template-file ,(my/org-file "templates/basic.ledger"))))
+              ("Record Comms Message"
+               :file ,(my/agenda-file "datetree.org")
+               :keys "c"
+               :datetree t 
+               :template "* TODO %?")
+              ("Emacs config snippet" :keys "e"
+               :file "~/.emacs.d/config-base.org"
+               :headline "New"
+               :template "* %^{Title}\n#+begin_src emacs-lisp\n %?\n#+end_src")
+              ("Journal" :keys "j" :children
+               (("Decision Template"
+                 :file ,(my/org-file "entries/journal.gpg")
+                 :datetree t
+                 :keys "d"
+                 :template-file ,(my/org-file "templates/decide.org"))
+                ("Journal Entry" :keys "e"
+                 :file ,(my/org-file "entries/journal.gpg")
+                 :datetree t
+                 :template "* %<%R> %?")
+                ("Programming Interview Prep Journal" :keys "p"
+                 :file ,(my/org-file "entries/journal.gpg")
+                 :datetree t
+                 :template "* ")))
+              ("Create checklist" :keys "C" :children
+               (("Conference Via Bus"
+                 :keys "c"
+                 :file ,(my/agenda-file "dev.org")
+                 :template-file ,(my/org-file "checklists/conference.org")
+                 :conference/airplane nil)
+                ("Morning routine"
+                 :keys "m"
+                 :file ,(my/org-file "entries/routines.org")
+                 :template-file ,(my/org-file "checklists/mornings.org"))
+                ("Nightly routine"
+                 :keys "n"
+                 :file ,(my/org-file "entries/routines.org")
+                 :template-file ,(my/org-file "checklists/nights.org"))))
+              ("Protocol"
+               :keys "p"
+               :file ,(my/agenda-file "refile.org")
+               :template "* STUFF %^{Title}\n:PROPERTIES:\n:CREATED: %U\n:URL: %:link\n:END:\n#+begin_example\n%i\n#+end_example\n%?")
+              ("Protocol Link"
+               :keys "L"
+               :file ,(my/agenda-file "refile.org")
+               :before-finalize my/org-board-prompt
+               :template "* STUFF %? [[%:link][%:description]]\n:PROPERTIES:\n:CREATED: %U\n:URL: %:link\n:END:")
+              ("Add to lists conveniently" :keys "l" :children
+               (("Plan week" :keys "P"
+                 :file ,(my/agenda-file "dev.org")
+                 :headline "The Plan"
+                 :template-file ,(my/org-file "templates/weekly-plan.org"))
+                ("Plan your day" :keys "p"
+                 :file ,(my/agenda-file "dev.org")
+                 :headline "The Plan"
+                 :template-file ,(my/org-file "templates/daily-plan.org"))
+                ("Cringe" :keys "c"
+                 :file ,(my/org-file "entries/cringe.gpg")
+                 :template "* %?")
+                ("Mental Model" :keys "m"
+                 :file ,(my/org-file "entries/mental_models.gpg")
+                 :template "* %?")
+                ("Important Information"
+                 :keys "i"
+                 :file ,(my/org-file "entries/important.gpg")
+                 :template "* %?")))
+              ("Logging" :keys "g" :children
+               (("Source location"
+                 :keys "s"
+                 :function org-notes-find-file
+                 :template "* %?\n%a")
+                ("Log entry"
+                 :keys "l"
+                 :function org-notes-find-file
+                 :template "* %?")
+                ("Timer event"
+                 :keys "t" :clock-in t :clock-keep t
+                 :function org-notes-find-file
+                 :template "* %?"))))))
+
+
+(defvar themes-file "20200605172953_roll_dice_what_to_do.org")
+
+(defun read-short-term-theme ()
+  (save-excursion
+    (let (filename)
+      ;; If org-roam is not loaded, or our themes file is gone
+      (if (or (not (boundp 'org-roam-directory))
+              (not (file-exists-p
+                    (setq filename
+                          (expand-file-name themes-file org-roam-directory)))))
+          ;; Just read a string
+          (read-string "What's the theme for today? ")
+        ;; Otherwise, find that file, and do a completing read
+        (let ((buffer (find-file-noselect filename))
+              headings)
+          (with-current-buffer buffer
+            (let ((num 0))
+              (setq headings (mapcar #'(lambda (str)
+                                         (concat (int-to-string (incf num))
+                                                 "-"
+                                                 str))
+                                     (org-map-entries #'org-get-heading)))))
+          (let* ((match (ivy-completing-read "What's the theme for today? "
+                                             headings))
+                 (i (1+ (string-match "-" match))))
+            (substring match i)))))))
 
 (defvar yearly-theme "Thought")
-
-;; Functions required by template
-(defun get-journal-entries-from (start-date end-date)
-  (let ((string "")
-        match)
-    (save-window-excursion
-      (switch-to-buffer (find-file-noselect "~/MEGA/org/entries/journal.gpg"))
-      (goto-char (point-min))
-      (while (setq match 
-                   (re-search-forward
-                    "^\\*\\*\\* \\(2[0-9]\\{3\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\) \\w+$" nil t))
-        (let ((date (match-string 1)))
-          (when (and (org-time< start-date date)
-                     (or (not end-date) (org-time< date end-date)))
-            (org-narrow-to-subtree)
-            (setq string (concat string "\n" (buffer-string)))
-            (widen))))
-      (not-modified)
-      (kill-buffer))
-    string))
-
-;; Setup stuff, called by capture template
-(defun get-last-review-date ()
-  (save-window-excursion
-    (let ((auto-insert-alist nil))
-      (set-buffer (find-file-noselect "~/.emacs.d/last-review.el")))
-    (let ((res (buffer-string)))
-      (kill-buffer)
-      res)))
-
-(defun output-incomplete-date ()
-  (save-window-excursion
-    (let ((auto-insert-alist nil))
-      (switch-to-buffer (find-file-noselect "~/.emacs.d/review-incomplete.el")))
-    (erase-buffer)
-    (insert (org-read-date nil nil ""))
-    (save-buffer)
-    (kill-buffer)))
-
-(defvar my/review-date-old nil)
-(defun setup-automatic-review ()
-  (unless current-prefix-arg
-    ;; Check for older review
-    (when (and (file-exists-p "~/.emacs.d/review-incomplete.el")
-               (y-or-n-p "Woah, we found an incomplete review. Would you like to use that date as the start date? "))
-      (shell-command "mv ~/.emacs.d/review-incomplete.el ~/.emacs.d/last-review.el"))
-    ;; Setup current review
-    (let* ((date (org-read-date nil nil (get-last-review-date)))
-           (week (format "%02d" 
-                         (org-days-to-iso-week
-                          (org-time-string-to-absolute date)))))
-      (output-incomplete-date)
-      (setq my/review-date-old date)
-      (setq my/review-visibility-level 6)
-      (org-capture-put :start-date date)
-      (org-capture-put :start-week week)
-      (goto-char (point-min))
-      (re-search-forward "Reviews"))))
-
-(defun aux-get-week-string ()
-  (let ((last (plist-get org-capture-plist :start-week))
-        (this (format-time-string "%V")))
-    (if (string= this last)
-        (concat "Week " this)
-      (concat "Weeks " last "-" this))))
-
-(defun setup-manual-review ()
-  ;; Read the date manually, and setup review accordingly
-  (let* ((org-read-date-prefer-future nil)
-         (date (org-read-date))
-         (week (format "%02d" 
-                       (org-days-to-iso-week
-                        (org-time-string-to-absolute date)))))
-    (output-incomplete-date)
-    (setq my/review-date-old date)
-    (setq my/review-visibility-level 6)
-    (org-capture-put :start-date date)
-    (org-capture-put :start-week week)
-    (goto-char (point-min))
-    (re-search-forward "Reviews")))
-
-;; Teardown stuff, called through hooks
-(defun finalize-review ()
-  "Save a copy of the weekly agenda, and write the current date
-  as the most current weekly review."
-  (let ((desc (plist-get org-capture-current-plist :description)))
-    (when (and (string= desc "Automatic Review")
-               my/review-date-old)
-      (my/save-agenda-week my/review-date-old)
-      (shell-command "rm ~/.emacs.d/review-incomplete.el")
-      (save-window-excursion
-        (switch-to-buffer (find-file-noselect "~/.emacs.d/last-review.el"))
-        (erase-buffer)
-        (insert (org-read-date nil nil ""))
-        (save-buffer)
-        (kill-buffer)
-        "")
-      (setq my/review-date-old nil))))
-(add-hook 'org-capture-before-finalize-hook 'finalize-review)
-
-(defun clear-out-review-files ()
-  (when (file-exists-p "~/.emacs.d/review-incomplete.el")
-    (shell-command "rm ~/.emacs.d/review-incomplete.el")))
-(add-hook 'org-capture-after-finalize-hook #'clear-out-review-files)
-(defconst my/org-agenda-snapshot-pdf-filename "~/MEGA/org/entries/review/%Y_%m_%d.pdf")
-(defconst my/org-agenda-snapshot-html-filename "~/MEGA/org/entries/review/%Y_%m_%d.html")
-
-(defun my/agenda-dates (start &optional end)
-  (interactive (list (let ((org-read-date-prefer-future nil))
-                       (org-read-date))))
-  (when-let (buf (get-buffer "*Org Agenda(a)*"))
-    (kill-buffer buf))
-  (or end (setq end (org-read-date nil nil ".")))
-  (let* ((span (- (org-time-string-to-absolute end)
-                  (org-time-string-to-absolute start)))
-         (org-agenda-archives-mode t)
-         (org-agenda-start-with-log-mode '(closed clock))
-         (org-agenda-start-on-weekday nil)
-         (org-agenda-start-day start)
-         (org-agenda-span span))
-    (org-agenda-list nil)
-    (put 'org-agenda-redo-command 'org-lprops
-         `((org-agenda-archives-mode t)
-           (org-agenda-start-with-log-mode '(closed clock))
-           (org-agenda-start-on-weekday nil)
-           (org-agenda-start-day ,start)
-           (org-agenda-span ,span)))))
-
-;; (my/agenda-dates "2019-07-14")
-
-(defun my/save-agenda-week (start &optional end)
-  (interactive (list (let ((org-read-date-prefer-future nil))
-                       (org-read-date))))
-  (let ((end (or end (org-read-date nil nil "."))))
-    (save-window-excursion
-      (my/agenda-dates start end)
-      (org-agenda-write (format-time-string my/org-agenda-snapshot-pdf-filename (org-time-string-to-time end)))
-      (org-agenda-write (format-time-string my/org-agenda-snapshot-html-filename (org-time-string-to-time end))))))
-
-;; (my/save-agenda-week "2019-06-03" "2019-08-18")
-
-;; (my/save-agenda-week "2019-07-14")
-
-(defun my/png-ize-buffer (buffer name-without-ext)
-  (with-current-buffer (htmlize-buffer buffer)
-    (write-file (my/agenda-file (concat name-without-ext ".html"))))
-  (shell-command (format "wkhtmltoimage %s %s"
-                         (my/agenda-file (concat name-without-ext ".html"))
-                         (my/agenda-file (concat name-without-ext ".png")))))
-
-(defun my/write-agendas-for-review ()
-  (interactive)
-  (let* ((org-agenda-sticky nil)
-         (dev (save-excursion 
-                (org-agenda nil "d")
-                (current-buffer)))
-         (week (save-excursion
-                 (org-agenda nil "d")
-                 (current-buffer))))
-    (my/png-ize-buffer dev "org-agenda")
-    (my/png-ize-buffer week "org-week")))
 
 (defun my/org-add-tag (tag)
   (org-set-tags (cons tag (org-get-tags nil t))))
@@ -261,14 +225,8 @@
                (y-or-n-p "Do you want to archive the page? "))
       (call-interactively #'org-board-archive))))
 
-(add-hook 'org-capture-before-finalize-hook 'my/org-board-prompt)
-
 ;; New Note-taking capture template
 (defvar org-notes-current-file nil)
-
-(add-to-list 'org-capture-templates
-             '("n" "\tNotes" entry (function org-notes-find-file)
-               "* %A\n%?"))
 
 (defun org-notes-find-file ()
   (when (or current-prefix-arg

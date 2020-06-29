@@ -205,8 +205,11 @@
 
   ;; I like my unicode to be monospace too, so I use these
   (set-fontset-font t 'unicode (font-spec :size 10 :name "FontAwesome"))
-  (set-fontset-font t 'unicode (font-spec :size 15 :name "DejaVu Sans Mono"))
-  (set-fontset-font t 'unicode (font-spec :size 18 :name "Baekmuk Gulim"))
+  (set-fontset-font t 'unicode (font-spec :name "SourceCodePro"))
+  ;; (set-fontset-font t 'unicode (font-spec :size 15 :name "DejaVu Sans Mono"))
+  ;; (set-fontset-font t 'japanese-jisx0208 (font-spec :size 10 :name "HanaMinA.ttf"))
+  ;; (set-fontset-font t 'korean-ksc5601 (font-spec :size 18 :name "Baekmuk Gulim"))
+  ;; (set-fontset-font t '(9472 . 9472) (font-spec :size 15 :name "DejaVu Sans Mono"))
 
   (defun my/reading-color ()
     (interactive)

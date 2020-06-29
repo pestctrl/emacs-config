@@ -24,7 +24,7 @@
 
 ;;; Code:
 (defvar exwm-startup-programs
-  '("megasync"
+  '(("megasync" "QT_SCALE_FACTOR=1 megasync") 
     "deadd-notification-center"
     "/usr/lib/kdeconnectd"
     ("compton" "compton -f -i .7 -b")
@@ -40,6 +40,10 @@
     (if (listp program)
         (start-process-shell-command (car program) nil (cadr program))
       (start-process-shell-command (file-name-nondirectory program) nil program))))
+
+(add-to-list 'exwm-manage-configurations
+             '((equal exwm-class-name "MEGAsync")
+               floating t))
 
 (provide 'exwm-startup)
 ;;; exwm-startup.el ends here

@@ -6,6 +6,9 @@
 (make-variable-buffer-local 'bisect-bottom-overlay)
 (defvar bisect-linewise t)
 
+(defface bisect-line-face `((t (:box (:line-width 1 :color "grey75" :style released-button))))
+  nil)
+
 (defvar bisect-mode-map nil)
 
 (unless bisect-mode-map
@@ -15,8 +18,11 @@
     (define-key map (kbd "d") #'bisect-down-inclusive)
     (define-key map (kbd "D") #'bisect-down-exclusive)
     (define-key map (kbd "g") #'bisect-goto-current-middle)
+    (define-key map (kbd "SPC") #'bisect-goto-current-middle)
     (define-key map (kbd "C-SPC") #'bisect-middle-here)
     (define-key map (kbd "q") #'bisect-mode)
+    (define-key map (kbd "p") #'previous-line)
+    (define-key map (kbd "n") #'next-line)
     (setq bisect-mode-map map)))
 
 (defun move-overlay-to-line (overlay line)
@@ -34,7 +40,7 @@
                    (propertize "!" 'display
                                (list 'left-fringe
                                      bitmap)))
-      (overlay-put overlay 'face font-lock-comment-face)
+      (overlay-put overlay 'face 'bisect-line-face)
       overlay)))
 
 (defun bisect-overlay-line (overlay &optional eol)
@@ -43,15 +49,14 @@
             overlay)))
 
 (define-minor-mode bisect-mode ""
-  nil nil
-  bisect-mode-map
+  nil nil bisect-mode-map
   (if (not bisect-mode)
       (mapcar #'delete-overlay (list bisect-middle-overlay
                                      bisect-top-overlay
                                      bisect-bottom-overlay))
     (let ((top    (line-number-at-pos (if mark-active (region-beginning) (point-min))))
           (bottom (line-number-at-pos (if mark-active (region-end)       (point-max)))))
-      (when mark-active (call-interactively #'set-mark-command))
+      (when (region-active-p) (pop-mark))
       (setq bisect-top-overlay (bisect-make-overlay top 'right-arrow))
       (setq bisect-bottom-overlay (bisect-make-overlay bottom 'right-arrow))
       (setq bisect-middle-overlay (bisect-make-overlay bottom 'right-triangle)))
@@ -62,32 +67,39 @@
                         (bisect-overlay-line bisect-bottom-overlay))
                      2)))
     (goto-line average)
-    (bisect-middle-here)))
+    (bisect-middle-here)
+    (recenter)))
 
 (defun bisect-middle-here ()
   (interactive)
-  (move-overlay-to-line bisect-middle-overlay (line-number-at-pos)))
+  (move-overlay-to-line bisect-middle-overlay
+                        (line-number-at-pos)))
 
 (defun bisect-up-inclusive ()
   (interactive)
-  (move-overlay-to-line bisect-bottom-overlay (bisect-overlay-line bisect-middle-overlay))
+  (move-overlay-to-line bisect-bottom-overlay
+                        (bisect-overlay-line bisect-middle-overlay))
   (bisect-find-middle))
 
 (defun bisect-down-inclusive ()
   (interactive)
-  (move-overlay-to-line bisect-top-overlay (bisect-overlay-line bisect-middle-overlay))
+  (move-overlay-to-line bisect-top-overlay
+                        (bisect-overlay-line bisect-middle-overlay))
   (bisect-find-middle))
 
 (defun bisect-up-exclusive ()
   (interactive)
-  (move-overlay-to-line bisect-bottom-overlay (1- (bisect-overlay-line bisect-middle-overlay)))
+  (move-overlay-to-line bisect-bottom-overlay
+                        (1- (bisect-overlay-line bisect-middle-overlay)))
   (bisect-find-middle))
 
 (defun bisect-down-exclusive ()
   (interactive)
-  (move-overlay-to-line bisect-top-overlay (1+ (bisect-overlay-line bisect-middle-overlay)))
+  (move-overlay-to-line bisect-top-overlay
+                        (1+ (bisect-overlay-line bisect-middle-overlay)))
   (bisect-find-middle))
 
 (defun bisect-goto-current-middle ()
   (interactive)
-  (goto-char (overlay-start bisect-middle-overlay)))
+  (goto-char (overlay-start bisect-middle-overlay))
+  (recenter))

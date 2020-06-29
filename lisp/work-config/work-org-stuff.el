@@ -32,11 +32,64 @@
 
 (setq org-agenda-compact-blocks t)
 
+(use-package doct)
+
+(defun doct-pad-and-icon-recursive (element)
+  (let* ((name (car element))
+         (plist (cdr element))
+         (icon (or (plist-get plist :icon) ""))
+         (children (plist-get plist :children)))
+    (setq plist (org-plist-delete plist :icon))
+    (when children
+      (-as-> children it
+             (mapcar #'doct-pad-and-icon-recursive
+                     it)
+             (plist-put plist :children it)
+             (setq plist it)))
+    (cons (format "%s\t%s" icon name)
+          plist)))
+
+(defun doct-pad-and-icon-all (orig list)
+  (funcall orig
+           (mapcar #'doct-pad-and-icon-recursive
+                   list)))
+
+(advice-add #'doct :around #'doct-pad-and-icon-all)
+
+(defvar org-notes-current-file nil)
+
+(defun org-notes-find-file ()
+  (when (or current-prefix-arg
+            (not org-notes-current-file))
+    (setq org-notes-current-file
+          (read-file-name "Notes file? ")))
+  (find-file org-notes-current-file)
+  (end-of-buffer))
+
 (setq org-capture-templates
-      '(("t" "Todo" entry (file "/home/a0487752/org/refile.org")
-         "* STUFF %?\n:PROPERTIES:\n:CREATED: %U\n:VIEWING: %a\n:END:")
-        ("c" "Charging Setup" entry (file "/home/a0487752/org/refile.org")
-         "* STUFF %?\n:PROPERTIES:\n:CREATED: %U\n:VIEWING: %a\n:END:")))
+      (doct `(("Todo"
+               :icon ,(all-the-icons-octicon "inbox" :face 'all-the-icons-yellow :v-adjust 0.01)
+               :keys "t"
+               :file "/home/a0487752/org/refile.org"
+               :template "* STUFF %?\n:PROPERTIES:\n:CREATED: %U\n:VIEWING: %a\n:END:")
+              ("Charging Setup"
+               :icon ,(all-the-icons-faicon "bolt" :face 'all-the-icons-blue :v-adjust 0.1)
+               :keys "c"
+               :file "/home/a0487752/org/refile.org"
+               :template "* %?")
+              ("Logging" :keys "g" :children
+               (("Source location"
+                 :keys "s"
+                 :function org-notes-find-file
+                 :template "* %?\n%a")
+                ("Log entry"
+                 :keys "l"
+                 :function org-notes-find-file
+                 :template "* %?")
+                ("Timer event"
+                 :keys "t" :clock-in t :clock-keep t
+                 :function org-notes-find-file
+                 :template "* %?"))))))
 
 (setq org-agenda-custom-commands
       '(("p" "prod"
@@ -210,19 +263,6 @@
 
 
 (setq show-tab-bar-new-tab t)
-(defvar org-notes-current-file nil)
-
-(add-to-list 'org-capture-templates
-             '("n" "\tNotes" entry (function org-notes-find-file)
-               "* %A\n%?"))
-
-(defun org-notes-find-file ()
-  (when (or current-prefix-arg
-            (not org-notes-current-file))
-    (setq org-notes-current-file
-          (read-file-name "Notes file? ")))
-  (find-file org-notes-current-file)
-  (end-of-buffer))
 
 
 (provide 'work-org-stuff)

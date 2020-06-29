@@ -73,20 +73,25 @@
                :file "/home/a0487752/org/refile.org"
                :template "* STUFF %?\n:PROPERTIES:\n:CREATED: %U\n:VIEWING: %a\n:END:")
               ("Charging Setup"
-               :icon ,(all-the-icons-faicon "bolt" :face 'all-the-icons-blue :v-adjust 0.1)
+               :icon ,(all-the-icons-faicon "bolt" :face 'all-the-icons-blue :v-adjust 0.01)
                :keys "c"
                :file "/home/a0487752/org/refile.org"
                :template "* %?")
-              ("Logging" :keys "g" :children
+              ("Logging"
+               :icon ,(all-the-icons-material "laptop" :face 'all-the-icons-lblue)
+               :keys "g" :children
                (("Source location"
+                 :icon ,(all-the-icons-faicon "code" :face 'all-the-icons-lgreen :v-adjust 0.01)
                  :keys "s"
                  :function org-notes-find-file
                  :template "* %?\n%a")
                 ("Log entry"
+                 :icon ,(all-the-icons-material "laptop" :face 'all-the-icons-blue)
                  :keys "l"
                  :function org-notes-find-file
                  :template "* %?")
                 ("Timer event"
+                 :icon ,(all-the-icons-material "timer" :face 'all-the-icons-red)
                  :keys "t" :clock-in t :clock-keep t
                  :function org-notes-find-file
                  :template "* %?"))))))

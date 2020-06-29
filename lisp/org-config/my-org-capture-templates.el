@@ -165,16 +165,21 @@
                  :keys "i"
                  :file ,(my/org-file "entries/important.gpg")
                  :template "* %?")))
-              ("Logging" :keys "g" :children
+              ("Logging"
+               :icon ,(all-the-icons-material "add_to_queue" :face 'all-the-icons-lblue)
+               :keys "g" :children
                (("Source location"
+                 :icon ,(all-the-icons-faicon "code" :face 'all-the-icons-lgreen :v-adjust 0.01)
                  :keys "s"
                  :function org-notes-find-file
                  :template "* %?\n%a")
                 ("Log entry"
+                 :icon ,(all-the-icons-material "laptop" :face 'all-the-icons-lblue)
                  :keys "l"
                  :function org-notes-find-file
                  :template "* %?")
                 ("Timer event"
+                 :icon ,(all-the-icons-material "timer" :face 'all-the-icons-lred)
                  :keys "t" :clock-in t :clock-keep t
                  :function org-notes-find-file
                  :template "* %?"))))))

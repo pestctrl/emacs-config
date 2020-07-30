@@ -46,9 +46,6 @@
 
 (setq my/enable-exwm (and my/enable-exwm (eq 'x window-system)))
 
-;; On TI VNC machine
-(when my/at-ti (setq epg-pinentry-mode nil))
-
 (require 'keymap)
 (require 'libs)
 
@@ -70,13 +67,9 @@
  (expand-file-name "config-ext.org"
                    user-emacs-directory))
 
-;; Load the minimal org config stuff
-(require 'my-org-misc)
-
-;; These are less important when it comes to debugging emacs itself
-(org-babel-load-file
- (expand-file-name "config-org.org"
-                   user-emacs-directory))
+;; Load work stuff when at work. 
+(when my/at-ti 
+  (require 'work-config))
 
 (require 'my-org)
 

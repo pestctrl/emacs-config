@@ -780,3 +780,10 @@
            :map *root-map*
            ("SPC" . 'ace-jump-mode)))
 #+END_SRC
+** olivetti
+#+begin_src emacs-lisp
+  (use-package olivetti
+    :commands olivetti-mode
+    :config
+    (setq-default olivetti-body-width 140))
+#+end_src

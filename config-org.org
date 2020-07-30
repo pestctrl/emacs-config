@@ -622,13 +622,6 @@
 
   (define-key org-agenda-mode-map (kbd "T") #'my/tickle-todo)
 #+end_src
-* olivetti
-#+begin_src emacs-lisp
-  (use-package olivetti
-    :commands olivetti-mode
-    :config
-    (setq-default olivetti-body-width 120))
-#+end_src
 * org-wiki
 #+begin_src emacs-lisp
   (require 'org-wiki)

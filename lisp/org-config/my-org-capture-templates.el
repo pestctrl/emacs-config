@@ -31,6 +31,16 @@
 ;; - #'clear-out-review-files
 (require 'my-org-weekly-review)
 
+;; Provides #'org-notes-find-file
+(require 'org-capture-notes)
+
+(defun my/org-board-prompt ()
+  (let ((desc (plist-get org-capture-current-plist :description)))
+    (when (and (not org-note-abort)
+               (string= desc "\tProtocol Link")
+               (y-or-n-p "Do you want to archive the page? "))
+      (call-interactively #'org-board-archive))))
+
 (use-package doct)
 
 (defun doct-pad-and-icon-recursive (element)
@@ -222,24 +232,6 @@
 
 (advice-add #'org-board-archive :after
             #'org-board-add-offline-tag)
-
-(defun my/org-board-prompt ()
-  (let ((desc (plist-get org-capture-current-plist :description)))
-    (when (and (not org-note-abort)
-               (string= desc "\tProtocol Link")
-               (y-or-n-p "Do you want to archive the page? "))
-      (call-interactively #'org-board-archive))))
-
-;; New Note-taking capture template
-(defvar org-notes-current-file nil)
-
-(defun org-notes-find-file ()
-  (when (or current-prefix-arg
-            (not org-notes-current-file))
-    (setq org-notes-current-file
-          (read-file-name "Notes file? ")))
-  (find-file org-notes-current-file)
-  (end-of-buffer))
 
 (provide 'my-org-capture-templates)
 ;;; my-org-capture-templates.el ends here

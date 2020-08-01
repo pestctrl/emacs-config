@@ -24,6 +24,7 @@
             ("cleared" ,new-report-str)
             ("last-superfluous" "%(binary) -f %(ledger-file) bal --limit='account =~ /^Exp:(Food|Luxury|NewTech|People)/ && date >= [last month]'")
             ("superfluous" "%(binary) -f %(ledger-file) reg --limit='account =~ /^Exp:(Food|Luxury|NewTech|People)/'")
+            ("recurring" "%(binary) -f %(ledger-file) reg --limit='has_tag(\"RECURRING\")'")
             ("expmonth" "%(binary) -f %(ledger-file) -M reg Expenses")
             ("owedmom" "%(binary) -f %(ledger-file) reg Liabilities")
             ("progress" "%(binary) -f %(ledger-file) reg Assets Equity Liabilities")

@@ -41,6 +41,9 @@
                (y-or-n-p "Do you want to archive the page? "))
       (call-interactively #'org-board-archive))))
 
+(define-key org-capture-mode-map (kbd "C-c C-c") nil)
+(define-key org-capture-mode-map (kbd "C-<return>") #'org-capture-finalize)
+
 (use-package doct)
 
 (defun doct-pad-and-icon-recursive (element)

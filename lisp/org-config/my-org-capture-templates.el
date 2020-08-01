@@ -66,11 +66,19 @@
 (advice-add #'doct :around #'doct-pad-and-icon-all)
 
 (setq org-capture-templates
-      (doct `(("Todo"
-               :icon ,(all-the-icons-octicon "inbox" :face 'all-the-icons-yellow :v-adjust 0.01)
-               :keys "t"
-               :file ,(my/agenda-file "refile.org")
-               :template "* STUFF %?\n:PROPERTIES:\n:CREATED: %U\n:VIEWING: %a\n:END:")
+      (doct `(("Tasks" :keys "t" :children
+               (("New Refile Task"
+                 :keys "t"
+                 :icon ,(all-the-icons-octicon "inbox" :face 'all-the-icons-yellow :v-adjust 0.01)
+                 :file ,(my/agenda-file "refile.org")
+                 :template "* STUFF %?\n:PROPERTIES:\n:CREATED: %U\n:VIEWING: %a\n:END:")
+                ("Distracted"
+                 :file ,(my/agenda-file "dev.org")
+                 :keys "d" :clock-in t :clock-resume t
+                 :template "* TASK %?")
+                ("New Task" :file ,(my/agenda-file "dev.org")
+                 :keys "n" :clock-in t :clock-keep t
+                 :template "* TASK %?")))
               ("Reviews" :keys "r"
                :icon ,(all-the-icons-faicon "share" :face 'all-the-icons-lblue)
                :children
@@ -90,13 +98,6 @@
                  :keys "o"
                  :file ,(my/org-file "entries/reviews.gpg")
                  :template-file ,(my/org-file "templates/reorient.org"))))
-              ("Distracted"
-               :file ,(my/agenda-file "dev.org")
-               :keys "D" :clock-in t :clock-resume t
-               :template "* TASK %?")
-              ("New Task" :file ,(my/agenda-file "dev.org")
-               :keys "T" :clock-in t :clock-keep t
-               :template "* TASK %?")
               ("Money" :keys "m"
                :icon ,(all-the-icons-material "attach_money" :face 'all-the-icons-lgreen)
                :children

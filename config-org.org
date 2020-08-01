@@ -838,3 +838,8 @@
   ;; (setq debug-the-process (magit-run-git-async '("fetch" "--all")
   ;;                                              :sentinel '(lambda (process event) (message "Done"))))
 #+end_src
+* elgantt
+#+begin_src emacs-lisp
+  (add-to-list 'load-path "~/.emacs.d/submodule/elgantt")
+  (require 'elgantt)
+#+end_src

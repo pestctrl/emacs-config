@@ -173,17 +173,35 @@
 
   (use-package exwm
     :config
+    (defvar offlineimap-timer nil)
+    (defvar offlineimap-process nil)
+
     (defun run-offlineimap ()
       (interactive)
-      (set-process-sentinel
-       (start-process-shell-command "offlineimap" nil "offlineimap")
-       #'(lambda (process event)
-           (when (string-match "^finished" event)
-             (message "Offlineimap finished")
-             (run-with-timer 300 nil #'run-offlineimap)))))
+      (if (and (processp offlineimap-process)
+               (process-live-p offlineimap-process))
+          (message "offlineimap already running...")
+        (message "offlineimap starting...")
+        (when (and (timerp offlineimap-timer)
+                   (not (timer--triggered offlineimap-timer)))
+          (cancel-timer offlineimap-timer))
+        (set-process-sentinel
+         (setq offlineimap-process
+               (start-process-shell-command "offlineimap" "*offlineimap-output*" "offlineimap"))
+         #'(lambda (process event)
+             (when (string-match-p "exited abnormally with code 1" event)
+               (with-current-buffer (process-buffer offlineimap-process)
+                 (when (string-match-p "get_password_emacs"(buffer-string))
+                   (erase-buffer)
+                   (message "Oops, didn't grab a password. ")
+                   (setq offlineimap-timer (run-with-timer 300 nil #'run-offlineimap)))))
+             (when (string-match-p "^finished" event)
+               (message "Offlineimap finished")
+               (setq offlineimap-timer (run-with-timer 300 nil #'run-offlineimap)))))))
 
     (add-to-list 'exwm-init-hook
-                 #'run-offlineimap))
+                 #'run-offlineimap
+                 t))
 #+end_src
 ** erc
 #+begin_src emacs-lisp

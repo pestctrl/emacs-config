@@ -1,4 +1,5 @@
 #+PROPERTY: header-args :tangle "~/.emacs.d/config-org.el" :comments both
+
 * Need this for base config
 #+begin_src emacs-lisp
 (require 'my-org-agenda-files)
@@ -357,14 +358,14 @@
                   (if (equal (match-string 1) "100%")
                       (unless (string-equal todo-state "DONE")
                         (org-todo 'done))
-                    (unless (string-equal todo-state "TODO")
+                    (unless (string-equal todo-state "TASK")
                       (org-todo 'todo)))
                 (if (and (> (match-end 2) (match-beginning 2))
                          (equal (match-string 2) (match-string 3)))
                     (unless (string-equal todo-state "DONE")
                       (org-todo 'done))
-                  (unless (string-equal todo-state "TODO")
-                    (org-todo 'todo)))))))))
+                  (unless (string-equal todo-state "TASK")
+                    (org-todo "TASK")))))))))
 
   (add-hook 'org-checkbox-statistics-hook 'my/org-checkbox-todo)
 #+END_SRC

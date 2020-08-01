@@ -64,6 +64,8 @@
 
 (defvar my/review-date-old nil)
 (defun setup-automatic-review ()
+  (beginning-of-buffer)
+  (outline-next-heading)
   (unless current-prefix-arg
     ;; Check for older review
     (when (and (file-exists-p "~/.emacs.d/review-incomplete.el")

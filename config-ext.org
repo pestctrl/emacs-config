@@ -163,7 +163,7 @@
         (notmuch-mua-send-and-exit)))
 
     (add-to-list 'notmuch-tagging-keys
-                 '("r" ("-inbox" "+recruiting") "Recruiting"))
+                 '("R" ("-inbox" "+recruiting") "Recruiting"))
 
     (setf (cdr (assoc "d" notmuch-tagging-keys))
           '(("+deleted") "Delete"))

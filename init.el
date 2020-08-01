@@ -88,3 +88,4 @@
 
 (put 'narrow-to-region 'disabled nil)
 (put 'list-timers 'disabled nil)
+(put 'erase-buffer 'disabled nil)

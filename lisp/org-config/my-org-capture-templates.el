@@ -68,6 +68,10 @@
 
 (advice-add #'doct :around #'doct-pad-and-icon-all)
 
+(defun place-in-current-tree ()
+  (org-clock-goto)
+  (org-up-heading-safe))
+
 (setq org-capture-templates
       (doct `(("Tasks" :keys "t" :children
                (("New Refile Task"
@@ -75,11 +79,15 @@
                  :icon ,(all-the-icons-octicon "inbox" :face 'all-the-icons-yellow :v-adjust 0.01)
                  :file ,(my/agenda-file "refile.org")
                  :template "* STUFF %?\n:PROPERTIES:\n:CREATED: %U\n:VIEWING: %a\n:END:")
+                ("Task in the same tree"
+                 :keys "s"
+                 :function place-in-current-tree
+                 :template "* STUFF %?\n:PROPERTIES:\n:CREATED: %U\n:VIEWING: %a\n:END:")
                 ("Distracted"
                  :file ,(my/agenda-file "dev.org")
                  :keys "d" :clock-in t :clock-resume t
                  :template "* TASK %?")
-                ("New Task" :file ,(my/agenda-file "dev.org")
+                ("Working on this task now" :file ,(my/agenda-file "dev.org")
                  :keys "n" :clock-in t :clock-keep t
                  :template "* TASK %?")))
               ("Reviews" :keys "r"

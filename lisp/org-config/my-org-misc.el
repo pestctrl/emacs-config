@@ -26,7 +26,7 @@
 
 (require 'org)
 
-(exwm-global-set-key (kbd "C-x C-o") 'org-agenda)
+(global-set-key (kbd "C-x C-o") 'org-agenda)
 (global-set-key (kbd "C-c c") 'org-capture)
 (global-set-key (kbd "C-c l") 'org-store-link)
 

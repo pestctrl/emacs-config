@@ -39,6 +39,9 @@
     :config
     (use-package exwm-x)
 
+    ;; Editting with Emacs in X-windows
+    (use-package exwm-edit)
+
     ;; System tray
     (require 'exwm-systemtray)
     (exwm-systemtray-enable)

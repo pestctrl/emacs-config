@@ -35,6 +35,8 @@
 ;; Provides #'org-notes-find-file
 (require 'org-capture-notes)
 
+(require 'org-capture-emacs-exit-warn)
+
 (defun my/org-board-prompt ()
   (let ((desc (plist-get org-capture-current-plist :description)))
     (when (and (not org-note-abort)

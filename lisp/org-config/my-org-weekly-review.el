@@ -82,6 +82,13 @@
       (org-capture-put :start-date date)
       (org-capture-put :start-week week))))
 
+(defun review-hide-journal-entries ()
+  (save-excursion
+    (re-search-forward "Journal")
+    (org-back-to-heading t)
+    (org-flag-subtree t)
+    (org-show-children)))
+
 (defun aux-get-week-string ()
   (let ((last (plist-get org-capture-plist :start-week))
         (this (format-time-string "%V")))

@@ -29,6 +29,7 @@
 ;; - #'setup-automatic-review
 ;; - #'finalize-review
 ;; - #'clear-out-review-files
+;; - #'review-hide-journal-entries
 (require 'my-org-weekly-review)
 
 ;; Provides #'org-notes-find-file
@@ -99,6 +100,7 @@
                  :function setup-automatic-review
                  :before-finalize finalize-review
                  :after-finalize clear-out-review-files
+                 :hook review-hide-journal-entries
                  :template-file ,(my/org-file "templates/weekly-review.org"))
                 ("Manual Review"
                  :keys "m"

@@ -200,6 +200,14 @@
                (message "Offlineimap finished")
                (setq offlineimap-timer (run-with-timer 300 nil #'run-offlineimap)))))))
 
+    (defun stop-offlineimap ()
+      (interactive)
+      (when (timerp offlineimap-timer)
+        (cancel-timer offlineimap-timer))
+      (when (processp offlineimap-process)
+        (set-process-sentinel offlineimap-process
+                              nil)))
+
     (add-to-list 'exwm-init-hook
                  #'run-offlineimap
                  t))

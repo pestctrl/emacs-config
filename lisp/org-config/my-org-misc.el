@@ -94,5 +94,8 @@
 ;; Allow refile to create parent tasks with confirmation
 (setq org-refile-allow-creating-parent-nodes (quote confirm))
 
+;; Uh oh
+(setq org-clock-continuously t)
+
 (provide 'my-org-misc)
 ;;; my-org-misc.el ends here

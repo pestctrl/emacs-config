@@ -250,6 +250,9 @@
 
   (defvar my/format-time-string-function nil)
 
+  (defun my/org-today ()
+    (time-to-days my/frozen-time))
+
   (defun my/current-time ()
     my/frozen-time)
 
@@ -281,6 +284,7 @@
       (advice-add #'current-time :override #'my/current-time)
       (advice-add #'format-time-string :around #'my/format-time-string)
       (advice-add #'decode-time :around #'my/decode-time)
+      (advice-add #'org-today :override #'my/org-today)
       (set-face-background 'fringe "firebrick2")
       (message "Toki yo tomare")))
 
@@ -293,6 +297,7 @@
     (advice-remove #'current-time #'my/current-time)
     (advice-remove #'format-time-string #'my/format-time-string)
     (advice-remove #'decode-time #'my/decode-time)
+    (advice-remove #'org-today #'my/org-today)
     (setq my/frozen-time nil)
     (set-face-background 'fringe nil)
     (message "Soshite, toki wa ugoki dasu"))

@@ -28,7 +28,16 @@
 
 (defun warn-active-capture-template ()
   (or (zerop capture-count)
-      (yes-or-no-p "There's still some active capture templates. Exit? ")))
+      (progn (pop-to-buffer
+              (get-buffer
+               (car
+                (remove-if-not (lambda (b)
+                                 (let ((case-fold-search nil))
+                                   (and b
+                                        (buffer-name b)
+                                        (string-match-p "CAPTURE-.*" (buffer-name b)))))
+                               (buffer-list)))))
+             (yes-or-no-p "Active capture templates exist; exit anyway? "))))
 
 (add-hook 'kill-emacs-query-functions
           #'warn-active-capture-template)

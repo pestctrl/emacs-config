@@ -623,8 +623,8 @@
 
   (define-key org-agenda-mode-map (kbd "T") #'my/tickle-todo)
 #+end_src
-* org-wiki
-#+begin_src emacs-lisp
+* org-wiki                                                              :FIX:
+#+begin_src emacs-lisp#
   (require 'org-wiki)
   (setq org-wiki-location-list
         '("~/MEGA/org/wiki"))

@@ -27,9 +27,6 @@
 ;; Buggy overall, not needed cause of workgroups2.el
 ;; (require 'exwm-workspace-counsel)
 
-;; New stuff, may not stick around
-(require 'org-ql-custom-stuck-projects)
-
 ;; I would like the library of alexandria
 (require 'subr-x)
 

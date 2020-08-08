@@ -19,10 +19,6 @@
   (add-to-list 'exwm-input-prefix-keys my/keymap-key-key))
 
 ;; Disable C-t for all others
-(with-eval-after-load "vterm"
-  (define-key vterm-mode-map my/keymap-key nil))
-(with-eval-after-load "ibuf-ext"
-  (define-key ibuffer-mode-map my/keymap-key nil))
 (with-eval-after-load "dired"
   (define-key dired-mode-map my/keymap-key nil))
 

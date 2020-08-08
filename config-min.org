@@ -31,6 +31,11 @@
   ;; If I ever decide to turn on display-lines-mode, use relative line
   ;; numbering
   (setq display-line-numbers-type 'relative)
+
+  ;; Make sure shell and rgrep works in windows
+  (when (eq 'windows-nt system-type)
+    (setq-default explicit-shell-file-name "bash")
+    (setq shell-file-name "bash"))
 #+end_src
 * exwm
 #+begin_src emacs-lisp
@@ -297,22 +302,23 @@
 * w3m
 #+begin_src emacs-lisp
   ;; Remove when Emacs 27 releases
-  (setq w3m-use-tabs nil)
-  (use-package w3m)
+  (when (executable-find "w3m")
+    (setq w3m-use-tabs nil)
+    (use-package w3m)
 
-  (defun dired-browse-with-w3m (arg)
-    (interactive "P")
-    (let ((browse-url-browser-function (if arg
-                                           (symbol-function browse-url-browser-function)
-                                         #'w3m-browse-url)))
-      (browse-url-of-dired-file)))
+    (defun dired-browse-with-w3m (arg)
+      (interactive "P")
+      (let ((browse-url-browser-function (if arg
+                                             (symbol-function browse-url-browser-function)
+                                           #'w3m-browse-url)))
+        (browse-url-of-dired-file)))
 
-  (define-key dired-mode-map (kbd "W") 'dired-browse-with-w3m)
+    (define-key dired-mode-map (kbd "W") 'dired-browse-with-w3m)
 
-  (global-set-key (kbd "C-c g")
-                  (lambda ()
-                    (interactive)
-                    (w3m-goto-url "https://google.com")))
+    (global-set-key (kbd "C-c g")
+                    (lambda ()
+                      (interactive)
+                      (w3m-goto-url "https://google.com"))))
 #+end_src
 * emacs lisp
 #+begin_src emacs-lisp
@@ -546,6 +552,8 @@
 
   (require 'ibuf-ext)
 
+  (define-key ibuffer-mode-map my/keymap-key nil)
+
   (eval-after-load "ibuf-ext"
     '(define-ibuffer-filter directory-name
          "Filter files in the agenda folder"
@@ -674,60 +682,62 @@
 #+end_src
 ** terminal
 #+begin_src emacs-lisp
-  (use-package vterm
-    :commands vterm find-vterm vterm-kill
-    :bind (:map vterm-mode-map
-                ("C-t" . nil)
-                :map *root-map*
-                ("c" . #'find-vterm))
-    :config
-    (setq ansi-color-names-vector
-          ["black" "red3" "green3" "yellow3" "DodgerBlue2" "magenta3" "cyan3" "gray90"])
+  (if (eq system-type 'windows-nt)
+      (define-key *root-map* "c" #'shell)
+    (use-package vterm
+      :commands vterm find-vterm vterm-kill
+      :bind (:map vterm-mode-map
+                  ("C-t" . nil)
+                  :map *root-map*
+                  ("c" . #'find-vterm))
+      :config
+      (setq ansi-color-names-vector
+            ["black" "red3" "green3" "yellow3" "DodgerBlue2" "magenta3" "cyan3" "gray90"])
 
-    (set-face-attribute 'term-bold        nil :weight 'bold)
-    (set-face-attribute 'vterm-color-blue nil :foreground "DodgerBlue2")
+      (set-face-attribute 'term-bold        nil :weight 'bold)
+      (set-face-attribute 'vterm-color-blue nil :foreground "DodgerBlue2")
 
-    (if (<= 27 emacs-major-version)
+      (if (<= 27 emacs-major-version)
+          (defun find-vterm ()
+            (interactive)
+            (let* ((current-tab (alist-get 'name (tab-bar--current-tab)))
+                   (term-name (concat current-tab "-term")))
+              (if-let (b (get-buffer term-name))
+                  (switch-to-buffer b)
+                (vterm)
+                (rename-buffer term-name))))
         (defun find-vterm ()
           (interactive)
-          (let* ((current-tab (alist-get 'name (tab-bar--current-tab)))
-                 (term-name (concat current-tab "-term")))
-            (if-let (b (get-buffer term-name))
-                (switch-to-buffer b)
-              (vterm)
-              (rename-buffer term-name))))
-      (defun find-vterm ()
-        (interactive)
-        (if-let (b (get-buffer "vterm"))
-            (switch-to-buffer b)
-          (vterm))))
+          (if-let (b (get-buffer "vterm"))
+              (switch-to-buffer b)
+            (vterm))))
 
-    (add-hook 'vterm-exit-functions
-              (lambda (buf com)
-                (kill-buffer buf)))
+      (add-hook 'vterm-exit-functions
+                (lambda (buf com)
+                  (kill-buffer buf)))
 
-    (defun rename-vterm-with-tab (orig name &optional arg)
-      (let ((current-tab-name (alist-get 'name (tab-bar--current-tab))))
-        (funcall orig name arg)
-        (when-let (b (get-buffer (concat current-tab-name "-term")))
-          (with-current-buffer b
-            (rename-buffer (concat (alist-get 'name (tab-bar--current-tab))
-                                   "-term"))))))
-
-    (advice-add #'tab-bar-rename-tab
-                :around
-                #'rename-vterm-with-tab)
-
-    (defun close-vterm-with-tab (orig)
-      (let ((current-tab-name (alist-get 'name (tab-bar--current-tab))))
-        (when (funcall orig)
+      (defun rename-vterm-with-tab (orig name &optional arg)
+        (let ((current-tab-name (alist-get 'name (tab-bar--current-tab))))
+          (funcall orig name arg)
           (when-let (b (get-buffer (concat current-tab-name "-term")))
             (with-current-buffer b
-              (vterm-send-C-d))))))
+              (rename-buffer (concat (alist-get 'name (tab-bar--current-tab))
+                                     "-term"))))))
 
-    (advice-add #'close-tab-switch
-                :around
-                #'close-vterm-with-tab))
+      (advice-add #'tab-bar-rename-tab
+                  :around
+                  #'rename-vterm-with-tab)
+
+      (defun close-vterm-with-tab (orig)
+        (let ((current-tab-name (alist-get 'name (tab-bar--current-tab))))
+          (when (funcall orig)
+            (when-let (b (get-buffer (concat current-tab-name "-term")))
+              (with-current-buffer b
+                (vterm-send-C-d))))))
+
+      (advice-add #'close-tab-switch
+                  :around
+                  #'close-vterm-with-tab)))
 #+end_src
 ** posting source code
 #+begin_src emacs-lisp

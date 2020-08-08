@@ -38,6 +38,9 @@
 (ec/load-or-ask-pred my/is-wsl "Are you running Emacs in WSL?")
 (ec/load-or-ask-pred my/enable-exwm "Do you want to load EXMW?")
 (ec/load-or-ask-pred my/at-ti "Are you at TI for work?")
+(defvar is-windows (or my/is-wsl
+                       (eq system-type
+                           'windows-nt)))
 
 (setq my/enable-exwm (and my/enable-exwm (eq 'x window-system)))
 

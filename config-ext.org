@@ -237,12 +237,13 @@
 #+end_src
 * pdf-tools use isearch
 #+BEGIN_SRC emacs-lisp
-  (use-package pdf-tools)
-  (pdf-tools-install)
-  (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
-  (define-key pdf-view-mode-map (kbd "d") (lambda () (interactive) (pdf-view-next-line-or-next-page 8)))
-  (define-key pdf-view-mode-map (kbd "u") (lambda () (interactive) (pdf-view-previous-line-or-previous-page 8)))
-#+END_SRC
+  (when (not (eq system-type 'windows-nt))
+    (use-package pdf-tools)
+    (pdf-tools-install)
+    (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
+    (define-key pdf-view-mode-map (kbd "d") (lambda () (interactive) (pdf-view-next-line-or-next-page 8)))
+    (define-key pdf-view-mode-map (kbd "u") (lambda () (interactive) (pdf-view-previous-line-or-previous-page 8))))
+  #+END_SRC
 * freezing time
 #+begin_src emacs-lisp
   (defvar my/frozen-time nil)

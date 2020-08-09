@@ -68,9 +68,11 @@
   (outline-next-heading)
   (unless current-prefix-arg
     ;; Check for older review
-    (when (and (file-exists-p "~/.emacs.d/review-incomplete.el")
-               (y-or-n-p "Woah, we found an incomplete review. Would you like to use that date as the start date? "))
-      (shell-command "mv ~/.emacs.d/review-incomplete.el ~/.emacs.d/last-review.el"))
+    (if (and (file-exists-p "~/.emacs.d/review-incomplete.el")
+               (y-or-n-p (format "Woah, we found an incomplete review: %s. Would you like to use that date as the start date? "
+                                 (shell-command-to-string "cat ~/.emacs.d/review-incomplete.el | tr -d '\n'"))))
+        (rename-file "~/.emacs.d/review-incomplete.el" "~/.emacs.d/last-review.el" t)
+      (delete-file  "~/.emacs.d/review-incomplete.el"))
     ;; Setup current review
     (let* ((date (org-read-date nil nil (get-last-review-date)))
            (week (format "%02d" 

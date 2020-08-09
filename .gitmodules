@@ -73,3 +73,6 @@
 [submodule "submodule/elgantt"]
 	path = submodule/elgantt
 	url = https://github.com/legalnonsense/elgantt/
+[submodule "submodule/conceal"]
+	path = submodule/conceal
+	url = https://github.com/lepisma/conceal

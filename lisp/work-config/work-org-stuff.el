@@ -235,15 +235,15 @@
                                (+ alnum)
                                " in "))
                          ;; Function Name
-                         (group (+? anything))
+                         (group (+? nonl))
                          (optional " ")
                          "("
-                         (+? anything)
+                         (*? nonl)
                          ") at "
                          ;; File name
                          (group
                           ;;"/"
-                          (+? anything))
+                          (+? nonl))
                          ":"
                          ;; Line Number
                          (group
@@ -316,6 +316,10 @@
 		     string-buffer))
 	   (setq string-buffer (substring string-buffer (match-end 0))))
 	 (split-string string-buffer "^$ *")))))
+
+(require 'ob-plantuml)
+(use-package plantuml-mode)
+(setq org-plantuml-jar-path "/home/a0487752/bin/plantuml")
 
 
 (provide 'work-org-stuff)

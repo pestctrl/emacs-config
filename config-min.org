@@ -689,9 +689,7 @@
       (define-key *root-map* "c" #'shell)
     (use-package vterm
       :commands vterm find-vterm vterm-kill
-      :bind (:map vterm-mode-map
-                  ("C-t" . nil)
-                  :map *root-map*
+      :bind (:map *root-map*
                   ("c" . #'find-vterm))
       :config
       (setq ansi-color-names-vector
@@ -699,6 +697,8 @@
 
       (set-face-attribute 'term-bold        nil :weight 'bold)
       (set-face-attribute 'vterm-color-blue nil :foreground "DodgerBlue2")
+
+      (define-key vterm-mode-map my/keymap-key nil)
 
       (if (<= 27 emacs-major-version)
           (defun find-vterm ()

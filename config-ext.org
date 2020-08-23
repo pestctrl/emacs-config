@@ -735,3 +735,34 @@
   ;; enable elfeed-protocol
   (elfeed-protocol-enable)
 #+end_src
+** pavucontrol switch speakers headphones
+#+begin_src emacs-lisp
+  (defvar laptop-sink-index 0)
+
+  ;; (let* ((result (shell-command-to-string "pacmd list-modules"))
+  ;;        (split (cdr (split-string result "index: "))))
+  ;;   split)
+
+  (let* ((result (shell-command-to-string "pactl list short sinks")))
+    (when (string-match "\\([0-9]\\).*analog-stereo" result)
+      (setq laptop-sink-index
+            (string-to-number
+             (match-string 1 result)))))
+
+  (defun current-speakers ()
+    (let ((string (shell-command-to-string "pactl list sinks | grep 'Active Port: '")))
+      (if (string-match-p "headphones" string)
+          'headphones
+        'speakers)))
+
+  (defun toggle-audio-output ()
+    (interactive)
+    (if (eq (current-speakers)
+            'headphones)
+        (shell-command (format "pactl set-sink-port %d analog-output-speaker"
+                               laptop-sink-index))
+      (shell-command (format "pactl set-sink-port %d analog-output-headphones"
+                             laptop-sink-index))))
+
+  (exwm-global-set-key (kbd "s-s") #'toggle-audio-output)
+#+end_src

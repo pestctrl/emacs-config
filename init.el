@@ -11,7 +11,7 @@
 (package-initialize)
 
 (when (not package-archive-contents)
-      (package-refresh-contents))
+  (package-refresh-contents))
 ;; fetch the list of packages available 
 (unless package-archive-contents
   (package-refresh-contents))

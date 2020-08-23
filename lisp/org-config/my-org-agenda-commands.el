@@ -143,7 +143,7 @@
                    (org-agenda-skip-function (lambda ()
                                                (when (member (org-get-todo-state) '("HOLD" "TICKLER"))
                                                  (outline-next-heading))))
-                   (org-super-agenda-groups '((:name "The Plan" :tag "PLAN")
+                   (org-super-agenda-groups '((:name "The Plan" :and (:tag "PLAN" :log nil) )
                                               (:name "Overdue" :and (:deadline past :log nil))
                                               (:name "Upcoming" :deadline future)
                                               (:name "Should do" :and (:scheduled past :log nil))

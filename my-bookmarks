@@ -23,7 +23,7 @@
  (rear-context-string)
  (position . 1))
 ("Refile Location"
- (filename . "~/MEGA/org/2019-05-agenda/refile.org")
+ (filename . "~/MEGA/org/agenda/refile.org")
  (front-context-string)
  (rear-context-string . "6-07 Fri 16:15]\n")
  (position . 5681))

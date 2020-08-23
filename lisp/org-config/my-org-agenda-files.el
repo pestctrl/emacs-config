@@ -24,7 +24,7 @@
 
 ;;; Code:
 (defconst my/org-folder "~/MEGA/org")
-(defconst my/agenda-folder (expand-file-name "2019-05-agenda" my/org-folder))
+(defconst my/agenda-folder (expand-file-name "agenda" my/org-folder))
 
 (defun my/org-file (str)
   (expand-file-name str my/org-folder))

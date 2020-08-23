@@ -772,7 +772,7 @@
         (setq gitwatch-process
               (start-process-shell-command "gitwatch"
                                            nil
-                                           "~/bin/gitwatch -r origin -b laptop -m 'Gitwatch commit: %d' ~/MEGA/org/2019-05-agenda"))))
+                                           "~/bin/gitwatch -r origin -b laptop -m 'Gitwatch commit: %d' ~/MEGA/org/agenda"))))
     (defun kill-gitwatch ()
       (interactive)
       (when (and gitwatch-process
@@ -798,7 +798,7 @@
 
   (defun org-update-main ()
     (interactive)
-    (let ((default-directory "~/MEGA/org/2019-05-agenda"))
+    (let ((default-directory "~/MEGA/org/agenda"))
       (kill-gitwatch)
       ;; Make sure local changes are committed
       (when (magit-changed-files "HEAD")

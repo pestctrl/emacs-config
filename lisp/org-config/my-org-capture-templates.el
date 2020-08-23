@@ -225,19 +225,23 @@
           ;; Just read a string
           (read-string "What's the theme for today? ")
         ;; Otherwise, find that file, and do a completing read
-        (let ((buffer (find-file-noselect filename))
-              headings)
-          (with-current-buffer buffer
-            (let ((num 0))
-              (setq headings (mapcar #'(lambda (str)
-                                         (concat (int-to-string (incf num))
-                                                 "-"
-                                                 str))
-                                     (org-map-entries #'org-get-heading)))))
-          (let* ((match (ivy-completing-read "What's the theme for today? "
-                                             headings))
-                 (i (1+ (string-match "-" match))))
-            (substring match i)))))))
+        (let* ((buffer (find-file-noselect filename))
+               (headings (with-current-buffer buffer
+                           (org-map-entries #'org-get-heading)))
+               (headings-num
+                (let ((index 0))
+                  (mapcar #'(lambda (s)
+                              (prog1
+                                  (concat (number-to-string index)
+                                          "-" s)
+                                (incf index)))
+                          headings)))
+               (suggested-theme (nth (mod (random) 7) headings))
+               (match (ivy-completing-read (format "What's the theme for today (Suggested: %s)? "
+                                                   suggested-theme)
+                                           headings-num))
+               (i (1+ (string-match "-" match))))
+          (substring match i))))))
 
 (defvar yearly-theme "Thought")
 

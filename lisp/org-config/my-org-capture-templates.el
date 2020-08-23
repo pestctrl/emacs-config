@@ -24,6 +24,7 @@
 
 ;;; Code:
 (require 'my-org-agenda-files)
+(require 'org-capture)
 
 ;; Defines 3 things:
 ;; - #'setup-automatic-review

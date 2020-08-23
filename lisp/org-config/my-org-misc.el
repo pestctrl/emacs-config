@@ -30,8 +30,6 @@
 (global-set-key (kbd "C-c c") 'org-capture)
 (global-set-key (kbd "C-c l") 'org-store-link)
 
-(define-key org-agenda-mode-map (kbd "a") 'org-agenda)
-
 (setq org-src-window-setup 'current-window)
 
 (setq org-list-allow-alphabetical t)

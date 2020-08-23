@@ -23,15 +23,21 @@
 ;;; Commentary:
 
 ;;; Code:
+(require 'org-agenda)
 (require 'my-org-agenda-files)
 (require 'my-org-agenda-misc)
 (require 'my-org-tags)
+(require 'all-the-icons)
 
 (add-to-list 'load-path 
              "~/.emacs.d/submodule/org-ql")
 (require 'org-ql)
 (require 'org-ql-search)
 (require 'org-ql-custom-stuck-projects)
+(require 'org-scan-tags-indent)
+
+
+(define-key org-agenda-mode-map (kbd "a") 'org-agenda)
 
 (defvar org-ql-indent-levels nil)
 

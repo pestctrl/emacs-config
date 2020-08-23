@@ -202,8 +202,18 @@
           (org-agenda-finalize-hook '(org-agenda-add-separater-between-project))))
         ("a" . "\tAgendas")
         ("aa" "\tRegular Agenda" agenda "")
-        ("at" "\tAgenda Today" agenda ""
-         ())
+        ("ac" . "\tClocking")
+        ("acw" "Last week's clock" agenda ""
+         ((org-agenda-overriding-arguments
+           (list nil (my/last-or-last-last-saturday) 9))
+          (org-agenda-start-with-log-mode 'clockcheck)
+          (org-agenda-start-with-clockreport-mode t)
+          (org-agenda-clockreport-parameter-plist '(:link t :maxlevel 4))))
+        ("acd" "Today's clock" agenda ""
+         ((org-agenda-start-with-log-mode 'clockcheck)
+          (org-agenda-start-with-clockreport-mode t)
+          (org-agenda-clockreport-parameter-plist '(:link t :maxlevel 4))))
+        ("at" "\tAgenda Today" agenda "")
         ("aw" "\tWeekly view" agenda ""
          ((org-scheduled-past-days 0)
           (org-agenda-overriding-arguments
@@ -295,9 +305,6 @@
         ("f" . "\tFlip through")
         ("fc" "\tComms" tags-todo "datetime"
          ((org-agenda-overriding-header "Comms")))
-        ("fC" "\tLook at clocking" agenda ""
-         (          (org-agenda-start-with-log-mode '(closed clock))
-                    (org-agenda-clockreport-mode t)))
         ("fj" "\tReviews and Journals" tags "LEVEL=3&ITEM={Review for}|LEVEL=3&journal"
          ((org-agenda-files '(,(my/org-file "entries/reviews.gpg") 
                               ,(my/org-file "entries/journal.gpg")))
@@ -320,7 +327,7 @@
 
 (defun my/last-or-last-last-saturday ()
   (org-read-date nil nil
-                 (if (<= 6 (string-to-number (format-time-string "%u")))
+                 (if (< 6 (string-to-number (format-time-string "%u")))
                      "-2sat"
                    "-sat")))
 

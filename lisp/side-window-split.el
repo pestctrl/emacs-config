@@ -24,11 +24,16 @@
 
 ;;; Code:
 
-(defun side-window-op (side &optional size buffer)
+(defvar left-side-window-count -1)
+(defvar right-side-window-count -1)
+(defvar bottom-side-window-count -1)
+
+(defun side-window-op (side slot &optional size buffer)
   (let ((prev-win (selected-window))
         (win (display-buffer-in-side-window
               (or buffer (current-buffer))
-              `((side . ,side)))))
+              `((side . ,side)
+                (slot . ,slot)))))
     (select-window win)
     (set-window-dedicated-p win t)
     (set-window-parameter win 'no-delete-other-windows t)
@@ -38,15 +43,22 @@
 
 (defun side-left-window ()
   (interactive)
-  (side-window-op 'left))
+  (side-window-op 'left (incf left-side-window-count)))
 
 (defun side-right-window ()
   (interactive)
-  (side-window-op 'right))
+  (side-window-op 'right (incf right-side-window-count)))
 
 (defun side-bottom-window ()
   (interactive)
-  (side-window-op 'bottom))
+  (side-window-op 'bottom (incf bottom-side-window-count)))
+
+(defun side-window-delete-all ()
+  (interactive)
+  (setq left-side-window-count -1
+        right-side-window-count -1
+        bottom-side-window-count -1)
+  (call-interactively #'window-toggle-side-windows))
 
 (setq window-sides-vertical t)
 

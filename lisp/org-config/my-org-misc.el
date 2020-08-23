@@ -49,6 +49,8 @@
              '("sv" . "src :results value"))
 (add-to-list 'org-structure-template-alist
              '("so" . "src :results output"))
+(add-to-list 'org-structure-template-alist
+             '("n" . "notes"))
 
 (set-face-attribute 'org-agenda-date-today nil :inherit 'org-agenda-date :foreground "cyan" :slant 'italic :weight 'bold :height 1.1)
 (set-face-attribute 'org-agenda-structure  nil :foreground "LightSkyBlue" :box '(:line-width 1 :color "grey75" :style released-button))

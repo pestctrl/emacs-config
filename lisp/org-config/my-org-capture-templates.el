@@ -93,7 +93,7 @@
                  :template "* TASK %?")
                 ("Working on this task now" :file ,(my/agenda-file "dev.org")
                  :keys "n" :clock-in t :clock-keep t
-                 :template "* TASK %?")))
+                 :template "* TASK %?\nSCHEDULED: %T")))
               ("Reviews" :keys "r"
                :icon ,(all-the-icons-faicon "share" :face 'all-the-icons-lblue)
                :children

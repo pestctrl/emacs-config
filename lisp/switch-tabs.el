@@ -24,7 +24,9 @@
 
 ;;; Code:
 
-(defvar show-tab-bar-new-tab nil)
+(setq tab-bar-show nil
+      tab-bar-close-tab-select 'recent
+      )
 
 (defun switch-or-create-tab (tab-name)
   (interactive
@@ -40,8 +42,6 @@
     (if tab-index
         (tab-bar-select-tab (1+ tab-index))
       (tab-bar-new-tab)
-      (when (not show-tab-bar-new-tab)
-        (tab-bar-mode -1))
       (tab-bar-rename-tab tab-name))))
 
 (defun last-tab ()
@@ -59,8 +59,6 @@
     (when (y-or-n-p (format "Close tab \"%s\"? "
                             old-name))
       (tab-bar-close-tab)
-      (when (<= 2 (length (funcall tab-bar-tabs-function)))
-        (switch-or-create-tab "scratch"))
       t)))
 
 (defun tab-bar-report ()

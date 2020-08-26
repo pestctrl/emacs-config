@@ -185,6 +185,10 @@
   (set-face-attribute 'mode-line-inactive nil :height 100)
   (setq all-the-icons-scale-factor 1.0)
 
+  (set-face-attribute 'tab-bar nil :foreground "#70FF00" :background "dark slate gray" :inherit 'fixed-pitch)
+  (set-face-attribute 'tab-bar-tab nil :background "gray6")
+  (set-face-attribute 'tab-bar-tab-inactive nil :background "dark slate gray")
+
   ;; The most efficient cool looking modeline I've
   ;; found. Faster than even smart-mode-line
   (use-package doom-modeline)

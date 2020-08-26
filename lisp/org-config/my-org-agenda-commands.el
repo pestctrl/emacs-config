@@ -128,7 +128,6 @@
         ("M" "\tMinimal"
          ((org-ql-block '(and (tags "dev")
                               (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
-                              (my/top-level)
                               (property "DELAYED")
                               (org-time< (property "DELAYED") (org-matcher-time "<now>")))
                         ((org-ql-block-header "Previously Delayed")))
@@ -178,9 +177,11 @@
                                                                             :not (:deadline today)))))))))))
         ("h" "\tDev Hold and Delay"
          ((org-ql-block '(and (tags "dev")
-                              (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
-                              (property "DELAYED"))
-                        ((org-ql-block-header "Past Delayed Projects")))
+                                 (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
+                                 (property "DELAYED")
+                                 (org-time<= (org-entry-get (point) "DELAYED")
+                                             (org-matcher-time "<now>")))
+                           ((org-ql-block-header "Past Delayed Projects")))
           (org-ql-block '(and (tags "dev")
                               (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
                               (property "DELAYED")

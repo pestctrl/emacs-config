@@ -93,17 +93,23 @@
 (define-prefix-command '*music-map*)
 (define-key *root-map* (kbd "m") '*music-map*)
 
-(define-key *music-map* (kbd "SPC") (exec (shell-command "clementine -t")))
-(define-key *music-map* (kbd "n") (exec (shell-command "clementine --next")))
-(define-key *music-map* (kbd "p") (exec (shell-command "clementine --previous")))
-(define-key *music-map* (kbd "r") (exec (shell-command "clementine --restart-or-previous")))
+(define-key *music-map* (kbd "SPC") (exec (run-clementine-command "-t")))
+(define-key *music-map* (kbd "n") (exec (run-clementine-command "--next")))
+(define-key *music-map* (kbd "p") (exec (run-clementine-command "--previous")))
+(define-key *music-map* (kbd "r") (exec (run-clementine-command "--restart-or-previous")))
 (defhydra clementine-volume-hydra (*music-map* "v")
   "Clementine volume up and down"
-  ("j" (lambda () (interactive) (shell-command "clementine --volume-down")))
-  ("J" (lambda () (interactive) (shell-command "clementine --volume-decrease-by 25")))
-  ("k" (lambda () (interactive) (shell-command "clementine --volume-up")))
-  ("K" (lambda () (interactive) (shell-command "clementine --volume-increase-by 25")))
+  ("j" (lambda () (interactive) (run-clementine-command "--volume-down")))
+  ("J" (lambda () (interactive) (run-clementine-command "--volume-decrease-by 25")))
+  ("k" (lambda () (interactive) (run-clementine-command "--volume-up")))
+  ("K" (lambda () (interactive) (run-clementine-command "--volume-increase-by 25")))
   ("q" nil))
+
+(defun run-clementine-command (arg)
+  (when (zerop (length (shell-command-to-string "pgrep clementine")))
+    (launch-program "clementine"))
+  (shell-command (format "clementine %s"
+                         arg)))
 
 (add-to-list 'hydra-props-alist
              '(clementine-volume-hydra :verbosity 0))

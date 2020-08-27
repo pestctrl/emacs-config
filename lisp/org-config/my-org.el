@@ -24,10 +24,18 @@
 
 ;;; Code:
 (require 'org)
+
+(require 'org-loop)
+(require 'org-process)
+(require 'org-project)
+(require 'org-delay)
+
 (require 'my-org-misc)
 (require 'my-org-indent)
 (require 'my-org-agenda-commands)
 (require 'my-org-capture-templates)
+
+(require 'self-talk-mode)
 
 (provide 'my-org)
 ;;; my-org.el ends here

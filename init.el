@@ -35,7 +35,7 @@
   (let ((default-directory  "~/.emacs.d/submodule/"))
     (normal-top-level-add-subdirs-to-load-path)))
 
-(require 'libs)
+(require 'emacs-custom-load-or-ask)
 
 (ec/load-or-ask-pred my/is-wsl "Are you running Emacs in WSL?")
 (ec/load-or-ask-pred my/enable-exwm "Do you want to load EXMW?")
@@ -50,6 +50,7 @@
 (when my/at-ti (setq epg-pinentry-mode nil))
 
 (require 'keymap)
+(require 'libs)
 
 ;; It is imperative that this be loaded for a nice emacs
 ;; experience. Only SUPER stable stuff goes in this file, and should

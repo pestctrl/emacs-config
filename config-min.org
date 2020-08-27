@@ -176,6 +176,7 @@
   (load-theme 'calm-forest t)
   ;; I don't like the shade of green for the foreground and the shade of
   ;; gray for the background. This overrides those
+  (add-to-list 'custom-theme-load-path "~/.emacs.d/lisp/themes")
   (load-theme 'dark-default)
 
   ;; Need to configure all-the-icons so that mode-line doesn't look fat

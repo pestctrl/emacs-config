@@ -87,7 +87,7 @@
 (when my/enable-exwm
   (require 'exwm)
   (setq exwm-input--global-prefix-keys
-        (delq 24 exwm-input--global-prefix-keys)))
+        (delq 3 exwm-input--global-prefix-keys)))
 
 (setq my/finished t)
 ;; Testing pull from windows

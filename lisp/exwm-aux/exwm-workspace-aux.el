@@ -26,7 +26,7 @@
 (require 'exwm)
 (require 'exwm-randr)
 (require 'dash)
-(require 'clj-swap)
+(require 'clojure-swap)
 
 (defvar exwm-randr/current-offset 0)
 

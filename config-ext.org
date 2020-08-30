@@ -747,16 +747,28 @@
 ** pavucontrol switch speakers headphones
 #+begin_src emacs-lisp
   (defvar laptop-sink-index 0)
-
-  ;; (let* ((result (shell-command-to-string "pacmd list-modules"))
-  ;;        (split (cdr (split-string result "index: "))))
-  ;;   split)
+  (defvar hdmi-pcie-interface nil)
 
   (let* ((result (shell-command-to-string "pactl list short sinks")))
     (when (string-match "\\([0-9]\\).*analog-stereo" result)
       (setq laptop-sink-index
             (string-to-number
-             (match-string 1 result)))))
+             (match-string 1 result))))
+    (when (string-match "[0-9].*\\(pci-.*\\)\\.hdmi-stereo" result)
+      (setq hdmi-pcie-interface
+            (match-string 1 result))))
+
+  (when hdmi-pcie-interface
+    (let* ((result (shell-command-to-string "pacmd list-modules"))
+           (split (cdr (split-string result "index: "))))
+      (loop for mod in split
+            while (not
+                   (string-match (format "\\([0-9]+\\)\n.*\n.*name=\"%s\"" hdmi-pcie-interface)
+                                 mod))
+            finally
+            do (shell-command
+                (format "pactl unload-module %s"
+                        (match-string 1 mod))))))
 
   (defun current-speakers ()
     (let ((string (shell-command-to-string "pactl list sinks | grep 'Active Port: '")))

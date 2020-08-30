@@ -45,7 +45,11 @@
     (use-package exwm-x)
 
     ;; Editting with Emacs in X-windows
-    (use-package exwm-edit)
+    (use-package exwm-edit
+      :init
+      (setq exwm-edit-bind-default-keys nil)
+      :config
+      (exwm-global-set-key (kbd "s-e") #'exwm-edit--compose))
 
     ;; System tray
     (require 'exwm-systemtray)

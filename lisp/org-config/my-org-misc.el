@@ -97,5 +97,16 @@
 ;; Uh oh
 (setq org-clock-continuously t)
 
+(defun my/org-un-project ()
+  (interactive)
+  (let ((level (org-current-level)))
+    (org-map-entries 'org-do-promote (format "LEVEL>%d" level) 'tree)
+    (org-cycle t)))
+
+(defun my/org-delete-promote ()
+  (interactive)
+  (my/org-un-project)
+  (org-cut-subtree))
+
 (provide 'my-org-misc)
 ;;; my-org-misc.el ends here

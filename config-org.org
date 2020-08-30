@@ -502,17 +502,6 @@
 #+end_src
 * archive sibling remove sub archive sibling
 #+begin_src emacs-lisp
-  (defun my/org-un-project ()
-    (interactive)
-    (let ((level (org-current-level)))
-      (org-map-entries 'org-do-promote (format "LEVEL>%d" level) 'tree)
-      (org-cycle t)))
-
-  (defun my/org-delete-promote ()
-    (interactive)
-    (my/org-un-project)
-    (org-cut-subtree))
-
   (defun my/is-archive-tree ()
     (and (string= "Archive"
                   (org-get-heading t t t t))

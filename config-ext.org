@@ -112,6 +112,7 @@
                 ("C-c C-c" . #'my/choose-email-address-and-send)
                 :map notmuch-search-mode-map
                 ("z" . #'notmuch-search-tree-current-thread)
+                ("A" . #'notmuch-search-show-all)
                 ("<mouse-1>" . nil)
                 :map notmuch-tree-mode-map
                 ("<tab>" . #'notmuch-tree-explore-here)
@@ -137,6 +138,13 @@
     (set-face-attribute 'notmuch-message-summary-face nil :background "steel blue" :foreground "snow")
     (add-to-list 'notmuch-search-line-faces
                  '("deleted" . font-lock-comment-face))
+
+    (defun notmuch-search-show-all ()
+      (interactive)
+      (let* ((query (replace-regexp-in-string "date:[^ ]+" "" notmuch-search-query-string))
+             (noand (replace-regexp-in-string "^ *and +" "" query))
+             (noand2 (replace-regexp-in-string " +and *" "" query)))
+        (notmuch-search noand2)))
 
     (defun notmuch-search-tree-current-thread (arg)
       (interactive "P")

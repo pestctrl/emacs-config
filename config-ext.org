@@ -173,6 +173,7 @@
             (:name "flagged" :query "tag:flagged" :key "f")
             (:name "cs" :query "tag:cs" :key "c")
             (:name "receipts" :query "tag:receipts" :key "R")
+            (:name "voicemail" :query "tag:voicemail" :key "v")
             ;; (:name "sent" :query "tag:sent" :key "s")
             ;; (:name "drafts" :query "tag:draft" :key "d")
             (:name "all mail" :query "*" :key "a")))

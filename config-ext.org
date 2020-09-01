@@ -783,7 +783,8 @@
         (shell-command (format "pactl set-sink-port %d analog-output-speaker"
                                laptop-sink-index))
       (shell-command (format "pactl set-sink-port %d analog-output-headphones"
-                             laptop-sink-index))))
+                             laptop-sink-index)))
+    (message (format "Switched to: %s" (current-speakers))))
 
   (exwm-global-set-key (kbd "s-s") #'toggle-audio-output)
 #+end_src

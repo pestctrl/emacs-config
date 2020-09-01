@@ -25,7 +25,8 @@
 ;;; Code:
 
 (setq tab-bar-show nil
-      tab-bar-close-tab-select 'recent)
+      tab-bar-close-tab-select 'recent
+      tab-bar-close-button-show nil)
 
 (defun switch-or-create-tab (tab-name)
   (interactive

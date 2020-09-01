@@ -29,5 +29,10 @@
 ;; Prompt for passwords via the minibuffer
 (setq epg-pinentry-mode nil)
 
+(add-to-list 'display-buffer-alist
+             '("\\*xref\\*" display-buffer-in-side-window
+               (side . top) (slot . 0) (window-height . fit-window-to-buffer)
+               (preserve-size . (nil . t)) ,parameters))
+
 (provide 'work-config)
 ;;; work-config.el ends here

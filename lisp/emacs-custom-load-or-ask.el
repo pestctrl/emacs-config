@@ -29,18 +29,50 @@
 
 (defvar ec/my-variables-list '())
 
-(defmacro ec/load-or-ask-pred (sym prompt)
-  `(when (not (boundp ',sym))
-     (customize-save-variable ',sym (y-or-n-p ,prompt))))
+(defvar ec/prompt-functions (make-hash-table))
 
-(defmacro ec/load-or-ask-key (key key-key prompt)
-  (mmt-with-gensyms (keygen)
-    `(when (not (boundp ',key))
-       (let ((,keygen (read-key ,prompt)))
-         (customize-save-variable ',key-key ,keygen)
-         (customize-save-variable ',key (char-to-string ,keygen))))))
+(defmacro defun-prompt (name type args &rest body)
+  (declare (indent 3))
+  (when (not (gethash name ec/prompt-functions)) ;;(not (fboundp name))
+    (puthash type name ec/prompt-functions))
+  `(defun ,name ,(append args '(&optional override))
+     (setq ec/my-variables-list
+           (delq (list ',type ,@args)
+                 ec/my-variables-list))
+     (add-to-list 'ec/my-variables-list
+                  (list ',type ,@args))
+     (when (or override (not (boundp ,(car args))))
+       ,@body)))
 
-(defun ec/re-run-all-prompts ())
+(defun-prompt ec/load-or-ask-pred predicate (sym prompt)
+  (customize-save-variable sym (y-or-n-p prompt)))
+
+(defun-prompt ec/load-or-ask-key key (key key-key prompt)
+  (let ((keygen (read-key prompt)))
+      (customize-save-variable key-key keygen)
+      (customize-save-variable key (char-to-string keygen))))
+
+(defun ec/rerun-prompt (prompt-arglist)
+  (apply (symbol-function (gethash (car prompt-arglist) ec/prompt-functions))
+         (append (cdr prompt-arglist)
+                 (list t))))
+
+(defun ec/rerun-all-prompts ()
+  (interactive)
+  (dolist (prompt ec/my-variables-list)
+    (ec/rerun-prompt prompt)))
+
+(defun ec/rerun-one-prompt ()
+  (interactive)
+  (let ((resp (completing-read "Which prompt? "
+                               (mapcar #'(lambda (a)
+                                           (last a))
+                                       ec/my-variables-list))))
+    (loop for i in ec/my-variables-list
+          until (member resp i)
+          finally
+          do
+          (ec/rerun-prompt i))))
 
 (provide 'emacs-custom-load-or-ask)
 ;;; emacs-custom-load-or-ask.el ends here

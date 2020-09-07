@@ -37,9 +37,9 @@
 
 (require 'emacs-custom-load-or-ask)
 
-(ec/load-or-ask-pred my/is-wsl "Are you running Emacs in WSL?")
-(ec/load-or-ask-pred my/enable-exwm "Do you want to load EXMW?")
-(ec/load-or-ask-pred my/at-ti "Are you at TI for work?")
+(ec/load-or-ask-pred 'my/is-wsl "Are you running Emacs in WSL?")
+(ec/load-or-ask-pred 'my/enable-exwm "Do you want to load EXMW?")
+(ec/load-or-ask-pred 'my/at-ti "Are you at TI for work?")
 (defvar is-windows (or my/is-wsl
                        (eq system-type
                            'windows-nt)))

@@ -10,8 +10,8 @@
 (exwm-global-set-key (kbd "s-k") (lambda () (interactive) (kill-buffer (current-buffer))))
 (exwm-global-set-key (kbd "M-Q") #'bury-buffer)
 
-(ec/load-or-ask-key my/keymap-key
-                    my/keymap-key-key
+(ec/load-or-ask-key 'my/keymap-key
+                    'my/keymap-key-key
                     "What would you like *root-map* to be bound to?")
 
 (use-package exwm

@@ -47,7 +47,7 @@
 
 (define-todo-keyword "TODO" 'ambiguous :key ?T)
 
-(define-todo-keyword "ONE" 'ambiguous :color "royal blue" :key ?o)
+(define-todo-keyword "ONE" 'ambiguous :key ?o)
 
 (finish-active-type 'ambiguous)
 
@@ -74,15 +74,15 @@
 
 ;; Legacy keywords
 
-(define-todo-keyword "CLOCK" 'legacy :color "dark gray")
+(define-todo-keyword "CLOCK" 'legacy)
 
-(define-todo-keyword "INACT" 'legacy :color "dark gray")
+(define-todo-keyword "INACT" 'legacy)
 
-(define-todo-keyword "BACKLOG" 'legacy :color "dark gray" :key ?b)
+(define-todo-keyword "BACKLOG" 'legacy :key ?b)
 
 (finish-active-type 'legacy)
 
-(define-todo-keyword "ABANDON" 'legacy :color "dark gray" :recordstr "@/!")
+(define-todo-keyword "ABANDON" 'legacy :recordstr "@/!")
 
 (defun opr/get-type ()
   (let* ((state (org-get-todo-state))

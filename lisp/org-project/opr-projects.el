@@ -29,7 +29,7 @@
 (defvar opr/meta-active-if-one-active nil)
 
 ;; Context sensitive
-(define-todo-keyword "META" 'project :color "white" :key ?m)
+(define-todo-keyword "META" 'project :key ?m)
 
 (defun meta-status? (&optional active-if-one-active)
   (if (or opr/meta-active-if-one-active active-if-one-active)
@@ -62,9 +62,9 @@
       'invis
       'stuck)))
 
-(define-todo-keyword "SEQ" 'project :color "white" :key ?s)
+(define-todo-keyword "SEQ" 'project :key ?s)
 
-(define-todo-keyword "EMPTY" 'project :color "white" :key ?e)
+(define-todo-keyword "EMPTY" 'project :key ?e)
 
 (defun empty-status? ()
   (if (olc/any-todo-children?
@@ -75,7 +75,7 @@
 ;; Simple ones
 (define-todo-keyword "ETERNAL" 'project :key ?E)
 
-(define-todo-keyword "HOLD" 'project :color "red" :key ?h)
+(define-todo-keyword "HOLD" 'project :key ?h)
 
 (finish-active-type 'project)
 

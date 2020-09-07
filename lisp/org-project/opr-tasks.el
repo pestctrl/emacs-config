@@ -26,17 +26,17 @@
 
 (require 'opr-util)
 
-(define-todo-keyword "STUFF" 'task :color "goldenrod" :key ?S)
+(define-todo-keyword "STUFF" 'task :key ?S)
 
-(define-todo-keyword "FUTURE" 'task :color "medium spring green" :key ?f)
+(define-todo-keyword "FUTURE" 'task :key ?f)
 
 (define-todo-keyword "TICKLER" 'task :key ?\))
 
 (define-todo-keyword "TASK" 'task :key ?t)
 
-(define-todo-keyword "NEXT" 'task :key ?n :color "cyan")
+(define-todo-keyword "NEXT" 'task :key ?n)
 
-(define-todo-keyword "WAIT" 'task :color "yellow" :key ?w :recordstr "!")
+(define-todo-keyword "WAIT" 'task :key ?w :recordstr "!")
 
 (finish-active-type 'task)
 

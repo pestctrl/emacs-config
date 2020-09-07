@@ -48,9 +48,12 @@
     (setf (nth index org-todo-keywords)
           (append (nth index org-todo-keywords)
                   (list todo-keyword-str))))
-  (when color
-    (add-to-list 'org-todo-keyword-faces
-                 `(,str :foreground ,color :weight bold :inherit fixed-pitch)))
+  (let ((face-name (intern (format "opr/%s-todo-face" str))))
+    (eval
+     `(progn
+        (defface ,face-name '((t (:inherit org-todo))) nil)
+        (add-to-list 'org-todo-keyword-faces
+                     '(,str . ,face-name)))))
   (pcase type
     ('ambiguous (add-to-list 'opr/ambiguous
                              str))

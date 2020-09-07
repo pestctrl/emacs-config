@@ -394,24 +394,6 @@
   (use-package rainbow-delimiters)
   (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
 
-  (let ((rainbow-purple  "#9E1CB2")
-        (rainbow-blue    "#1194f6")
-        (rainbow-green   "#47B04B")
-        (rainbow-yellow  "#FFED18")
-        (rainbow-orange  "#E7B500")
-        (rainbow-red     "#C90067")
-        (rainbow-7       "#00AA5D")
-        (rainbow-8       "#FE7380"))
-    (set-face-attribute 'rainbow-delimiters-depth-1-face nil :foreground rainbow-purple)
-    (set-face-attribute 'rainbow-delimiters-depth-2-face nil :foreground rainbow-green)
-    (set-face-attribute 'rainbow-delimiters-depth-3-face nil :foreground rainbow-blue)
-    (set-face-attribute 'rainbow-delimiters-depth-4-face nil :foreground rainbow-red)
-    (set-face-attribute 'rainbow-delimiters-depth-5-face nil :foreground rainbow-yellow)
-    (set-face-attribute 'rainbow-delimiters-depth-6-face nil :foreground rainbow-blue)
-    (set-face-attribute 'rainbow-delimiters-depth-7-face nil :foreground rainbow-red)
-    (set-face-attribute 'rainbow-delimiters-depth-8-face nil :foreground rainbow-8)
-    (set-face-attribute 'rainbow-delimiters-depth-9-face nil :foreground rainbow-purple))
-
   ;; Macroexpander
   (use-package macrostep)
 

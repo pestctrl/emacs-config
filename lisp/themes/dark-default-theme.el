@@ -26,13 +26,33 @@
 
 (deftheme dark-default)
 
-(custom-theme-set-faces
- 'dark-default
+(let ((rainbow-purple  "#9E1CB2")
+      (rainbow-green   "#47B04B")
+      (rainbow-blue    "#1194f6")
+      (rainbow-red     "#C90067")
+      (rainbow-yellow  "#FFED18")
+      (rainbow-orange  "#E7B500")
+      (rainbow-7       "#00AA5D")
+      (rainbow-8       "#FE7380"))
+  (custom-theme-set-faces
+   'dark-default
  
- '(default ((t (:background "gray8" :foreground "#70FF00"))))
- '(mode-line-inactive ((t :foreground "gray60" :background "#404045" :inverse-video nil)))
- '(mode-line     ((t :foreground "gray60" :background "black" :inverse-video nil)))
- '(eldoc-highlight-function-argument ((t :foreground "dodger blue"))))
+   '(default ((t (:foreground "#70FF00" :background "gray8"))))
+   '(mode-line-inactive ((t :foreground "gray60" :background "#404045" :inverse-video nil)))
+   '(mode-line     ((t :foreground "gray60" :background "black" :inverse-video nil)))
+   '(eldoc-highlight-function-argument ((t :foreground "dodger blue")))
+
+   `(rainbow-delimiters-depth-1-face ((t :foreground ,rainbow-purple)))
+   `(rainbow-delimiters-depth-2-face ((t :foreground ,rainbow-green)))
+   `(rainbow-delimiters-depth-3-face ((t :foreground ,rainbow-blue)))
+   `(rainbow-delimiters-depth-4-face ((t :foreground ,rainbow-red)))
+   `(rainbow-delimiters-depth-5-face ((t :foreground ,rainbow-yellow)))
+   `(rainbow-delimiters-depth-6-face ((t :foreground ,rainbow-blue)))
+   `(rainbow-delimiters-depth-7-face ((t :foreground ,rainbow-red)))
+   `(rainbow-delimiters-depth-8-face ((t :foreground ,rainbow-8)))
+   `(rainbow-delimiters-depth-9-face ((t :foreground ,rainbow-purple)))
+
+  )
 
 ;;###autoload
 (when load-file-name

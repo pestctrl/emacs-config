@@ -25,8 +25,7 @@
 ;;; Code:
 
 (setq tab-bar-show nil
-      tab-bar-close-tab-select 'recent
-      )
+      tab-bar-close-tab-select 'recent)
 
 (defun switch-or-create-tab (tab-name)
   (interactive
@@ -86,6 +85,10 @@
 (define-key *tab-map* (kbd "t") #'last-tab)
 
 (tab-bar-rename-tab "scratch1")
+
+(add-hook 'server-after-make-frame-hook
+          #'(lambda ()
+              (tab-bar-rename-tab "scratch1")))
 
 (provide 'switch-tabs)
 ;;; switch-tabs.el ends here

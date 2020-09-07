@@ -34,6 +34,9 @@
 (define-key *root-map* (kbd "RET") 'dired-jump)
 (define-key *root-map* (kbd "C-b") 'previous-buffer)
 
+(with-eval-after-load "org"
+  (define-key *root-map* (kbd "!") 'org-time-stamp-inactive))
+
 (defun toggle-notifications ()
   (interactive)
   (shell-command "kill -s USR1 $(pidof deadd-notification-center)"))

@@ -182,6 +182,7 @@
   ;; gray for the background. This overrides those
   (add-to-list 'custom-theme-load-path "~/.emacs.d/lisp/themes")
   (load-theme 'dark-default)
+  (load-theme 'same-defaults)
 
   ;; Need to configure all-the-icons so that mode-line doesn't look fat
   ;; and ugly
@@ -189,10 +190,6 @@
   (set-face-attribute 'mode-line nil :height 100)
   (set-face-attribute 'mode-line-inactive nil :height 100)
   (setq all-the-icons-scale-factor 1.0)
-
-  (set-face-attribute 'tab-bar nil :foreground "#70FF00" :background "dark slate gray" :inherit 'fixed-pitch)
-  (set-face-attribute 'tab-bar-tab nil :background "gray6")
-  (set-face-attribute 'tab-bar-tab-inactive nil :background "dark slate gray")
 
   ;; The most efficient cool looking modeline I've
   ;; found. Faster than even smart-mode-line
@@ -209,15 +206,6 @@
   (require 'display-hard-drive-space-mode)
   (display-hard-drive-space-mode)
 
-  ;; Roboto mono is nice
-  (when (member "Roboto Mono" (font-family-list))
-    (set-face-attribute 'default nil :font "Roboto Mono" :height 100)
-    (set-face-attribute 'fixed-pitch nil :font "Roboto Mono" :height 100))
-
-  ;; (when (member "Liberation Serif" (font-family-list)))
-  (when (member "Linux Libertine" (font-family-list))
-    (set-face-attribute 'variable-pitch nil :font "Linux Libertine" :height 130
-                        :width 'normal))
   ;;(set-face-attribute 'variable-pitch nil :font '(:family "ETBookOT"))
 
   ;; I like my unicode to be monospace too, so I use these
@@ -790,4 +778,74 @@
     :commands olivetti-mode
     :config
     (setq-default olivetti-body-width 140))
+#+end_src
+** Change themes on the spot
+#+begin_src emacs-lisp
+  (require 'light-default-theme)
+  (require 'dark-default-theme)
+  (use-package modus-operandi-theme)
+
+  (defvar current-theme 'dark)
+
+  (defvar light-theme 'modus-operandi)
+  (defvar dark-theme 'calm-forest)
+
+  (defun switch-themes ()
+    (interactive)
+    (setq current-theme (if (eq current-theme 'dark) 'light 'dark))
+    (disable-theme 'same-defaults)
+    (pcase current-theme
+      ('light
+       (disable-theme 'dark-default)
+       (disable-theme dark-theme)
+       (enable-theme light-theme)
+       (enable-theme 'light-default))
+      ('dark
+       (disable-theme 'light-default)
+       (disable-theme light-theme)
+       (enable-theme dark-theme)
+       (enable-theme 'dark-default)))
+    (enable-theme 'same-defaults)
+    (set-background-mode current-theme))
+
+  (defun reload-theme ()
+    (interactive)
+    (disable-theme 'same-defaults)
+    (pcase current-theme
+      ('light
+       (disable-theme 'light-default)
+       (disable-theme light-theme)
+       (enable-theme light-theme)
+       (enable-theme 'light-default))
+      ('dark
+       (disable-theme 'dark-default)
+       (disable-theme dark-theme)
+       (enable-theme dark-theme)
+       (enable-theme 'dark-default)))
+    (enable-theme 'same-defaults)
+    (set-background-mode current-theme))
+
+  (defun disable-all-theming ()
+    (interactive)
+    (disable-theme 'light-default)
+    (disable-theme light-theme)
+    (disable-theme 'dark-default)
+    (disable-theme dark-theme)
+    (disable-theme 'same-defaults)
+    (set-background-mode 'light)
+    (setq default-theme 'light))
+
+  (ec/load-or-ask-pred 'my/light-default "Use light-theme? ")
+
+  (defun update-frame-background-mode ()
+    (mapc 'frame-set-background-mode (frame-list)))
+
+  (defun set-background-mode (mode)
+    (set-default frame-background-mode mode)
+    (setf frame-background-mode mode)
+    (update-frame-background-mode))
+
+  ;; Executable
+  (when my/light-default
+    (switch-themes))
 #+end_src

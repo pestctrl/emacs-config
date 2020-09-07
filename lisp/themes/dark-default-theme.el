@@ -42,6 +42,8 @@
    '(mode-line     ((t :foreground "gray60" :background "black" :inverse-video nil)))
    '(eldoc-highlight-function-argument ((t :foreground "dodger blue")))
 
+   '(sml/charging ((t (:inherit sml/global :foreground "forest green"))))
+   
    `(rainbow-delimiters-depth-1-face ((t :foreground ,rainbow-purple)))
    `(rainbow-delimiters-depth-2-face ((t :foreground ,rainbow-green)))
    `(rainbow-delimiters-depth-3-face ((t :foreground ,rainbow-blue)))
@@ -52,6 +54,28 @@
    `(rainbow-delimiters-depth-8-face ((t :foreground ,rainbow-8)))
    `(rainbow-delimiters-depth-9-face ((t :foreground ,rainbow-purple)))
 
+   '(org-todo ((t (:foreground "Pink" :bold t :inherit fixed-pitch))))
+
+   '(opr/STUFF-todo-face ((t :foreground "goldenrod")))
+   '(opr/FUTURE-todo-face ((t :foreground "medium spring green")))
+   '(opr/NEXT-todo-face ((t :foreground "cyan")))
+   '(opr/WAIT-todo-face ((t :foreground "yellow")))
+   
+   '(opr/ONE-todo-face ((t :foreground "royal blue")))
+   
+   '(opr/CLOCK-todo-face ((t :foreground "dark gray")))
+   '(opr/INACT-todo-face ((t :foreground "dark gray")))
+   '(opr/BACKLOG-todo-face ((t :foreground "dark gray"))) 
+   '(opr/ABANDON-todo-face ((t :foreground "dark gray")))
+   
+   '(opr/META-todo-face ((t :foreground "white")))
+   '(opr/SEQ-todo-face ((t :foreground "white")))
+   '(opr/EMPTY-todo-face ((t :foreground "white")))
+   '(opr/HOLD-todo-face ((t :foreground "red")))
+   
+   '(tab-bar ((t :foreground "#70FF00" :background "dark slate gray" :inherit 'fixed-pitch)))
+   '(tab-bar-tab ((t :background "gray6")))
+   '(tab-bar-tab-inactive ((t :background "dark slate gray"))))
   )
 
 ;;###autoload

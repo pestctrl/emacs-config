@@ -203,8 +203,10 @@
   (display-battery-mode t)
   (display-time-mode t)
   (setq display-time-day-and-date t)
-  (require 'display-hard-drive-space-mode)
-  (display-hard-drive-space-mode)
+  (unless (or (eq 'windows-nt system-type)
+              (not (executable-find "df")))
+    (require 'display-hard-drive-space-mode)
+    (display-hard-drive-space-mode))
 
   ;;(set-face-attribute 'variable-pitch nil :font '(:family "ETBookOT"))
 
@@ -295,27 +297,6 @@
 
   (define-key dired-mode-map (kbd "<tab>") 'dired-subtree-insert)
   (define-key dired-mode-map (kbd "<backtab>") 'dired-subtree-remove)
-#+end_src
-* w3m
-#+begin_src emacs-lisp
-  ;; Remove when Emacs 27 releases
-  (when (executable-find "w3m")
-    (setq w3m-use-tabs nil)
-    (use-package w3m)
-
-    (defun dired-browse-with-w3m (arg)
-      (interactive "P")
-      (let ((browse-url-browser-function (if arg
-                                             (symbol-function browse-url-browser-function)
-                                           #'w3m-browse-url)))
-        (browse-url-of-dired-file)))
-
-    (define-key dired-mode-map (kbd "W") 'dired-browse-with-w3m)
-
-    (global-set-key (kbd "C-c g")
-                    (lambda ()
-                      (interactive)
-                      (w3m-goto-url "https://google.com"))))
 #+end_src
 * emacs lisp
 #+begin_src emacs-lisp
@@ -515,6 +496,27 @@
   ;; re-builder
   (require 're-builder)
   (setq reb-re-syntax 'rx)
+#+end_src
+* w3m
+#+begin_src emacs-lisp
+  ;; Remove when Emacs 27 releases
+  (when (executable-find "w3m")
+    (setq w3m-use-tabs nil)
+    (use-package w3m)
+
+    (defun dired-browse-with-w3m (arg)
+      (interactive "P")
+      (let ((browse-url-browser-function (if arg
+                                             (symbol-function browse-url-browser-function)
+                                           #'w3m-browse-url)))
+        (browse-url-of-dired-file)))
+
+    (define-key dired-mode-map (kbd "W") 'dired-browse-with-w3m)
+
+    (global-set-key (kbd "C-c g")
+                    (lambda ()
+                      (interactive)
+                      (w3m-goto-url "https://google.com"))))
 #+end_src
 * ibuffer
 #+begin_src emacs-lisp

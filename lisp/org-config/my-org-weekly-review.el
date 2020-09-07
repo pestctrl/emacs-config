@@ -69,8 +69,16 @@
   (unless current-prefix-arg
     ;; Check for older review
     (if (and (file-exists-p "~/.emacs.d/review-incomplete.el")
+             (save-excursion
+               (when (file-exists-p "~/MEGA/org/entries/reviews.gpg")
+                 (switch-to-buffer (find-file "~/MEGA/org/entries/reviews.gpg"))
+                 (end-of-buffer)
+                 (org-back-to-heading t)
+                 (org-up-heading-safe)
+                 (org-narrow-to-subtree)
+                 (org-show-all))
                (y-or-n-p (format "Woah, we found an incomplete review: %s. Would you like to use that date as the start date? "
-                                 (shell-command-to-string "cat ~/.emacs.d/review-incomplete.el | tr -d '\n'"))))
+                                 (shell-command-to-string "cat ~/.emacs.d/review-incomplete.el | tr -d '\n'")))))
         (rename-file "~/.emacs.d/review-incomplete.el" "~/.emacs.d/last-review.el" t)
       (delete-file  "~/.emacs.d/review-incomplete.el"))
     ;; Setup current review

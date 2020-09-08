@@ -53,8 +53,6 @@
           (my/org-ql-active-projects nil
                                      ((org-ql-block-header "Active Projects")
                                       (org-ql-indent-levels t)))
-          (org-ql-block '(todo "WAIT")
-                        ((org-ql-block-header "Waiting tasks")))
           (agenda ""
                   ((org-agenda-span 'day)
                    (org-agenda-tag-filter-preset)
@@ -166,6 +164,65 @@
 ;;                            (funcall deft-parse-title-function
 ;;                                     (substring contents begin (match-end 0))))))
 ;;                    (org-roam--get-title-or-slug file))))
+
+(defun gdb-stacktrace-to-org-table ()
+  (interactive)
+  (let ((regexp (rx (and line-start
+                         "#"
+                         ;; Stack Number
+                         (group (+? digit))
+                         (+ " ")
+                         (optional
+                          (and "0x"
+                               (+ alnum)
+                               " in "))
+                         ;; Function Name
+                         (group (+? anything))
+                         (optional " ")
+                         "("
+                         (+? anything)
+                         ") at "
+                         ;; File name
+                         (group
+                          ;;"/"
+                          (+? anything))
+                         ":"
+                         ;; Line Number
+                         (group
+                          (+ digit))
+                         line-end
+                         ))))
+    (beginning-of-buffer)
+    (save-excursion
+      (while (re-search-forward regexp nil 'noerror)
+        (replace-match
+         (format "|\\1|\\2|%s:\\4|[[\\3::\\4][Link]]|"
+                 (if (string-match-p "/scratch/benson/tools/llvm_cgt/llvm-project/clang/"
+                                     (match-string 3))
+                     (substring (match-string 3) 43)
+                   (match-string 3))))))
+    (org-table-sort-lines nil ?N)
+    (save-excursion
+      (insert "|-\n|#|Function Name|File & Line Number|Link|\n|-\n")
+      (end-of-buffer)
+      (insert "\n|-"))
+    (org-table-align)))
+
+
+(setq show-tab-bar-new-tab t)
+(defvar org-notes-current-file nil)
+
+(add-to-list 'org-capture-templates
+             '("n" "\tNotes" entry (function org-notes-find-file)
+               "* %A\n%?"))
+
+(defun org-notes-find-file ()
+  (when (or current-prefix-arg
+            (not org-notes-current-file))
+    (setq org-notes-current-file
+          (read-file-name "Notes file? ")))
+  (find-file org-notes-current-file)
+  (end-of-buffer))
 
 
 (provide 'work-org-stuff)

@@ -5,8 +5,7 @@
   (setq backup-directory-alist `(("." . ,(concat user-emacs-directory "backups"))))
 
   ;; Don't fricken suspend emacs
-  (when (eq #'suspend-frame
-            (key-binding (kbd "C-z")))
+  (unless (string= my/keymap-key (kbd "C-z"))
     (global-set-key (kbd "C-z") nil))
 
   ;; Minibuffer reading
@@ -327,12 +326,12 @@
   ;; Errors
   (use-package flycheck)
   (add-to-list 'display-buffer-alist
-               `(,(rx bos "*Flycheck errors*" eos)
-                 (display-buffer-reuse-window
-                  display-buffer-in-side-window)
-                 (side            . bottom)
-                 (reusable-frames . visible)
-                 (window-height   . 0.10)))
+	       `(,(rx bos "*Flycheck errors*" eos)
+		 (display-buffer-reuse-window
+		  display-buffer-in-side-window)
+		 (side            . bottom)
+		 (reusable-frames . visible)
+		 (window-height   . 0.10)))
 
   ;; Autocompletion
   (use-package company)
@@ -352,30 +351,39 @@
     "Push all branches."
     (interactive)
     (magit-run-git-async "push" "-v"
-                         (magit-read-remote "Remote")
-                         "--all"))
+			 (magit-read-remote "Remote")
+			 "--all"))
 
   (transient-append-suffix 'magit-push "m"
     '("a" "all remotes" my/magit-push-all))
 
   ;; Magit uses ediff
-  (setq ediff-window-setup-function 'ediff-setup-windows-plain)
-
-  (defun ediff-copy-both-to-C ()
-    (interactive)
-    (ediff-copy-diff ediff-current-difference nil 'C nil
-                     (concat
-                      (ediff-get-region-contents ediff-current-difference 'A ediff-control-buffer)
-                      (ediff-get-region-contents ediff-current-difference 'B ediff-control-buffer))))
-  (defun add-d-to-ediff-mode-map () (define-key ediff-mode-map "d" 'ediff-copy-both-to-C))
-  (add-hook 'ediff-keymap-setup-hook 'add-d-to-ediff-mode-map)
+  (with-eval-after-load 'ediff
+    (setq ediff-window-setup-function 'ediff-setup-windows-plain)
+  
+    (defun ediff-copy-both-to-C ()
+      (interactive)
+      (ediff-copy-diff ediff-current-difference nil 'C nil
+		       (concat
+			(ediff-get-region-contents ediff-current-difference 'A ediff-control-buffer)
+			(ediff-get-region-contents ediff-current-difference 'B ediff-control-buffer))))
+    (defun add-d-to-ediff-mode-map () (define-key ediff-mode-map "d" 'ediff-copy-both-to-C))
+    (add-hook 'ediff-keymap-setup-hook 'add-d-to-ediff-mode-map)
+    (set-face-attribute 'ediff-even-diff-A nil :background "midnight blue")
+    (set-face-attribute 'ediff-even-diff-Ancestor nil :background "midnight blue")
+    (set-face-attribute 'ediff-even-diff-B nil :background "midnight blue")
+    (set-face-attribute 'ediff-even-diff-C nil :background "midnight blue")
+    (set-face-attribute 'ediff-odd-diff-A nil :background "midnight blue")
+    (set-face-attribute 'ediff-odd-diff-Ancestor nil :background "midnight blue")
+    (set-face-attribute 'ediff-odd-diff-B nil :background "midnight blue")
+    (set-face-attribute 'ediff-odd-diff-C nil :background "midnight blue"))
 
   ;; Paredit
   (use-package paredit
     :bind (:map paredit-mode-map
-                ("M-?" . nil))
+		("M-?" . nil))
     :hook ((emacs-lisp-mode . paredit-mode)
-           (lisp-mode . paredit-mode)))
+	   (lisp-mode . paredit-mode)))
 
   ;; Paren highlighting
   (show-paren-mode t)
@@ -408,7 +416,7 @@
   ;; Auto highlighting of symbols
   (use-package auto-highlight-symbol)
   (add-hook 'prog-mode-hook
-            'auto-highlight-symbol-mode)
+	    'auto-highlight-symbol-mode)
 
   ;; wgrep
   (use-package wgrep)
@@ -441,8 +449,8 @@
   (defun my/TABS (num)
     (interactive "p")
     (setq tab-width (if (= num 1)
-                        8
-                      num)))
+			8
+		      num)))
 
   ;; Eval buffer, slime-ism
   (define-key emacs-lisp-mode-map (kbd "C-c C-k") #'eval-buffer)
@@ -452,7 +460,7 @@
     (interactive)
     (let ((count 0))
       (while (get-buffer (format "*scratch%d*" count))
-        (incf count))
+	(incf count))
       (switch-to-buffer (get-buffer-create (format "*scratch%d*" count)))
       (lisp-interaction-mode)
       (insert (substitute-command-keys initial-scratch-message))))
@@ -463,10 +471,10 @@
     (interactive)
     (backward-kill-sexp)
     (condition-case nil
-        (prin1 (eval (read (current-kill 0)))
-               (current-buffer))
+	(prin1 (eval (read (current-kill 0)))
+	       (current-buffer))
       (error (message "Invalid expression")
-             (insert (current-kill 0)))))
+	     (insert (current-kill 0)))))
 
   (define-key emacs-lisp-mode-map (kbd "C-c C-e") 'my/eval-and-replace)
 
@@ -481,22 +489,22 @@
     value)
 
   (advice-add 'eval-region :around
-              (lambda (f beg end &rest r)
-                (endless/eval-overlay
-                 (apply f beg end r)
-                 end)))
+	      (lambda (f beg end &rest r)
+		(endless/eval-overlay
+		 (apply f beg end r)
+		 end)))
 
   (advice-add 'eval-last-sexp :filter-return
-              (lambda (r)
-                (endless/eval-overlay r (point))))
+	      (lambda (r)
+		(endless/eval-overlay r (point))))
 
   (advice-add 'eval-defun :filter-return
-              (lambda (r)
-                (endless/eval-overlay
-                 r
-                 (save-excursion
-                   (end-of-defun)
-                   (point)))))
+	      (lambda (r)
+		(endless/eval-overlay
+		 r
+		 (save-excursion
+		   (end-of-defun)
+		   (point)))))
 
   ;; expand-region
   (use-package expand-region
@@ -511,47 +519,47 @@
     (defun my/banner-comment ()
       (interactive)
       (save-excursion
-        (save-restriction
-          (beginning-of-line)
-          (forward-to-indentation 0)
-          (let ((banner-width (- (or banner-comment-width
-                                     comment-fill-column
-                                     fill-column)
-                                 (current-column)))
-                (comment-start (or banner-comment-start comment-start))
-                (comment-end (or banner-comment-end comment-end)))
-            (narrow-to-region (point) (line-end-position))
-            ;; re search to extract existing into: pre(97), text(98), post(99)
-            (when (re-search-forward
-                   (format
-                    "\\(?97:^\\(%s\\|\\)%s\\)\\(?98:.*?\\)\\(?99:%s\\(%s\\|%s\\|\\)\\)$"
-                    (or comment-start-skip (regexp-quote (string-trim comment-start)))
-                    banner-comment-char-match
-                    banner-comment-char-match
-                    (regexp-quote (string-trim comment-start))
-                    (or comment-end-skip (regexp-quote (string-trim comment-start)))))
-              (let ((remaining-width (- banner-width
-                                        (length comment-start)
-                                        (length (match-string 98))
-                                        (length comment-end))))
-                (when (< remaining-width 0)
-                  (error "Text too wide for banner comment"))
-                (replace-match ;; replace everything before
-                 comment-start
-                 nil nil nil 97)
-                (replace-match ;; replace everything after
-                 (concat
-                  (if (string-empty-p (match-string 98))
-                      (make-string remaining-width banner-comment-char)
-                    (make-string remaining-width ? ))
-                  comment-end)
-                 nil nil nil 99))))))))
+	(save-restriction
+	  (beginning-of-line)
+	  (forward-to-indentation 0)
+	  (let ((banner-width (- (or banner-comment-width
+				     comment-fill-column
+				     fill-column)
+				 (current-column)))
+		(comment-start (or banner-comment-start comment-start))
+		(comment-end (or banner-comment-end comment-end)))
+	    (narrow-to-region (point) (line-end-position))
+	    ;; re search to extract existing into: pre(97), text(98), post(99)
+	    (when (re-search-forward
+		   (format
+		    "\\(?97:^\\(%s\\|\\)%s\\)\\(?98:.*?\\)\\(?99:%s\\(%s\\|%s\\|\\)\\)$"
+		    (or comment-start-skip (regexp-quote (string-trim comment-start)))
+		    banner-comment-char-match
+		    banner-comment-char-match
+		    (regexp-quote (string-trim comment-start))
+		    (or comment-end-skip (regexp-quote (string-trim comment-start)))))
+	      (let ((remaining-width (- banner-width
+					(length comment-start)
+					(length (match-string 98))
+					(length comment-end))))
+		(when (< remaining-width 0)
+		  (error "Text too wide for banner comment"))
+		(replace-match ;; replace everything before
+		 comment-start
+		 nil nil nil 97)
+		(replace-match ;; replace everything after
+		 (concat
+		  (if (string-empty-p (match-string 98))
+		      (make-string remaining-width banner-comment-char)
+		    (make-string remaining-width ? ))
+		  comment-end)
+		 nil nil nil 99))))))))
 
   (add-hook 'lisp-mode-hook
-            (lambda () (setq comment-start ";; ")))
+	    (lambda () (setq comment-start ";; ")))
 
   (add-hook 'emacs-lisp-mode-hook
-            (lambda () (setq comment-start ";; ")))
+	    (lambda () (setq comment-start ";; ")))
 
   ;; re-builder
   (require 're-builder)

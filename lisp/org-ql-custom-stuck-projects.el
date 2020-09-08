@@ -93,8 +93,7 @@
                                     (or (eq 'stuck (opr/type-of-task))
                                         (eq 'stuck (opr/type-of-project))))
                               :action 'element-with-markers
-                              :narrow narrow-p
-                              :sort 'todo))))
+                              :narrow narrow-p))))
         (when narrow-p
           ;; Restore buffer's previous restrictions.
           (with-current-buffer from

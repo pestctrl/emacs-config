@@ -23,7 +23,7 @@
   (define-key dired-mode-map my/keymap-key nil))
 
 (define-prefix-command '*root-map*)
-(exwm-global-set-key my/keymap-key '*root-map*)
+(exwm-global-set-key (kbd my/keymap-key) '*root-map*)
 
 (define-key *root-map* (kbd "C-n") 'switch-window)
 (define-key *root-map* (kbd "i") 'org-mru-clock-in)

@@ -106,10 +106,11 @@
   ("q" nil))
 
 (defun run-clementine-command (arg)
-  (when (zerop (length (shell-command-to-string "pgrep clementine")))
-    (launch-program "clementine"))
-  (shell-command (format "clementine %s"
-                         arg)))
+  (let ((pid (shell-command-to-string "pgrep clementine")))
+    (if (< 0 (length pid))
+        (shell-command (format "clementine %s" arg))
+      (launch-program "clementine")
+      (run-with-timer 4 nil #'run-clementine-command arg))))
 
 (add-to-list 'hydra-props-alist
              '(clementine-volume-hydra :verbosity 0))

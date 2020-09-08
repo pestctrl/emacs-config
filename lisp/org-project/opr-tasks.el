@@ -42,6 +42,9 @@
 
 (define-todo-keyword "DONE" 'task :key ?d :recordstr "!")
 
+(add-to-list 'org-todo-keyword-faces
+             '("DONE" . org-done))
+
 (defun opr/is-task ()
   (let ((state (org-get-todo-state)))
     (or (member state opr/strict-tasks)

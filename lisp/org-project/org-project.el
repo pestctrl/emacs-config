@@ -47,6 +47,9 @@
 
 (define-todo-keyword "TODO" 'ambiguous :key ?T)
 
+(add-to-list 'org-todo-keyword-faces
+             '("TODO" . org-todo))
+
 (define-todo-keyword "ONE" 'ambiguous :key ?o)
 
 (finish-active-type 'ambiguous)

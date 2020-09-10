@@ -124,6 +124,7 @@
                 ("N" . #'notmuch-tree-next-sibling)
                 ("P" . #'notmuch-tree-prev-sibling)
                 ("t" . #'notmuch-tree-toggle-folding-thread)
+                ("/" . #'notmuch-tree-undo-read)
                 ("F" . #'notmuch-tree-focus)
                 ("S-SPC" . #'notmuch-tree-scroll-message-window-back))
     :config
@@ -155,6 +156,21 @@
     (defun notmuch-tree-focus (arg)
       (interactive "P")
       (notmuch-tree notmuch-tree-basic-query (notmuch-tree-get-message-id) nil nil nil nil nil (if (not arg) #'notmuch-tree-hide-dead-trees #'notmuch-tree-show-trail-and-alive-children)))
+
+    (defun notmuch-tree-undo-read (arg)
+      (interactive "P")
+      (if arg
+          (save-excursion
+            (beginning-of-buffer)
+            (while (text-property-search-forward
+                    'face 'notmuch-tag-deleted
+                    #'(lambda (value prop)
+                        (if (consp prop)
+                            (member value prop)
+                          (eq value prop))))
+              (notmuch-tree-add-tag '("+unread"))))
+        (notmuch-tree-add-tag '("+unread"))
+        (next-line)))
 
     (setq notmuch-search-oldest-first nil
           notmuch-saved-searches

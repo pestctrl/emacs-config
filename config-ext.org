@@ -148,15 +148,13 @@
 
     (defun notmuch-search-tree-current-thread (arg)
       (interactive "P")
-      (setq notmuch-tree-show-filter-function (unless arg #'notmuch-tree-hide-dead-trees))
       (let* ((thread-id (notmuch-search-find-thread-id))
              (input (notmuch-read-query (concat "Notmuch tree: " thread-id " and "))))
-        (notmuch-tree thread-id (unless (zerop (length input)) input))))
+        (notmuch-tree thread-id (unless (zerop (length input)) input) nil nil nil nil nil (unless arg #'notmuch-tree-hide-dead-trees))))
 
     (defun notmuch-tree-focus (arg)
       (interactive "P")
-      (setq notmuch-tree-show-filter-function (if (not arg) #'notmuch-tree-hide-dead-trees #'notmuch-tree-show-trail-and-alive-children))
-      (notmuch-tree notmuch-tree-basic-query (notmuch-tree-get-message-id)))
+      (notmuch-tree notmuch-tree-basic-query (notmuch-tree-get-message-id) nil nil nil nil nil (if (not arg) #'notmuch-tree-hide-dead-trees #'notmuch-tree-show-trail-and-alive-children)))
 
     (setq notmuch-search-oldest-first nil
           notmuch-saved-searches

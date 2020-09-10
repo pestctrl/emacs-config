@@ -25,6 +25,8 @@
 ;;; Code:
 
 (defvar notmuch-tree-show-filter-function nil)
+(make-variable-buffer-local 'notmuch-tree-show-filter-function)
+(put 'notmuch-tree-show-filter-function 'permanent-local t)
 (defvar notmuch-tree-filter-debug nil)
 
 (defun notmuch-tree-alive-match-p (msg)
@@ -71,12 +73,48 @@
 ;; (notmuch-tree-show-trail-and-alive-children notmuch-tree-filter-debug)
 
 (defun notmuch-tree-insert-hide (orig forest-thread)
+  (message "Filter function start: %s " notmuch-tree-show-filter-function)
   (let ((forest-thread
          (if notmuch-tree-show-filter-function
              (progn (setq notmuch-tree-filter-debug forest-thread) (funcall notmuch-tree-show-filter-function forest-thread))
-           forest-thread)))
-    (setq notmuch-tree-show-filter-function nil)
-    (funcall orig forest-thread)))
+           forest-thread))
+        (notmuch-tree-show-filter-function nil))
+    (funcall orig forest-thread))
+  (message "Filter function end: %s" notmuch-tree-show-filter-function))
+
+(defun notmuch-tree (&optional query query-context target buffer-name open-target unthreaded parent-buffer filter-function)
+  "Display threads matching QUERY in tree view.
+
+The arguments are:
+  QUERY: the main query. This can be any query but in many cases will be
+      a single thread. If nil this is read interactively from the minibuffer.
+  QUERY-CONTEXT: is an additional term for the query. The query used
+      is QUERY and QUERY-CONTEXT unless that does not match any messages
+      in which case we fall back to just QUERY.
+  TARGET: A message ID (with the id: prefix) that will be made
+      current if it appears in the tree view results.
+  BUFFER-NAME: the name of the buffer to display the tree view. If
+      it is nil \"*notmuch-tree\" followed by QUERY is used.
+  OPEN-TARGET: If TRUE open the target message in the message pane.
+  UNTHREADED: If TRUE only show matching messages in an unthreaded view."
+  (interactive)
+  (unless query
+    (setq query (notmuch-read-query (concat "Notmuch "
+					    (if unthreaded "unthreaded " "tree ")
+					    "view search: "))))
+  (let ((buffer (get-buffer-create (generate-new-buffer-name
+				    (or buffer-name
+					(concat "*notmuch-"
+						(if unthreaded "unthreaded-" "tree-")
+						query "*")))))
+	(inhibit-read-only t))
+    (pop-to-buffer-same-window buffer))
+  (setq notmuch-tree-show-filter-function filter-function)
+  ;; Don't track undo information for this buffer
+  (set 'buffer-undo-list t)
+  (notmuch-tree-worker query query-context target open-target unthreaded)
+  (setq notmuch-tree-parent-buffer parent-buffer)
+  (setq truncate-lines t))
 
 (advice-add #'notmuch-tree-insert-forest-thread
             :around

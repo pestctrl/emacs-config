@@ -52,6 +52,12 @@
       (customize-save-variable key-key keygen)
       (customize-save-variable key (char-to-string keygen))))
 
+(defun-prompt ec/load-or-ask-file file (sym prompt)
+  (customize-save-variable sym (read-file-name prompt)))
+
+(defun-prompt ec/load-or-ask-dir dir (sym prompt)
+  (customize-save-variable sym (read-directory-name prompt)))
+
 (defun ec/rerun-prompt (prompt-arglist)
   (apply (symbol-function (gethash (car prompt-arglist) ec/prompt-functions))
          (append (cdr prompt-arglist)

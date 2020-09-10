@@ -44,6 +44,12 @@
                        (eq system-type
                            'windows-nt)))
 
+(ec/load-or-ask-pred 'my/add-info-dir "Do you want an auxiliary info dir? ")
+
+(when my/add-info-dir
+  (ec/load-or-ask-dir 'my/info-dir "Info Directory? ")
+  (add-to-list 'Info-directory-list my/info-dir))
+
 (setq my/enable-exwm (and my/enable-exwm (eq 'x window-system)))
 
 (require 'keymap)

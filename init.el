@@ -55,6 +55,10 @@
 (require 'keymap)
 (require 'libs)
 
+(define-obsolete-variable-alias
+  'face-new-frame-defaults 'face--new-frame-defaults
+ "28.1")
+
 ;; It is imperative that this be loaded for a nice emacs
 ;; experience. Only SUPER stable stuff goes in this file, and should
 ;; rarely be modified

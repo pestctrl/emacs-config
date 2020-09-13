@@ -687,17 +687,38 @@
 #+end_src
 ** ivy-posframe
 #+begin_src emacs-lisp
-  (when (eq 'hash-table (type-of face-new-frame-defaults))
-    (use-package ivy-posframe)
-    ;; (setq ivy-posframe-parameters '((parent-frame t)))
-    ;; Different command can use different display function.
-    (setq ivy-posframe-display-functions-alist
-          '((swiper          . ivy-posframe-display-at-frame-center)
-            (complete-symbol . ivy-posframe-display-at-point)
-            (iwc-switch-to-wc . nil)
-            (t               . ivy-posframe-display-at-window-top-center)))
+  (use-package ivy-posframe)
+  ;; (ivy-posframe-mode 1)
 
-    ;; (ivy-posframe-mode 1)
+  (setq ivy-posframe-display-functions-alist
+        '((swiper          . ivy-posframe-display-at-frame-center)
+          (complete-symbol . ivy-posframe-display-at-point)
+          (iwc-switch-to-wc . nil)
+          (t               . ivy-posframe-display-at-window-top-center)))
+
+  (defun ivy-posframe-display-at-window-top-center (str)
+    (ivy-posframe--display str #'posframe-poshandler-window-top-center))
+
+  (defun posframe-poshandler-window-top-center (info)
+    "Posframe's position handler.
+
+    Get a position which let posframe stay onto current window's
+    center.  The structure of INFO can be found in docstring
+    of `posframe-show'."
+    (let* ((frame-width (plist-get info :parent-frame-width))
+           (window-left (plist-get info :parent-window-left))
+           (window-top (plist-get info :parent-window-top))
+           (window-width (plist-get info :parent-window-width))
+           (posframe-width (plist-get info :posframe-width)))
+      (cons (min (- frame-width posframe-width)
+                 (+ window-left (max 0
+                                     (/ (- window-width posframe-width) 2))))
+            (+ window-top 50))))
+
+  (use-package ivy-rich)
+  (ivy-rich-mode 1)
+
+  (unless (eq 'hash-table (type-of face-new-frame-defaults))
 
     (defun disable-ivy-posframe-on-exwm-windows (orig &rest args)
       (if (not (eq major-mode 'exwm-mode))
@@ -713,28 +734,6 @@
     (advice-add #'ivy-posframe--read
                 :around
                 #'disable-ivy-posframe-on-exwm-windows)
-
-    (defun ivy-posframe-display-at-window-top-center (str)
-      (ivy-posframe--display str #'posframe-poshandler-window-top-center))
-
-    (defun posframe-poshandler-window-top-center (info)
-      "Posframe's position handler.
-
-    Get a position which let posframe stay onto current window's
-    center.  The structure of INFO can be found in docstring
-    of `posframe-show'."
-      (let* ((frame-width (plist-get info :parent-frame-width))
-             (window-left (plist-get info :parent-window-left))
-             (window-top (plist-get info :parent-window-top))
-             (window-width (plist-get info :parent-window-width))
-             (posframe-width (plist-get info :posframe-width)))
-        (cons (min (- frame-width posframe-width)
-                   (+ window-left (max 0
-                                       (/ (- window-width posframe-width) 2))))
-              (+ window-top 50))))
-
-    (use-package ivy-rich)
-    (ivy-rich-mode 1)
 
     ;;(setq ivy-posframe-min-height 0)
 

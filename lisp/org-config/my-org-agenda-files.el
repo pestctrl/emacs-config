@@ -23,7 +23,7 @@
 ;;; Commentary:
 
 ;;; Code:
-(defconst my/org-folder "~/MEGA/org")
+(ec/load-or-ask-file 'my/org-folder "Where's the org root directory? ")
 (defconst my/agenda-folder (expand-file-name "agenda" my/org-folder))
 
 (defun my/org-file (str)

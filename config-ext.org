@@ -715,25 +715,25 @@
                                      (/ (- window-width posframe-width) 2))))
             (+ window-top 50))))
 
+  (defun disable-ivy-posframe-on-exwm-windows (orig &rest args)
+    (if (not (eq major-mode 'exwm-mode))
+        (apply orig args)
+      (letf (((symbol-function 'display-graphic-p) (lambda (&optional display) nil)))
+        (apply orig args))))
+
+  (advice-add #'ivy-posframe--read
+              :around
+              #'disable-ivy-posframe-on-exwm-windows)
+
   (use-package ivy-rich)
   (ivy-rich-mode 1)
 
   (unless (eq 'hash-table (type-of face-new-frame-defaults))
 
-    (defun disable-ivy-posframe-on-exwm-windows (orig &rest args)
-      (if (not (eq major-mode 'exwm-mode))
-          (apply orig args)
-        (letf (((symbol-function 'display-graphic-p) (lambda (&optional display) nil)))
-          (apply orig args))))
-
     ;; (def-face-copier my/posframe-faces (sym)
     ;;   (let ((name (symbol-name sym)))
     ;;     (string-match-p "^ivy-.*"
     ;;                     name)))
-
-    (advice-add #'ivy-posframe--read
-                :around
-                #'disable-ivy-posframe-on-exwm-windows)
 
     ;;(setq ivy-posframe-min-height 0)
 

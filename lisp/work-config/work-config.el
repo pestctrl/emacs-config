@@ -25,6 +25,7 @@
 ;;; Code:
 (require 'my-org-misc)
 (require 'work-org-stuff)
+(require 'work-commentor)
 
 ;; Prompt for passwords via the minibuffer
 (setq epg-pinentry-mode nil)

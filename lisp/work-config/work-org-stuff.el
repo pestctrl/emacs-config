@@ -27,6 +27,7 @@
 (require 'org-project)
 (require 'org-ql)
 (require 'org-ql-custom-stuck-projects)
+(require 'org-scan-tags-indent)
 
 (defvar org-ql-indent-levels nil)
 

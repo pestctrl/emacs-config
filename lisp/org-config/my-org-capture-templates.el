@@ -76,6 +76,22 @@
   (org-clock-goto)
   (org-up-heading-safe))
 
+(defun org-plan-goto ()
+  (find-file (my/agenda-file "dev.org"))
+  (beginning-of-buffer)
+  (re-search-forward "* ETERNAL The Plan")
+  (org-narrow-to-subtree)
+  (let ((today-plan (format-time-string "\\*\\* [A-z]* Plan for \\[%Y-%m-%d %a\\]")))
+    (when (re-search-forward today-plan nil t)
+      (org-narrow-to-subtree)
+      (org-show-all)
+      (end-of-buffer)
+      (when (save-excursion
+              (beginning-of-line)
+              (not (looking-at-p "- \\[ \\] $")))
+        (org-insert-item 'checkbox))
+      (error "Already have a plan today!"))))
+
 (setq org-capture-templates
       (doct `(("Tasks" :keys "t" :children
                (("New Refile Task"
@@ -180,7 +196,7 @@
                  :template-file ,(my/org-file "templates/weekly-plan.org"))
                 ("Plan your day" :keys "p"
                  :file ,(my/agenda-file "dev.org")
-                 :headline "The Plan"
+                 :function org-plan-goto
                  :template-file ,(my/org-file "templates/daily-plan.org"))
                 ("Cringe" :keys "c"
                  :file ,(my/org-file "entries/cringe.gpg")

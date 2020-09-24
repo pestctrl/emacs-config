@@ -874,7 +874,6 @@
     (mapc 'frame-set-background-mode (frame-list)))
 
   (defun set-background-mode (mode)
-    (set-default frame-background-mode mode)
     (setf frame-background-mode mode)
     (update-frame-background-mode))
 

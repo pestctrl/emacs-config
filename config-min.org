@@ -1,4 +1,4 @@
-#+PROPERTY: header-args :tangle "~/.emacs.d/config-min.el" :comments both
+#+PROPERTY: header-args:emacs-lisp :tangle "~/.emacs.d/config-min.el" :comments both
 
 * misc emacs settings
 #+begin_src emacs-lisp

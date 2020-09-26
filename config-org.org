@@ -233,41 +233,6 @@
   (setq org-now-location
         nil)
 #+end_src
-* org agenda goto headline AND narrow
-#+begin_src emacs-lisp
-  (defun my/org-agenda-narrow ()
-    (interactive)
-    (org-agenda-switch-to)
-    (org-narrow-to-subtree)
-    (outline-show-branches))
-  (define-key org-agenda-mode-map (kbd "S-<return>") 'my/org-agenda-narrow)
-#+end_src
-
-
-* Keybindings
-#+begin_src emacs-lisp
-  (use-package org)
-  (require 'org-agenda)
-
-  ;; This is for safety
-  (define-key org-mode-map (kbd "C-S-<backspace>") 
-    (lambda (arg)
-      (interactive "P")
-      (if (string= "yes" (completing-read "Are you sure you want to use that keybinding? " '("yes" "no")))
-          (kill-whole-line arg)
-        (org-cut-subtree))))
-#+end_src
-* count archive tree characters
-#+begin_src emacs-lisp
-  (defun my/org-count-subtree-characters ()
-    (interactive)
-    (save-window-excursion
-      (org-agenda-goto t)
-      (org-mark-subtree)
-      (message (format "This subtree has %d characters. " (- (region-end) (region-beginning))))))
-
-  (define-key org-agenda-mode-map (kbd "C") #'my/org-count-subtree-characters)
-#+end_src
 * More alternative views
 #+begin_src emacs-lisp
   (defun cfw:open-org-calendar-no-projects (&args)

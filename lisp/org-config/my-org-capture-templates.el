@@ -23,6 +23,7 @@
 ;;; Commentary:
 
 ;;; Code:
+(require 'org-protocol)
 (require 'my-org-agenda-files)
 (require 'org-capture)
 

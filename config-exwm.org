@@ -1,4 +1,4 @@
-#+PROPERTY: header-args :tangle "~/.emacs.d/config-exwm.el" :comments both
+#+PROPERTY: header-args:emacs-lisp :tangle "~/.emacs.d/config-exwm.el" :comments both
 
 * window manipulation
 #+begin_src emacs-lisp

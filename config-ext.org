@@ -132,6 +132,9 @@
     (require 'notmuch-tree-hide)
     (require 'notmuch-tree)
     (require 'notmuch-fold)
+
+    (setq notmuch-draft-tags '("+drafts"))
+
     (custom-set-faces
      '(notmuch-tree-match-tree-face ((t (:family "DejaVu Sans Mono"))) t)
      '(notmuch-tree-no-match-tree-face ((t (:family "DejaVu Sans Mono"))) t))

@@ -79,10 +79,9 @@
                    user-emacs-directory))
 
 ;; Load work stuff when at work. 
-(when my/at-ti 
-  (require 'work-config))
-
-;; (require 'my-org)
+(if my/at-ti
+    (require 'work-config)
+  (require 'my-org))
 
 (org-babel-load-file
  (expand-file-name "my-redefs.org"

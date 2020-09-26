@@ -92,10 +92,6 @@
   (setq org-reveal-root "file:///home/benson/.reveal.js")
   (setq org-structure-template-alist (remove-if (lambda (c) (string= (car c) "n")) org-structure-template-alist))
 #+END_SRC
-** org-protocol
-#+BEGIN_SRC emacs-lisp
-  (require 'org-protocol)
-#+END_SRC
 ** org-timeline
 #+BEGIN_SRC emacs-lisp
   (use-package org-timeline)
@@ -120,11 +116,6 @@
   (setq org-confirm-babel-evaluate 'my-org-confirm-babel-evaluate)
   (setq org-plantuml-jar-path "/usr/share/java/plantuml/plantuml.jar")
 #+END_SRC
-** org-super-agenda
-#+begin_src emacs-lisp
-  (use-package org-super-agenda)
-  (org-super-agenda-mode)
-#+end_src
 ** helm-org-rifle
 #+begin_src emacs-lisp
   (use-package helm-org-rifle)

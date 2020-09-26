@@ -29,6 +29,9 @@
 (require 'my-org-tags)
 (require 'all-the-icons)
 
+(use-package org-super-agenda)
+(org-super-agenda-mode)
+
 (add-to-list 'load-path 
              "~/.emacs.d/submodule/org-ql")
 (require 'org-ql)

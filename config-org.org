@@ -185,17 +185,6 @@
   (use-package org-edna)
   (org-edna-load)
 #+end_src
-** org agenda goto headline AND narrow
-#+begin_src emacs-lisp
-  (defun my/org-agenda-narrow ()
-    (interactive)
-    (org-agenda-switch-to)
-    (org-narrow-to-subtree)
-    (outline-show-branches))
-  (define-key org-agenda-mode-map (kbd "S-<return>") 'my/org-agenda-narrow)
-#+end_src
-
-
 ** org-brain
 #+begin_src emacs-lisp
   (use-package org-brain :ensure t
@@ -244,6 +233,17 @@
   (setq org-now-location
         nil)
 #+end_src
+* org agenda goto headline AND narrow
+#+begin_src emacs-lisp
+  (defun my/org-agenda-narrow ()
+    (interactive)
+    (org-agenda-switch-to)
+    (org-narrow-to-subtree)
+    (outline-show-branches))
+  (define-key org-agenda-mode-map (kbd "S-<return>") 'my/org-agenda-narrow)
+#+end_src
+
+
 * Keybindings
 #+begin_src emacs-lisp
   (use-package org)

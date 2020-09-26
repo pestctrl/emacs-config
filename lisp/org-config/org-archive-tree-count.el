@@ -1,9 +1,9 @@
-;;; my-org.el ---  -*- lexical-binding: t -*-
+;;; org-archive-tree-count.el ---  -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2020 Benson Chu
 
 ;; Author: Benson Chu <bensonchu457@gmail.com>
-;; Created: [2020-05-03 14:42]
+;; Created: [2020-09-26 18:48]
 
 ;; This file is not part of GNU Emacs
 
@@ -23,20 +23,15 @@
 ;;; Commentary:
 
 ;;; Code:
-(require 'org)
 
-(require 'org-loop)
-(require 'org-process)
-(require 'org-project)
-(require 'org-delay)
+(defun my/org-count-subtree-characters ()
+  (interactive)
+  (save-window-excursion
+    (org-agenda-goto t)
+    (org-mark-subtree)
+    (message (format "This subtree has %d characters. " (- (region-end) (region-beginning))))))
 
-(require 'my-org-misc)
-(require 'my-org-indent)
-(require 'my-org-agenda-commands)
-(require 'my-org-capture-templates)
-(require 'org-other-additions)
+(define-key org-agenda-mode-map (kbd "C") #'my/org-count-subtree-characters)
 
-(require 'self-talk-mode)
-
-(provide 'my-org)
-;;; my-org.el ends here
+(provide 'org-archive-tree-count)
+;;; org-archive-tree-count.el ends here

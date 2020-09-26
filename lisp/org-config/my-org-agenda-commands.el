@@ -39,6 +39,8 @@
 (require 'org-ql-custom-stuck-projects)
 (require 'org-scan-tags-indent)
 
+(require 'org-archive-tree-count)
+
 
 (define-key org-agenda-mode-map (kbd "a") 'org-agenda)
 

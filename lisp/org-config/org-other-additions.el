@@ -1,9 +1,9 @@
-;;; my-org.el ---  -*- lexical-binding: t -*-
+;;; org-other-additions.el ---  -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2020 Benson Chu
 
 ;; Author: Benson Chu <bensonchu457@gmail.com>
-;; Created: [2020-05-03 14:42]
+;; Created: [2020-09-26 18:48]
 
 ;; This file is not part of GNU Emacs
 
@@ -23,20 +23,21 @@
 ;;; Commentary:
 
 ;;; Code:
-(require 'org)
+(defun my/org-agenda-narrow ()
+  (interactive)
+  (org-agenda-switch-to)
+  (org-narrow-to-subtree)
+  (outline-show-branches))
 
-(require 'org-loop)
-(require 'org-process)
-(require 'org-project)
-(require 'org-delay)
+(define-key org-agenda-mode-map (kbd "S-<return>") 'my/org-agenda-narrow)
 
-(require 'my-org-misc)
-(require 'my-org-indent)
-(require 'my-org-agenda-commands)
-(require 'my-org-capture-templates)
-(require 'org-other-additions)
+(defun org-check-before-killing-line (arg)
+  (interactive "P")
+  (if (string= "yes" (completing-read "Are you sure you want to use that keybinding? " '("yes" "no")))
+      (kill-whole-line arg)
+    (org-cut-subtree)))
 
-(require 'self-talk-mode)
+(define-key org-mode-map (kbd "C-S-<backspace>") #'org-check-before-killing-line)
 
-(provide 'my-org)
-;;; my-org.el ends here
+(provide 'org-other-additions)
+;;; org-other-additions.el ends here

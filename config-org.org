@@ -12,7 +12,7 @@
   (require 'org-fstree)
 #+END_SRC
 ** org-bullets
-#+BEGIN_SRC emacs-lisp#
+#+BEGIN_SRC
 (use-package org-bullets)
 (when (not (eq system-type 'windows-nt))
 (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
@@ -80,12 +80,12 @@
         org-caldav-exclude-tags '("ARCHIVE" "_nosync_"))
 #+END_SRC
 ** Reveal.js
-#+begin_src emacs-lisp#
+#+begin_src
   (use-package org-re-reveal)
   (setq org-re-reveal-root "file:///home/benson/.reveal.js")
 #+end_src
 *** Old ox-reveal package
-#+BEGIN_SRC emacs-lisp#
+#+BEGIN_SRC
   (add-to-list 'load-path
                "~/.emacs.d/submodule/org-reveal")
   (require 'ox-reveal)
@@ -258,7 +258,7 @@
           ))))
 #+end_src
 * Stuff                                                                 :FIX:
-#+begin_src emacs-lisp#
+#+begin_src
     (setq org-agenda-tags-todo-honor-ignore-options t)
 
     (defun bh/org-auto-exclude-function (tag)
@@ -569,7 +569,7 @@
   (define-key org-agenda-mode-map (kbd "T") #'my/tickle-todo)
 #+end_src
 * org-wiki                                                              :FIX:
-#+begin_src emacs-lisp#
+#+begin_src
   (require 'org-wiki)
   (setq org-wiki-location-list
         '("~/MEGA/org/wiki"))
@@ -707,7 +707,7 @@
   (define-key org-agenda-mode-map (kbd "U") #'org-agenda-remove-restriction-lock)
 #+end_src
 * Org mode magit update commands
-#+begin_src emacs-lisp#
+#+begin_src 
   (when (executable-find "~/bin/gitwatch")
     (defun start-gitwatch ()
       (interactive)

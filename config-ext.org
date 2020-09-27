@@ -813,3 +813,8 @@
     :config
     (add-hook 'exwm-init-hook #'setup-headphone-stuff))
 #+end_src
+** shell-command+
+#+begin_src emacs-lisp
+  (use-package shell-command+
+    :bind ("M-!" . shell-command+))
+#+end_src

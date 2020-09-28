@@ -25,6 +25,13 @@
 #+begin_src emacs-lisp
   (add-to-list 'load-path "~/.emacs.d/submodule/exwm-background/")
   (require 'exwm-background)
+
+  (let ((wm (shell-command-to-string "wmctrl -m")))
+    (when (and (string-match "Name: \\(.*\\)\n" wm)
+               (not (string= "EXWM"
+                             (match-string 1 wm))))
+      (setq exwm-background/current-transparency 95)))
+
   (define-key *window-map* (kbd "t") 'exwm-background/window-transparency-hydra/body)
   (setq window-system-default-frame-alist `((x . ((alpha . (,exwm-background/current-transparency . 50))))))
   (exwm-global-set-key (kbd "s-v") #'exwm-background/toggle-viewing-background)

@@ -142,6 +142,10 @@
           (my/org-ql-active-projects "dev"
                                      ((org-ql-block-header "Active Projects")
                                       (org-ql-indent-levels t)))
+          (org-ql-block '(tags "pinned")
+                        ((org-ql-block-header "Pinned Projects")
+                         (org-ql-indent-levels nil)
+                         (org-use-tag-inheritance nil)))
           (agenda ""
                   ((org-agenda-tag-filter-preset (quote ("+dev")))
                    (org-agenda-skip-function (lambda ()

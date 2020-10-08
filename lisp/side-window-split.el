@@ -53,6 +53,10 @@
   (interactive)
   (side-window-op 'bottom (incf bottom-side-window-count)))
 
+(defun side-top-window ()
+  (interactive)
+  (side-window-op 'top (incf bottom-side-window-count)))
+
 (defun side-window-delete-all ()
   (interactive)
   (setq left-side-window-count -1

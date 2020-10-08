@@ -11,6 +11,7 @@
   (require 'side-window-split)
   (define-key *window-map* (kbd "j") 'side-bottom-window)
   (define-key *window-map* (kbd "h") 'side-left-window)
+  (define-key *window-map* (kbd "k") 'side-top-window)
   (define-key *window-map* (kbd "l") 'side-right-window)
   (define-key *window-map* (kbd "d") 'side-window-delete-all)
   (define-key *window-map* (kbd "r") 'resize-window)

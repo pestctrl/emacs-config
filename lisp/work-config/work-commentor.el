@@ -23,8 +23,15 @@
 ;;; Commentary:
 
 ;;; Code:
-
+(use-package banner-comment)
 (global-set-key (kbd "C-c h") #'banner-comment)
+
+(defun banner-switch-char ()
+  (interactive)
+  (setq banner-comment-char
+        (if (= banner-comment-char ?-)
+            ?*
+          ?-)))
 
 (setq banner-comment-char ?-)
 (setq banner-comment-start "/*")

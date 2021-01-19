@@ -338,6 +338,7 @@
     '("a" "all remotes" my/magit-push-all))
 
   ;; Magit uses ediff
+  (require 'ediff)
   (setq ediff-window-setup-function 'ediff-setup-windows-plain)
 
   (defun ediff-copy-both-to-C ()
@@ -348,6 +349,13 @@
                       (ediff-get-region-contents ediff-current-difference 'B ediff-control-buffer))))
   (defun add-d-to-ediff-mode-map () (define-key ediff-mode-map "d" 'ediff-copy-both-to-C))
   (add-hook 'ediff-keymap-setup-hook 'add-d-to-ediff-mode-map)
+
+  (set-face-attribute 'ediff-odd-diff-A nil :background "gray30")
+  (set-face-attribute 'ediff-odd-diff-B nil :background "gray30")
+  (set-face-attribute 'ediff-even-diff-A nil :background "#5c370f")
+  (set-face-attribute 'ediff-even-diff-B nil :background "#5c370f")
+  ;; (set-face-attribute 'ediff-current-diff-A nil :background "")
+  (set-face-attribute 'ediff-current-diff-B nil :background "dark green")
 
   ;; Paredit
   (use-package paredit

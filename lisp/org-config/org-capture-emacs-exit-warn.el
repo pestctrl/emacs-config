@@ -27,17 +27,19 @@
 (defvar capture-count 0)
 
 (defun warn-active-capture-template ()
-  (or (zerop capture-count)
-      (progn (pop-to-buffer
-              (get-buffer
-               (car
-                (remove-if-not (lambda (b)
-                                 (let ((case-fold-search nil))
-                                   (and b
-                                        (buffer-name b)
-                                        (string-match-p "CAPTURE-.*" (buffer-name b)))))
-                               (buffer-list)))))
-             (yes-or-no-p "Active capture templates exist; exit anyway? "))))
+  ;; (or (zerop capture-count)
+  ;;     (progn (pop-to-buffer
+  ;;             (get-buffer
+  ;;              (car
+  ;;               (remove-if-not (lambda (b)
+  ;;                                (let ((case-fold-search nil))
+  ;;                                  (and b
+  ;;                                       (buffer-name b)
+  ;;                                       (string-match-p "CAPTURE-.*" (buffer-name b)))))
+  ;;                              (buffer-list)))))
+  ;;            (yes-or-no-p "Active capture templates exist; exit anyway? ")))
+  t
+  )
 
 (add-hook 'kill-emacs-query-functions
           #'warn-active-capture-template)

@@ -86,9 +86,20 @@
 
 (tab-bar-rename-tab "scratch1")
 
-(add-hook 'server-after-make-frame-hook
-          #'(lambda ()
-              (tab-bar-rename-tab "scratch1")))
+(defvar tab-switch-mode-map nil)
+
+(unless tab-switch-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "s-1") #'(lambda () (interactive) (switch-or-create-tab "1")))
+    (define-key map (kbd "q") #'(lambda () (interactive) (tab-switch-mode -1)))
+    (setq tab-switch-mode-map map)))
+
+(define-minor-mode tab-switch-mode ""
+  nil nil tab-switch-mode-map :global t)
+
+;; (add-hook 'after-make-frame-functions
+;;           #'(lambda ()
+;;               (tab-bar-rename-tab "scratch1")))
 
 (provide 'switch-tabs)
 ;;; switch-tabs.el ends here

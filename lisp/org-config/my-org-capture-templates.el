@@ -93,6 +93,16 @@
         (org-insert-item 'checkbox))
       (error "Already have a plan today!"))))
 
+(defun my/org-find-journal ()
+  (let* ((files
+          (directory-files (my/org-file "journals/")
+                           nil "^[^\\.]"))
+         (journal (ivy-completing-read "Which journal? " files)))
+    (when (not (file-name-extension journal))
+      (setq journal (concat journal "")))
+    (find-file (my/org-file (format "journals/%s" journal)))
+    (outline-next-heading)))
+
 (setq org-capture-templates
       (doct `(("Tasks" :keys "t" :children
                (("New Refile Task"
@@ -163,6 +173,10 @@
                  :file ,(my/org-file "entries/journal.gpg")
                  :datetree t
                  :template "* %<%R> %?")
+                ("New Journal System" :keys "j"
+                 :function my/org-find-journal
+                 :datetree t
+                 :template "* %U\n%?")
                 ("Programming Interview Prep Journal" :keys "p"
                  :file ,(my/org-file "entries/journal.gpg")
                  :datetree t

@@ -35,6 +35,7 @@
   (let ((default-directory  "~/.emacs.d/submodule/"))
     (normal-top-level-add-subdirs-to-load-path)))
 
+(require 'libs)
 (require 'emacs-custom-load-or-ask)
 
 (ec/load-or-ask-pred 'my/is-wsl "Are you running Emacs in WSL?")
@@ -53,7 +54,6 @@
 (setq my/enable-exwm (and my/enable-exwm (eq 'x window-system)))
 
 (require 'keymap)
-(require 'libs)
 
 (when (boundp 'face--new-frame-defaults)
   (define-obsolete-variable-alias

@@ -256,6 +256,7 @@
         (when (and (timerp offlineimap-timer)
                    (not (timer--triggered offlineimap-timer)))
           (cancel-timer offlineimap-timer))
+        (call-process-shell-command "timedatectl" nil "*offlineimap-output*")
         (set-process-sentinel
          (setq offlineimap-process
                (start-process-shell-command "offlineimap" "*offlineimap-output*" "offlineimap"))

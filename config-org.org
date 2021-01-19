@@ -635,8 +635,9 @@
     :after org
     :hook 
     (after-init . org-roam-mode)
+    :straight (:host github :repo "jethrokuan/org-roam" :branch "master")
     :custom
-    (org-roam-directory "~/big_files/MEGA/org/org-roam/")
+    (org-roam-directory "~/MEGA/org/org-roam/")
     :bind (:map org-roam-mode-map
                 (("C-c n l" . org-roam)
                  ("C-c n f" . org-roam-find-file)
@@ -652,7 +653,7 @@
   (use-package el-patch
     :straight (:host github
                      :repo "raxod502/el-patch"
-                     :branch "develop"))
+                     :branch "master"))
 
   (eval-when-compile
     (require 'el-patch))
@@ -665,7 +666,7 @@
     (deft-recursive t)
     (deft-use-filter-string-for-filename t)
     (deft-default-extension "org")
-    (deft-directory "~/big_files/MEGA/org/org-roam/")
+    (deft-directory "~/MEGA/org/org-roam/")
     :config/el-patch
     (defun deft-parse-title (file contents)
       "Parse the given FILE and CONTENTS and determine the title.

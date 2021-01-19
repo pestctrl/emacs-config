@@ -34,6 +34,8 @@
 
 (add-to-list 'load-path 
              "~/.emacs.d/submodule/org-ql")
+(use-package peg)
+(use-package ov)
 (require 'org-ql)
 (require 'org-ql-search)
 (require 'org-ql-custom-stuck-projects)

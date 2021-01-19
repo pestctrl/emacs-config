@@ -203,8 +203,44 @@
     (setf (cdr (assoc "d" notmuch-tagging-keys))
           '(("+deleted") "Delete"))
 
-    (advice-add #'notmuch-tag-jump :after #'(lambda (&rest args) (next-line))))
+    (advice-add #'notmuch-tag-jump :after #'(lambda (&rest args) (next-line)))
 
+    (defun notmuch-add-child (child-id)
+      (interactive (list (read-string (format "Message id of new child (default: %s): "
+                                              (current-kill 0))
+                                      nil nil (current-kill 0))))
+      (let ((parent-id (notmuch-show-get-message-id t))
+            (child-file
+             (save-window-excursion
+               (notmuch-show (format "id:%s" child-id))
+               (notmuch-show-get-filename))))
+        (with-current-buffer (find-file-noselect child-file)
+          (beginning-of-buffer)
+          (if (save-excursion (re-search-forward "^In-Reply-To: " nil t))
+              (error "File already has reply message")
+            (save-excursion
+              (re-search-forward "^Date: ")
+              (end-of-line)
+              (insert (format "\nIn-Reply-To: <%s>"
+                              parent-id))
+              (save-buffer)))
+          (re-search-forward "^Message-ID: <\\(.*\\)>$")
+          (message (match-string 1)))
+        (notmuch-refresh-file child-id)))
+
+    (defun notmuch-refresh-file (id)
+      (interactive (list (read-string "Which id? ")))
+      (let ((thread-id
+             (replace-regexp-in-string
+              "\\n" ""
+              (shell-command-to-string
+               (format "notmuch search --output=threads id:%s" id)))))
+        (shell-command (format "notmuch reindex %s" thread-id)))
+      (shell-command (format "notmuch reindex id:%s" id)))
+
+    (defun notmuch-show-goto-file ()
+      (interactive)
+      (find-file (notmuch-show-get-filename))))
 
   (use-package exwm
     :config

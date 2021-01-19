@@ -103,3 +103,5 @@
   (interactive)
   (goto-char (overlay-start bisect-middle-overlay))
   (recenter))
+
+(provide 'bisect-mode)

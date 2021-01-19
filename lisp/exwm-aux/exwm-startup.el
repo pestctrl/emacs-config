@@ -45,5 +45,9 @@
              '((equal exwm-class-name "MEGAsync")
                floating t))
 
+(add-to-list 'exwm-manage-configurations
+             '((equal exwm-title "Picture-in-Picture")
+               floating nil))
+
 (provide 'exwm-startup)
 ;;; exwm-startup.el ends here

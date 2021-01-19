@@ -379,6 +379,13 @@
     (set-face-attribute 'ediff-odd-diff-B nil :background "midnight blue")
     (set-face-attribute 'ediff-odd-diff-C nil :background "midnight blue"))
 
+  (set-face-attribute 'ediff-odd-diff-A nil :background "gray30")
+  (set-face-attribute 'ediff-odd-diff-B nil :background "gray30")
+  (set-face-attribute 'ediff-even-diff-A nil :background "#5c370f")
+  (set-face-attribute 'ediff-even-diff-B nil :background "#5c370f")
+  ;; (set-face-attribute 'ediff-current-diff-A nil :background "")
+  (set-face-attribute 'ediff-current-diff-B nil :background "dark green")
+
   ;; Paredit
   (use-package paredit
     :bind (:map paredit-mode-map

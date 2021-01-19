@@ -274,8 +274,8 @@
   (global-set-key (kbd "M-F") 'forward-word)
 
   ;; Goto-char
-  (use-package iy-go-to-char
-    :bind (("M-m" . #'iy-go-to-char)))
+  (require 'brumlow-goto-char)
+  (global-set-key (kbd "M-m") #'jump-to-char)
 #+end_src
 * window manipulation
 #+begin_src emacs-lisp

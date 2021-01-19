@@ -9,6 +9,7 @@
 (exwm-global-set-key (kbd "M-T") 'flop-frame)
 (exwm-global-set-key (kbd "s-k") (lambda () (interactive) (kill-buffer (current-buffer))))
 (exwm-global-set-key (kbd "M-Q") #'bury-buffer)
+(exwm-global-set-key (kbd "M-o") #'other-window)
 
 (ec/load-or-ask-key 'my/keymap-key
                     'my/keymap-key-key
@@ -35,7 +36,9 @@
 (define-key *root-map* (kbd "C-b") 'previous-buffer)
 
 (with-eval-after-load "org"
-  (define-key *root-map* (kbd "!") 'org-time-stamp-inactive))
+  (define-key *root-map* (kbd "!") #'(lambda ()
+                                       (interactive)
+                                       (org-time-stamp-inactive t))))
 
 (defun toggle-notifications ()
   (interactive)

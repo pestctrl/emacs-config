@@ -186,7 +186,7 @@
   (org-edna-load)
 #+end_src
 ** org-brain
-#+begin_src emacs-lisp
+#+begin_src
   (use-package org-brain :ensure t
     :init
     (global-set-key (kbd "M-'") 'org-brain-visualize)
@@ -503,13 +503,6 @@
 
   ;; (pop org-drill-card-type-alist)
 #+end_src
-* Plan module
-#+begin_src emacs-lisp
-  (add-to-list 'org-capture-templates
-               `("P" "The Plan" entry (file+headline ,(my/agenda-file "dev.org") "The plan")
-                 (file ,(my/org-file "templates/daily-plan.org"))))
-#+end_src
-
 * Insert inactive timestamp after last org-datetree--find-create
 #+begin_src emacs-lisp
   (defun org-datetree--find-create-add-timestamp (regex-template year &optional month day insert)
@@ -642,7 +635,6 @@
     :after org
     :hook 
     (after-init . org-roam-mode)
-    :straight (:host github :repo "jethrokuan/org-roam" :branch "develop")
     :custom
     (org-roam-directory "~/big_files/MEGA/org/org-roam/")
     :bind (:map org-roam-mode-map

@@ -124,7 +124,7 @@
                   ((org-agenda-tag-filter-preset (quote ("+dev")))
                    (org-super-agenda-groups '((:name "The Plan" :tag "PLAN")
                                               (:name "Overdue" :and (:deadline past :log nil))
-                                              (:name "Upcoming" :deadline future)
+                                              (:name "Upcoming" :and (:not (:scheduled today) :deadline future))
                                               (:name "Should do" :and (:scheduled past :log nil))
                                               (:name "Today" :time-grid t
                                                      :and (:not (:and (:not (:scheduled today)
@@ -153,7 +153,7 @@
                                                  (outline-next-heading))))
                    (org-super-agenda-groups '((:name "The Plan" :and (:tag "PLAN" :log nil) )
                                               (:name "Overdue" :and (:deadline past :log nil))
-                                              (:name "Upcoming" :deadline future)
+                                              (:name "Upcoming" :and (:deadline future :not (:todo "DONE")))
                                               (:name "Should do" :and (:scheduled past :log nil))
                                               (:name "Today" :time-grid t
                                                      :and (:not (:and (:not (:scheduled today)

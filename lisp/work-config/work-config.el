@@ -42,5 +42,11 @@
                (side . top) (slot . 0) (window-height . fit-window-to-buffer)
                (preserve-size . (nil . t)) ,parameters))
 
+(add-to-list 'auto-mode-alist '("\\.mir$" . llvm-mode))
+
+(load-file "/scratch/benson/tools2/llvm_cgt/llvm-project/llvm/utils/emacs/llvm-mode.el")
+(load-file "/scratch/benson/tools2/llvm_cgt/llvm-project/llvm/utils/emacs/tablegen-mode.el")
+(load-file "/scratch/benson/tools2/llvm_cgt/llvm-project/llvm/utils/emacs/emacs.el")
+
 (provide 'work-config)
 ;;; work-config.el ends here

@@ -98,9 +98,10 @@
     (define-key *root-map* (kbd "C-p") #'launch-program)
 
     ;; Volume control
-    (use-package volume
-      :bind (:map *root-map*
-                  ("v" . #'volume)))
+    (unless my/at-ti
+      (use-package volume
+        :bind (:map *root-map*
+                    ("v" . #'volume))))
 
     ;; Shut down
     (add-hook 'exwm-exit-hook 'org-save-all-org-buffers)

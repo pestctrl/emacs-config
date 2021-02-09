@@ -27,6 +27,7 @@
 (defvar left-side-window-count -1)
 (defvar right-side-window-count -1)
 (defvar bottom-side-window-count -1)
+(defvar top-side-window-count -1)
 
 (defun side-window-op (side slot &optional size buffer)
   (let ((prev-win (selected-window))
@@ -55,13 +56,14 @@
 
 (defun side-top-window ()
   (interactive)
-  (side-window-op 'top (incf bottom-side-window-count)))
+  (side-window-op 'top (incf top-side-window-count)))
 
 (defun side-window-delete-all ()
   (interactive)
   (setq left-side-window-count -1
         right-side-window-count -1
-        bottom-side-window-count -1)
+        bottom-side-window-count -1
+        top-side-window-count -1)
   (call-interactively #'window-toggle-side-windows))
 
 (setq window-sides-vertical t)

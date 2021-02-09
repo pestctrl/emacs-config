@@ -26,7 +26,7 @@
 
 (defvar current-system-clock nil)
 
-(defvar system-clock-time 5)
+(defvar system-clock-time 30)
 
 (define-minor-mode system-clock-mode
   nil nil nil

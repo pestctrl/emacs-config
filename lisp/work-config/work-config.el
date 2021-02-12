@@ -48,5 +48,22 @@
 (load-file "/scratch/benson/tools2/llvm_cgt/llvm-project/llvm/utils/emacs/tablegen-mode.el")
 (load-file "/scratch/benson/tools2/llvm_cgt/llvm-project/llvm/utils/emacs/emacs.el")
 
+(pop c-mode-common-hook)
+(add-hook 'c-mode-common-hook
+	  (function
+	   (lambda nil
+	     (if (and buffer-file-name (string-match "llvm" buffer-file-name))
+		 (progn
+		   (c-set-style "llvm.org"))))))
+
+(when (executable-find "rg")
+  (use-package deadgrep
+    :config
+    (setq deadgrep-project-root-function
+          #'(lambda ()
+              (if current-prefix-arg
+                  default-directory
+                (deadrep--project-root))))))
+
 (provide 'work-config)
 ;;; work-config.el ends here

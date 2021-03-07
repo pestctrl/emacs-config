@@ -97,9 +97,15 @@
 (define-minor-mode tab-switch-mode ""
   nil nil tab-switch-mode-map :global t)
 
-;; (add-hook 'after-make-frame-functions
-;;           #'(lambda ()
-;;               (tab-bar-rename-tab "scratch1")))
+(defun init-tab-name (&optional frame)
+  (interactive)
+  (let* ((tab (assq 'current-tab (frame-parameter frame 'tabs)))
+         (tab-explicit-name (alist-get 'explicit-name tab)))
+    (unless tab-explicit-name
+      (tab-bar-rename-tab "scratch1"))))
+
+(add-hook 'after-make-frame-functions
+          #'init-tab-name)
 
 (provide 'switch-tabs)
 ;;; switch-tabs.el ends here

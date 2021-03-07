@@ -43,6 +43,16 @@
 
 (require 'org-archive-tree-count)
 
+;; (add-to-list 'directory-abbrev-alist
+;;              '("/templates" . "/home/benson/MEGA/org/templates"))
+;; (pop directory-abbrev-alist)
+
+;; (add-to-list 'ido-rewrite-file-prompt-rules
+;;              '("^/templates" . ido-set-shortcut))
+;; (pop ido-rewrite-file-prompt-rules)
+
+;; (defun ido-set-shortcut (dir)
+;;   (setq ido-current-directory "/home/benson/MEGA/org/templates/"))
 
 (define-key org-agenda-mode-map (kbd "a") 'org-agenda)
 

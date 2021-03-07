@@ -135,7 +135,6 @@
   (exwm-global-set-key (kbd "s-r") #'exwm-reset)
   (require 'keyboard-toggle)
   (exwm-global-set-key (kbd "s-a") #'my/toggle-keyboard)
-  (exwm-global-set-key (kbd "s-o") #'other-window)
 
   (setq exwm-input-simulation-keys
         '(;; movement

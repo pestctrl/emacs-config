@@ -10,6 +10,8 @@
 (exwm-global-set-key (kbd "s-k") (lambda () (interactive) (kill-buffer (current-buffer))))
 (exwm-global-set-key (kbd "M-Q") #'bury-buffer)
 (exwm-global-set-key (kbd "M-o") #'other-window)
+(exwm-global-set-key (kbd "s-o") #'org-agenda)
+(exwm-global-set-key (kbd "s-u") #'org-capture)
 
 (ec/load-or-ask-key 'my/keymap-key
                     'my/keymap-key-key
@@ -31,7 +33,7 @@
 (define-key *root-map* (kbd "C-i") 'leaving-computer)
 (define-key *root-map* (kbd "C") 'org-resolve-clocks)
 (define-key *root-map* (kbd "j") 'org-clock-goto)
-(define-key *root-map* (kbd "o") 'switch-window)
+(define-key *root-map* (kbd "o") 'org-agenda)
 (define-key *root-map* (kbd "RET") 'dired-jump)
 (define-key *root-map* (kbd "C-b") 'previous-buffer)
 
@@ -39,6 +41,12 @@
   (define-key *root-map* (kbd "!") #'(lambda ()
                                        (interactive)
                                        (org-time-stamp-inactive t))))
+
+(define-prefix-command '*lazy-map*)
+(exwm-global-set-key (kbd "<f1>") '*lazy-map*)
+
+(define-key *lazy-map* (kbd "1") #'org-capture)
+(define-key *lazy-map* (kbd "2") #'org-agenda)
 
 (defun toggle-notifications ()
   (interactive)

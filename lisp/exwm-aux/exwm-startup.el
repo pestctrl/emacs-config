@@ -33,6 +33,7 @@
     "/usr/lib/notification-daemon-1.0/notification-daemon"
     "nm-applet"
     "start-pulseaudio-x11;pactl upload-sample /usr/share/sounds/gnome/default/alerts/drip.ogg beep; pactl load-module module-x11-bell sample=beep; xset b 100"
+    "kdeconnect-indicator"
     ))
 
 (defun call-startup-programs ()

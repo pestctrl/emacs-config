@@ -125,10 +125,34 @@
 
 (defun exwm-rename-buffer ()
   (interactive)
-  (when-let ((name (or my/window-name exwm-class-name)))
+  (when-let ((name (or my/window-name (exwm-get-name) exwm-class-name)))
     (exwm-workspace-rename-buffer name)
     (setq-local exwm-instance-name name)
     (setq my/window-name nil)))
+
+(defun exwm-get-name ()
+  (when-let ((class exwm-class-name)
+             (title exwm-title))
+    (cond ((string-match-p "firefox" exwm-class-name)
+           (cond ((string-match-p "youtube" exwm-title)
+                  "youtube")
+                 ((string-match-p "citrix" exwm-title)
+                  "work"))))))
+
+(defun exwm-name-firefox-windows ()
+  (interactive)
+  (dolist (buffer (buffer-list))
+    (let ((name (buffer-name buffer)))
+      (when (string-match-p "firefox" name)
+        (with-current-buffer buffer
+          (when exwm-title
+            (cond ((or (string-match-p "citrix" exwm-title)
+                       (string-match-p "texas instruments" exwm-title)
+                       (string-match-p "webmail" exwm-title)
+                       (string-match-p "web sso" exwm-title))
+                   (exwmx-name-buffer "work"))
+                  ((string-match-p "youtube" exwm-title)
+                   (exwmx-name-buffer "youtube")))))))))
 
 (defvar my/window-name nil)
 

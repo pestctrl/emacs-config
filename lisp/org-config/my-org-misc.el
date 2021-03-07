@@ -108,5 +108,9 @@
   (my/org-un-project)
   (org-cut-subtree))
 
+(defun my/org-reset-clock ()
+  (interactive)
+  (setq org-clock-out-time nil))
+
 (provide 'my-org-misc)
 ;;; my-org-misc.el ends here

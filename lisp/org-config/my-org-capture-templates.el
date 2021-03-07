@@ -46,8 +46,21 @@
                (y-or-n-p "Do you want to archive the page? "))
       (call-interactively #'org-board-archive))))
 
-(define-key org-capture-mode-map (kbd "C-c C-c") nil)
-(define-key org-capture-mode-map (kbd "C-<return>") #'org-capture-finalize)
+(defun org-click-check (click)
+  (interactive "e")
+  (let* ((posn     (event-start click))
+	     (click-pt (posn-point posn))
+	     (window   (posn-window posn)))
+    (deactivate-mark)
+    (select-window window)
+    (goto-char click-pt)
+    (when (org-at-item-p)
+      (org-toggle-checkbox))))
+
+(define-key org-capture-mode-map (kbd "<mouse-1>") #'org-click-check)
+
+(define-key org-capture-mode-map (kbd "S-<return>")
+  #'(lambda () (interactive) (org-toggle-checkbox) (next-line)))
 
 (use-package doct)
 
@@ -78,20 +91,22 @@
   (org-up-heading-safe))
 
 (defun org-plan-goto ()
-  (find-file (my/agenda-file "dev.org"))
-  (beginning-of-buffer)
-  (re-search-forward "* ETERNAL The Plan")
-  (org-narrow-to-subtree)
-  (let ((today-plan (format-time-string "\\*\\* [A-z]* Plan for \\[%Y-%m-%d %a\\]")))
-    (when (re-search-forward today-plan nil t)
-      (org-narrow-to-subtree)
-      (org-show-all)
-      (end-of-buffer)
-      (when (save-excursion
-              (beginning-of-line)
-              (not (looking-at-p "- \\[ \\] $")))
-        (org-insert-item 'checkbox))
-      (error "Already have a plan today!"))))
+  (let ((buffer (find-file-noselect (my/agenda-file "plan.org"))))
+    (set-buffer buffer)
+    (beginning-of-buffer)
+    (re-search-forward "* ETERNAL The Plan")
+    (org-narrow-to-subtree)
+    (let ((today-plan (format-time-string "\\*\\* [A-z]* Plan for \\[%Y-%m-%d %a\\]")))
+      (when (re-search-forward today-plan nil t)
+        (org-narrow-to-subtree)
+        (org-show-all)
+        (end-of-buffer)
+        (when (save-excursion
+                (beginning-of-line)
+                (not (looking-at-p "- \\[ \\] $")))
+          (org-insert-item 'checkbox))
+        (display-buffer buffer)
+        (error "Already have a plan today!")))))
 
 (defun my/org-find-journal ()
   (let* ((files
@@ -156,7 +171,7 @@
                  :template-file ,(my/org-file "templates/basic.ledger"))))
               ("Record Comms Message"
                :file ,(my/agenda-file "datetree.org")
-               :keys "c"
+               :keys "C"
                :datetree t 
                :template "* TODO %?")
               ("Emacs config snippet" :keys "e"
@@ -181,7 +196,7 @@
                  :file ,(my/org-file "entries/journal.gpg")
                  :datetree t
                  :template "* ")))
-              ("Create checklist" :keys "C" :children
+              ("Create checklist" :keys "c" :children
                (("Conference Via Bus"
                  :keys "c"
                  :file ,(my/agenda-file "dev.org")
@@ -190,11 +205,11 @@
                 ("Morning routine"
                  :keys "m"
                  :file ,(my/org-file "entries/routines.org")
-                 :template-file ,(my/org-file "checklists/mornings.org"))
-                ("Nightly routine"
+                 :template-file ,(my/org-file "templates/morning-routine.org"))
+                ("Night routine"
                  :keys "n"
                  :file ,(my/org-file "entries/routines.org")
-                 :template-file ,(my/org-file "checklists/nights.org"))))
+                 :template-file ,(my/org-file "templates/evening-routine.org"))))
               ("Protocol"
                :keys "p"
                :file ,(my/agenda-file "refile.org")
@@ -206,11 +221,11 @@
                :template "* STUFF %? [[%:link][%:description]]\n:PROPERTIES:\n:CREATED: %U\n:URL: %:link\n:END:")
               ("Add to lists conveniently" :keys "l" :children
                (("Plan week" :keys "P"
-                 :file ,(my/agenda-file "dev.org")
+                 :file ,(my/agenda-file "plan.org")
                  :headline "The Plan"
                  :template-file ,(my/org-file "templates/weekly-plan.org"))
                 ("Plan your day" :keys "p"
-                 :file ,(my/agenda-file "dev.org")
+                 :file ,(my/agenda-file "plan.org")
                  :function org-plan-goto
                  :template-file ,(my/org-file "templates/daily-plan.org"))
                 ("Cringe" :keys "c"

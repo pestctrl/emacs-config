@@ -848,3 +848,34 @@
   (use-package shell-command+
     :bind ("M-!" . shell-command+))
 #+end_src
+** shackle-mode
+#+begin_src emacs-lisp
+  (use-package shackle)
+
+  (defun shackle--display-buffer-reuse (buffer alist)
+
+    (let ((window (display-buffer-reuse-window buffer
+                                               ;; Reuse frames
+                                               (cons '(reusable-frames . t) alist))))
+      (prog1 window
+        (when (and window (window-live-p window)
+                   shackle-select-reused-windows)
+          (select-window window)))))
+
+  (setq switch-to-buffer-obey-display-actions t
+        shackle-select-reused-windows t)
+  (setq shackle-rules '(("the_plan" :select t)))
+
+  (shackle-mode 1)
+
+  (defun get-the-plan ()
+    (with-current-buffer (find-file-noselect "~/MEGA/org/agenda/plan.org")
+      (rename-buffer "the_plan")
+      (current-buffer)))
+
+  (defun the-plan ()
+    (interactive)
+    (switch-to-buffer (get-the-plan)))
+
+  (exwm-global-set-key (kbd "s-p") #'the-plan)
+#+end_src

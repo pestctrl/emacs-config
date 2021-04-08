@@ -27,6 +27,8 @@
 (require 'org-project)
 (require 'org-ql)
 (require 'org-ql-custom-stuck-projects)
+;; Redef some of org-ql stuff
+(load-file "./work-specific-org-project-redefs.el")
 (require 'org-scan-tags-indent)
 
 (defvar org-ql-indent-levels nil)

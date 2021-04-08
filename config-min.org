@@ -36,6 +36,9 @@
   (when (eq 'windows-nt system-type)
     (setq-default explicit-shell-file-name "bash")
     (setq shell-file-name "bash"))
+
+  ;; Show the column number!
+  (column-number-mode t)
 #+end_src
 * exwm
 #+begin_src emacs-lisp
@@ -322,6 +325,10 @@
 #+begin_src emacs-lisp
   ;; These are the programming facilities I like the most for a minimal
   ;; setup for emacs-lisp programming
+
+  ;; Don't leave any whitespace on the end of lines in a file.
+  (use-package ws-butler)
+  (ws-butler-global-mode t)
 
   ;; Errors
   (use-package flycheck)

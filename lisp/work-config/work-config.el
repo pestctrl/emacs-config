@@ -27,9 +27,6 @@
 (require 'work-org-stuff)
 (require 'work-commentor)
 
-(use-package ws-butler)
-(ws-butler-global-mode t)
-
 (global-display-fill-column-indicator-mode t)
 
 (setq-default fill-column 79)

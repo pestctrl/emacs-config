@@ -65,5 +65,12 @@
                   default-directory
                 (deadgrep--project-root))))))
 
+(defmacro load-file? (fname)
+  `(when (file-exists-p ,fname)
+     (load-file ,fname)))
+
+(load-file? "~/.emacs.d/lisp/work-config/secrets/tools-manipulation.el")
+(load-file? "~/.emacs.d/lisp/work-config/secrets/update_environment.el")
+
 (provide 'work-config)
 ;;; work-config.el ends here

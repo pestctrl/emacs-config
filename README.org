@@ -1,0 +1,46 @@
+* My Emacs Config
+If you're new here, start in init.el.
+
+Modules will be progressively loaded from there. There's two kinds of
+ways I load things.
+
+- From a top level *.org file
+- From a tiny lisp module in the lisp/* subfolder.
+
+Why do I do it two ways? Because in the past, I only used to do the
+first way. However, it became confusing to manage dependencies, and my
+org config blocks had to be in a certain order in order for my config
+to work. That was stupid, so I pulled out all of the heavy dependency
+related stuff into lisp modules. This made things easier, so when I
+#'require a top level module, it will #'require everything else that
+it needs. Goodbye dependency nightmares!
+
+** Loading an org file
+Loading an org file will look something like this:
+
+#+begin_src emacs-lisp
+  (org-babel-load-file
+   (expand-file-name "config-org.org"
+                     user-emacs-directory))
+#+end_src
+
+If you want to know what this loads, then dive in to config.org!
+(Hint, it probably loads stuff related to org)
+
+** Loading a module from lisp folder
+If you see something along the lines of:
+
+#+begin_src emacs-lisp
+(require 'emacs-custom-load-or-ask)
+#+end_src
+
+This *could* just be just a 3rd party emacs-lisp package. However,
+I've tried to stick with use-package for things I have to download
+from melpa/elpa/etc., so most of the requires will be for stuff
+locally on my system that I wrote. Look for something in the lisp/
+subfolder that matches the name of the module, and you'll find what's
+being loaded. Most likely.
+
+** Questions?
+Feel free to shoot me an email. Maybe include in the subject line
+something about emacs config blah blah blah.

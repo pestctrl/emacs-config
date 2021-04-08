@@ -63,7 +63,7 @@
           #'(lambda ()
               (if current-prefix-arg
                   default-directory
-                (deadrep--project-root))))))
+                (deadgrep--project-root))))))
 
 (provide 'work-config)
 ;;; work-config.el ends here

@@ -738,9 +738,7 @@
               (switch-to-buffer b)
             (vterm))))
 
-      (add-hook 'vterm-exit-functions
-                (lambda (buf com)
-                  (kill-buffer buf)))
+      (setq vterm-kill-buffer-on-exit t)
 
       (defun rename-vterm-with-tab (orig name &optional arg)
         (let ((current-tab-name (alist-get 'name (tab-bar--current-tab))))

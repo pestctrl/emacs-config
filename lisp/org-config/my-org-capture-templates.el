@@ -180,12 +180,12 @@
                :template "* %^{Title}\n#+begin_src emacs-lisp\n %?\n#+end_src")
               ("Journal" :keys "j" :children
                (("Decision Template"
-                 :file ,(my/org-file "entries/journal.gpg")
+                 :file ,(my/org-file "gpg/journal.gpg")
                  :datetree t
                  :keys "d"
                  :template-file ,(my/org-file "templates/decide.org"))
                 ("Journal Entry" :keys "e"
-                 :file ,(my/org-file "entries/journal.gpg")
+                 :file ,(my/org-file "gpg/journal.gpg")
                  :datetree t
                  :template "* %<%R> %?")
                 ("New Journal System" :keys "j"
@@ -193,7 +193,7 @@
                  :datetree t
                  :template "* %U\n%?")
                 ("Programming Interview Prep Journal" :keys "p"
-                 :file ,(my/org-file "entries/journal.gpg")
+                 :file ,(my/org-file "gpg/journal.gpg")
                  :datetree t
                  :template "* ")))
               ("Create checklist" :keys "c" :children

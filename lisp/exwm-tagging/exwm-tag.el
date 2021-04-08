@@ -41,7 +41,9 @@
   (if (and (get-buffer name)
            (not (equal (get-buffer name) (current-buffer)))
            (y-or-n-p (format "Already a buffer named \"%s\". Would you like to swap?" name)))
-      (let ((oname (completing-read "Name of other buffer: " xprograms)))
+      (let ((oname (completing-read "Name of other buffer: "
+                                    (mapcar (lambda (a) (plist-get a :instance))
+                                            (exwmx-appconfig--get-all-appconfigs)))))
         (exwm-workspace-rename-buffer "This is a stupid name that no one would ever choose for a buffer, hopefully")
         (with-current-buffer (get-buffer name)
           (exwm-workspace-rename-buffer oname)

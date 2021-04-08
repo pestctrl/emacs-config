@@ -274,6 +274,28 @@
                                      (:name "Today" :time-grid t
                                             :and (:not (:and (:not (:scheduled today)
                                                                    :not (:deadline today)))))))))
+        ("am" "\tMinimal agenda" agenda ""
+         ((org-agenda-tag-filter-preset (quote ("+dev")))
+          (org-agenda-skip-function (lambda ()
+                                      (when (or (when-let (delayed (org-entry-get (point) "DELAYED"))
+                                                  (org-time< (org-matcher-time "<now>") delayed))
+                                                (member (org-get-todo-state) '("HOLD" "TICKLER")))
+                                        (outline-next-heading))))
+          (org-super-agenda-groups '((:name "Delayed" :pred
+                                            ((lambda (item)
+                                               (when-let (marker (or (get-text-property 0 'org-marker item)
+                                                                     (get-text-property 0 'org-hd-marker item)))
+                                                 (with-current-buffer (marker-buffer marker)
+                                                   (goto-char marker)
+                                                   (and ;; (not (string-match-p "SCHEDULED" item))
+                                                    (org-entry-get (point) "DELAYED")))))))
+                                     (:name "The Plan" :and (:tag "PLAN" :log nil))
+                                     (:name "Overdue" :and (:deadline past :log nil))
+                                     (:name "Upcoming" :and (:deadline future :not (:todo "DONE")))
+                                     (:name "Should do" :and (:scheduled past :log nil))
+                                     (:name "Today" :time-grid t
+                                            :and (:not (:and (:not (:scheduled today)
+                                                                   :not (:deadline today)))))))))
         ("p" . "\tProd")
         ("pa" "\tAll" ,(production-agenda "time"))
         ("ps" "\tschool" ,(production-agenda "school"))

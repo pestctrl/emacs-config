@@ -424,11 +424,11 @@
 
   (defhydra mc-interactive (*multiple-cursors-map* "i")
     "For those looping commands"
-      ("n" mc/mark-next-like-this)
-      ("p" mc/mark-previous-like-this)
-      ("s" mc/skip-to-next-like-this)
-      ("S" mc/skip-to-previous-like-this)
-      ("q" nil))
+    ("n" mc/mark-next-like-this)
+    ("p" mc/mark-previous-like-this)
+    ("s" mc/skip-to-next-like-this)
+    ("S" mc/skip-to-previous-like-this)
+    ("q" nil))
 
   (global-set-key (kbd "C-c m") '*multiple-cursors-map*)
 

@@ -12,6 +12,8 @@
   (setq font-lock-defaults '(self-chat-highlights)))
 
 (define-key self-chat-mode-map (kbd "RET") #'self-chat-insert-next)
+(define-key self-chat-mode-map (kbd "DEL") #'delete-self-chat-line)
+(define-key self-chat-mode-map (kbd "C-DEL") #'delete-self-chat-text)
 
 (defun self-chat-insert-next ()
   (interactive)
@@ -28,7 +30,34 @@
   (insert "> "))
 
 (defun chat-post ()
-  (insert (alist-get self-chat-num self-chat-alist) ": "))
+  (if-let ((name (alist-get self-chat-num self-chat-alist)))
+      (insert name ": ")))
+
+(defun delete-self-chat-text ()
+  (interactive)
+  (beginning-of-line)
+  (search-forward ":")
+  (call-interactively #'forward-char)
+  (call-interactively #'set-mark-command)
+  (end-of-line)
+  (call-interactively #'kill-region))
+
+(defun delete-self-chat-line ()
+  (interactive)
+  (save-excursion
+    (call-interactively #'set-mark-command)
+    (beginning-of-line)
+    (call-interactively #'kill-ring-save))
+  (cond ((= 0 (length (current-kill 0)))
+         (call-interactively #'backward-char))
+        ((string-match-p "^> [A-z]*: $" (current-kill 0))
+         (set-mark-command nil)
+         (previous-line)
+         (previous-line)
+         (end-of-line)
+         (call-interactively #'kill-region))
+        (t
+         (call-interactively #'delete-backward-char))))
 
 (defmacro define-users (list)
   `(progn
@@ -42,7 +71,7 @@
                           :after-exit (chat-post))
        ""
        ("RET" nil "Same")
-       ("TAB" (setq self-chat-num self-chat-last2) "Switch")
+       ("TAB" (when self-chat-last2 (setq self-chat-num self-chat-last2)) "Switch")
        ,@(let ((num 0))
            (mapcar #'(lambda (triple)
                        (let ((name (car triple))
@@ -74,4 +103,4 @@
                ("Coop" "c" "cornsilk")
                ("Everyone" "e" "pale green")))
 
-(provide 'self-talk-mode)
+(provide 'self-chat-mode)

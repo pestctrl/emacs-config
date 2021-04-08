@@ -36,7 +36,7 @@
 (require 'my-org-capture-templates)
 (require 'org-other-additions)
 
-(require 'self-talk-mode)
+(require 'self-chat-mode)
 
 (provide 'my-org)
 ;;; my-org.el ends here

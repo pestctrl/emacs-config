@@ -257,11 +257,24 @@
     (save-excursion
       (while (re-search-forward regexp nil 'noerror)
         (replace-match
-         (format "|\\1|\\2|%s:\\4|[[\\3::\\4][Link]]|"
-                 (if (string-match-p "/scratch/benson/tools/llvm_cgt/llvm-project/clang/"
-                                     (match-string 3))
-                     (substring (match-string 3) 43)
-                   (match-string 3))))))
+         (let ((path (match-string 3)))
+           (save-match-data
+             (format "|\\1|\\2|%s:\\4|[[\\3::\\4][Link]]|"
+                     (cond ((string-match (rx (and "/scratch/benson/tools"
+                                                   (* digit)
+                                                   "/llvm_cgt/llvm-project/"
+                                                   (group
+                                                    (+ nonl))))
+                                          path)
+                            (format "$LLVM_PROJECT/%s" (match-string 1 path)))
+                           ((string-match (rx (and "/scratch/benson/tools"
+                                                   (* digit)
+                                                   "/"
+                                                   (group
+                                                    (+ nonl))))
+                                          path)
+                            (format "$SANDBOX/%s" (match-string 1 path)))
+                           (t path))))))))
     (org-table-sort-lines nil ?N)
     (save-excursion
       (insert "|-\n|#|Function Name|File & Line Number|Link|\n|-\n")

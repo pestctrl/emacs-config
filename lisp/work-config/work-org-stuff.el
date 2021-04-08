@@ -25,10 +25,15 @@
 ;;; Code:
 (require 'my-org-misc)
 (require 'org-project)
+(use-package dash-functional)
+(use-package ts)
+(use-package peg)
+(use-package org-super-agenda)
+(use-package ov)
 (require 'org-ql)
 (require 'org-ql-custom-stuck-projects)
 ;; Redef some of org-ql stuff
-(load-file "./work-specific-org-project-redefs.el")
+(load-file "~/.emacs.d/lisp/work-config/work-specific-org-project-redefs.el")
 (require 'org-scan-tags-indent)
 
 (defvar org-ql-indent-levels nil)

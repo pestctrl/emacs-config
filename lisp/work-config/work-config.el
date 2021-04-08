@@ -41,9 +41,25 @@
 
 (add-to-list 'auto-mode-alist '("\\.mir$" . llvm-mode))
 
+(when (executable-find "rg")
+  (use-package deadgrep
+    :config
+    (setq deadgrep-project-root-function
+          #'(lambda ()
+              (if current-prefix-arg
+                  default-directory
+                (deadgrep--project-root))))))
+
 (defmacro load-file? (fname)
   `(when (file-exists-p ,fname)
      (load-file ,fname)))
+
+(load-file? (expand-file-name
+             "lisp/work-config/secrets/tools-manipulation.el"
+             user-emacs-directory))
+(load-file? (expand-file-name
+             "lisp/work-config/secrets/update_environment.el"
+             user-emacs-directory))
 
 (load-file? "/scratch/benson/tools2/llvm_cgt/llvm-project/llvm/utils/emacs/llvm-mode.el")
 (load-file? "/scratch/benson/tools2/llvm_cgt/llvm-project/llvm/utils/emacs/tablegen-mode.el")
@@ -56,18 +72,6 @@
 	     (if (and buffer-file-name (string-match "llvm" buffer-file-name))
 		 (progn
 		   (c-set-style "llvm.org"))))))
-
-(when (executable-find "rg")
-  (use-package deadgrep
-    :config
-    (setq deadgrep-project-root-function
-          #'(lambda ()
-              (if current-prefix-arg
-                  default-directory
-                (deadgrep--project-root))))))
-
-(load-file? "~/.emacs.d/lisp/work-config/secrets/tools-manipulation.el")
-(load-file? "~/.emacs.d/lisp/work-config/secrets/update_environment.el")
 
 (provide 'work-config)
 ;;; work-config.el ends here

@@ -527,9 +527,9 @@
 
   ;; Banner comments
   (unless my/at-ti
-     (use-package banner-comment
-       :commands banner-comment
-       :bind (("C-c h" . #'banner-comment))))
+    (use-package banner-comment
+      :commands banner-comment
+      :bind (("C-c h" . #'banner-comment))))
 
   (add-hook 'lisp-mode-hook
             (lambda () (setq comment-start ";; ")))

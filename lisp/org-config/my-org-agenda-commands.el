@@ -32,7 +32,7 @@
 (use-package org-super-agenda)
 (org-super-agenda-mode)
 
-(add-to-list 'load-path 
+(add-to-list 'load-path
              "~/.emacs.d/submodule/org-ql")
 (use-package peg)
 (use-package ov)

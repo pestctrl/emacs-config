@@ -112,5 +112,9 @@
   (interactive)
   (setq org-clock-out-time nil))
 
+(with-eval-after-load 'ox-html
+  (setq org-html-table-default-attributes
+        '(:border "2" :cellspacing "0" :cellpadding "6")))
+
 (provide 'my-org-misc)
 ;;; my-org-misc.el ends here

@@ -1,3 +1,6 @@
+(add-to-list 'default-frame-alist '(width  . 200))
+(add-to-list 'default-frame-alist '(height . 60))
+
 (setq package-list '(org use-package exwm))
 ;; list the repositories containing them
 (setq package-archives '(("melpa" . "http://melpa.org/packages/")

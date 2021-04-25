@@ -32,7 +32,7 @@
             (not org-notes-current-file))
     (setq org-notes-current-file
           (read-file-name "Notes file? ")))
-  (find-file org-notes-current-file)
+  (set-buffer (find-file-noselect org-notes-current-file))
   (end-of-buffer))
 
 (provide 'org-capture-notes)

@@ -29,7 +29,7 @@
   (let ((string "")
         match)
     (save-window-excursion
-      (switch-to-buffer (find-file-noselect "~/MEGA/org/entries/journal.gpg"))
+      (set-buffer (find-file-noselect (my/org-file "gpg/journal.gpg")))
       (goto-char (point-min))
       (while (setq match 
                    (re-search-forward

@@ -53,7 +53,7 @@
 
 (defun seq-status? ()
   (if (olc/any-todo-children?
-        (or (eq 'active (opr/type-of-task))
+        (or (member (opr/type-of-task) '(wait active)) ;; BENSON_UPDATE_THIS: Change this to active?
             (eq 'active (opr/type-of-project))))
       'active
     (if (olc/any-todo-children?

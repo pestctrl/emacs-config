@@ -83,6 +83,9 @@
 
 (define-todo-keyword "BACKLOG" 'legacy :key ?b)
 
+(define-todo-keyword "BLOCKED" 'legacy :key ?B)
+(require 'org-block-edna)
+
 (finish-active-type 'legacy)
 
 (define-todo-keyword "ABANDON" 'legacy :recordstr "@/!")

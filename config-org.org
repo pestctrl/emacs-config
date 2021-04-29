@@ -180,11 +180,6 @@
   (org-clock-persistence-insinuate)
   (setq org-clock-continuously t)
 #+end_src
-** org-edna
-#+begin_src emacs-lisp
-  (use-package org-edna)
-  (org-edna-load)
-#+end_src
 ** org-brain
 #+begin_src
   (use-package org-brain :ensure t

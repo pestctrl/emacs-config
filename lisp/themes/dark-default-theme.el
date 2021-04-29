@@ -65,7 +65,8 @@
    
    '(opr/CLOCK-todo-face ((t :foreground "dark gray")))
    '(opr/INACT-todo-face ((t :foreground "dark gray")))
-   '(opr/BACKLOG-todo-face ((t :foreground "dark gray"))) 
+   '(opr/BACKLOG-todo-face ((t :foreground "dark gray")))
+   '(opr/BLOCKED-todo-face ((t :foreground "dark gray")))
    '(opr/ABANDON-todo-face ((t :foreground "dark gray")))
    
    '(opr/META-todo-face ((t :foreground "white")))

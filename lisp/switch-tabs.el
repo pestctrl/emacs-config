@@ -101,7 +101,9 @@
   (interactive)
   (let* ((tab (assq 'current-tab (frame-parameter frame 'tabs)))
          (tab-explicit-name (alist-get 'explicit-name tab)))
-    (unless tab-explicit-name
+    (unless (or tab-explicit-name
+                (and (boundp 'exwm-mode)
+                     exwm-mode))
       (tab-bar-rename-tab "scratch1"))))
 
 (add-hook 'after-make-frame-functions

@@ -71,11 +71,12 @@
                    user-emacs-directory))
 
 ;; Load additional exwm stuff that changes constantly
-(use-package exwm
-  :config 
-  (org-babel-load-file
-   (expand-file-name "config-exwm.org"
-                     user-emacs-directory)))
+(when my/enable-exwm
+  (use-package exwm
+    :config
+    (org-babel-load-file
+     (expand-file-name "config-exwm.org"
+                       user-emacs-directory))))
 
 (org-babel-load-file
  (expand-file-name "config-ext.org"

@@ -1,7 +1,8 @@
 #+PROPERTY: header-args:emacs-lisp :tangle "~/.emacs.d/config-org.el" :comments both
 
-* Need this for base config
+* The all-mighty org configuration
 #+begin_src emacs-lisp
+(require 'my-org)
 (require 'my-org-agenda-files)
 #+end_src
 * Plugins
@@ -632,7 +633,7 @@
     (after-init . org-roam-mode)
     :straight (:host github :repo "jethrokuan/org-roam" :branch "master")
     :custom
-    (org-roam-directory "~/MEGA/org/org-roam/")
+    (org-roam-directory (expand-file-name "org-roam" my/org-folder))
     :bind (:map org-roam-mode-map
                 (("C-c n l" . org-roam)
                  ("C-c n f" . org-roam-find-file)

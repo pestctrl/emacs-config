@@ -85,7 +85,6 @@
 ;; Load work stuff when at work. 
 (if my/at-ti
     (require 'work-config)
-  (require 'my-org)
   (org-babel-load-file
    (expand-file-name "config-org.org"
                      user-emacs-directory)))

@@ -532,6 +532,7 @@
   (use-package org-noter
     :config
     (unless (eq 'hash-table (type-of face-new-frame-defaults))
+      (require 'face-copier)
       (def-face-copier x-show-tip-faces (sym)
         nil
         tooltip)

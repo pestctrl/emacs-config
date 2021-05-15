@@ -23,7 +23,7 @@
 ;;; Commentary:
 
 ;;; Code:
-(require 'org-edna)
+(use-package org-edna)
 (org-edna-mode t)
 
 (defun org-blocked-mark-blocking-tasks (change-plist)

@@ -36,6 +36,7 @@
              "~/.emacs.d/submodule/org-ql")
 (use-package peg)
 (use-package ov)
+(use-package dash-functional)
 (require 'org-ql)
 (require 'org-ql-search)
 (require 'org-ql-custom-stuck-projects)

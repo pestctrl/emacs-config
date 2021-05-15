@@ -1,5 +1,27 @@
 #+PROPERTY: header-args:emacs-lisp :tangle "~/.emacs.d/config-ext.el" :comments both
 
+* window manipulation
+#+begin_src emacs-lisp
+  ;; The prefix
+  (define-prefix-command '*window-map*)
+  (define-key *root-map* (kbd "w") '*window-map*)
+
+  ;; Side-window stuff
+  (use-package resize-window)
+  (require 'side-window-split)
+  (define-key *window-map* (kbd "j") 'side-bottom-window)
+  (define-key *window-map* (kbd "h") 'side-left-window)
+  (define-key *window-map* (kbd "k") 'side-top-window)
+  (define-key *window-map* (kbd "l") 'side-right-window)
+  (define-key *window-map* (kbd "d") 'side-window-delete-all)
+  (define-key *window-map* (kbd "r") 'resize-window)
+
+  ;; Dedicated window
+  (defun my/toggle-dedicated-window ()
+    (interactive)
+    (let ((win (selected-window)))
+      (set-window-dedicated-p win (not (window-dedicated-p win)))))
+#+end_src
 * Various tools
 ** ledger
 #+begin_src emacs-lisp

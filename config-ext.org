@@ -452,7 +452,7 @@
 #+begin_src emacs-lisp
   (use-package projectile
     :defer 5
-    :bind-keymap ("C-c C-." . projectile-command-map)
+    ;; :bind-keymap ("C-c C-." . projectile-command-map)
     :init   (progn
               (setq projectile-enable-caching nil)
               (setq projectile-git-submodule-command nil)
@@ -462,6 +462,8 @@
               (setq projectile-switch-project-action 'projectile-dired)
               (setq projectile-require-project-root t))
     :config
+    (global-set-key (kbd (if (null window-system) "C-c ." "C-c C-."))
+                    'projectile-command-map)
     (projectile-mode)
 
     ;; Provide my own projectile-compile-project which uses

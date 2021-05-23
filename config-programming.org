@@ -1,5 +1,9 @@
 #+PROPERTY: header-args :tangle "~/.emacs.d/config-programming.el" :comments both
 
+* Pretty Symbols!
+#+begin_src emacs-lisp
+(global-prettify-symbols-mode t)
+#+end_src
 * irony
 #+begin_src emacs-lisp
   (use-package irony
@@ -15,6 +19,7 @@
 
   ;; (global-company-mode)
 #+end_src
+
 * Yasnippets
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet)

@@ -901,3 +901,7 @@
 
   (exwm-global-set-key (kbd "s-p") #'the-plan)
 #+end_src
+** Emojis!
+#+begin_src emacs-lisp
+  (use-package emojify)
+#+end_src

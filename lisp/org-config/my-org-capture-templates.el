@@ -220,14 +220,19 @@
                :before-finalize my/org-board-prompt
                :template "* STUFF %? [[%:link][%:description]]\n:PROPERTIES:\n:CREATED: %U\n:URL: %:link\n:END:")
               ("Add to lists conveniently" :keys "l" :children
-               (("Plan week" :keys "P"
-                 :file ,(my/agenda-file "plan.org")
-                 :headline "The Plan"
-                 :template-file ,(my/org-file "templates/weekly-plan.org"))
-                ("Plan your day" :keys "p"
-                 :file ,(my/agenda-file "plan.org")
-                 :function org-plan-goto
-                 :template-file ,(my/org-file "templates/daily-plan.org"))
+               (("Plan" :keys "p" :children
+                 (("Plan week" :keys "w"
+                    :file ,(my/agenda-file "plan.org")
+                    :headline "The Plan"
+                    :template-file ,(my/org-file "templates/weekly-plan.org"))
+                  ("Plan your day" :keys "p"
+                   :file ,(my/agenda-file "plan.org")
+                   :function org-plan-goto
+                   :template-file ,(my/org-file "templates/daily-plan.org"))
+                  ("Plan specific day" :keys "d"
+                   :file ,(my/agenda-file "plan.org")
+                   :function org-plan-goto
+                   :template-file ,(my/org-file "templates/daily-plan-prompt.org"))))
                 ("Cringe" :keys "c"
                  :file ,(my/org-file "entries/cringe.gpg")
                  :template "* %?")

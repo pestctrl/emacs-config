@@ -239,8 +239,9 @@
                       (let ((refile-location (op/insert-category-heading beg category-name)))
                         (setf (alist-get category db)
                               refile-location)))
-                    (when-let (location (alist-get category db))
-                      (op/refile-to-point (buffer-file-name) location))))))))))))
+                    (prog1 (when-let (location (alist-get category db))
+                             (op/refile-to-point (buffer-file-name) location))
+                      (recenter))))))))))))
 
 ;; (defun op/open-loop ()
 ;;   (interactive)

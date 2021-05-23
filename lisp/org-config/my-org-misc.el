@@ -116,5 +116,87 @@
   (setq org-html-table-default-attributes
         '(:border "2" :cellspacing "0" :cellpadding "6")))
 
+(use-package git-auto-commit-mode
+  :config
+  (use-package keychain-environment)
+  (setq gac-automatically-add-new-files-p nil)
+  (setq-default gac-debounce-interval 300)
+
+  (defun gac-use-magit-push (buffer)
+    (let ((default-directory (file-name-directory (buffer-file-name buffer))))
+      (magit-push-current-to-pushremote nil)))
+
+  (advice-add #'gac-push :override #'gac-use-magit-push)
+
+  (defvar rb/ssh-default-key "~/.ssh/id_rsa"
+    "My default SSH key.")
+
+  (defun rb/ssh-add (&optional arg)
+    "Add the default ssh-key if it's not present.
+
+With a universal argument, prompt to specify which key."
+    (interactive "P")
+    (when (or arg
+              (not (rb/ssh-agent-has-keys-p)))
+      (rb/ssh-add-in-emacs
+       (if (not arg)
+           rb/ssh-default-key
+         (read-file-name
+          "Add key: \n" "~/.ssh" nil 't nil
+          (lambda (x)
+            (not (or (string-suffix-p ".pub" x)
+                     (string= "known_hosts" x)))))))))
+
+  (defun rb/ssh-agent-has-keys-p ()
+    "Return t if the ssh-agent has a key."
+    (when (not
+           (string-match-p
+            "No identities"
+            (shell-command-to-string "ssh-add -l")))
+      t))
+
+  (defun rb/ssh-add-in-emacs (key-file)
+    "Run ssh-add to add a key to the running SSH agent."
+    (let ((process-connection-type t)
+          process)
+      (unwind-protect
+          (progn
+            (setq process
+                  (start-process
+                   "ssh-add" nil "ssh-add"
+                   (expand-file-name key-file)))
+            (set-process-filter
+             process 'rb/ssh-add-process-filter)
+            (while (accept-process-output process)))
+        (if (eq (process-status process) 'run)
+            (kill-process process)))))
+
+  (defun rb/ssh-add-process-filter (process string)
+    (save-match-data
+      (if (string-match ":\\s *\\'" string)
+          (process-send-string process
+                               (concat
+                                (read-passwd string)
+                                "\n"))
+        (message "ssh-add: %s" string))))
+
+  (advice-add #'keychain-refresh-environment
+              :after
+              (lambda (&rest args) (message "Remember to ssh-add!")))
+
+  (add-hook 'git-auto-commit-mode-hook
+            #'rb/ssh-add)
+
+  (add-hook 'git-auto-commit-mode-hook
+            #'keychain-refresh-environment)
+
+  (defun gac-commit-message (filename)
+    (format "Desktop autocommit: %s\n\n%s"
+            (format-time-string "%Y/%m/%d %H:%M:%S")
+            filename))
+
+  (setq gac-default-message
+        #'gac-commit-message))
+
 (provide 'my-org-misc)
 ;;; my-org-misc.el ends here

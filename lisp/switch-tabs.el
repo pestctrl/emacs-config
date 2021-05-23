@@ -109,8 +109,8 @@
       (message "Exwm mode? %s" )
       (tab-bar-rename-tab "scratch1"))))
 
-(add-hook 'after-make-frame-functions
-          #'init-tab-name)
+;; (add-hook 'after-make-frame-functions
+;;           #'init-tab-name)
 
 (provide 'switch-tabs)
 ;;; switch-tabs.el ends here

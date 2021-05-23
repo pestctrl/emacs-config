@@ -47,6 +47,7 @@
     (use-package exwm
       :config
       (use-package exwm-x)
+      (exwm-global-set-key (kbd "s-e") #'exwm-edit--compose)
 
       ;; Editting with Emacs in X-windows
       (use-package exwm-edit

@@ -102,8 +102,11 @@
   (let* ((tab (assq 'current-tab (frame-parameter frame 'tabs)))
          (tab-explicit-name (alist-get 'explicit-name tab)))
     (unless (or tab-explicit-name
-                (and (boundp 'exwm-mode)
-                     exwm-mode))
+                (eq major-mode 'exwm-mode))
+      ;; this-command won't work
+      ;; neither will checking for exwm-mode
+      ;; current buffer will be *scratch*
+      (message "Exwm mode? %s" )
       (tab-bar-rename-tab "scratch1"))))
 
 (add-hook 'after-make-frame-functions

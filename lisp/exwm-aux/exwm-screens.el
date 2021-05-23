@@ -40,8 +40,6 @@
                        ((string-match-p "^eDP" b) nil)
                        (t nil))))))
 
-(setq exwm-workspace-number (length (my/get-screens)))
-
 (defun position-screen (screen relative-to)
   (interactive (cl-destructuring-bind (primary . secondary) (my/get-screens)
                  (list (completing-read "Which screen? " secondary)
@@ -52,6 +50,7 @@
 
 (defun my/setup-screens ()
   (interactive)
+  (setq exwm-workspace-number (length (my/get-screens)))
   (let ((count 1))
     (cl-destructuring-bind (primary . secondaries) (my/get-screens)
       (loop for secondary in secondaries
@@ -62,6 +61,11 @@
     (setup-wallpaper)
     (setq exwm-workspace-number count)
     (exwm-workspace-after-monitor-change)))
+
+(defun my/minimal-setup-screens ()
+  (interactive)
+  (setup-workspace-monitors)
+  (setup-wallpaper))
 
 (defun my/disconnect-screen (screen)
   (interactive (list (let ((screens (cdr (my/get-screens))))

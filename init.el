@@ -15,7 +15,7 @@
 
 (when (not package-archive-contents)
   (package-refresh-contents))
-;; fetch the list of packages available 
+;; fetch the list of packages available
 (unless package-archive-contents
   (package-refresh-contents))
 
@@ -82,7 +82,7 @@
  (expand-file-name "config-ext.org"
                    user-emacs-directory))
 
-;; Load work stuff when at work. 
+;; Load work stuff when at work.
 (if my/at-ti
     (require 'work-config)
   (org-babel-load-file

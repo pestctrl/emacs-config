@@ -49,7 +49,7 @@
   (let ((state (org-get-todo-state)))
     (or (member state opr/strict-tasks)
         (and (member state opr/ambiguous)
-             (opr/ambiguous-project-or-task)))))
+             (opr/ambiguous-task-or-project)))))
 
 (defun opr/type-of-task ()
   (when-let ((state (org-get-todo-state)))

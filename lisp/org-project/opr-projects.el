@@ -83,7 +83,7 @@
   (let ((state (org-get-todo-state)))
     (or (member state opr/strict-projects)
         (and (member state opr/ambiguous)
-             (opr/ambiguous-project-or-task)))))
+             (opr/ambiguous-task-or-project)))))
 
 (defun opr/type-of-project (&optional greedy-active)
   (when-let ((state (org-get-todo-state)))

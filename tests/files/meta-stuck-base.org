@@ -8,3 +8,8 @@
 ** TASK Next task
 * META should be stuck if stuck subproject
 ** META Stuck subproject
+* META should be stuck even if there are scheduled dones
+** DONE Scheduled done task
+* META should be stuck even if there are deadlined dones
+** DONE Deadlined done task
+DEADLINE: <2021-06-21 Mon>

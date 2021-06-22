@@ -47,7 +47,11 @@
             ;; Have a stuck project? Stuck! 
             (eq 'stuck (opr/type-of-project))))
          ;; No todo children? Stuck!
-         (not (olc/any-todo-children? t)))
+         (not (olc/any-todo-children? t))
+         ;; All todo children are done? Stuck!
+         (not (olc/any-todo-children?
+                (not (eq 'done
+                         (cdr (opr/get-type-and-state)))))))
         'stuck
       'active)))
 

@@ -395,9 +395,9 @@
   (defvar my/delete-blocks t)
 
   (defun org-agenda-delete-empty-compact-blocks ()
-    "Function removes empty compact blocks. 
-   If two lines next to each other have the 
-   org-agenda-structure face, then delete the 
+    "Function removes empty compact blocks.
+   If two lines next to each other have the
+   org-agenda-structure face, then delete the
    previous block."
     (unless org-agenda-compact-blocks
       (user-error "Compact blocks must be on"))
@@ -419,9 +419,27 @@
               (unless (org-agenda-check-type nil 'agenda)
                 (setq previous t)))
              (t (setq previous nil)))
-            (forward-line))))))
+            (forward-line))))
+      (setq buffer-read-only t)))
 
   (add-hook 'org-agenda-finalize-hook #'org-agenda-delete-empty-compact-blocks)
+#+end_src
+* Highlight top priority projects
+#+begin_src emacs-lisp
+  (defvar my/highlight-top-priority t)
+
+  (defun org-agenda-highlight-top-priority ()
+    (when my/highlight-top-priority
+      (setq buffer-read-only nil)
+      (save-excursion
+        (goto-char (point-min))
+        (let ((start-pos (point))
+              (previous nil))
+          (while (re-search-forward "\\[#A\\]" nil t)
+            (add-face-text-property (point-at-bol) (point-at-eol) '(:background "color-19")))))
+      (setq buffer-read-only t)))
+
+  (add-hook 'org-agenda-finalize-hook #'org-agenda-highlight-top-priority)
 #+end_src
 * org-notmuch
 #+begin_src emacs-lisp

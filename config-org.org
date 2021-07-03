@@ -133,7 +133,7 @@
     (interactive)
     (forward-char 6)
     (while (condition-case nil
-               (progn 
+               (progn
                  (previous-line)
                  (org-clock-convenience-goto-ts)
                  nil)
@@ -328,7 +328,7 @@
     (interactive "MName: ")
     (switch-to-buffer (find-file-noselect (concat "~/MEGA/org/random/" filename ".org"))))
 
-  (defun make-encrypted-org-file (filename) 
+  (defun make-encrypted-org-file (filename)
     (interactive "MName: ")
     (switch-to-buffer (find-file-noselect (concat "~/MEGA/org/random/" filename ".gpg")))
     (insert "# -*- mode:org; epa-file-encrypt-to: (\"bensonchu457@gmail.com\") -*-\n\n")
@@ -549,19 +549,20 @@
 #+begin_src emacs-lisp
   (use-package org-noter
     :config
-    (unless (eq 'hash-table (type-of face-new-frame-defaults))
-      (require 'face-copier)
-      (def-face-copier x-show-tip-faces (sym)
-        nil
-        tooltip)
+    ;; (unless (eq 'hash-table (type-of face-new-frame-defaults))
+    ;;   (require 'face-copier)
+    ;;   (def-face-copier x-show-tip-faces (sym)
+    ;;     nil
+    ;;     tooltip)
 
-      (defun dont-copy-faces-for-x-show-tip (orig &rest args)
-        (override1-face x-show-tip-faces
-          (apply orig args)))
+    ;;   (defun dont-copy-faces-for-x-show-tip (orig &rest args)
+    ;;     (override1-face x-show-tip-faces
+    ;;       (apply orig args)))
 
-      (advice-add #'x-show-tip
-                  :around
-                  #'dont-copy-faces-for-x-show-tip)))
+    ;;   (advice-add #'x-show-tip
+    ;;               :around
+    ;;               #'dont-copy-faces-for-x-show-tip))
+    )
 
   (use-package exwm
     :config
@@ -717,7 +718,7 @@
   (define-key org-agenda-mode-map (kbd "U") #'org-agenda-remove-restriction-lock)
 #+end_src
 * Org mode magit update commands
-#+begin_src 
+#+begin_src
   (when (executable-find "~/bin/gitwatch")
     (defun start-gitwatch ()
       (interactive)

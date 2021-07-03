@@ -317,7 +317,7 @@
   (setq erc-kill-buffer-on-part t)
   (setq erc-autojoin-channels-alist
         '(("freenode.net" "#emacs" "#org-mode"
-           ;; "##linux" "#compilers" "#pltclub" 
+           ;; "##linux" "#compilers" "#pltclub"
            ;; "##cs" "##computerscience" "##programming" "#lisp" "##lisp"
            ;; "#sbcl" "#ecl"
            )))
@@ -452,7 +452,7 @@
 #+begin_src emacs-lisp
   (use-package projectile
     :defer 5
-    ;; :bind-keymap ("C-c C-." . projectile-command-map)
+    :commands projectile-command-map
     :init   (progn
               (setq projectile-enable-caching nil)
               (setq projectile-git-submodule-command nil)
@@ -460,11 +460,17 @@
 
               ;; (setq counsel-projectile-switch-project-action 'projectile-vc)
               (setq projectile-switch-project-action 'projectile-dired)
-              (setq projectile-require-project-root t))
+              (setq projectile-require-project-root t)
+              (global-set-key (kbd (if (null window-system)
+                                       "C-c ."
+                                     "C-c C-."))
+                              'projectile-command-map))
     :config
-    (global-set-key (kbd (if (null window-system) "C-c ." "C-c C-."))
-                    'projectile-command-map)
     (projectile-mode)
+
+    (when (null window-system)
+      (define-key c++-mode-map (kbd "C-c .") nil)
+      (define-key c++-mode-map (kbd "C-c . .") #'c-set-style))
 
     ;; Provide my own projectile-compile-project which uses
     ;; cca/projectile-compilation-dir instead of projectile-compilation-dir.
@@ -808,7 +814,7 @@
     (ivy-rich-mode 1))
 #+end_src
 ** Elfeed
-#+begin_src 
+#+begin_src
   (require 'elfeed)
   (setq elfeed-use-curl t)
   (elfeed-set-timeout 36000)

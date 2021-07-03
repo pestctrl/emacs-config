@@ -65,6 +65,9 @@
 (load-file? "/scratch/benson/tools2/llvm_cgt/llvm-project/llvm/utils/emacs/tablegen-mode.el")
 (load-file? "/scratch/benson/tools2/llvm_cgt/llvm-project/llvm/utils/emacs/emacs.el")
 
+(add-to-list 'auto-mode-alist
+             '("\\.dsls$" . json-mode))
+
 (pop c-mode-common-hook)
 (add-hook 'c-mode-common-hook
 	  (function

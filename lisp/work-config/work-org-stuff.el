@@ -25,6 +25,7 @@
 ;;; Code:
 (require 'my-org-misc)
 (require 'org-project)
+(require 'emacs-custom-load-or-ask)
 (use-package dash-functional)
 (use-package ts)
 (use-package peg)
@@ -74,16 +75,18 @@
   (set-buffer (find-file-noselect org-notes-current-file))
   (end-of-buffer))
 
+(ec/load-or-ask-dir 'my/work-org-folder "Where is the work-org root directory? ")
+
 (setq org-capture-templates
       (doct `(("Todo"
                :icon ,(all-the-icons-octicon "inbox" :face 'all-the-icons-yellow :v-adjust 0.01)
                :keys "t"
-               :file "/home/a0487752/org/refile.org"
+               :file ,(expand-file-name "refile.org" my/work-org-folder)
                :template "* STUFF %?\n:PROPERTIES:\n:CREATED: %U\n:VIEWING: %a\n:END:")
               ("Charging Setup"
                :icon ,(all-the-icons-faicon "bolt" :face 'all-the-icons-blue :v-adjust 0.01)
                :keys "c"
-               :file "/home/a0487752/org/refile.org"
+               :file ,(expand-file-name "refile.org" my/work-org-folder)
                :template "* %?")
               ("Logging"
                :icon ,(all-the-icons-material "laptop" :face 'all-the-icons-lblue)
@@ -135,40 +138,40 @@
 (setq org-outline-path-complete-in-steps nil)
 (setq org-refile-use-outline-path t)
 
-(defun wait-mark-blocking-tasks (change-plist)
-  (when (string= "WAIT"
-                 (plist-get change-plist :to))
-    (let ((ids '()))
-      (unwind-protect
-          (while
-              (progn
-                (let ((id (org-id-get-with-outline-path-completion '((nil :maxlevel . 9)))))
-                  (save-excursion
-                    (org-id-goto id)
-                    (org-entry-put (point) "WAIT_PREV_STATE" (org-get-todo-state))
-                    (org-todo "NEXT"))
-                  (push id ids))
-                (y-or-n-p "Add another heading?"))))
-      (org-entry-put (point) "WAITING" (mapconcat #'concat ids ", ")))))
+;; (defun wait-mark-blocking-tasks (change-plist)
+;;   (when (string= "WAIT"
+;;                  (plist-get change-plist :to))
+;;     (let ((ids '()))
+;;       (unwind-protect
+;;           (while
+;;               (progn
+;;                 (let ((id (org-id-get-with-outline-path-completion '((nil :maxlevel . 9)))))
+;;                   (save-excursion
+;;                     (org-id-goto id)
+;;                     (org-entry-put (point) "WAIT_PREV_STATE" (org-get-todo-state))
+;;                     (org-todo "NEXT"))
+;;                   (push id ids))
+;;                 (y-or-n-p "Add another heading?"))))
+;;       (org-entry-put (point) "WAITING" (mapconcat #'concat ids ", ")))))
 
-(add-hook 'org-trigger-hook
-          #'wait-mark-blocking-tasks)
+;; (add-hook 'org-trigger-hook
+;;           #'wait-mark-blocking-tasks)
 
-(defun unwait-unblock-tasks (change-plist)
-  (when (string= "WAIT"
-                 (plist-get change-plist :from))
-    (-as-> (org-entry-get (point) "WAITING")
-           it
-           (split-string it ", ")
-           (mapcar (lambda (id)
-                     (save-excursion
-                       (org-id-goto id)
-                       (org-todo (org-entry-get (point) "WAIT_PREV_STATE"))
-                       (org-entry-delete (point) "WAIT_PREV_STATE")))
-                   it))))
+;; (defun unwait-unblock-tasks (change-plist)
+;;   (when (string= "WAIT"
+;;                  (plist-get change-plist :from))
+;;     (-as-> (org-entry-get (point) "WAITING")
+;;            it
+;;            (split-string it ", ")
+;;            (mapcar (lambda (id)
+;;                      (save-excursion
+;;                        (org-id-goto id)
+;;                        (org-todo (org-entry-get (point) "WAIT_PREV_STATE"))
+;;                        (org-entry-delete (point) "WAIT_PREV_STATE")))
+;;                    it))))
 
-(add-hook 'org-trigger-hook
-          #'unwait-unblock-tasks)
+;; (add-hook 'org-trigger-hook
+;;           #'unwait-unblock-tasks)
 
 
 ;; (defvar bootstrap-version)

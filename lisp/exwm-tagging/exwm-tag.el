@@ -109,6 +109,8 @@
   ("K" (lambda () (interactive) (run-clementine-command "--volume-increase-by 25")))
   ("q" nil))
 
+(use-package pulseaudio-control)
+
 (defhydra volume-hydra (*root-map* "v")
   "volume up and down"
   ("j" (lambda () (interactive) (pulseaudio-control-decrease-volume)))

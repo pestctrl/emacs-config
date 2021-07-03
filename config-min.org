@@ -269,9 +269,24 @@
   (define-key ivy-minibuffer-map (kbd "C-<return>") 'ivy-done)
 
   ;; Scrollkeeper is helpful for scrolling up and down
-  (use-package scrollkeeper)
-  (global-set-key (kbd "C-v") 'scrollkeeper-down)
-  (global-set-key (kbd "M-v") 'scrollkeeper-up)
+  (defun window-third-height ()
+    (max 1 (/ (1- (window-height (selected-window))) 3)))
+
+  (defun scroll-up-third ()
+    (interactive)
+    (pulse-momentary-highlight-one-line (point))
+    (scroll-up (window-third-height)))
+
+  (defun scroll-down-third ()
+    (interactive)
+    (pulse-momentary-highlight-one-line (point))
+    (scroll-down (window-third-height)))
+
+  (global-set-key (kbd "C-v") 'scroll-up-third)
+  (global-set-key (kbd "M-v") 'scroll-down-third)
+  ;; (use-package scrollkeeper)
+  ;; (global-set-key (kbd "C-v") 'scrollkeeper-down)
+  ;; (global-set-key (kbd "M-v") 'scrollkeeper-up)
 
   ;; Word navigation
   (global-set-key (kbd "M-f") 'forward-to-word)

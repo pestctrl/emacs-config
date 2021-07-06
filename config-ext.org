@@ -470,7 +470,9 @@
 
     (when (null window-system)
       (define-key c++-mode-map (kbd "C-c .") nil)
-      (define-key c++-mode-map (kbd "C-c . .") #'c-set-style))
+      (define-key c++-mode-map (kbd "C-c . .") #'c-set-style)
+      (define-key org-mode-map (kbd "C-c .") nil)
+      (define-key org-mode-map (kbd "C-c . .") #'org-time-stamp))
 
     ;; Provide my own projectile-compile-project which uses
     ;; cca/projectile-compilation-dir instead of projectile-compilation-dir.

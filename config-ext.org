@@ -582,6 +582,19 @@
     :init
     (add-to-list 'auto-mode-alist '("\\.js$" . js2-mode)))
 #+end_src
+** line-numbers
+#+begin_src emacs-lisp
+  (defun toggle-line-numbers ()
+    (interactive)
+    (if (not display-line-numbers-mode)
+        (display-line-numbers-mode 1)
+      (display-line-numbers-mode -1)
+      (setq display-line-numbers-type
+            (if (eq display-line-numbers-type t)
+                'relative
+              t))
+      (display-line-numbers-mode 1)))
+#+end_src
 * colorful compilation buffer
 #+begin_src emacs-lisp
   (require 'ansi-color)

@@ -24,6 +24,7 @@
 
 ;;; Code:
 (require 'org-agenda)
+(require 'org-get-time)
 (require 'my-org-agenda-files)
 (require 'my-org-agenda-misc)
 (require 'my-org-tags)

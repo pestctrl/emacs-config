@@ -190,6 +190,9 @@ With a universal argument, prompt to specify which key."
   (add-hook 'git-auto-commit-mode-hook
             #'keychain-refresh-environment)
 
+  (add-to-list 'safe-local-variable-values
+               '(gac-automatically-push-p . t))
+
   (defun gac-commit-message (filename)
     (format "Desktop autocommit: %s\n\n%s"
             (format-time-string "%Y/%m/%d %H:%M:%S")

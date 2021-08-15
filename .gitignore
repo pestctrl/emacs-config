@@ -47,3 +47,7 @@ custom.el
 /elpy
 /emms
 /lisp/work-config/secrets
+/org-roam.db
+/emojis
+/eln-cache
+/straight

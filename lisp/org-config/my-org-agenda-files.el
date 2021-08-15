@@ -24,7 +24,15 @@
 
 ;;; Code:
 (ec/load-or-ask-file 'my/org-folder "Where's the org root directory? ")
-(defconst my/agenda-folder (expand-file-name "agenda" my/org-folder))
+(ec/load-or-ask-pred 'my/separate-org-agenda-folder "Is the agenda folder separate? ")
+
+(when my/separate-org-agenda-folder
+  (ec/load-or-ask-file 'my/org-agenda-folder "Where's the org agenda directory? "))
+
+(defconst my/agenda-folder
+  (if my/separate-org-agenda-folder
+      my/org-agenda-folder
+    (expand-file-name "agenda" my/org-folder)))
 
 (defun my/org-file (str)
   (expand-file-name str my/org-folder))

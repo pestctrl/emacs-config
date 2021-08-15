@@ -1,9 +1,10 @@
 (defmacro exwm-global-set-key (keybinding function)
   `(progn
-     (use-package exwm
+     (use-exwm
        :config
-       (add-to-list 'exwm-input-global-keys
-                    (cons ,keybinding ,function)))
+       (with-eval-after-load "exwm"
+         (add-to-list 'exwm-input-global-keys
+                      (cons ,keybinding ,function))))
      (global-set-key ,keybinding ,function)))
 
 (exwm-global-set-key (kbd "M-T") 'flop-frame)
@@ -17,9 +18,10 @@
                     'my/keymap-key-key
                     "What would you like *root-map* to be bound to?")
 
-(use-package exwm
+(use-exwm
   :config
-  (add-to-list 'exwm-input-prefix-keys my/keymap-key-key))
+  (with-eval-after-load "exwm"
+    (add-to-list 'exwm-input-prefix-keys my/keymap-key-key)))
 
 ;; Disable C-t for all others
 (with-eval-after-load "dired"

@@ -11,4 +11,7 @@
 (require 'cl)
 (require 'subr-x)
 
+;; This is helpful, for exwm-related loading
+(require 'use-exwm)
+
 (provide 'libs)

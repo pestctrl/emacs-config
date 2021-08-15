@@ -1,7 +1,7 @@
 (add-to-list 'default-frame-alist '(width  . 200))
 (add-to-list 'default-frame-alist '(height . 60))
 
-(setq package-list '(org use-package exwm))
+(setq package-list '(org use-package))
 ;; list the repositories containing them
 (setq package-archives '(("melpa" . "http://melpa.org/packages/")
                          ("org" . "https://orgmode.org/elpa/")
@@ -63,6 +63,8 @@
     'face-new-frame-defaults 'face--new-frame-defaults
     "28.1"))
 
+(ec/load-or-ask-pred 'my/load-full-config "Do you want to load full config for emacs?")
+
 ;; It is imperative that this be loaded for a nice emacs
 ;; experience. Only SUPER stable stuff goes in this file, and should
 ;; rarely be modified
@@ -70,28 +72,32 @@
  (expand-file-name "config-min.org"
                    user-emacs-directory))
 
-;; Load additional exwm stuff that changes constantly
-(when my/enable-exwm
-  (use-package exwm
-    :config
-    (org-babel-load-file
-     (expand-file-name "config-exwm.org"
-                       user-emacs-directory))))
+(when my/load-full-config
 
-(org-babel-load-file
- (expand-file-name "config-ext.org"
-                   user-emacs-directory))
+  ;; Load additional exwm stuff that changes constantly
+  (use-exwm
+   :config
+   (org-babel-load-file
+    (expand-file-name "config-exwm.org"
+                      user-emacs-directory)))
 
-;; Load work stuff when at work.
-(if my/at-ti
-    (require 'work-config)
   (org-babel-load-file
-   (expand-file-name "config-org.org"
-                     user-emacs-directory)))
+   (expand-file-name "config-ext.org"
+                     user-emacs-directory))
 
-(org-babel-load-file
- (expand-file-name "my-redefs.org"
-                   user-emacs-directory))
+  ;; Load work stuff when at work.
+  (if my/at-ti
+      (require 'work-config)
+    (org-babel-load-file
+     (expand-file-name "config-org.org"
+                       user-emacs-directory)))
+
+  (org-babel-load-file
+   (expand-file-name "my-redefs.org"
+                     user-emacs-directory))
+
+  (when my/enable-exwm
+    (require 'exwm)))
 
 (setq my/finished t)
 ;; Testing pull from windows

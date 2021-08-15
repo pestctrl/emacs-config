@@ -172,7 +172,7 @@
            (op/refile-to-point (buffer-file-name) location)))))))
 
 
-(use-package exwm
+(use-exwm
   :config
   (require 'fireorg)
 

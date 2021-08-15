@@ -264,7 +264,7 @@
       (interactive)
       (find-file (notmuch-show-get-filename))))
 
-  (use-package exwm
+  (use-exwm
     :config
     (defvar offlineimap-timer nil)
     (defvar offlineimap-process nil)
@@ -871,7 +871,7 @@
 
   (exwm-global-set-key (kbd "s-s") #'toggle-audio-output)
 
-  (use-package exwm
+  (use-exwm
     :config
     (add-hook 'exwm-init-hook #'setup-headphone-stuff))
 #+end_src

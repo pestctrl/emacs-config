@@ -564,7 +564,7 @@
     ;;               #'dont-copy-faces-for-x-show-tip))
     )
 
-  (use-package exwm
+  (use-exwm
     :config
     (setq org-noter-always-create-frame nil))
 #+end_src

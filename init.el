@@ -64,6 +64,7 @@
     "28.1"))
 
 (ec/load-or-ask-pred 'my/load-full-config "Do you want to load full config for emacs?")
+(ec/load-or-ask-pred 'my/load-org-config "Do you want to load org config?")
 
 ;; It is imperative that this be loaded for a nice emacs
 ;; experience. Only SUPER stable stuff goes in this file, and should
@@ -86,8 +87,10 @@
                      user-emacs-directory))
 
   ;; Load work stuff when at work.
-  (if my/at-ti
-      (require 'work-config)
+  (when my/at-ti
+    (require 'work-config))
+
+  (when (and (not my/at-ti) my/load-org-config)
     (org-babel-load-file
      (expand-file-name "config-org.org"
                        user-emacs-directory)))

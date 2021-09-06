@@ -69,9 +69,15 @@
                            (funcall tab-bar-tabs-function)
                            ", "))))
 
+(defun my/show-tab-bar ()
+  (interactive)
+  (setq tab-bar-show (not tab-bar-show))
+  (tab-bar-mode tab-bar-show))
+
 (define-prefix-command '*tab-map*)
 
 (define-key *root-map* (kbd "b") #'switch-or-create-tab)
+(define-key *root-map* (kbd "B") #'my/show-tab-bar)
 (define-key *root-map* (kbd "R") #'tab-bar-rename-tab)
 (define-key *root-map* (kbd "q") #'close-tab-switch)
 (define-key *root-map* (kbd "T") #'tab-bar-report)

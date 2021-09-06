@@ -51,3 +51,4 @@ custom.el
 /emojis
 /eln-cache
 /straight
+/session.*

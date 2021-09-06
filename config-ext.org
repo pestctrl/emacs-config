@@ -28,6 +28,8 @@
   (use-package ledger-mode
     :mode "\\.dat\\'"
     :config
+    (setq ledger-narrow-on-reconcile nil)
+
     (setq ledger-reports
           `(("account" "%(binary) -f %(ledger-file) reg %(account)")
             ("bal" "%(binary) -f %(ledger-file) bal")

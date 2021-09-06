@@ -23,16 +23,18 @@
 ;;; Commentary:
 
 ;;; Code:
-(ec/load-or-ask-file 'my/org-folder "Where's the org root directory? ")
-(ec/load-or-ask-pred 'my/separate-org-agenda-folder "Is the agenda folder separate? ")
+(ec/load-or-ask-file 'my/plaintext-folder "Where's the MEGASync plaintext directory? ")
+(ec/load-or-ask-pred 'my/is-org-migration-folder "Is there a migration (source controlled) plaintext directory? ")
 
 (when my/separate-org-agenda-folder
-  (ec/load-or-ask-file 'my/org-agenda-folder "Where's the org agenda directory? "))
+  (ec/load-or-ask-file 'my/org-migration-folder "Where's the migration directory? "))
+
+(defconst my/org-folder (expand-file-name "org" my/plaintext-folder))
 
 (defconst my/agenda-folder
-  (if my/separate-org-agenda-folder
-      my/org-agenda-folder
-    (expand-file-name "agenda" my/org-folder)))
+  (or (and my/is-org-migration-folder
+           (expand-file-name "org/agenda" my/org-migration-folder))
+      (expand-file-name "org/" my/org-folder)))
 
 (defun my/org-file (str)
   (expand-file-name str my/org-folder))

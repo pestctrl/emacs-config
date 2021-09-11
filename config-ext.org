@@ -453,7 +453,6 @@
 ** Projectile
 #+begin_src emacs-lisp
   (use-package projectile
-    :defer 5
     :commands projectile-command-map
     :init   (progn
               (setq projectile-enable-caching nil)

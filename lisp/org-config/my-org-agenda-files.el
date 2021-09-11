@@ -26,10 +26,11 @@
 (ec/load-or-ask-file 'my/plaintext-folder "Where's the MEGASync plaintext directory? ")
 (ec/load-or-ask-pred 'my/is-org-migration-folder "Is there a migration (source controlled) plaintext directory? ")
 
-(when my/separate-org-agenda-folder
-  (ec/load-or-ask-file 'my/org-migration-folder "Where's the migration directory? "))
+(when my/is-org-migration-folder
+  (ec/load-or-ask-file 'my/plaintext-migration-folder "Where's the migration directory? "))
 
 (defconst my/org-folder (expand-file-name "org" my/plaintext-folder))
+(defconst my/org-migration-folder (expand-file-name "org" my/plaintext-migration-folder))
 
 (defconst my/agenda-folder
   (or (and my/is-org-migration-folder
@@ -37,9 +38,16 @@
       (expand-file-name "org/" my/org-folder)))
 
 (defun my/org-file (str)
-  (expand-file-name str my/org-folder))
+  (let (result)
+    (setq result (expand-file-name str my/org-folder))
+    (when my/is-org-migration-folder
+      (let ((folder (expand-file-name str my/org-migration-folder)))
+        (when (file-exists-p folder)
+          (setq result folder))))
+    result))
+
 (defun my/agenda-file (str)
-  (expand-file-name str my/agenda-folder))
+  (my/org-file (concat (file-name-as-directory "agenda") str)))
 
 (defconst my/non-agenda-files
   `(,(my/org-file "entries/reviews.gpg") 
@@ -50,6 +58,12 @@
 (defconst my/all-agenda-files
   (cons (my/agenda-file "eternal.org")
         org-agenda-files))
+
+(setq org-agenda-files
+      `(,(my/agenda-file "plan.org")
+        ,(my/agenda-file "refile.org")
+        ,(my/agenda-file "sandbox.org")
+        ,(my/agenda-file "dev.org")))
 
 (provide 'my-org-agenda-files)
 ;;; my-org-agenda-files.el ends here

@@ -126,6 +126,10 @@
     (let ((default-directory (file-name-directory (buffer-file-name buffer))))
       (magit-push-current-to-pushremote nil)))
 
+  (defun gac-use-magit-fetch ()
+    (let ((default-directory (file-name-directory (buffer-file-name (current-buffer)))))
+      (magit-fetch-all nil)))
+
   (advice-add #'gac-push :override #'gac-use-magit-push)
 
   (defvar rb/ssh-default-key "~/.ssh/id_rsa"
@@ -189,6 +193,9 @@ With a universal argument, prompt to specify which key."
 
   (add-hook 'git-auto-commit-mode-hook
             #'keychain-refresh-environment)
+
+  (add-hook 'git-auto-commit-mode-hook
+            #'gac-use-magit-fetch)
 
   (add-to-list 'safe-local-variable-values
                '(gac-automatically-push-p . t))

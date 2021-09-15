@@ -80,5 +80,15 @@
 		 (progn
 		   (c-set-style "llvm.org"))))))
 
+(define-key *root-map* (kbd "u")
+  (lambda ()
+    (interactive)
+    (insert comment-start)
+    (just-one-space)
+    (insert "BENSON_UPDATE_THIS: ")
+    (save-excursion
+      (insert comment-end)
+      (indent-for-comment))))
+
 (provide 'work-config)
 ;;; work-config.el ends here

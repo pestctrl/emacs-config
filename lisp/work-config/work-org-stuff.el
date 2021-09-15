@@ -138,6 +138,8 @@
 (setq org-outline-path-complete-in-steps nil)
 (setq org-refile-use-outline-path t)
 
+(setq org-refile-targets `((nil :maxlevel . 9)))
+
 ;; (defun wait-mark-blocking-tasks (change-plist)
 ;;   (when (string= "WAIT"
 ;;                  (plist-get change-plist :to))

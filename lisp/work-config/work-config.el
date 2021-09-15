@@ -68,6 +68,10 @@
 (add-to-list 'auto-mode-alist
              '("\\.dsls$" . json-mode))
 
+(add-to-list 'auto-mode-alist '("\\.test" . tcl-mode))
+
+(add-to-list 'auto-mode-alist '("\\.gel" . c-mode))
+
 (pop c-mode-common-hook)
 (add-hook 'c-mode-common-hook
 	  (function

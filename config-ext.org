@@ -595,6 +595,15 @@
               t))
       (display-line-numbers-mode 1)))
 #+end_src
+** Comment keys
+#+begin_src emacs-lisp
+  (define-prefix-command '*comment-map*)
+
+  (define-key *comment-map* (kbd "/") #'comment-region)
+  (define-key *comment-map* (kbd "\\") #'uncomment-region)
+
+  (define-key *root-map* (kbd "/") '*comment-map*)
+#+end_src
 * colorful compilation buffer
 #+begin_src emacs-lisp
   (require 'ansi-color)

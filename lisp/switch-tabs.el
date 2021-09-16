@@ -28,16 +28,19 @@
       tab-bar-close-tab-select 'recent
       tab-bar-close-button-show nil)
 
+(defun my/read-tab-name ()
+  (let ((current-tab (alist-get 'name (tab-bar--current-tab))))
+    (->> (tab-bar--tabs-recent)
+      (mapcar #'(lambda (tab)
+                  (alist-get 'name tab)))
+      (remove-if #'(lambda (tab-name)
+                     (string= tab-name current-tab)))
+      (ido-completing-read (format "Switch to tab (%s): "
+                                   current-tab)))))
+
 (defun switch-or-create-tab (tab-name)
   (interactive
-   (list (let ((current-tab (alist-get 'name (tab-bar--current-tab))))
-           (->> (tab-bar--tabs-recent)
-                (mapcar #'(lambda (tab)
-                            (alist-get 'name tab)))
-                (remove-if #'(lambda (tab-name)
-                               (string= tab-name current-tab)))
-                (ido-completing-read (format "Switch to tab (%s): "
-                                             current-tab))))))
+   (list (my/read-tab-name)))
   (let ((tab-index (tab-bar--tab-index-by-name tab-name)))
     (if tab-index
         (tab-bar-select-tab (1+ tab-index))
@@ -74,6 +77,25 @@
   (setq tab-bar-show (not tab-bar-show))
   (tab-bar-mode tab-bar-show))
 
+(defun my/get-free-tab-name ()
+  (let (result)
+    (while (not result)
+      (let ((name (int-to-string (+ 10000000000 (random 10000000000)))))
+        (unless (tab-bar--tab-index-by-name name)
+          (setq result name))))
+    result))
+
+(defun my/tab-bar-swap-tabs ()
+  (interactive)
+  (let ((current-tab (alist-get 'name (tab-bar--current-tab)))
+        (switch-tab (my/read-tab-name))
+        (temp-name (my/get-free-tab-name)))
+    (tab-bar-rename-tab temp-name)
+    (switch-or-create-tab switch-tab)
+    (tab-bar-rename-tab current-tab)
+    (switch-or-create-tab temp-name)
+    (tab-bar-rename-tab switch-tab)))
+
 (define-prefix-command '*tab-map*)
 
 (define-key *root-map* (kbd "b") #'switch-or-create-tab)
@@ -87,6 +109,7 @@
 (define-key *tab-map* (kbd "l") (lambda () (interactive) (tab-bar-move-tab 1)))
 
 (define-key *tab-map* (kbd "n") #'tab-bar-switch-to-next-tab)
+(define-key *tab-map* (kbd "s") #'my/tab-bar-swap-tabs)
 (define-key *tab-map* (kbd "p") #'tab-bar-switch-to-prev-tab)
 (define-key *tab-map* (kbd "t") #'last-tab)
 

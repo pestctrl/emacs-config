@@ -30,10 +30,10 @@
   (ec/load-or-ask-file 'my/plaintext-migration-folder "Where's the migration directory? "))
 
 (defconst my/org-folder (expand-file-name "org" my/plaintext-folder))
-(defconst my/org-migration-folder (expand-file-name "org" my/plaintext-migration-folder))
+(defconst my/org-migration-folder (and my/is-org-migration-folder (expand-file-name "org" my/plaintext-migration-folder)))
 
 (defconst my/agenda-folder
-  (or (and my/is-org-migration-folder
+  (or (and my/org-migration-folder
            (expand-file-name "org/agenda" my/org-migration-folder))
       (expand-file-name "org/" my/org-folder)))
 

@@ -156,7 +156,7 @@
                  :keys "o"
                  :file ,(my/org-file "entries/reviews.gpg")
                  :template-file ,(my/org-file "templates/reorient.org"))))
-              ("Money" :keys "m"
+              ("Finance" :keys "f"
                :icon ,(all-the-icons-material "attach_money" :face 'all-the-icons-lgreen)
                :children
                (("Credit Card"
@@ -168,7 +168,11 @@
                 ("General" :keys "g"
                  :unnarrowed t :empty-lines 1 :type plain
                  :file ,(my/org-file "entries/finances/ledger.ledger")
-                 :template-file ,(my/org-file "templates/basic.ledger"))))
+                 :template-file ,(my/org-file "templates/basic.ledger"))
+                ("Reconciliation" :keys "r"
+                 :file ,(my/org-file "entries/reviews.gpg")
+                 :olp ("Reviews")
+                 :template-file ,(my/org-file "templates/fin-recon.org"))))
               ("Record Comms Message"
                :file ,(my/agenda-file "datetree.org")
                :keys "C"

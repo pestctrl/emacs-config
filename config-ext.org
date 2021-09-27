@@ -36,7 +36,7 @@
             ("reg" "%(binary) -f %(ledger-file) reg")
             ("equity" "%(binary) -f %(ledger-file) bal ^Exp ^RE ^Rev")
             ("uncleared" "%(binary) -f %(ledger-file) reg --uncleared --limit=\"payee!='Texas Instruments Income'\"")
-            ("last-superfluous" "%(binary) -f %(ledger-file) bal --limit='account =~ /^Exp:(Food|Luxury|NewTech|People)/ && date >= [last month]'")
+            ("last-superfluous" "%(binary) -f %(ledger-file) bal --limit='account =~ /^Exp:(Food|Luxury|NewTech|People)/ && date >= [this month]'")
             ("superfluous" "%(binary) -f %(ledger-file) reg --limit='account =~ /^Exp:(Food|Luxury|NewTech|People)/'")
             ("recurring" "%(binary) -f %(ledger-file) reg --limit='has_tag(\"RECURRING\")' ^Exp")
             ("expmonth" "%(binary) -f %(ledger-file) -M reg Expenses")

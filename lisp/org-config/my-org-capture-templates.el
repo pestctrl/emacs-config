@@ -118,6 +118,13 @@
     (find-file (my/org-file (format "journals/%s" journal)))
     (outline-next-heading)))
 
+(defun my/rent-next-month ()
+  (if (<= 15 (ts-day (ts-now)))
+      (format-time-string "%B"
+                          (time-convert (time-add (current-time)
+                                                  (days-to-time 16))))
+    (format-time-string "%B")))
+
 (setq org-capture-templates
       (doct `(("Tasks" :keys "t" :children
                (("New Refile Task"
@@ -172,7 +179,12 @@
                 ("Reconciliation" :keys "r"
                  :file ,(my/org-file "entries/reviews.gpg")
                  :olp ("Reviews")
-                 :template-file ,(my/org-file "templates/fin-recon.org"))))
+                 :template-file ,(my/org-file "templates/fin-recon.org"))
+                ("Rent" :keys "R"
+                 :unnarrowed t :empty-lines 1 :type plain
+                 :function (lambda () (org-capture-put :month-rent (my/rent-next-month)) (end-of-buffer))
+                 :file ,(my/plaintext-file "ledger-finance/ledger.ledger")
+                 :template-file ,(my/org-file "templates/rent.ledger"))))
               ("Record Comms Message"
                :file ,(my/agenda-file "datetree.org")
                :keys "C"

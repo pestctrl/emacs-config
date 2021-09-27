@@ -153,8 +153,8 @@
     (setq notmuch-draft-tags '("+drafts"))
 
     (custom-set-faces
-     '(notmuch-tree-match-tree-face ((t (:family "DejaVu Sans Mono"))) t)
-     '(notmuch-tree-no-match-tree-face ((t (:family "DejaVu Sans Mono"))) t))
+     '(notmuch-tree-match-tree-face ((t (:family "Source Code Pro"))) t)
+     '(notmuch-tree-no-match-tree-face ((t (:family "Source Code Pro"))) t))
     (set-face-attribute 'notmuch-search-unread-face nil :foreground "white")
     (set-face-attribute 'notmuch-message-summary-face nil :background "steel blue" :foreground "snow")
     (add-to-list 'notmuch-search-line-faces

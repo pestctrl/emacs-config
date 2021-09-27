@@ -132,7 +132,7 @@
 
   (advice-add #'gac-push :override #'gac-use-magit-push)
 
-  (defvar rb/ssh-default-key "~/.ssh/id_rsa"
+  (defvar rb/ssh-default-key (format "~/.ssh/devices/%s/id_rsa" (system-name))
     "My default SSH key.")
 
   (defun rb/ssh-add (&optional arg)

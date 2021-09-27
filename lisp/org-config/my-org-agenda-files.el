@@ -23,11 +23,7 @@
 ;;; Commentary:
 
 ;;; Code:
-(ec/load-or-ask-file 'my/plaintext-folder "Where's the MEGASync plaintext directory? ")
-(ec/load-or-ask-pred 'my/is-org-migration-folder "Is there a migration (source controlled) plaintext directory? ")
-
-(when my/is-org-migration-folder
-  (ec/load-or-ask-file 'my/plaintext-migration-folder "Where's the migration directory? "))
+(require 'my-plaintext-files)
 
 (defconst my/org-folder (expand-file-name "org" my/plaintext-folder))
 (defconst my/org-migration-folder (and my/is-org-migration-folder (expand-file-name "org" my/plaintext-migration-folder)))
@@ -38,13 +34,7 @@
       (expand-file-name "org/" my/org-folder)))
 
 (defun my/org-file (str)
-  (let (result)
-    (setq result (expand-file-name str my/org-folder))
-    (when my/is-org-migration-folder
-      (let ((folder (expand-file-name str my/org-migration-folder)))
-        (when (file-exists-p folder)
-          (setq result folder))))
-    result))
+  (my/plaintext-file (concat (file-name-as-directory "org") str)))
 
 (defun my/agenda-file (str)
   (my/org-file (concat (file-name-as-directory "agenda") str)))

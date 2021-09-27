@@ -162,12 +162,12 @@
                (("Credit Card"
                  :keys "c"
                  :icon ,(all-the-icons-faicon "credit-card" :face 'all-the-icons-blue)
-                 :file ,(my/org-file "entries/finances/ledger.ledger")
+                 :file ,(my/plaintext-file "ledger-finance/ledger.ledger")
                  :unnarrowed t :empty-lines 1 :type plain
                  :template-file ,(my/org-file "templates/credit.ledger"))
                 ("General" :keys "g"
                  :unnarrowed t :empty-lines 1 :type plain
-                 :file ,(my/org-file "entries/finances/ledger.ledger")
+                 :file ,(my/plaintext-file "ledger-finance/ledger.ledger")
                  :template-file ,(my/org-file "templates/basic.ledger"))
                 ("Reconciliation" :keys "r"
                  :file ,(my/org-file "entries/reviews.gpg")

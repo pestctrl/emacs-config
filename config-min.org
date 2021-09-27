@@ -123,12 +123,15 @@
   ;;(set-face-attribute 'variable-pitch nil :font '(:family "ETBookOT"))
 
   ;; I like my unicode to be monospace too, so I use these
+  (set-face-attribute 'default nil  :family "RobotoMono" :weight 'normal)
   (set-fontset-font t 'unicode (font-spec :size 10 :name "FontAwesome"))
   (set-fontset-font t 'unicode (font-spec :name "SourceCodePro"))
-  ;; (set-fontset-font t 'unicode (font-spec :size 15 :name "DejaVu Sans Mono"))
-  ;; (set-fontset-font t 'japanese-jisx0208 (font-spec :size 10 :name "HanaMinA.ttf"))
-  ;; (set-fontset-font t 'korean-ksc5601 (font-spec :size 18 :name "Baekmuk Gulim"))
-  ;; (set-fontset-font t '(9472 . 9472) (font-spec :size 15 :name "DejaVu Sans Mono"))
+  ;; adobe-source-han-sans-otc-fonts
+  (set-fontset-font t 'han (font-spec :size 16 :name "Source Han Sans"))
+  ;; ttf-paratype
+  (set-fontset-font t 'cyrillic (font-spec :size 15 :name "PT Sans Expert"))
+  ;; extra/adobe-source-code-pro-fonts
+  (set-fontset-font t '(9472 . 9599) (font-spec :name "Source Code Pro"))
 
   (defun my/reading-color ()
     (interactive)

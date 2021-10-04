@@ -32,6 +32,7 @@
 
     (setq ledger-reports
           `(("account" "%(binary) -f %(ledger-file) reg %(account)")
+            ("credit card" "%(binary) -f %(ledger-file) reg %(account) --aux-date --sort -d")
             ("bal" "%(binary) -f %(ledger-file) bal")
             ("reg" "%(binary) -f %(ledger-file) reg")
             ("equity" "%(binary) -f %(ledger-file) bal ^Exp ^RE ^Rev")

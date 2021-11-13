@@ -26,7 +26,7 @@
 (require 'my-plaintext-files)
 
 (defconst my/org-folder (expand-file-name "org" my/plaintext-folder))
-(defconst my/org-migration-folder (and my/is-org-migration-folder (expand-file-name "org" my/plaintext-migration-folder)))
+(defconst my/org-migration-folder (and my/is-plaintext-migration-folder (expand-file-name "org" my/plaintext-migration-folder)))
 
 (defconst my/agenda-folder
   (or (and my/org-migration-folder
@@ -48,6 +48,13 @@
 (defconst my/all-agenda-files
   (cons (my/agenda-file "eternal.org")
         org-agenda-files))
+
+(setq my/all-agenda-files
+      (mapcar #'(lambda (x)
+                  (replace-regexp-in-string
+                   "/mnt/c/Users/Benson/Documents/MEGAsync/"
+                   (expand-file-name "~/") x))
+              my/all-agenda-files))
 
 (setq org-agenda-files
       `(,(my/agenda-file "plan.org")

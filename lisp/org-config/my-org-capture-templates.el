@@ -163,7 +163,7 @@
                  :keys "o"
                  :file ,(my/org-file "entries/reviews.gpg")
                  :template-file ,(my/org-file "templates/reorient.org"))))
-              ("Finance" :keys "f"
+              ("Finances" :keys "f"
                :icon ,(all-the-icons-material "attach_money" :face 'all-the-icons-lgreen)
                :children
                (("Credit Card"
@@ -179,7 +179,7 @@
                 ("Reconciliation" :keys "r"
                  :file ,(my/org-file "entries/reviews.gpg")
                  :olp ("Reviews")
-                 :template-file ,(my/org-file "templates/fin-recon.org"))
+                 :template-file ,(my/org-file "templates/finance-recon.org"))
                 ("Rent" :keys "R"
                  :unnarrowed t :empty-lines 1 :type plain
                  :function (lambda () (org-capture-put :month-rent (my/rent-next-month)) (end-of-buffer))
@@ -188,7 +188,7 @@
               ("Record Comms Message"
                :file ,(my/agenda-file "datetree.org")
                :keys "C"
-               :datetree t 
+               :datetree t
                :template "* TODO %?")
               ("Emacs config snippet" :keys "e"
                :file "~/.emacs.d/config-base.org"

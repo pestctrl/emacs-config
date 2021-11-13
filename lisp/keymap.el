@@ -28,6 +28,7 @@
   (define-key dired-mode-map my/keymap-key nil))
 
 (define-prefix-command '*root-map*)
+(define-key *root-map* (kbd my/keymap-key) (key-binding (kbd "C-t")))
 (exwm-global-set-key (kbd my/keymap-key) '*root-map*)
 
 (define-key *root-map* (kbd "C-n") 'switch-window)

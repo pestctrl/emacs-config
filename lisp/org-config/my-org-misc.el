@@ -197,6 +197,9 @@ With a universal argument, prompt to specify which key."
   (add-hook 'git-auto-commit-mode-hook
             #'gac-use-magit-fetch)
 
+  (add-hook 'git-auto-commit-mode-hook
+            #'gac-after-save-func t t)
+
   (add-to-list 'safe-local-variable-values
                '(gac-automatically-push-p . t))
 

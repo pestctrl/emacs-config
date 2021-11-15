@@ -192,13 +192,13 @@ With a universal argument, prompt to specify which key."
             #'rb/ssh-add)
 
   (add-hook 'git-auto-commit-mode-hook
-            #'keychain-refresh-environment)
-
-  (add-hook 'git-auto-commit-mode-hook
             #'gac-use-magit-fetch)
 
   (add-hook 'git-auto-commit-mode-hook
             #'gac-after-save-func t t)
+
+  (add-hook 'git-auto-commit-mode-hook
+            #'keychain-refresh-environment)
 
   (add-to-list 'safe-local-variable-values
                '(gac-automatically-push-p . t))

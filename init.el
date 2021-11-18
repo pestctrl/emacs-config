@@ -13,6 +13,10 @@
 ;; activate all the packages (in particular autoloads)
 (package-initialize)
 
+(when (<= emacs-major-version 26)
+  (setq gnutls-algorithm-priority
+	"NORMAL:-VERS-TLS1.3"))
+
 (when (not package-archive-contents)
   (package-refresh-contents))
 ;; fetch the list of packages available

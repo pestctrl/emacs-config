@@ -756,11 +756,12 @@
 #+begin_src emacs-lisp
   (require 'light-default-theme)
   (require 'dark-default-theme)
-  (use-package modus-operandi-theme)
 
   (defvar current-theme 'dark)
 
-  (defvar light-theme 'modus-operandi)
+  (when (>= emacs-major-version 27)
+    (use-package modus-operandi-theme)
+    (defvar light-theme 'modus-operandi))
   (defvar dark-theme 'calm-forest)
 
   (defun switch-themes ()

@@ -639,16 +639,17 @@
 #+end_src
 ** Youtube-dl
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/submodule/youtube-dl-emacs/")
-  (require 'youtube-dl)
+  (when (executable-find "youtube-dl")
+    (add-to-list 'load-path "~/.emacs.d/submodule/youtube-dl-emacs/")
+    (require 'youtube-dl)
 
-  (defun youtube-dl-song (url)
-    (interactive
-     (list (read-from-minibuffer
-            "URL: " (or (thing-at-point 'url)
-                        (when interprogram-paste-function
-                          (funcall interprogram-paste-function))))))
-    (async-shell-command (format "youtube-dl -x -f \"bestaudio[ext=m4a]\" \"%s\"; tageditor -s album=\"youtube-dl\" -f *.m4a" url)))
+    (defun youtube-dl-song (url)
+      (interactive
+       (list (read-from-minibuffer
+              "URL: " (or (thing-at-point 'url)
+                          (when interprogram-paste-function
+                            (funcall interprogram-paste-function))))))
+      (async-shell-command (format "youtube-dl -x -f \"bestaudio[ext=m4a]\" \"%s\"; tageditor -s album=\"youtube-dl\" -f *.m4a" url))))
 #+END_SRC
 ** set-default-directory
 #+begin_src emacs-lisp

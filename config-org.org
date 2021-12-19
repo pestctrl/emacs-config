@@ -445,7 +445,7 @@
 #+begin_src emacs-lisp
   (use-package notmuch
     :config
-    (require 'ol-notmuch))
+    (use-package ol-notmuch))
 #+end_src
 * remove inherited tags
 #+begin_src emacs-lisp

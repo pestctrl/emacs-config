@@ -632,7 +632,7 @@
 #+end_src
 * org-roam
 ** Roam itself
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp#
   (require 'org-ql)
   (defvar bootstrap-version)
   (let ((bootstrap-file
@@ -667,7 +667,7 @@
   (org-roam-mode t)
 #+end_src
 ** Deft
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp#
   (use-package el-patch
     :straight (:host github
                      :repo "raxod502/el-patch"

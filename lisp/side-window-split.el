@@ -34,10 +34,12 @@
         (win (display-buffer-in-side-window
               (or buffer (current-buffer))
               `((side . ,side)
-                (slot . ,slot)))))
+                (slot . ,slot)
+                (dedicated . t)
+                (window-parameters (no-delete-other-windows . t))))))
     (select-window win)
-    (set-window-dedicated-p win t)
-    (set-window-parameter win 'no-delete-other-windows t)
+    ;; (set-window-dedicated-p win t)
+    ;; (set-window-parameter win 'no-delete-other-windows t)
     (when size
       (window-resize win (- size (window-pixel-width)) t nil t))
     (select-window prev-win)))

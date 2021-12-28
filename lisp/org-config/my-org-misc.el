@@ -214,5 +214,10 @@ With a universal argument, prompt to specify which key."
   (setq gac-default-message
         #'gac-commit-message))
 
+(when (eq window-system 'x)
+  (define-key org-mode-map
+    (kbd "C-B")
+    #'(lambda () (interactive) (org-back-to-heading))))
+
 (provide 'my-org-misc)
 ;;; my-org-misc.el ends here

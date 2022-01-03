@@ -88,6 +88,10 @@
                :keys "c"
                :file ,(expand-file-name "refile.org" my/work-org-folder)
                :template "* %?")
+              ("Magit Save Branch"
+               :keys "B"
+               :file "/scratch/benson/old-git-branches.org"
+               :template "* %c")
               ("Logging"
                :icon ,(all-the-icons-material "laptop" :face 'all-the-icons-lblue)
                :keys "g" :children
@@ -347,6 +351,12 @@
 (use-package plantuml-mode)
 (setq org-plantuml-jar-path "/home/a0487752/bin/plantuml")
 
+(use-package gnuplot-mode)
+(use-package gnuplot)
+(add-to-list 'exec-path
+             "/scratch/benson/gnuplot-5.4.2/bin/bin")
+
+(setenv "GNUPLOT_DRIVER_DIR" "/scratch/benson/gnuplot-5.4.2/bin/libexec/gnuplot/5.4")
 
 (provide 'work-org-stuff)
 ;;; work-org-stuff.el ends here

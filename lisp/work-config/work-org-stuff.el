@@ -303,49 +303,49 @@
   "Only split with \"^$ *\""
   (declare (indent 1))
   (let ((buffer (nth 0 meta))
-	(eoe-indicator (nth 1 meta))
-	(remove-echo (nth 2 meta))
-	(full-body (nth 3 meta)))
+	    (eoe-indicator (nth 1 meta))
+	    (remove-echo (nth 2 meta))
+	    (full-body (nth 3 meta)))
     `(org-babel-comint-in-buffer ,buffer
        (let* ((string-buffer "")
-	      (comint-output-filter-functions
-	       (cons (lambda (text) (setq string-buffer (concat string-buffer text)))
-		     comint-output-filter-functions))
-	      dangling-text)
-	 ;; got located, and save dangling text
-	 (goto-char (process-mark (get-buffer-process (current-buffer))))
-	 (let ((start (point))
-	       (end (point-max)))
-	   (setq dangling-text (buffer-substring start end))
-	   (delete-region start end))
-	 ;; pass FULL-BODY to process
-	 ,@body
-	 ;; wait for end-of-evaluation indicator
-	 (while (progn
-		  (goto-char comint-last-input-end)
-		  (not (save-excursion
-			 (and (re-search-forward
-			       (regexp-quote ,eoe-indicator) nil t)
-			      (re-search-forward
-			       comint-prompt-regexp nil t)))))
-	   (accept-process-output (get-buffer-process (current-buffer)))
-	   ;; thought the following this would allow async
-	   ;; background running, but I was wrong...
-	   ;; (run-with-timer .5 .5 'accept-process-output
-	   ;; 		 (get-buffer-process (current-buffer)))
-	   )
-	 ;; replace cut dangling text
-	 (goto-char (process-mark (get-buffer-process (current-buffer))))
-	 (insert dangling-text)
+	          (comint-output-filter-functions
+	           (cons (lambda (text) (setq string-buffer (concat string-buffer text)))
+		             comint-output-filter-functions))
+	          dangling-text)
+	     ;; got located, and save dangling text
+	     (goto-char (process-mark (get-buffer-process (current-buffer))))
+	     (let ((start (point))
+	           (end (point-max)))
+	       (setq dangling-text (buffer-substring start end))
+	       (delete-region start end))
+	     ;; pass FULL-BODY to process
+	     ,@body
+	     ;; wait for end-of-evaluation indicator
+	     (while (progn
+		          (goto-char comint-last-input-end)
+		          (not (save-excursion
+			             (and (re-search-forward
+			                   (regexp-quote ,eoe-indicator) nil t)
+			                  (re-search-forward
+			                   comint-prompt-regexp nil t)))))
+	       (accept-process-output (get-buffer-process (current-buffer)))
+	       ;; thought the following this would allow async
+	       ;; background running, but I was wrong...
+	       ;; (run-with-timer .5 .5 'accept-process-output
+	       ;; 		 (get-buffer-process (current-buffer)))
+	       )
+	     ;; replace cut dangling text
+	     (goto-char (process-mark (get-buffer-process (current-buffer))))
+	     (insert dangling-text)
 
-	 ;; remove echo'd FULL-BODY from input
-	 (when (and ,remove-echo ,full-body
-		    (string-match
-		     (replace-regexp-in-string
-		      "\n" "[\r\n]+" (regexp-quote (or ,full-body "")))
-		     string-buffer))
-	   (setq string-buffer (substring string-buffer (match-end 0))))
-	 (split-string string-buffer "^$ *")))))
+	     ;; remove echo'd FULL-BODY from input
+	     (when (and ,remove-echo ,full-body
+		            (string-match
+		             (replace-regexp-in-string
+		              "\n" "[\r\n]+" (regexp-quote (or ,full-body "")))
+		             string-buffer))
+	       (setq string-buffer (substring string-buffer (match-end 0))))
+	     (split-string string-buffer "^$ *")))))
 
 (require 'ob-plantuml)
 (use-package plantuml-mode)

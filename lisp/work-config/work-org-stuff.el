@@ -358,5 +358,74 @@
 
 (setenv "GNUPLOT_DRIVER_DIR" "/scratch/benson/gnuplot-5.4.2/bin/libexec/gnuplot/5.4")
 
+(setq straight-vc-git-default-protocol 'ssh)
+
+(use-package org-roam
+  :after org
+  :custom
+  (org-roam-directory (expand-file-name "~/org/org-roam"))
+  (org-roam-use-completion-everywhere t)
+  :bind (("C-c n l" . org-roam-buffer-toggle)
+         ("C-c n f" . org-roam-node-find)
+         ("C-c n c" . org-roam-capture)
+         ("C-c n T" . org-roam-dailies-goto-today)
+         ("C-c n t" . org-roam-dailies-capture-today)
+         ("C-c n i" . org-roam-node-insert)
+         :map org-mode-map
+         ("C-M-i" . completion-at-point))
+  :config
+  (org-roam-db-autosync-enable)
+  (setq org-roam-capture-templates
+        '(("d" "default" plain "%?" :target
+           (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+           :unnarrowed t)))
+  (setq org-roam-dailies-directory "daily/")
+  (setq org-roam-dailies-capture-templates
+        '(("d" "Journal" entry "* %<%H:%M> %?"
+           :unnarrowed t
+           :target (file+head+olp "%<%Y-%m-%d>.org"
+                                  "#+title: %<%Y-%m-%d>\n#+filetags: %<:%Y:%B:>\n"
+                                  ("Journal")))
+          ("s" "Standup" plain "%?"
+           :unnarrowed t
+           :target (file+head+olp "%<%Y-%m-%d>.org"
+                                  "#+title: %<%Y-%m-%d>\n#+filetags: %<:%Y:%B:>\n"
+                                  ("Standup Notes for %u")))))
+
+  (defun my/org-roam-filter-by-tag (tag-name)
+    (lambda (node)
+      (member tag-name (org-roam-node-tags node))))
+
+  (defun my/org-roam-list-notes-by-tag (tag-name)
+    (mapcar #'org-roam-node-file
+            (seq-filter
+             (my/org-roam-filter-by-tag tag-name)
+             (org-roam-node-list))))
+
+  (defun my/org-roam-find-project ()
+    (interactive)
+    ;; Select a project file to open, creating it if necessary
+    (org-roam-node-find
+     nil
+     nil
+     (my/org-roam-filter-by-tag "Project")
+     :templates
+     '(("p" "project" plain ""
+        :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}: %^{Description}\n#+category: ${title}\n#+filetags: Project")
+        :unnarrowed t))))
+
+  (global-set-key (kbd "C-c n p") #'my/org-roam-find-project)
+
+  (setq org-roam-capture-templates
+        '(("d" "default" plain "%?" :target
+           (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+           :unnarrowed t)
+          ("j" "Journal" entry "* %<%H:%M> %?"
+           :unnarrowed t
+           :target
+           (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
+                          "#+title: ${title}\n"
+                          ("Journal" "%<%b %d, %Y>"))))))
+
 (provide 'work-org-stuff)
 ;;; work-org-stuff.el ends here

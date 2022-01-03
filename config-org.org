@@ -647,6 +647,8 @@
         (eval-print-last-sexp)))
     (load bootstrap-file nil 'nomessage))
 
+  (setq straight-vc-git-default-protocol 'ssh)
+
   (use-package org-roam
     :after org
     :straight (:host github :repo "jethrokuan/org-roam" :branch "master")

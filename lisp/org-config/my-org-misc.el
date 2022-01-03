@@ -216,7 +216,7 @@ With a universal argument, prompt to specify which key."
 
 (when (eq window-system 'x)
   (define-key org-mode-map
-    (kbd "C-B")
+    (kbd "C-S-b")
     #'(lambda () (interactive) (org-back-to-heading))))
 
 (provide 'my-org-misc)

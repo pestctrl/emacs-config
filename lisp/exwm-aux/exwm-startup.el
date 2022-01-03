@@ -34,13 +34,15 @@
     "nm-applet"
     "start-pulseaudio-x11;pactl upload-sample /usr/share/sounds/gnome/default/alerts/drip.ogg beep; pactl load-module module-x11-bell sample=beep; xset b 100"
     "kdeconnect-indicator"
+    "qtox"
     ))
 
 (defun call-startup-programs ()
-  (dolist (program exwm-startup-programs)
-    (if (listp program)
-        (start-process-shell-command (car program) nil (cadr program))
-      (start-process-shell-command (file-name-nondirectory program) nil program))))
+  (when (y-or-n-p "Run startup programs? ")
+    (dolist (program exwm-startup-programs)
+      (if (listp program)
+          (start-process-shell-command (car program) nil (cadr program))
+        (start-process-shell-command (file-name-nondirectory program) nil program)))))
 
 (add-to-list 'exwm-manage-configurations
              '((equal exwm-class-name "MEGAsync")

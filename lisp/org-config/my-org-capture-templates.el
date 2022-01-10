@@ -228,11 +228,11 @@
                  :template-file ,(my/org-file "templates/evening-routine.org"))))
               ("Protocol"
                :keys "p"
-               :file ,(my/agenda-file "refile.org")
+               :file ,(my/agenda-file "incoming.org")
                :template "* STUFF %^{Title}\n:PROPERTIES:\n:CREATED: %U\n:URL: %:link\n:END:\n#+begin_example\n%i\n#+end_example\n%?")
               ("Protocol Link"
                :keys "L"
-               :file ,(my/agenda-file "refile.org")
+               :file ,(my/agenda-file "incoming.org")
                :before-finalize my/org-board-prompt
                :template "* STUFF %? [[%:link][%:description]]\n:PROPERTIES:\n:CREATED: %U\n:URL: %:link\n:END:")
               ("Add to lists conveniently" :keys "l" :children

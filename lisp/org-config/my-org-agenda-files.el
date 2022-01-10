@@ -52,9 +52,13 @@
 (setq my/all-agenda-files
       (mapcar #'(lambda (x)
                   (replace-regexp-in-string
-                   "/mnt/c/Users/Benson/Documents/MEGAsync/"
+                   "/home/benson/MEGA/"
                    (expand-file-name "~/") x))
-              my/all-agenda-files))
+              (mapcar #'(lambda (x)
+                          (replace-regexp-in-string
+                           "/mnt/c/Users/Benson/Documents/MEGAsync/"
+                           (expand-file-name "~/") x))
+                      my/all-agenda-files)))
 
 (setq org-agenda-files
       `(,(my/agenda-file "plan.org")

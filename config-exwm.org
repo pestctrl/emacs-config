@@ -69,12 +69,12 @@
       ;; Startup programs
       (add-hook 'exwm-init-hook 'server-start)
 
+      (require 'exwm-screens)
+      (add-hook 'exwm-init-hook 'my/setup-screens)
+
       ;; Reminder: Hooks execute in order. Make sure megasync launches after systemtray is enabled
       (require 'exwm-startup)
       (add-hook 'exwm-init-hook 'call-startup-programs)
-
-      (require 'exwm-screens)
-      (add-hook 'exwm-init-hook 'my/setup-screens)
 
       (require 'exwm-systemtray)
       (exwm-systemtray-enable)

@@ -425,7 +425,26 @@
            :target
            (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
                           "#+title: ${title}\n"
-                          ("Journal" "%<%b %d, %Y>"))))))
+                          ("Journal" "%<%b %d, %Y>")))))
+
+  (defvar my/current-journal-cache nil)
+
+  (defun my/org-roam-journal-capture-current (arg)
+    (interactive "P")
+    (when (or (null my/current-journal-cache) arg)
+      (setq my/current-journal-cache
+            (org-roam-node-read nil (my/org-roam-filter-by-tag "Project"))))
+    (org-roam-capture-
+     :node my/current-journal-cache
+     :templates '(("d" "default" entry "* %<%H:%M> %?"
+                   :unnarrowed t
+                   :target
+                   (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
+                                  "#+title: ${title}\n"
+                                  ("Journal" "%<%b %d, %Y>"))))
+     :props '(:finalize find-file)))
+
+  (global-set-key (kbd "C-c n j") #'my/org-roam-journal-capture-current))
 
 (provide 'work-org-stuff)
 ;;; work-org-stuff.el ends here

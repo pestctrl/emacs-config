@@ -381,7 +381,7 @@
            :unnarrowed t)))
   (setq org-roam-dailies-directory "daily/")
   (setq org-roam-dailies-capture-templates
-        '(("d" "Journal" entry "* %<%H:%M> %?"
+        '(("j" "Journal" entry "* %<%H:%M> %?"
            :unnarrowed t
            :target (file+head+olp "%<%Y-%m-%d>.org"
                                   "#+title: %<%Y-%m-%d>\n#+filetags: %<:%Y:%B:>\n"

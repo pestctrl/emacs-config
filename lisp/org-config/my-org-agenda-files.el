@@ -45,6 +45,12 @@
     ,(my/agenda-file "reference.org") 
     ,(my/org-file "entries/journal.gpg")))
 
+(setq org-agenda-files
+      `(,(my/agenda-file "plan.org")
+        ,(my/agenda-file "refile.org")
+        ,(my/agenda-file "sandbox.org")
+        ,(my/agenda-file "dev.org")))
+
 (defconst my/all-agenda-files
   (cons (my/agenda-file "eternal.org")
         org-agenda-files))
@@ -59,12 +65,6 @@
                            "/mnt/c/Users/Benson/Documents/MEGAsync/"
                            (expand-file-name "~/") x))
                       my/all-agenda-files)))
-
-(setq org-agenda-files
-      `(,(my/agenda-file "plan.org")
-        ,(my/agenda-file "refile.org")
-        ,(my/agenda-file "sandbox.org")
-        ,(my/agenda-file "dev.org")))
 
 (provide 'my-org-agenda-files)
 ;;; my-org-agenda-files.el ends here

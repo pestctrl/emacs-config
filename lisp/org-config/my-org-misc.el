@@ -189,10 +189,10 @@ With a universal argument, prompt to specify which key."
               (lambda (&rest args) (message "Remember to ssh-add!")))
 
   (add-hook 'git-auto-commit-mode-hook
-            #'rb/ssh-add)
+            #'gac-use-magit-fetch)
 
   (add-hook 'git-auto-commit-mode-hook
-            #'gac-use-magit-fetch)
+            #'rb/ssh-add)
 
   (add-hook 'git-auto-commit-mode-hook
             #'gac-after-save-func t t)

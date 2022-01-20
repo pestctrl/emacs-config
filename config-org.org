@@ -655,7 +655,7 @@
     :custom
     (org-roam-directory (expand-file-name "org-roam" my/org-folder))
     (org-roam-use-completion-everywhere t)
-    :bind (("C-c n l" . org-roam-buffer-toggle)
+    :bind (("C-c n h" . org-roam-buffer-toggle)
            ("C-c n f" . org-roam-node-find)
            ("C-c n T" . org-roam-dailies-goto-today)
            ("C-c n t" . org-roam-dailies-capture-today)
@@ -684,7 +684,9 @@
             ;;  :target (file+head+olp "%<%Y-%m-%d>.org"
             ;;                         "#+title: %<%Y-%m-%d>\n#+filetags: %<:%Y:%B:>\n"
             ;;                         ("Most Important Thing(s)")))
-            )))
+            ))
+    (require 'my-org-roam-logger)
+    (global-set-key (kbd "C-c n l") #'my/org-roam-logger-capture-current))
 
   ;; (require 'org-roam-protocol)
 #+end_src

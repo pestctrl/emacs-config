@@ -392,15 +392,18 @@
                                   "#+title: %<%Y-%m-%d>\n#+filetags: %<:%Y:%B:>\n"
                                   ("Standup Notes for %u")))))
 
-  (defun my/org-roam-filter-by-tag (tag-name)
-    (lambda (node)
-      (member tag-name (org-roam-node-tags node))))
+  (setq org-roam-capture-templates
+        '(("d" "default" plain "%?" :target
+           (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+           :unnarrowed t)
+          ("j" "Journal" entry "* %<%H:%M> %?"
+           :unnarrowed t
+           :target
+           (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
+                          "#+title: ${title}\n"
+                          ("Journal" "%<%b %d, %Y>")))))
 
-  (defun my/org-roam-list-notes-by-tag (tag-name)
-    (mapcar #'org-roam-node-file
-            (seq-filter
-             (my/org-roam-filter-by-tag tag-name)
-             (org-roam-node-list))))
+  (require 'org-roam-util)
 
   (defun my/org-roam-find-project ()
     (interactive)
@@ -416,35 +419,10 @@
 
   (global-set-key (kbd "C-c n p") #'my/org-roam-find-project)
 
-  (setq org-roam-capture-templates
-        '(("d" "default" plain "%?" :target
-           (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
-           :unnarrowed t)
-          ("j" "Journal" entry "* %<%H:%M> %?"
-           :unnarrowed t
-           :target
-           (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
-                          "#+title: ${title}\n"
-                          ("Journal" "%<%b %d, %Y>")))))
+  (require 'my-org-roam-logger)
 
-  (defvar my/current-journal-cache nil)
-
-  (defun my/org-roam-journal-capture-current (arg)
-    (interactive "P")
-    (when (or (null my/current-journal-cache) arg)
-      (setq my/current-journal-cache
-            (org-roam-node-read nil (my/org-roam-filter-by-tag "Project"))))
-    (org-roam-capture-
-     :node my/current-journal-cache
-     :templates '(("d" "default" entry "* %<%H:%M> %?"
-                   :unnarrowed t
-                   :target
-                   (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
-                                  "#+title: ${title}\n"
-                                  ("Journal" "%<%b %d, %Y>"))))
-     :props '(:finalize find-file)))
-
-  (global-set-key (kbd "C-c n j") #'my/org-roam-journal-capture-current))
+  (setq my/org-roam-logger-filter-fun (my/org-roam-filter-by-tag "Project"))
+  (global-set-key (kbd "C-c n j") #'my/org-roam-logger-capture-current))
 
 (provide 'work-org-stuff)
 ;;; work-org-stuff.el ends here

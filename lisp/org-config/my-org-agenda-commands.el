@@ -111,6 +111,8 @@
   (and (opr/type-of-project)
        (opr/type-of-task)))
 
+(require 'org-dev-level)
+
 (setq org-agenda-custom-commands
       `(("d" ,(format "%s\tDev" (all-the-icons-faicon "code" :face 'all-the-icons-lcyan :v-adjust 0.1))
          ((org-ql-block '(and (tags "dev")
@@ -118,7 +120,6 @@
                         ((org-ql-block-header "Refile tasks")))
           (org-ql-block '(and (tags "dev")
                               (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
-                              (my/top-level)
                               (property "DELAYED")
                               (org-time< (property "DELAYED") (org-matcher-time "<now>")))
                         ((org-ql-block-header "Previously Delayed")))
@@ -134,11 +135,29 @@
           (org-ql-block '(and (tags "dev")
                               (todo "NEXT"))
                         ((org-ql-block-header "Things to do")))
+          (org-ql-block '(and (tags "pinned")
+                              (eq (opr/get-type) 'project))
+                        ((org-ql-block-header "Pinned Projects")
+                         (org-ql-indent-levels t)
+                         (org-use-tag-inheritance nil)))
           (agenda ""
                   ((org-agenda-tag-filter-preset (quote ("+dev")))
-                   (org-super-agenda-groups '((:name "The Plan" :tag "PLAN")
+                   (org-agenda-skip-function (lambda ()
+                                               (when (or (when-let (delayed (org-entry-get (point) "DELAYED"))
+                                                           (org-time< (org-matcher-time "<now>") delayed))
+                                                         (not (odl/part-of-current-level-p)))
+                                                 (outline-next-heading))))
+                   (org-super-agenda-groups '((:name "Delayed" :pred
+                                                     ((lambda (item)
+                                                        (when-let (marker (or (get-text-property 0 'org-marker item)
+                                                                              (get-text-property 0 'org-hd-marker item)))
+                                                          (with-current-buffer (marker-buffer marker)
+                                                            (goto-char marker)
+                                                            (and ;; (not (string-match-p "SCHEDULED" item))
+                                                                 (org-entry-get (point) "DELAYED")))))))
+                                              (:name "The Plan" :and (:tag "PLAN" :log nil))
                                               (:name "Overdue" :and (:deadline past :log nil))
-                                              (:name "Upcoming" :and (:not (:scheduled today) :deadline future))
+                                              (:name "Upcoming" :and (:deadline future :not (:todo "DONE")))
                                               (:name "Should do" :and (:scheduled past :log nil))
                                               (:name "Today" :time-grid t
                                                      :and (:not (:and (:not (:scheduled today)
@@ -156,7 +175,8 @@
           (my/org-ql-active-projects "dev"
                                      ((org-ql-block-header "Active Projects")
                                       (org-ql-indent-levels t)))
-          (org-ql-block '(tags "pinned")
+          (org-ql-block '(and (tags "pinned")
+                              (eq (opr/get-type) 'project))
                         ((org-ql-block-header "Pinned Projects")
                          (org-ql-indent-levels t)
                          (org-use-tag-inheritance nil)))
@@ -182,6 +202,16 @@
                                               (:name "Today" :time-grid t
                                                      :and (:not (:and (:not (:scheduled today)
                                                                             :not (:deadline today))))))))))
+         ((org-agenda-start-with-log-mode '(closed))))
+        ("t" "\tTest"
+         ((agenda ""
+                  ((org-agenda-tag-filter-preset (quote ("+dev")))
+                   (org-agenda-skip-function (lambda ()
+                                               (when (or (when-let (delayed (org-entry-get (point) "DELAYED"))
+                                                           (org-time< (org-matcher-time "<now>") delayed))
+                                                         (member (org-get-todo-state) '("HOLD" "TICKLER")))
+                                                 (outline-next-heading))))
+                   (org-super-agenda-groups '((:name "Upcoming" :todo "TASK"))))))
          ((org-agenda-start-with-log-mode '(closed))))
         ("D" "\tdev-without-active"
          ((org-ql-block '(and (tags "dev")

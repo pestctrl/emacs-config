@@ -44,6 +44,11 @@
     (org-element-headline-parser
      (point)))))
 
+(defconst my/is-project-short-circuit
+  '((not (tags "short"))
+    (todo "TODO" "TASK" "ONE" "META" "META1" "EMPTY" "SEQ")
+    (my/top-level)))
+
 (defun my/get-project-stuck-displayables (element)
   (let ((marker (org-element-property :org-marker element)))
     (with-current-buffer (marker-buffer marker)
@@ -81,15 +86,14 @@
                                       (setf old-beg (point-min) old-end (point-max)
                                             narrow-p t)
                                       (narrow-to-region org-agenda-restrict-begin org-agenda-restrict-end)))))))
-      (let* ((org-todo-keywords-1 '("EMPTY" "ONE" "META" "META1" "TODO"))
+      (let* ((org-todo-keywords-1 '("EMPTY" "ONE" "META" "META1" "TODO" "TASK" "SEQ"))
              (items (mapcan #'my/get-project-stuck-displayables
                             (org-ql-select from
                               `(and ,@(when (and tag
                                                  (not (zerop (length tag))))
                                         `((tags ,tag)))
-                                    (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
-                                    (my/top-level)
-                                    (not (property "DELAYED"))
+                                    (odl/part-of-current-level-p)
+                                    ,@my/is-project-short-circuit
                                     (or (eq 'stuck (opr/type-of-task))
                                         (eq 'stuck (opr/type-of-project))))
                               :action 'element-with-markers
@@ -165,6 +169,8 @@
                         (setf display (append res display))))))
                 (reverse display)))))))
 
+(require 'org-dev-level)
+
 (defun my/org-ql-active-projects (tag)
   (let (narrow-p old-beg old-end)
     (let* ((from (or (pcase org-agenda-overriding-restriction
@@ -183,9 +189,8 @@
                             `(and ,@(when (and tag
                                                (not (zerop (length tag))))
                                       `((tags ,tag)))
-                                  (not (tags "short"))
-                                  (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
-                                  (my/top-level)
+                                  (odl/part-of-current-level-p)
+                                    ,@my/is-project-short-circuit
                                   (or (eq 'active (opr/type-of-task))
                                       (eq 'active (opr/type-of-project 'active))))
                             :action 'element-with-markers

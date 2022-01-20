@@ -153,7 +153,7 @@
         (path (org-get-outline-path t)))
     (org-set-tags (delete "sorting" (org-get-tags nil t)))
     (ols/children
-     (if (member "sorting" (org-get-tags))
+     (if (member "sorting" (org-get-tags (point) t))
          (let* ((heading (org-get-heading t t t t))
                 (index-of (string-match-p ":" heading))
                 (category (intern (substring heading 0 index-of))))

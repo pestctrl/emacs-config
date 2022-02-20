@@ -53,7 +53,7 @@
 
 (defun org-delay-until-next-week ()
   (interactive)
-  (let ((time (org-read-date nil nil "fri")))
+  (let ((time (org-read-date nil nil "fri 17:00")))
     (org-delay nil time)))
 
 (define-key org-mode-map (kbd "C-c <C-tab>") #'org-delay)

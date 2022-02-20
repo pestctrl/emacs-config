@@ -145,6 +145,7 @@
                    (org-agenda-skip-function (lambda ()
                                                (when (or (when-let (delayed (org-entry-get (point) "DELAYED"))
                                                            (org-time< (org-matcher-time "<now>") delayed))
+                                                         (opr/is-project)
                                                          (not (odl/part-of-current-level-p)))
                                                  (outline-next-heading))))
                    (org-super-agenda-groups '((:name "Delayed" :pred

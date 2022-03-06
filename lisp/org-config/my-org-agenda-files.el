@@ -40,10 +40,13 @@
   (my/org-file (concat (file-name-as-directory "agenda") str)))
 
 (defconst my/non-agenda-files
-  `(,(my/org-file "entries/reviews.gpg") 
-    ,(my/agenda-file "datetree.org") 
-    ,(my/agenda-file "reference.org") 
-    ,(my/org-file "entries/journal.gpg")))
+  `(,(my/agenda-file "datetree.org")
+    ,(my/agenda-file "reference.org")
+    ,(my/org-file "entries/journal.gpg")
+    ,(my/org-file "entries/reviews.gpg")))
+
+(defconst my/aux-refile-files
+  `(,(my/agenda-file "vrchat_things.org")))
 
 (setq org-agenda-files
       `(,(my/agenda-file "plan.org")

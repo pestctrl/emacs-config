@@ -73,6 +73,7 @@
 ;; Targets include this file and any file contributing to the agenda - up to 9 levels deep
 (setq org-refile-targets `((nil :maxlevel . 9)
                            (my/all-agenda-files :maxlevel . 9)
+                           (my/aux-refile-files :maxlevel . 3)
                            ("~/MEGA/org/entries/panic.org" :maxlevel . 9)))
 
 (setq org-refile-use-cache t)

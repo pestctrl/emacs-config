@@ -27,18 +27,32 @@
 (require 'exwm-randr)
 (require 'exwm-workspace-aux)
 (require 'exwm-wallpaper)
+(require 'subr-x)
+
+(defun remove-no-mode-screens (x)
+  (when-let ((entries (remove-if-not (lambda (x) (string-match-p "is not disconnected but" x))
+                                     x)))
+    (let ((remove-list (append entries
+                               (mapcar (lambda (entry)
+                                         (string-match "Output \\([A-z0-9-]+\\) is not disconnected but has no modes" entry)
+                                         (match-string 1 entry))
+                                       entries))))
+      (remove-if (lambda (x) (member x remove-list))
+                 x))))
 
 (defun my/get-screens ()
   (-> "xrandr | grep ' connected ' | cut -d ' ' -f 1"
       (shell-command-to-string)
       (split-string "\n")
+      (remove-no-mode-screens)
       (reverse)
       (cdr)
       (reverse)
       (cl-sort (lambda (a b)
                  (cond ((string-match-p "^eDP" a) t)
                        ((string-match-p "^eDP" b) nil)
-                       (t nil))))))
+                       (t nil))))
+      ))
 
 (defun position-screen (screen relative-to)
   (interactive (cl-destructuring-bind (primary . secondary) (my/get-screens)

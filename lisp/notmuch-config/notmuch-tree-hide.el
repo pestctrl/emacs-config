@@ -82,7 +82,7 @@
     (funcall orig forest-thread))
   (message "Filter function end: %s" notmuch-tree-show-filter-function))
 
-(defun notmuch-tree (&optional query query-context target buffer-name open-target unthreaded parent-buffer filter-function)
+(defun my-notmuch-tree (&optional query query-context target buffer-name open-target unthreaded parent-buffer filter-function)
   "Display threads matching QUERY in tree view.
 
 The arguments are:

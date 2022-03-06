@@ -164,7 +164,7 @@
     (defun notmuch-search-show-all ()
       (interactive)
       (let* ((query (replace-regexp-in-string "date:[^ ]+" "" notmuch-search-query-string))
-             (noand (replace-regexp-in-string "^ *and +" "" query))
+             (noand (replace-regexp-in-string "^ *and +" "" noand))
              (noand2 (replace-regexp-in-string " +and *" "" query)))
         (notmuch-search noand2)))
 
@@ -172,11 +172,17 @@
       (interactive "P")
       (let* ((thread-id (notmuch-search-find-thread-id))
              (input (notmuch-read-query (concat "Notmuch tree: " thread-id " and "))))
-        (notmuch-tree thread-id (unless (zerop (length input)) input) nil nil nil nil nil (unless arg #'notmuch-tree-hide-dead-trees))))
+        (my-notmuch-tree thread-id
+                         (unless (zerop (length input)) input)
+                         nil nil nil nil nil
+                         (unless arg #'notmuch-tree-hide-dead-trees))))
 
     (defun notmuch-tree-focus (arg)
       (interactive "P")
-      (notmuch-tree notmuch-tree-basic-query (notmuch-tree-get-message-id) nil nil nil nil nil (if (not arg) #'notmuch-tree-hide-dead-trees #'notmuch-tree-show-trail-and-alive-children)))
+      (my-notmuch-tree notmuch-tree-basic-query
+                       (notmuch-tree-get-message-id)
+                       nil nil nil nil nil
+                       (if (not arg) #'notmuch-tree-hide-dead-trees #'notmuch-tree-show-trail-and-alive-children)))
 
     (defun notmuch-tree-undo-read (arg)
       (interactive "P")

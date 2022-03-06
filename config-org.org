@@ -686,7 +686,7 @@
             ;;                         ("Most Important Thing(s)")))
             ))
     (require 'my-org-roam-logger)
-    (global-set-key (kbd "C-c n l") #'my/org-roam-logger-capture-current))
+    (global-set-key (kbd "C-c n j") #'my/org-roam-logger-capture-current))
 
   ;; (require 'org-roam-protocol)
 #+end_src

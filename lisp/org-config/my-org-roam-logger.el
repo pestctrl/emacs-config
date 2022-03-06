@@ -41,8 +41,7 @@
                  :target
                  (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
                                 "#+title: ${title}\n"
-                                ("Journal" "%<%b %d, %Y>"))))
-   :props '(:finalize find-file)))
+                                ("Journal" "%<%b %d, %Y>"))))))
 
 (provide 'my-org-roam-logger)
 ;;; my-org-roam-logger.el ends here

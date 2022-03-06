@@ -116,7 +116,6 @@
 
 (defun op/refile-quick-sort ()
   (interactive)
-  (find-file (my/agenda-file "refile.org"))
   (goto-char (point-min))
   (let ((beg (ol/get-bot-marker)))
     (outline-next-heading)

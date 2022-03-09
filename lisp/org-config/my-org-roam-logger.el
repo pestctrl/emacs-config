@@ -29,19 +29,29 @@
 (defvar my/current-logger-cache nil)
 (defvar my/org-roam-logger-filter-fun nil)
 
+(defvar my/org-roam-logger-templates
+  '(("j" "default" entry "* %<%H:%M> %?"
+     :unnarrowed t
+     :target
+     (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
+                    "#+title: ${title}\n"
+                    ("Journal" "%<%b %d, %Y>")))
+    ("s" "source location" entry "* %<%H:%M> %?\n%a"
+     :unnarrowed t
+     :target
+     (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
+                    "#+title: ${title}\n"
+                    ("Journal" "%<%b %d, %Y>")))))
+
 (defun my/org-roam-logger-capture-current (arg)
   (interactive "P")
-  (when (or (null my/current-logger-cache) arg)
+  (when (or (null my/current-logger-cache) (equal arg '(16)))
     (setq my/current-logger-cache
           (org-roam-node-read nil my/org-roam-logger-filter-fun)))
   (org-roam-capture-
+   :goto (when (equal arg '(4)) arg)
    :node my/current-logger-cache
-   :templates '(("d" "default" entry "* %<%H:%M> %?"
-                 :unnarrowed t
-                 :target
-                 (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
-                                "#+title: ${title}\n"
-                                ("Journal" "%<%b %d, %Y>"))))))
+   :templates my/org-roam-logger-templates))
 
 (provide 'my-org-roam-logger)
 ;;; my-org-roam-logger.el ends here

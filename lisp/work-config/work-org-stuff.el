@@ -195,7 +195,7 @@
 
 ;; (use-package org-roam
 ;;   :after org
-;;   :hook 
+;;   :hook
 ;;   (after-init . org-roam-mode)
 ;;   :straight (:host github :repo "jethrokuan/org-roam" :branch "develop")
 ;;   :custom

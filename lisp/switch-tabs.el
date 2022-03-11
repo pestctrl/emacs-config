@@ -41,11 +41,15 @@
 (defun switch-or-create-tab (tab-name)
   (interactive
    (list (my/read-tab-name)))
-  (let ((tab-index (tab-bar--tab-index-by-name tab-name)))
+  (let ((tab-index  (tab-bar--tab-index-by-name tab-name)))
     (if tab-index
-        (tab-bar-select-tab (1+ tab-index))
+        (progn
+          (incf tab-index)
+          (tab-bar-select-tab tab-index)
+          tab-index)
       (tab-bar-new-tab)
-      (tab-bar-rename-tab tab-name))))
+      (tab-bar-rename-tab tab-name)
+      (tab-bar--current-tab-index))))
 
 (defun last-tab ()
   (interactive)

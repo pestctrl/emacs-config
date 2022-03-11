@@ -101,6 +101,7 @@
                ("Dan" "d" "spring green")
                ("Ver" "v" "white")
                ("Coop" "c" "cornsilk")
+               ("Someone" "s" "dim gray")
                ("Everyone" "e" "pale green")))
 
 (provide 'self-chat-mode)

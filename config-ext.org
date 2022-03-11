@@ -180,7 +180,7 @@
     (defun notmuch-tree-focus (arg)
       (interactive "P")
       (my-notmuch-tree notmuch-tree-basic-query
-                       (notmuch-tree-get-message-id)
+                       (when arg (notmuch-tree-get-message-id))
                        nil nil nil nil nil
                        (if (not arg) #'notmuch-tree-hide-dead-trees #'notmuch-tree-show-trail-and-alive-children)))
 

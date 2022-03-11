@@ -35,7 +35,8 @@
 (defvar notmuch-tree-alive-function #'notmuch-tree-alive-match-p)
 
 (defun notmuch-tree-hide-dead-trees (forest-thread)
-  (let ((new-forest '()))
+  (let ((new-forest '())
+        (notmuch-tree-alive-function #'(lambda (msg) (member "unread" (plist-get msg :tags)))))
     (cl-loop for tree in forest-thread
              while (car tree)
              do (let ((subtrees (notmuch-tree-hide-dead-trees (cadr tree)))

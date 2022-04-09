@@ -42,6 +42,7 @@
 (defconst my/non-agenda-files
   `(,(my/agenda-file "datetree.org")
     ,(my/agenda-file "reference.org")
+    ,(my/agenda-file "leisure.org")
     ,(my/org-file "entries/journal.gpg")
     ,(my/org-file "entries/reviews.gpg")))
 

@@ -37,6 +37,8 @@
 (load-file "~/.emacs.d/lisp/work-config/work-specific-org-project-redefs.el")
 (require 'org-scan-tags-indent)
 
+(require 'ob-shell)
+
 (defvar org-ql-indent-levels nil)
 
 (setq org-agenda-compact-blocks t)

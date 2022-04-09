@@ -96,7 +96,7 @@
     (beginning-of-buffer)
     (re-search-forward "* ETERNAL The Plan")
     (org-narrow-to-subtree)
-    (let ((today-plan (format-time-string "\\*\\* [A-z]* Plan for \\[%Y-%m-%d %a\\]")))
+    (let ((today-plan (format-time-string "\\*\\* [A-z]+ \\[[0-9/]+\\] Plan for \\[%Y-%m-%d %a\\]")))
       (when (re-search-forward today-plan nil t)
         (org-narrow-to-subtree)
         (org-show-all)
@@ -106,7 +106,7 @@
                 (not (looking-at-p "- \\[ \\] $")))
           (org-insert-item 'checkbox))
         (display-buffer buffer)
-        (error "Already have a plan today!")))))
+        (user-error "Already have a plan today!")))))
 
 (defun my/org-find-journal ()
   (let* ((files

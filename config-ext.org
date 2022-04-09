@@ -131,6 +131,9 @@
                 :map notmuch-search-mode-map
                 ("z" . #'notmuch-search-tree-current-thread)
                 ("A" . #'notmuch-search-show-all)
+                ("D" . #'notmuch-search-delete-all)
+                ("f" . #'notmuch-search-filter-for-domain)
+                ("F" . #'notmuch-search-filter-for-sender)
                 ("<mouse-1>" . nil)
                 :map notmuch-tree-mode-map
                 ("<tab>" . #'notmuch-tree-explore-here)
@@ -229,6 +232,32 @@
           '(("+deleted") "Delete"))
 
     (advice-add #'notmuch-tag-jump :after #'(lambda (&rest args) (next-line)))
+
+    (defun notmuch-search-filter-for-domain ()
+      (interactive)
+      (notmuch-search-show-thread)
+      (let* ((author (notmuch-show-get-from)))
+        (notmuch-bury-or-kill-this-buffer)
+        (string-match (rx (and (group (+ (not (any "." "@" "<")))
+                                      "."
+                                      (+ (not (any "." "@" "<"))))
+                               (or ">" eol)))
+                      author)
+        (notmuch-search-filter (format "from:%s" (match-string 1 author)))))
+
+    (defun notmuch-search-filter-for-sender ()
+      (interactive)
+      (notmuch-search-show-thread)
+      (let ((author (notmuch-show-get-from)))
+        (notmuch-bury-or-kill-this-buffer)
+        (notmuch-search-filter (format "from:%s" author))))
+
+    (defun notmuch-search-delete-all ()
+      (interactive)
+      (let ((line-count (save-excursion (end-of-buffer) (line-number-at-pos (point)))))
+        (when (or (< line-count 20)
+                  (y-or-n-p "Are you sure? There seems to be a lot of emails... "))
+          (notmuch-search-tag-all '("+deleted")))))
 
     (defun notmuch-add-child (child-id)
       (interactive (list (read-string (format "Message id of new child (default: %s): "

@@ -240,7 +240,7 @@
         (notmuch-bury-or-kill-this-buffer)
         (string-match (rx (and (group (+ (not (any "." "@" "<")))
                                       "."
-                                      (+ (not (any "." "@" "<"))))
+                                      (+ (not (any "." "@" "<" ">"))))
                                (or ">" eol)))
                       author)
         (notmuch-search-filter (format "from:%s" (match-string 1 author)))))

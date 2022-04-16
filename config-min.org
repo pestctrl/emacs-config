@@ -266,6 +266,8 @@
 #+end_src
 * dired
 #+begin_src emacs-lisp
+  (setq dired-dwim-target t)
+
   ;; I like dired+'s formatting for listing files
   (add-to-list 'load-path
                  "~/.emacs.d/submodule/dired-plus")

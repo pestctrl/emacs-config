@@ -457,7 +457,24 @@
         ("o" "\tOffline" tags-todo "offline"
          ((org-tags-match-list-sublevels nil)))
         ("b" "\tBored" tags-todo "+short-grow"
-         ((org-tags-match-list-sublevels nil)))))
+         ((org-tags-match-list-sublevels nil)))
+        ("P" "\tPlan" agenda ""
+         ((org-agenda-tag-filter-preset (quote ("+PLAN")))
+          (org-super-agenda-groups '((:name "Delayed" :pred
+                                            ((lambda (item)
+                                               (when-let (marker (or (get-text-property 0 'org-marker item)
+                                                                     (get-text-property 0 'org-hd-marker item)))
+                                                 (with-current-buffer (marker-buffer marker)
+                                                   (goto-char marker)
+                                                   (and ;; (not (string-match-p "SCHEDULED" item))
+                                                    (org-entry-get (point) "DELAYED")))))))
+                                     (:name "The Plan" :and (:tag "PLAN" :log nil))
+                                     (:name "Overdue" :and (:deadline past :log nil))
+                                     (:name "Upcoming" :and (:deadline future :not (:todo "DONE")))
+                                     (:name "Should do" :and (:scheduled past :log nil))
+                                     (:name "Today" :time-grid t
+                                            :and (:not (:and (:not (:scheduled today)
+                                                                   :not (:deadline today)))))))))))
 
 
 (defun my/this-or-last-saturday ()
@@ -526,6 +543,9 @@
       ("\tMinimal" (advice-add #'org-agenda-show
                                :override
                                #'my/org-agenda-show-project))
+      ("\tPlan" (advice-add #'org-agenda-show
+                               :override
+                               #'my/org-agenda-show-review))
       (_ (advice-unadvice #'org-agenda-show)))))
 
 (defun advice-unadvice (sym)

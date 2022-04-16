@@ -59,15 +59,15 @@
                     :around
                     #'dont-copy-faces-for-x-show-tip))
 
+      ;; Startup programs
+      (add-hook 'emacs-startup-hook 'server-start)
+
       ;; Actually launch programs
       (require 'exwm-launch-program)
       (define-key *root-map* (kbd "C-p") #'launch-program)
 
       ;; Shut down
       (add-hook 'exwm-exit-hook 'org-save-all-org-buffers)
-
-      ;; Startup programs
-      (add-hook 'exwm-init-hook 'server-start)
 
       ;; Reminder: Hooks execute in order. Make sure megasync launches after systemtray is enabled
       (require 'exwm-startup)

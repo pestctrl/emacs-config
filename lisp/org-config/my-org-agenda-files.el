@@ -53,7 +53,8 @@
       `(,(my/agenda-file "plan.org")
         ,(my/agenda-file "refile.org")
         ,(my/agenda-file "sandbox.org")
-        ,(my/agenda-file "dev.org")))
+        ,(my/agenda-file "dev.org")
+        ,(my/agenda-file "prod.org")))
 
 (defconst my/all-agenda-files
   (cons (my/agenda-file "eternal.org")

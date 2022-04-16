@@ -376,6 +376,7 @@
         ("p" . "\tProd")
         ("pa" "\tAll" ,(production-agenda "time"))
         ("ps" "\tschool" ,(production-agenda "school"))
+        ("pf" "\tfamily" ,(production-agenda "family"))
         ("g" ,(format "%s\tGeneral View" (all-the-icons-material "all_inclusive" :face 'all-the-icons-cyan-alt))
          ((tags-todo "+sandbox+refile"
                      ((org-agenda-overriding-header "Refile tasks")))

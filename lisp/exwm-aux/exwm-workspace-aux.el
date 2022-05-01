@@ -45,8 +45,8 @@
               collect i
               collect m)))
 
-(defun my/get-next-workspace-number ()
-  (-> exwm-workspace-current-index
+(defun my/get-next-workspace-number (&optional current-index)
+  (-> (or current-index exwm-workspace-current-index)
       1+
       (mod exwm-workspace-number)))
 
@@ -59,9 +59,7 @@
 (defun my/swap-screens ()
   (interactive)
   (clj-swap exwm-randr/current-offset
-            (lambda (x)
-              (mod (1+ x)
-                   2)))
+            #'my/get-next-workspace-number)
   (let ((monitors (my/get-screens)))
     (setq exwm-randr-workspace-monitor-plist
           (loop for i from 0 below exwm-workspace-number

@@ -37,7 +37,20 @@
 ;; Provides #'org-notes-find-file
 (require 'org-capture-notes)
 
-(require 'org-capture-emacs-exit-warn)
+(defun warn-active-capture-template ()
+  (let ((capture-buffers
+         (->> (buffer-list)
+              (remove-if-not
+               (lambda (x)
+                 (with-current-buffer x
+                   (string-match-p "^CAPTURE-.*" (buffer-name))))))))
+    (if (zerop (length capture-buffers))
+        t
+      (pop-to-buffer (car capture-buffers))
+      (yes-or-no-p "Active capture templates exist; exit anyway? "))))
+
+(add-hook 'kill-emacs-query-functions
+          #'warn-active-capture-template)
 
 (defun my/org-board-prompt ()
   (let ((desc (plist-get org-capture-current-plist :description)))

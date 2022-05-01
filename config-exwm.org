@@ -3,7 +3,7 @@
 * exwm
 #+begin_src emacs-lisp
   ;; This will be the hardest to write :/
-  (when my/enable-exwm
+  (when my-ec/enable-exwm
     (use-exwm
       :load-path "~/.emacs.d/submodule/exwm/"
       :config

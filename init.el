@@ -45,20 +45,20 @@
 (require 'libs)
 (require 'emacs-custom-load-or-ask)
 
-(ec/load-or-ask-pred 'my/is-wsl "Are you running Emacs in WSL?")
-(ec/load-or-ask-pred 'my/enable-exwm "Do you want to load EXMW?")
-(ec/load-or-ask-pred 'my/at-ti "Are you at TI for work?")
-(defvar is-windows (or my/is-wsl
+(ec/load-or-ask-pred 'my-ec/is-wsl "Are you running Emacs in WSL?")
+(ec/load-or-ask-pred 'my-ec/enable-exwm "Do you want to load EXMW?")
+(ec/load-or-ask-pred 'my-ec/at-ti "Are you at TI for work?")
+(defvar is-windows (or my-ec/is-wsl
                        (eq system-type
                            'windows-nt)))
 
-(ec/load-or-ask-pred 'my/add-info-dir "Do you want an auxiliary info dir? ")
+(ec/load-or-ask-pred 'my-ec/add-info-dir "Do you want an auxiliary info dir? ")
 
-(when my/add-info-dir
-  (ec/load-or-ask-dir 'my/info-dir "Info Directory? ")
-  (add-to-list 'Info-directory-list my/info-dir))
+(when my-ec/add-info-dir
+  (ec/load-or-ask-dir 'my-ec/info-dir "Info Directory? ")
+  (add-to-list 'Info-directory-list my-ec/info-dir))
 
-(setq my/enable-exwm (and my/enable-exwm (eq 'x window-system)))
+(setq my-ec/enable-exwm (and my-ec/enable-exwm (eq 'x window-system)))
 
 (require 'keymap)
 
@@ -67,8 +67,8 @@
     'face-new-frame-defaults 'face--new-frame-defaults
     "28.1"))
 
-(ec/load-or-ask-pred 'my/load-full-config "Do you want to load full config for emacs?")
-(ec/load-or-ask-pred 'my/load-org-config "Do you want to load org config?")
+(ec/load-or-ask-pred 'my-ec/load-full-config "Do you want to load full config for emacs?")
+(ec/load-or-ask-pred 'my-ec/load-org-config "Do you want to load org config?")
 
 ;; It is imperative that this be loaded for a nice emacs
 ;; experience. Only SUPER stable stuff goes in this file, and should
@@ -77,7 +77,7 @@
  (expand-file-name "config-min.org"
                    user-emacs-directory))
 
-(when my/load-full-config
+(when my-ec/load-full-config
 
   ;; Load additional exwm stuff that changes constantly
   (use-exwm
@@ -91,10 +91,10 @@
                      user-emacs-directory))
 
   ;; Load work stuff when at work.
-  (when my/at-ti
+  (when my-ec/at-ti
     (require 'work-config))
 
-  (when (and (not my/at-ti) my/load-org-config)
+  (when (and (not my-ec/at-ti) my-ec/load-org-config)
     (org-babel-load-file
      (expand-file-name "config-org.org"
                        user-emacs-directory)))
@@ -103,7 +103,7 @@
    (expand-file-name "my-redefs.org"
                      user-emacs-directory))
 
-  (when my/enable-exwm
+  (when my-ec/enable-exwm
     (require 'exwm)))
 
 (setq my/finished t)

@@ -497,7 +497,7 @@
     :bind (("M-E" . #'er/expand-region)))
 
   ;; Banner comments
-  (unless my/at-ti
+  (unless my-ec/at-ti
     (use-package banner-comment
       :commands banner-comment
       :bind (("C-c h" . #'banner-comment))))

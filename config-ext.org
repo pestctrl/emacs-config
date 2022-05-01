@@ -805,7 +805,7 @@
 #+end_src
 ** ivy-posframe
 #+begin_src emacs-lisp
-  (unless my/at-ti
+  (unless my-ec/at-ti
     (use-package ivy-posframe
       :config
       (setq ivy-posframe-display-functions-alist

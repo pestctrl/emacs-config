@@ -24,6 +24,7 @@
 
 ;;; Code:
 (require 'org)
+(require 'org-overrides)
 
 (require 'org-loop)
 (require 'org-process)

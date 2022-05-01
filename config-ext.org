@@ -91,6 +91,27 @@
            "\\([ \t]+;.+?\\|[ \t]*\\)?$"))
 
     (define-key ledger-report-mode-map (kbd "M") #'ledger-report-show-monthly-average)
+
+    (defun my/ledger-complete-xact--remove-stars ()
+      (interactive)
+      (let* ((date-regexp (rx (and  (= 4 digit) "/" (= 2 digit) "/" (= 2 digit))))
+             (start (save-excursion
+                      (re-search-backward date-regexp)
+                      (point)))
+             (end (save-excursion
+                    (or (re-search-forward date-regexp nil t)
+                        (end-of-buffer))
+                    (beginning-of-line)
+                    (point))))
+        (save-window-excursion
+          (narrow-to-region start end)
+          (beginning-of-buffer)
+          (replace-regexp "    \\* " "    ")
+          (widen))))
+
+    (advice-add #'ledger-fully-complete-xact
+                :after
+                #'my/ledger-complete-xact--remove-stars))
 #+end_src
 ** Credit Card Statement Macro
 #+begin_src emacs-lisp

@@ -94,7 +94,7 @@
 
     (defun my/ledger-complete-xact--remove-stars ()
       (interactive)
-      (let* ((date-regexp (rx (and  (= 4 digit) "/" (= 2 digit) "/" (= 2 digit))))
+      (let* ((date-regexp (rx (and line-start (= 4 digit) "/" (= 2 digit) "/" (= 2 digit))))
              (start (save-excursion
                       (re-search-backward date-regexp)
                       (point)))

@@ -101,6 +101,7 @@
                ("Dan" "d" "spring green")
                ("Ver" "v" "white")
                ("Coop" "c" "cornsilk")
+               ("Net" "n" "magenta")
                ("Someone" "s" "dim gray")
                ("Everyone" "e" "pale green")))
 

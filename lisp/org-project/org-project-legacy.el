@@ -315,6 +315,7 @@
       (widen)
       (save-excursion
         (when (or (my/is-a-project)
+                  (not (member "PLAN" (org-get-tags)))
                   (member (org-get-todo-state) '("FUTURE" "WAIT" "HABIT" nil)))
           next-headline)))))
 

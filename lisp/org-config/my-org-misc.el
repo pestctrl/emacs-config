@@ -221,5 +221,7 @@ With a universal argument, prompt to specify which key."
     (kbd "C-S-b")
     #'(lambda () (interactive) (org-back-to-heading))))
 
+(define-key org-mode-map (kbd "M-g o") (lambda () (interactive) (org-back-to-heading)))
+
 (provide 'my-org-misc)
 ;;; my-org-misc.el ends here

@@ -363,6 +363,13 @@
     ;; (set-face-attribute 'ediff-current-diff-B nil :background "dark green")
     )
 
+  (with-eval-after-load 'diff
+    (set-face-attribute 'diff-header nil :background "gray20")
+    (set-face-attribute 'diff-file-header nil :background "gray20")
+    (set-face-attribute 'diff-function nil :background "midnight blue")
+    (set-face-attribute 'diff-added nil :background "#104010")
+    (set-face-attribute 'diff-refine-added nil :background "#308030"))
+
   ;; Paredit
   (use-package paredit
     :bind (:map paredit-mode-map

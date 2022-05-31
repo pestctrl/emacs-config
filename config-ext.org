@@ -463,7 +463,9 @@
 ** lsp
 #+begin_src emacs-lisp
   (use-package lsp-mode
-    :commands lsp)
+    :commands lsp
+    :config
+    (setq lsp-lens-enable nil))
 
   (use-package lsp-ui
     :after lsp-mode

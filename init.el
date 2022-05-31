@@ -17,8 +17,6 @@
   (setq gnutls-algorithm-priority
 	    "NORMAL:-VERS-TLS1.3"))
 
-(when (not package-archive-contents)
-  (package-refresh-contents))
 ;; fetch the list of packages available
 (unless package-archive-contents
   (package-refresh-contents))

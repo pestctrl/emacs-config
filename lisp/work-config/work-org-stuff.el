@@ -133,6 +133,7 @@
                    (org-agenda-tag-filter-preset)
                    (org-agenda-skip-deadline-if-done t)
                    (org-agenda-skip-scheduled-if-done t)
+                   (org-agenda-show-log '(closed))
                    (org-super-agenda-groups '((:name "The Plan" :tag "PLAN")
                                               (:name "Overdue" :and (:deadline past :log nil))
                                               (:name "Upcoming" :deadline future)

@@ -59,4 +59,11 @@
 (when (<= 27 emacs-major-version)
   (require 'switch-tabs))
 
+(defvar pestctrl-keymap-mode-map
+  (let ((map (make-sparse-keymap)))
+    map))
+
+(define-minor-mode pestctrl-keymap ""
+  nil nil nil)
+
 (provide 'keymap)

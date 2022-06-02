@@ -223,5 +223,21 @@ With a universal argument, prompt to specify which key."
 
 (define-key org-mode-map (kbd "M-g o") (lambda () (interactive) (org-back-to-heading)))
 
+;; My replacement for follow mode
+(defun org-agenda-jump-to-heading-show ()
+  (interactive)
+  (let ((agenda-buffer (buffer-name))
+	    (agenda-window (selected-window))
+        (indirect-window
+	     (and org-last-indirect-buffer
+		      (get-buffer-window org-last-indirect-buffer))))
+    (save-window-excursion (org-agenda-do-tree-to-indirect-buffer t))
+    (pop-to-buffer org-last-indirect-buffer)
+    (quick-bury-mode)))
+
+(require 'quick-bury)
+
+(define-key org-agenda-mode-map (kbd "j") #'org-agenda-jump-to-heading-show)
+
 (provide 'my-org-misc)
 ;;; my-org-misc.el ends here

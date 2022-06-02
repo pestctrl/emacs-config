@@ -237,7 +237,9 @@ With a universal argument, prompt to specify which key."
 
 (require 'quick-bury)
 
-(define-key org-agenda-mode-map (kbd "j") #'org-agenda-jump-to-heading-show)
+(with-eval-after-load "org-agenda"
+  (define-key org-agenda-mode-map (kbd "j")
+    #'org-agenda-jump-to-heading-show))
 
 (provide 'my-org-misc)
 ;;; my-org-misc.el ends here

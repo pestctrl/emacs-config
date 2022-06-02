@@ -359,8 +359,8 @@
                                :override
                                #'my/org-agenda-show-project))
       ("\tPlan" (advice-add #'org-agenda-show
-                               :override
-                               #'my/org-agenda-show-review))
+                            :override
+                            #'my/org-agenda-show-review))
       (_ (advice-unadvice #'org-agenda-show)))))
 
 (defun advice-unadvice (sym)

@@ -64,7 +64,7 @@
 
 (setq org-cycle-separator-lines 0)
 (setq org-catch-invisible-edits 'show-and-error)
-(setq org-link-abbrev-alist 
+(setq org-link-abbrev-alist
       '(("youtube" . "https://youtube.com/watch?v=")))
 
 (setq org-use-speed-commands t)
@@ -80,7 +80,7 @@
 (setq org-refile-use-cache t)
 
 (setq org-refile-target-verify-function
-      (lambda () 
+      (lambda ()
         (let ((tags (org-get-tags-at)))
           (and (not (member "ARCHIVE" tags))
                (not (equal "DONE" (org-get-todo-state)))))))

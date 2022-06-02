@@ -786,6 +786,11 @@
   (global-set-key (kbd "C-h v") #'helpful-variable)
   (global-set-key (kbd "C-h k") #'helpful-key)
   (global-set-key (kbd "C-h o") #'helpful-symbol)
+  (setq helpful-switch-buffer-function
+        #'(lambda (buffer)
+            (if (eq major-mode 'helpful-mode)
+                (switch-to-buffer buffer)
+              (pop-to-buffer buffer))))
 #+end_src
 ** Ace jump
 #+BEGIN_SRC emacs-lisp

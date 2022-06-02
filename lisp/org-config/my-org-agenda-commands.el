@@ -180,7 +180,7 @@
                                                          (org-entry-get (point) "DELAYED")))))))
                                           (:name "The Plan" :and (:tag "PLAN" :log nil))
                                           (:name "Overdue" :and (:deadline past :log nil))
-                                          (:name "Upcoming" :and (:deadline future :not (:todo "DONE")))
+                                          (:name "Upcoming" :and (:deadline future :not (:todo "DONE") :log nil))
                                           (:name "Should do" :and (:scheduled past :log nil))
                                           (:name "Today" :time-grid t
                                                  :and (:not (:and (:not (:scheduled today)

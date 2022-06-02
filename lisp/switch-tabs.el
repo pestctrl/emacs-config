@@ -47,7 +47,11 @@
           (incf tab-index)
           (tab-bar-select-tab tab-index)
           tab-index)
-      (tab-bar-new-tab)
+      (let* ((tabs (funcall tab-bar-tabs-function))
+             (current-index (or (tab-bar--current-tab-index tabs) 0)))
+        (tab-bar-new-tab
+         (when (< current-index 3)
+           '(4))))
       (tab-bar-rename-tab tab-name)
       (tab-bar--current-tab-index))))
 
@@ -100,6 +104,15 @@
     (switch-or-create-tab temp-name)
     (tab-bar-rename-tab switch-tab)))
 
+(defun tab-bar-jump ()
+  (interactive)
+  (let ((char (read-char "[e]macs-devel [s]cratch [o]rg")))
+    (switch-or-create-tab
+     (pcase char
+       (?o "org")
+       (?s "scratch")
+       (?e "emacs-devel")))))
+
 (define-prefix-command '*tab-map*)
 
 (define-key *root-map* (kbd "b") #'switch-or-create-tab)
@@ -116,6 +129,7 @@
 (define-key *tab-map* (kbd "s") #'my/tab-bar-swap-tabs)
 (define-key *tab-map* (kbd "p") #'tab-bar-switch-to-prev-tab)
 (define-key *tab-map* (kbd "t") #'last-tab)
+(define-key *tab-map* (kbd "j") #'tab-bar-jump)
 
 (tab-bar-rename-tab "scratch1")
 

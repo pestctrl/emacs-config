@@ -26,6 +26,7 @@
 (require 'my-org-misc)
 (require 'work-org-stuff)
 (require 'work-commentor)
+(require 'ti-lib)
 
 (global-display-fill-column-indicator-mode t)
 

@@ -124,11 +124,22 @@
   (setq gac-automatically-add-new-files-p nil)
   (setq-default gac-debounce-interval 300)
 
+  (defmacro defun-cached (name args &rest body)
+    (let ((var-name (intern (concat (symbol-name name) "--cached"))))
+      `(progn
+         (defvar ,var-name nil)
+
+         (defun ,name ,args
+           (when ,var-name
+             (setq ,var-name nil)
+             (run-with-timer 15 nil #'(lambda () (setq ,var-name t)))
+             ,@body)))))
+
   (defun gac-use-magit-push (buffer)
     (let ((default-directory (file-name-directory (buffer-file-name buffer))))
       (magit-push-current-to-pushremote nil)))
 
-  (defun gac-use-magit-fetch ()
+  (defun-cached gac-use-magit-fetch ()
     (let ((default-directory (file-name-directory (buffer-file-name (current-buffer)))))
       (magit-fetch-all nil)))
 
@@ -137,7 +148,7 @@
   (defvar rb/ssh-default-key (format "~/.ssh/devices/%s/id_rsa" (system-name))
     "My default SSH key.")
 
-  (defun rb/ssh-add (&optional arg)
+  (defun-cached rb/ssh-add (&optional arg)
     "Add the default ssh-key if it's not present.
 
 With a universal argument, prompt to specify which key."

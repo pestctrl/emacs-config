@@ -51,8 +51,7 @@
       (cl-sort (lambda (a b)
                  (cond ((string-match-p "^eDP" a) t)
                        ((string-match-p "^eDP" b) nil)
-                       (t nil))))
-      ))
+                       (t nil))))))
 
 (defun position-screen (screen relative-to)
   (interactive (cl-destructuring-bind (primary . secondary) (my/get-screens)
@@ -64,17 +63,18 @@
 
 (defun my/setup-screens ()
   (interactive)
-  (setq exwm-workspace-number (length (my/get-screens)))
-  (let ((count 1))
-    (cl-destructuring-bind (primary . secondaries) (my/get-screens)
-      (loop for secondary in secondaries
-            do (when (y-or-n-p (format "Monitor %s detected.  Setup? " secondary))
-                 (position-screen secondary primary)
-                 (incf count))))
-    (setup-workspace-monitors)
-    (setup-wallpaper)
-    (setq exwm-workspace-number count)
-    (exwm-workspace-after-monitor-change)))
+  (unwind-protect
+      (let ((count 1))
+        (setq exwm-workspace-number (length (my/get-screens)))
+        (cl-destructuring-bind (primary . secondaries) (my/get-screens)
+          (loop for secondary in secondaries
+                do (when (y-or-n-p (format "Monitor %s detected.  Setup? " secondary))
+                     (position-screen secondary primary)
+                     (incf count))))
+        (setup-workspace-monitors)
+        (setup-wallpaper)
+        (setq exwm-workspace-number count)
+        (exwm-workspace-after-monitor-change))))
 
 (defun my/minimal-setup-screens ()
   (interactive)

@@ -519,6 +519,7 @@
               ;; (setq counsel-projectile-switch-project-action 'projectile-vc)
               (setq projectile-switch-project-action 'projectile-dired)
               (setq projectile-require-project-root t)
+              (setq projectile-indexing-method 'hybrid)
               (setq projectile-auto-update-cache nil)
               (global-set-key (kbd (if (and (not (daemonp))
                                             (null window-system))
@@ -527,6 +528,8 @@
                               'projectile-command-map))
     :config
     (projectile-mode)
+    (add-to-list 'projectile-globally-ignored-directories
+                 ".ccls")
 
     (when (null window-system)
       (define-key c++-mode-map (kbd "C-c .") nil)

@@ -32,11 +32,10 @@
 
 (defun update-hard-drive-space-string ()
   (->> (get-hard-drive-space)
-       (format " [%s]")
+       (format "[%s]")
        (setq hard-drive-space)))
 
-(define-minor-mode display-hard-drive-space-mode
-  nil nil nil
+(define-minor-mode display-hard-drive-space-mode ""
   :global t
   (cond (display-hard-drive-space-mode
          (add-to-list 'global-mode-string 'hard-drive-space t)

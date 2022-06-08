@@ -1,3 +1,10 @@
+(defvar pestctrl-keymap-mode-map
+  (let ((map (make-sparse-keymap)))
+    map))
+
+(define-minor-mode pestctrl-keymap ""
+  :keymap pestctrl-keymap-mode-map :global t)
+
 (defmacro exwm-global-set-key (keybinding function)
   `(progn
      (use-exwm
@@ -5,7 +12,9 @@
        (with-eval-after-load "exwm"
          (add-to-list 'exwm-input-global-keys
                       (cons ,keybinding ,function))))
-     (global-set-key ,keybinding ,function)))
+     (define-key pestctrl-keymap-mode-map ,keybinding ,function)))
+
+(pestctrl-keymap 1)
 
 (exwm-global-set-key (kbd "M-T") 'flop-frame)
 (exwm-global-set-key (kbd "s-k") (lambda () (interactive) (kill-buffer (current-buffer))))
@@ -58,12 +67,5 @@
 
 (when (<= 27 emacs-major-version)
   (require 'switch-tabs))
-
-(defvar pestctrl-keymap-mode-map
-  (let ((map (make-sparse-keymap)))
-    map))
-
-(define-minor-mode pestctrl-keymap ""
-  nil nil nil)
 
 (provide 'keymap)

@@ -519,7 +519,9 @@
               ;; (setq counsel-projectile-switch-project-action 'projectile-vc)
               (setq projectile-switch-project-action 'projectile-dired)
               (setq projectile-require-project-root t)
-              (global-set-key (kbd (if (null window-system)
+              (setq projectile-auto-update-cache nil)
+              (global-set-key (kbd (if (and (not (daemonp))
+                                            (null window-system))
                                        "C-c ."
                                      "C-c C-."))
                               'projectile-command-map))

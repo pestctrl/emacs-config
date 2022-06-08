@@ -374,6 +374,7 @@
          ("C-c n T" . org-roam-dailies-goto-today)
          ("C-c n t" . org-roam-dailies-capture-today)
          ("C-c n i" . org-roam-node-insert)
+         ("C-c n j" . my/org-roam-logger-capture-current)
          :map org-mode-map
          ("C-M-i" . completion-at-point))
   :config
@@ -424,8 +425,7 @@
 
   (require 'my-org-roam-logger)
 
-  (setq my/org-roam-logger-filter-fun (my/org-roam-filter-by-tag "Project"))
-  (global-set-key (kbd "C-c n j") #'my/org-roam-logger-capture-current))
+  (setq my/org-roam-logger-filter-fun (my/org-roam-filter-by-tag "Project")))
 
 (provide 'work-org-stuff)
 ;;; work-org-stuff.el ends here

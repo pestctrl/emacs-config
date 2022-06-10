@@ -67,7 +67,11 @@
     (deactivate-mark)
     (select-window window)
     (goto-char click-pt)
-    (when (org-at-item-p)
+    (when (and (org-at-item-p)
+               (or (member (char-after) (list (string-to-char "[")
+                                              (string-to-char "]")))
+                   (and (eq (char-after) (string-to-char " "))
+                        (eq (char-before) (string-to-char "[")))))
       (org-toggle-checkbox))))
 
 (define-key org-capture-mode-map (kbd "<mouse-1>") #'org-click-check)

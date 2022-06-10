@@ -631,7 +631,6 @@
               #'my/org-wiki-insert-link)
 #+end_src
 * org-roam
-** Roam itself
 #+begin_src emacs-lisp
   (require 'org-ql)
   (defvar bootstrap-version)
@@ -652,6 +651,7 @@
   (use-package org-roam
     :after org
     :straight (:host github :repo "jethrokuan/org-roam" :branch "master")
+    :ensure t
     :custom
     (org-roam-directory (expand-file-name "org-roam" my/org-folder))
     (org-roam-use-completion-everywhere t)
@@ -689,39 +689,6 @@
     (global-set-key (kbd "C-c n j") #'my/org-roam-logger-capture-current))
 
   ;; (require 'org-roam-protocol)
-#+end_src
-** Deft
-#+begin_src emacs-lisp#
-  (use-package el-patch
-    :straight (:host github
-                     :repo "raxod502/el-patch"
-                     :branch "master"))
-
-  (eval-when-compile
-    (require 'el-patch))
-
-  (use-package deft
-    :after org
-    :bind
-    ("C-c n d" . deft)
-    :custom
-    (deft-recursive t)
-    (deft-use-filter-string-for-filename t)
-    (deft-default-extension "org")
-    (deft-directory "~/MEGA/org/org-roam/")
-    :config/el-patch
-    (defun deft-parse-title (file contents)
-      "Parse the given FILE and CONTENTS and determine the title.
-  If `deft-use-filename-as-title' is nil, the title is taken to
-  be the first non-empty line of the FILE.  Else the base name of the FILE is
-  used as title."
-      (el-patch-swap (if deft-use-filename-as-title
-                         (deft-base-filename file)
-                       (let ((begin (string-match "^.+$" contents)))
-                         (if begin
-                             (funcall deft-parse-title-function
-                                      (substring contents begin (match-end 0))))))
-                     (org-roam--get-title-or-slug file))))
 #+end_src
 * Variable pitch org-mode
 #+begin_src emacs-lisp

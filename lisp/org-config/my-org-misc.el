@@ -127,7 +127,7 @@
   (defmacro defun-cached (name args &rest body)
     (let ((var-name (intern (concat (symbol-name name) "--cached"))))
       `(progn
-         (defvar ,var-name nil)
+         (defvar ,var-name t)
 
          (defun ,name ,args
            (when ,var-name

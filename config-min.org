@@ -816,7 +816,7 @@
   (defvar current-theme 'dark)
 
   (when (>= emacs-major-version 27)
-    (use-package modus-operandi-theme)
+    (use-package modus-themes)
     (defvar light-theme 'modus-operandi))
   (defvar dark-theme 'calm-forest)
 

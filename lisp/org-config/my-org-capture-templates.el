@@ -23,6 +23,8 @@
 ;;; Commentary:
 
 ;;; Code:
+(require 'cl)
+
 (require 'org-protocol)
 (require 'my-org-agenda-files)
 (require 'org-capture)
@@ -322,7 +324,7 @@
                               (prog1
                                   (concat (number-to-string index)
                                           "-" s)
-                                (incf index)))
+                                (cl-incf index)))
                           headings)))
                (suggested-theme (nth (mod (random) 7) headings))
                (match (ivy-completing-read (format "What's the theme for today (Suggested: %s)? "

@@ -23,6 +23,7 @@
 ;;; Commentary:
 
 ;;; Code:
+(require 'cl)
 (require 'exwm)
 (require 'exwm-randr)
 (require 'dash)
@@ -40,10 +41,10 @@
 (defun setup-workspace-monitors ()
   (setq exwm-randr/current-offset 0)
   (setq exwm-randr-workspace-monitor-plist
-        (loop for m in (my/get-screens)
-              for i from 0
-              collect i
-              collect m)))
+        (cl-loop for m in (my/get-screens)
+                 for i from 0
+                 collect i
+                 collect m)))
 
 (defun my/get-next-workspace-number (&optional current-index)
   (-> (or current-index exwm-workspace-current-index)
@@ -62,12 +63,12 @@
             #'my/get-next-workspace-number)
   (let ((monitors (my/get-screens)))
     (setq exwm-randr-workspace-monitor-plist
-          (loop for i from 0 below exwm-workspace-number
-                for m = (nth (mod (+ i exwm-randr/current-offset)
-                                  exwm-workspace-number)
-                             monitors)
-                collect i
-                collect m)))
+          (cl-loop for i from 0 below exwm-workspace-number
+                   for m = (nth (mod (+ i exwm-randr/current-offset)
+                                     exwm-workspace-number)
+                                monitors)
+                   collect i
+                   collect m)))
   (exwm-randr-refresh)
   (exwm-workspace-switch-create (mod (1- exwm-workspace-current-index)
                                      2)))

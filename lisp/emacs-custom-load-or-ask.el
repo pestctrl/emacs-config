@@ -24,6 +24,8 @@
 
 ;;; Code:
 (require 'mmt)
+(require 'cl)
+
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file 'noerror)
 
@@ -74,11 +76,11 @@
                                (mapcar #'(lambda (a)
                                            (last a))
                                        ec/my-variables-list))))
-    (loop for i in ec/my-variables-list
-          until (member resp i)
-          finally
-          do
-          (ec/rerun-prompt i))))
+    (cl-loop for i in ec/my-variables-list
+             until (member resp i)
+             finally
+             do
+             (ec/rerun-prompt i))))
 
 (provide 'emacs-custom-load-or-ask)
 ;;; emacs-custom-load-or-ask.el ends here

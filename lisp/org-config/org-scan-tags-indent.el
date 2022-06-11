@@ -23,6 +23,7 @@
 ;;; Commentary:
 
 ;;; Code:
+(require 'cl)
 
 (defun get-parent-indent-level ()
   (save-excursion
@@ -30,7 +31,7 @@
       (while (and (org-up-heading-safe)
                   (org-get-todo-state))
         (when (not (string= "CAT" (org-get-todo-state)))
-          (incf levels)))
+          (cl-incf levels)))
       levels)))
 
 (defun my/org-scan-tags (action matcher todo-only &optional start-level)

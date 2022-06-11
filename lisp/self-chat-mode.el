@@ -1,5 +1,6 @@
 ;; This buffer is for text that is not saved, and for Lisp evaluation.
 ;; To create a file, visit it with C-x C-f and enter text in its buffer.
+(require 'cl)
 
 (defvar self-chat-num 0)
 (defvar self-chat-last nil)
@@ -77,7 +78,7 @@
                        (let ((name (car triple))
                              (key (cadr triple)))
                          (prog1 `(,key (setq self-chat-num ,num) ,name)
-                           (incf num))))
+                           (cl-incf num))))
                    list))
        ("r" (setq self-chat-num (random ,(length list))) "Random"))
      ,@(let ((num 0))
@@ -92,7 +93,7 @@
                                (defvar ,face-sym ',face-sym)
                                (add-to-list 'self-chat-highlights
                                             '(,(format "^> %s:.*$" name) . ,face-sym)))
-                             (incf num))))
+                             (cl-incf num))))
                  list))))
 
 (define-users (("Tau" "t" "turquoise1")

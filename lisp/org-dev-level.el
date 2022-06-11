@@ -23,18 +23,18 @@
 ;;; Commentary:
 
 ;;; Code:
-
 (require 'org)
+(require 'cl)
 
 (defvar org-dev-current-level 0)
 
 (defun odl/incr ()
   (interactive)
-  (incf org-dev-current-level))
+  (cl-incf org-dev-current-level))
 
 (defun odl/decr ()
   (interactive)
-  (decf org-dev-current-level))
+  (cl-decf org-dev-current-level))
 
 (defun odl/reset ()
   (interactive)

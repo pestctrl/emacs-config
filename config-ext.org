@@ -838,6 +838,8 @@
 #+end_src
 ** ivy-posframe
 #+begin_src emacs-lisp
+  (require 'cl)
+
   (unless my-ec/at-ti
     (use-package ivy-posframe
       :config
@@ -869,7 +871,7 @@
       (defun disable-ivy-posframe-on-exwm-windows (orig &rest args)
         (if (not (eq major-mode 'exwm-mode))
             (apply orig args)
-          (letf (((symbol-function 'display-graphic-p) (lambda (&optional display) nil)))
+          (cl-letf (((symbol-function 'display-graphic-p) (lambda (&optional display) nil)))
             (apply orig args))))
 
       (advice-add #'ivy-posframe--read
@@ -913,6 +915,8 @@
 #+end_src
 ** pavucontrol switch speakers headphones
 #+begin_src emacs-lisp
+  (require 'cl)
+
   (defvar laptop-sink-index 0)
   (defvar hdmi-pcie-interface nil)
 
@@ -930,14 +934,14 @@
     (when hdmi-pcie-interface
       (let* ((result (shell-command-to-string "pacmd list-modules"))
              (split (cdr (split-string result "index: "))))
-        (loop for mod in split
-              while (not
-                     (string-match (format "\\([0-9]+\\)\n.*\n.*name=\"%s\"" hdmi-pcie-interface)
-                                   mod))
-              finally
-              do (shell-command
-                  (format "pactl unload-module %s"
-                          (match-string 1 mod)))))))
+        (cl-loop for mod in split
+                 while (not
+                        (string-match (format "\\([0-9]+\\)\n.*\n.*name=\"%s\"" hdmi-pcie-interface)
+                                      mod))
+                 finally
+                 do (shell-command
+                     (format "pactl unload-module %s"
+                             (match-string 1 mod)))))))
 
   (defun current-speakers ()
     (let ((string (shell-command-to-string "pactl list sinks | grep 'Active Port: '")))

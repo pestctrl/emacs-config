@@ -23,6 +23,7 @@
 ;;; Commentary:
 
 ;;; Code:
+(require 'cl)
 (require 'dash)
 (require 'exwm-randr)
 (require 'exwm-workspace-aux)
@@ -67,10 +68,10 @@
       (let ((count 1))
         (setq exwm-workspace-number (length (my/get-screens)))
         (cl-destructuring-bind (primary . secondaries) (my/get-screens)
-          (loop for secondary in secondaries
-                do (when (y-or-n-p (format "Monitor %s detected.  Setup? " secondary))
-                     (position-screen secondary primary)
-                     (incf count))))
+          (cl-loop for secondary in secondaries
+                   do (when (y-or-n-p (format "Monitor %s detected.  Setup? " secondary))
+                        (position-screen secondary primary)
+                        (cl-incf count))))
         (setup-workspace-monitors)
         (setup-wallpaper)
         (setq exwm-workspace-number count)
@@ -93,7 +94,7 @@
 
 (define-minor-mode exwm-presentation-mode
   "Make both screen outputs display the same thing"
-  nil nil nil
+  :lighter nil
   (cond (exwm-presentation-mode
          (cl-destructuring-bind (primary . secondary) (my/get-screens)
            (shell-command

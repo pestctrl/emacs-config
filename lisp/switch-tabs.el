@@ -23,6 +23,7 @@
 ;;; Commentary:
 
 ;;; Code:
+(require 'cl)
 
 (setq tab-bar-show nil
       tab-bar-close-tab-select 'recent
@@ -44,7 +45,7 @@
   (let ((tab-index  (tab-bar--tab-index-by-name tab-name)))
     (if tab-index
         (progn
-          (incf tab-index)
+          (cl-incf tab-index)
           (tab-bar-select-tab tab-index)
           tab-index)
       (let* ((tabs (funcall tab-bar-tabs-function))

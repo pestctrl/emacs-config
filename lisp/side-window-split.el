@@ -23,6 +23,7 @@
 ;;; Commentary:
 
 ;;; Code:
+(require 'cl)
 
 (defvar left-side-window-count -1)
 (defvar right-side-window-count -1)
@@ -46,19 +47,19 @@
 
 (defun side-left-window ()
   (interactive)
-  (side-window-op 'left (incf left-side-window-count)))
+  (side-window-op 'left (cl-incf left-side-window-count)))
 
 (defun side-right-window ()
   (interactive)
-  (side-window-op 'right (incf right-side-window-count)))
+  (side-window-op 'right (cl-incf right-side-window-count)))
 
 (defun side-bottom-window ()
   (interactive)
-  (side-window-op 'bottom (incf bottom-side-window-count)))
+  (side-window-op 'bottom (cl-incf bottom-side-window-count)))
 
 (defun side-top-window ()
   (interactive)
-  (side-window-op 'top (incf top-side-window-count)))
+  (side-window-op 'top (cl-incf top-side-window-count)))
 
 (defun side-window-delete-all ()
   (interactive)

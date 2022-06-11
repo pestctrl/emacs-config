@@ -449,11 +449,12 @@
   (define-key emacs-lisp-mode-map (kbd "C-c C-k") #'eval-buffer)
 
   ;; Make scratch buffers out of nowhere!
+  (require 'cl)
   (defun scratch-buffer ()
     (interactive)
     (let ((count 0))
       (while (get-buffer (format "*scratch%d*" count))
-        (incf count))
+        (cl-incf count))
       (switch-to-buffer (get-buffer-create (format "*scratch%d*" count)))
       (lisp-interaction-mode)
       (insert (substitute-command-keys initial-scratch-message))))

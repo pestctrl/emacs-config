@@ -20,10 +20,10 @@
   (global-undo-tree-mode t)
 
   ;; Beacon-mode
-  ;; (use-package beacon)
-  ;; (beacon-mode 1)
-  ;; (setq beacon-blink-delay 0.1)
-  ;; (setq beacon-color "#006400")
+  (use-package beacon)
+  (beacon-mode 1)
+  (setq beacon-blink-delay 0.1)
+  (setq beacon-color "#006400")
 
   ;; Use my fork of chinese-etzy
   (load-file "~/.emacs.d/my-etzy.el")

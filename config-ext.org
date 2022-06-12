@@ -795,3 +795,10 @@
      split-window-preferred-function 'split-window-really-sensibly)
 
 #+end_src
+** dired-rsync
+#+begin_src emacs-lisp
+  (use-package dired-rsync
+    :config
+    (bind-key "C-c C-r" 'dired-rsync dired-mode-map)
+    (add-to-list 'global-mode-string 'dired-rsync-modeline-status t))
+#+end_src

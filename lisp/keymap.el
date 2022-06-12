@@ -1,9 +1,22 @@
-(defvar pestctrl-keymap-mode-map
+(defvar pestctrl-minor-mode-map
   (let ((map (make-sparse-keymap)))
     map))
 
-(define-minor-mode pestctrl-keymap ""
-  :keymap pestctrl-keymap-mode-map :global t)
+(define-minor-mode pestctrl-minor-mode ""
+  :keymap pestctrl-minor-mode-map :global t)
+
+(add-hook 'after-load-functions 'my-keys-have-priority)
+
+(defun my-keys-have-priority (_file)
+  "Try to ensure that my keybindings retain priority over other minor modes.
+
+Called via the `after-load-functions' special hook."
+  (unless (eq (caar minor-mode-map-alist) 'pestctrl-minor-mode)
+    (let ((mykeys (assq 'pestctrl-minor-mode minor-mode-map-alist)))
+      (message "%s" (key-binding (kbd "C-t")))
+      (assq-delete-all 'pestctrl-minor-mode minor-mode-map-alist)
+      (message "%s" (key-binding (kbd "C-t")))
+      (add-to-list 'minor-mode-map-alist mykeys))))
 
 (defmacro exwm-global-set-key (keybinding function)
   `(progn
@@ -12,9 +25,9 @@
        (with-eval-after-load "exwm"
          (add-to-list 'exwm-input-global-keys
                       (cons ,keybinding ,function))))
-     (define-key pestctrl-keymap-mode-map ,keybinding ,function)))
+     (define-key pestctrl-minor-mode-map ,keybinding ,function)))
 
-(pestctrl-keymap 1)
+(pestctrl-minor-mode 1)
 
 (exwm-global-set-key (kbd "M-T") 'flop-frame)
 (exwm-global-set-key (kbd "s-k") (lambda () (interactive) (kill-buffer (current-buffer))))

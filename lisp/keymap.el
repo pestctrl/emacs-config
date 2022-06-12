@@ -5,18 +5,18 @@
 (define-minor-mode pestctrl-minor-mode ""
   :keymap pestctrl-minor-mode-map :global t)
 
-(add-hook 'after-load-functions 'my-keys-have-priority)
+;; (add-hook 'after-load-functions 'my-keys-have-priority)
 
-(defun my-keys-have-priority (_file)
-  "Try to ensure that my keybindings retain priority over other minor modes.
+;; (defun my-keys-have-priority (_file)
+;;   "Try to ensure that my keybindings retain priority over other minor modes.
 
-Called via the `after-load-functions' special hook."
-  (unless (eq (caar minor-mode-map-alist) 'pestctrl-minor-mode)
-    (let ((mykeys (assq 'pestctrl-minor-mode minor-mode-map-alist)))
-      (message "%s" (key-binding (kbd "C-t")))
-      (assq-delete-all 'pestctrl-minor-mode minor-mode-map-alist)
-      (message "%s" (key-binding (kbd "C-t")))
-      (add-to-list 'minor-mode-map-alist mykeys))))
+;; Called via the `after-load-functions' special hook."
+;;   (unless (eq (caar minor-mode-map-alist) 'pestctrl-minor-mode)
+;;     (let ((mykeys (assq 'pestctrl-minor-mode minor-mode-map-alist)))
+;;       (message "%s" (key-binding (kbd "C-t")))
+;;       (assq-delete-all 'pestctrl-minor-mode minor-mode-map-alist)
+;;       (message "%s" (key-binding (kbd "C-t")))
+;;       (add-to-list 'minor-mode-map-alist mykeys))))
 
 (defmacro exwm-global-set-key (keybinding function)
   `(progn

@@ -642,7 +642,8 @@
   (use-package ivy-rich
     :requires ivy
     :config
-    (ivy-rich-mode 1))
+    (ivy-rich-mode 1)
+    (setq ivy-rich-project-root-cache-mode t))
 #+end_src
 ** Elfeed
 #+begin_src

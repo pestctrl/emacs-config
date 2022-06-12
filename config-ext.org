@@ -791,7 +791,7 @@
 
   (setq
      split-height-threshold 4
-     split-width-threshold 40
+     split-width-threshold 200
      split-window-preferred-function 'split-window-really-sensibly)
 
 #+end_src

@@ -17,6 +17,7 @@
 
   ;; Undo tree is useful
   (use-package undo-tree)
+  (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo")))
   (global-undo-tree-mode t)
 
   ;; Beacon-mode

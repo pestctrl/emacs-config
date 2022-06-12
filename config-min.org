@@ -268,15 +268,16 @@
 #+end_src
 * dired
 #+begin_src emacs-lisp
-  (setq dired-dwim-target t)
-
   ;; I like dired+'s formatting for listing files
   (add-to-list 'load-path
                  "~/.emacs.d/submodule/dired-plus")
   (require 'dired+)
-  (setq dired-listing-switches "-al  --group-directories-first --sort=extension")
   (setq diredp-hide-details-initially-flag nil)
   (setq diredp-hide-details-propagate-flag nil)
+
+  ;; dired configuration
+  (setq dired-dwim-target t)
+  (setq dired-listing-switches "-al  --group-directories-first --sort=extension")
 
   ;; diredx lets me hide stuff I don't want to see
   (require 'dired-x)

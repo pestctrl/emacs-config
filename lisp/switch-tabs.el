@@ -29,6 +29,8 @@
       tab-bar-close-tab-select 'recent
       tab-bar-close-button-show nil)
 
+(defvar switch-tabs/special-tabs '("scratch" "emacs-devel" "org" "org-spec"))
+
 (defun my/read-tab-name ()
   (let ((current-tab (alist-get 'name (tab-bar--current-tab))))
     (->> (tab-bar--tabs-recent)
@@ -48,11 +50,9 @@
           (cl-incf tab-index)
           (tab-bar-select-tab tab-index)
           tab-index)
-      (let* ((tabs (funcall tab-bar-tabs-function))
-             (current-index (or (tab-bar--current-tab-index tabs) 0)))
-        (tab-bar-new-tab
-         (when (< current-index 3)
-           '(4))))
+      (let* ((spec (member tab-name switch-tabs/special-tabs))
+             (tab-bar-new-tab-to (if spec 'leftmost 'rightmost)))
+        (tab-bar-new-tab))
       (tab-bar-rename-tab tab-name)
       (tab-bar--current-tab-index))))
 
@@ -147,18 +147,19 @@
 
 (defun init-tab-name (&optional frame)
   (interactive)
-  (let* ((tab (assq 'current-tab (frame-parameter frame 'tabs)))
-         (tab-explicit-name (alist-get 'explicit-name tab)))
-    (unless (or tab-explicit-name
-                (eq major-mode 'exwm-mode))
-      ;; this-command won't work
-      ;; neither will checking for exwm-mode
-      ;; current buffer will be *scratch*
-      (message "Exwm mode? %s" )
-      (tab-bar-rename-tab "scratch1"))))
+  (with-selected-frame frame
+    (let* ((tab (assq 'current-tab (frame-parameter frame 'tabs)))
+           (tab-explicit-name (alist-get 'explicit-name tab)))
+      (unless tab-explicit-name
+        (tab-bar-rename-tab "scratch")
+        (tab-bar-new-tab -1)
+        (tab-bar-rename-tab "emacs-devel")
+        (tab-bar-new-tab)
+        (tab-bar-rename-tab "org")
+        (switch-or-create-tab "scratch")))))
 
-;; (add-hook 'after-make-frame-functions
-;;           #'init-tab-name)
+(add-hook 'after-make-frame-functions
+          #'init-tab-name)
 
 (provide 'switch-tabs)
 ;;; switch-tabs.el ends here

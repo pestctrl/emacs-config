@@ -103,14 +103,15 @@
               (save-window-excursion
                 (apply orig-fun args))))
 (progn
-  (defun agenda-suite (name key tag &rest additional)
+  (defun agenda-suite (name key tag &optional additional)
     (declare (indent 3))
     `((,key . ,(concat "\t" name))
       (,(concat key "c") ,(concat "\t" name " Compound View")
-       ,(org-agenda-compound-view tag))
+       ,(org-agenda-compound-view tag)
+       ,additional)
       (,(concat key "h") ,(concat "\t" name " Hold and Delay")
-       ,(org-agenda-hold-view tag))
-      ,@additional))
+       ,(org-agenda-hold-view tag)
+       ,additional)))
 
   (defun org-agenda-hold-view (tag)
     `((org-ql-block '(and (tags ,tag)
@@ -199,6 +200,7 @@
            ,(org-agenda-compound-view "leisure")
            ((org-agenda-start-with-log-mode '(closed))
             (org-agenda-files `(,(my/agenda-file "leisure.org")))))
+          ,@(agenda-suite "Today" "t" "today" `((org-agenda-files '(,(my/agenda-file "today.org")))))
           ("m" . "\tMaintainence")
           ("md" "\tDone Tasks"
            ((org-ql-block '(and (not (tags "ARCHIVE"))

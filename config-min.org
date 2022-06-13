@@ -99,18 +99,23 @@
 
   ;; Need to configure all-the-icons so that mode-line doesn't look fat
   ;; and ugly
-  (use-package all-the-icons)
-  (set-face-attribute 'mode-line nil :height 100)
-  (set-face-attribute 'mode-line-inactive nil :height 100)
-  (setq all-the-icons-scale-factor 1.0)
+  (use-package all-the-icons
+    :config
+    (setq all-the-icons-scale-factor 1.0))
 
-  ;; The most efficient cool looking modeline I've
-  ;; found. Faster than even smart-mode-line
-  (use-package doom-modeline)
+  ;; The most efficient cool looking modeline I've found. Faster than even
+  ;; smart-mode-line
+  (use-package doom-modeline
+    :hook (after-init . doom-modeline-init)
+    :config
+    (setq doom-modeline-height 24)
 
-  (setq doom-modeline-height 24)
+    ;; Removes symlink bug w/ regards to doom-modeline
+    (setq doom-modeline-project-detection 'project)
 
-  (doom-modeline-mode)
+    (let ((mode-line-size 100))
+      (set-face-attribute 'mode-line nil :height mode-line-size)
+      (set-face-attribute 'mode-line-inactive nil :height mode-line-size)))
 
   ;; Modeline display useful information
   (display-battery-mode t)

@@ -31,15 +31,17 @@
 (require 'subr-x)
 
 (defun remove-no-mode-screens (x)
-  (when-let ((entries (remove-if-not (lambda (x) (string-match-p "is not disconnected but" x))
-                                     x)))
-    (let ((remove-list (append entries
-                               (mapcar (lambda (entry)
-                                         (string-match "Output \\([A-z0-9-]+\\) is not disconnected but has no modes" entry)
-                                         (match-string 1 entry))
-                                       entries))))
-      (remove-if (lambda (x) (member x remove-list))
-                 x))))
+  (let ((entries (remove-if-not (lambda (x) (string-match-p "is not disconnected but" x))
+                                x)))
+    (if (null entries)
+        x
+      (let ((remove-list (append entries
+                                 (mapcar (lambda (entry)
+                                           (string-match "Output \\([A-z0-9-]+\\) is not disconnected but has no modes" entry)
+                                           (match-string 1 entry))
+                                         entries))))
+        (remove-if (lambda (x) (member x remove-list))
+                   x)))))
 
 (defun my/get-screens ()
   (-> "xrandr | grep ' connected ' | cut -d ' ' -f 1"

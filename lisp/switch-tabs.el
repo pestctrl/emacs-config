@@ -132,8 +132,6 @@
 (define-key *tab-map* (kbd "t") #'last-tab)
 (define-key *tab-map* (kbd "j") #'tab-bar-jump)
 
-(tab-bar-rename-tab "scratch1")
-
 (defvar tab-switch-mode-map nil)
 
 (unless tab-switch-mode-map
@@ -150,13 +148,18 @@
   (with-selected-frame frame
     (let* ((tab (assq 'current-tab (frame-parameter frame 'tabs)))
            (tab-explicit-name (alist-get 'explicit-name tab)))
-      (unless tab-explicit-name
+      (unless (or tab-explicit-name
+                  (cdr (assoc 'unsplittable
+                              (frame-parameters nil))))
         (tab-bar-rename-tab "scratch")
         (tab-bar-new-tab -1)
         (tab-bar-rename-tab "emacs-devel")
         (tab-bar-new-tab)
         (tab-bar-rename-tab "org")
         (switch-or-create-tab "scratch")))))
+
+(add-hook 'emacs-startup-hook
+          #'(lambda () (init-tab-name (selected-frame))))
 
 (add-hook 'after-make-frame-functions
           #'init-tab-name)

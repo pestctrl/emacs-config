@@ -200,7 +200,7 @@
            ,(org-agenda-compound-view "leisure")
            ((org-agenda-show-log '(closed clock))
             (org-agenda-files `(,(my/agenda-file "leisure.org")))))
-          ,@(agenda-suite "Today" "t" "today" `((org-agenda-files '(,(my/agenda-file "today.org")))))
+          ,@(agenda-suite "Today" "t" "today" `((org-agenda-files ',(cons (my/agenda-file "today.org") org-agenda-files))))
           ("m" . "\tMaintainence")
           ("md" "\tDone Tasks"
            ((org-ql-block '(and (not (tags "ARCHIVE"))

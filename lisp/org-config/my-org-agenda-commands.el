@@ -161,7 +161,7 @@
                      (org-ql-indent-levels t)
                      (org-use-tag-inheritance nil)))
       (agenda ""
-              ((org-agenda-show-log '(closed))
+              ((org-agenda-show-log '(closed clock))
                (org-agenda-skip-function (lambda ()
                                            (let ((tags (org-get-tags)))
                                              (unless (and (or (member ,tag tags)
@@ -198,7 +198,7 @@
           ,@(agenda-suite "dev" "d" "dev")
           ("l" "\tLeisure"
            ,(org-agenda-compound-view "leisure")
-           ((org-agenda-start-with-log-mode '(closed))
+           ((org-agenda-show-log '(closed clock))
             (org-agenda-files `(,(my/agenda-file "leisure.org")))))
           ,@(agenda-suite "Today" "t" "today" `((org-agenda-files '(,(my/agenda-file "today.org")))))
           ("m" . "\tMaintainence")

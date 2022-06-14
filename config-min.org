@@ -113,7 +113,7 @@
     ;; Removes symlink bug w/ regards to doom-modeline
     (setq doom-modeline-project-detection 'project)
 
-    (let ((mode-line-size 100))
+    (let ((mode-line-size 95))
       (set-face-attribute 'mode-line nil :height mode-line-size)
       (set-face-attribute 'mode-line-inactive nil :height mode-line-size)))
 
@@ -129,8 +129,8 @@
   ;;(set-face-attribute 'variable-pitch nil :font '(:family "ETBookOT"))
 
   ;; I like my unicode to be monospace too, so I use these
-  (set-face-attribute 'default nil  :family "RobotoMono" :weight 'normal :height 100)
-  (set-face-attribute 'fixed-pitch nil  :family "RobotoMono" :weight 'normal :height 100)
+  (set-face-attribute 'default nil  :family "RobotoMono" :weight 'normal :height 95)
+  (set-face-attribute 'fixed-pitch nil  :family "RobotoMono" :weight 'normal :height 95)
   (set-fontset-font t 'unicode (font-spec :size 10 :name "FontAwesome"))
   (set-fontset-font t 'unicode (font-spec :name "SourceCodePro"))
   ;; adobe-source-han-sans-otc-fonts

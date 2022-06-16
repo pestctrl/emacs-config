@@ -280,6 +280,12 @@
   (setq diredp-hide-details-initially-flag nil)
   (setq diredp-hide-details-propagate-flag nil)
 
+  ;; This hook is neat, I get to see how far down the file I
+  ;; am. However, it's way too slow. Causes doom-modeline to lock up in
+  ;; redisplay. Disabling for now.
+  (remove-hook 'dired-after-readin-hook 'diredp-nb-marked-in-mode-name)
+  (remove-hook 'dired-mode-hook         'diredp-nb-marked-in-mode-name)
+
   ;; dired configuration
   (setq dired-dwim-target t)
   (setq dired-listing-switches "-al  --group-directories-first --sort=extension")

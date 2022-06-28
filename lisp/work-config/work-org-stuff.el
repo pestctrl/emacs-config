@@ -487,5 +487,11 @@
 
   (setq my/org-roam-logger-filter-fun (my/org-roam-filter-by-tag "Project")))
 
+(advice-add #'org-agenda-redo
+            :around
+            (lambda (orig-fun &rest args)
+              (save-window-excursion
+                (apply orig-fun args))))
+
 (provide 'work-org-stuff)
 ;;; work-org-stuff.el ends here

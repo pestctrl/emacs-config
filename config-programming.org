@@ -16,7 +16,8 @@
     :hook (lsp-mode . lsp-ui-mode)
     :config
     (setq lsp-ui-flycheck-enable t)
-    (setq lsp-ui-flycheck-live-reporting t))
+    (setq lsp-ui-flycheck-live-reporting t)
+    (setq lsp-ui-doc-show-with-cursor t))
 
   (use-package dap-mode
     :hook ((java-mode . dap-mode)

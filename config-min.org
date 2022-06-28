@@ -118,6 +118,7 @@
       (set-face-attribute 'mode-line-inactive nil :height mode-line-size)))
 
   ;; Modeline display useful information
+  (setq global-mode-string '(" "))
   (display-battery-mode t)
   (display-time-mode t)
   (setq display-time-day-and-date t)

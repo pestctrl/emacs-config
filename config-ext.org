@@ -106,7 +106,14 @@
         (save-window-excursion
           (narrow-to-region start end)
           (beginning-of-buffer)
-          (replace-regexp "    \\* " "    ")
+          (replace-regexp (rx "    "
+                              (or "*" "!")
+                              " ")
+                          "    ")
+          (replace-regexp (rx (and " " (+ " ")
+                                   ";; [" (+ (any digit "-" "=" "/")) "]"
+                                   line-end))
+                          "")
           (widen))))
 
     (advice-add #'ledger-fully-complete-xact

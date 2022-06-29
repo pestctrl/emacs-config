@@ -45,6 +45,8 @@
 
 (require 'org-archive-tree-count)
 
+(setq org-ql-indentor-function #'get-parent-indent-level)
+
 ;; (add-to-list 'directory-abbrev-alist
 ;;              '("/templates" . "/home/benson/MEGA/org/templates"))
 ;; (pop directory-abbrev-alist)
@@ -90,6 +92,15 @@
                (setf seen-non-todo t)
              (when seen-non-todo
                (throw 'break t)))))))))
+
+(defun my/pinned-indent-level ()
+  (save-excursion
+    (let ((levels 0))
+      (while (and (org-up-heading-safe)
+                  (member "pinned" (org-get-tags)))
+        (when (not (string= "CAT" (org-get-todo-state)))
+          (cl-incf levels)))
+      levels)))
 
 (defun my/ambiguous-todo ()
   (and (opr/type-of-project)
@@ -159,7 +170,8 @@
                               (eq (opr/get-type) 'project)))
                     ((org-ql-block-header "Pinned Projects")
                      (org-ql-indent-levels t)
-                     (org-use-tag-inheritance nil)))
+                     (org-use-tag-inheritance nil)
+                     (org-ql-indentor-function #'my/pinned-indent-level)))
       (agenda ""
               ((org-agenda-show-log '(closed clock))
                (org-agenda-skip-function (lambda ()

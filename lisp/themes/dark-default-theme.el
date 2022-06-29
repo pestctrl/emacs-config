@@ -54,7 +54,7 @@
    `(rainbow-delimiters-depth-8-face ((t :foreground ,rainbow-8)))
    `(rainbow-delimiters-depth-9-face ((t :foreground ,rainbow-purple)))
 
-   '(org-todo ((t (:foreground "Pink" :bold t :inherit fixed-pitch))))
+   '(org-todo ((t (:foreground "Pink" :bold t))))
 
    '(opr/STUFF-todo-face ((t :foreground "goldenrod")))
    '(opr/FUTURE-todo-face ((t :foreground "medium spring green")))
@@ -74,7 +74,7 @@
    '(opr/EMPTY-todo-face ((t :foreground "white")))
    '(opr/HOLD-todo-face ((t :foreground "red")))
    
-   '(tab-bar ((t :foreground "#70FF00" :background "dark slate gray" :inherit 'fixed-pitch)))
+   '(tab-bar ((t :foreground "#70FF00" :background "dark slate gray")))
    '(tab-bar-tab ((t :background "gray6")))
    '(tab-bar-tab-inactive ((t :background "dark slate gray"))))
   )

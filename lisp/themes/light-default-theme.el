@@ -29,7 +29,7 @@
 (custom-theme-set-faces
  'light-default
 
- '(org-todo ((t (:foreground "Red1" :bold t :inherit fixed-pitch))))
+ '(org-todo ((t :foreground "Red1" :bold t)))
  
  `(rainbow-delimiters-depth-1-face ((t :foreground "DodgerBlue3")))
  `(rainbow-delimiters-depth-2-face ((t :foreground "green4")))
@@ -39,7 +39,26 @@
  `(rainbow-delimiters-depth-6-face ((t :foreground "dark red")))
  `(rainbow-delimiters-depth-7-face ((t :foreground "dark green")))
  `(rainbow-delimiters-depth-8-face ((t :foreground "firebrick")))
- `(rainbow-delimiters-depth-9-face ((t :foreground "medium sea green"))))
+ `(rainbow-delimiters-depth-9-face ((t :foreground "medium sea green")))
+
+ '(opr/STUFF-todo-face ((t :foreground "goldenrod")))
+ '(opr/FUTURE-todo-face ((t :foreground "medium spring green")))
+ '(opr/NEXT-todo-face ((t :foreground "cyan")))
+ '(opr/WAIT-todo-face ((t :foreground "orange")))
+
+ '(opr/ONE-todo-face ((t :foreground "royal blue")))
+
+ '(opr/CLOCK-todo-face ((t :foreground "dark gray")))
+ '(opr/INACT-todo-face ((t :foreground "dark gray")))
+ '(opr/BACKLOG-todo-face ((t :foreground "dark gray")))
+ '(opr/BLOCKED-todo-face ((t :foreground "dark gray")))
+ '(opr/ABANDON-todo-face ((t :foreground "dark gray")))
+
+ '(opr/META-todo-face ((t :foreground "black" :background "medium spring green")))
+ '(opr/SEQ-todo-face ((t :foreground "black" :background "medium spring green")))
+ '(opr/EMPTY-todo-face ((t :foreground "black")))
+ '(opr/HOLD-todo-face ((t :foreground "red")))
+ )
 
 ;;###autoload
 (when load-file-name

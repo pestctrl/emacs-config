@@ -232,8 +232,13 @@
                  :datetree t
                  :template "* ")))
               ("Create checklist" :keys "c" :children
-               (("Conference Via Bus"
-                 :keys "c"
+               (("Travel Via Bus"
+                 :keys "b"
+                 :file ,(my/agenda-file "dev.org")
+                 :template-file ,(my/org-file "checklists/conference.org")
+                 :conference/airplane nil)
+                ("Travel Via Plane"
+                 :keys "p"
                  :file ,(my/agenda-file "dev.org")
                  :template-file ,(my/org-file "checklists/conference.org")
                  :conference/airplane nil)

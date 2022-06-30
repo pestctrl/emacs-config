@@ -26,7 +26,7 @@
 (require 'mmt)
 (require 'cl)
 
-(setq custom-file "~/.emacs.d/custom.el")
+(setq custom-file "~/.emacs.d/customize.el")
 (load custom-file 'noerror)
 
 (defvar ec/my-variables-list '())

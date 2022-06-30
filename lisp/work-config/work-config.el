@@ -28,6 +28,9 @@
 (require 'work-commentor)
 (require 'ti-lib)
 
+(setq url-proxy-services '(("http" . "http://webproxy.ext.ti.com:80")
+                           ("https" . "http://webproxy.ext.ti.com:80")))
+
 (global-display-fill-column-indicator-mode t)
 
 (setq-default fill-column 79)

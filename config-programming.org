@@ -33,6 +33,7 @@
 * c++
 #+begin_src emacs-lisp
   (use-package ccls
+    :after lsp
     :hook
     ((c-mode c++-mode objc-mode) .
      (lambda () (let ((project-root (projectile-project-p)))
@@ -53,7 +54,15 @@
     (when my-ec/at-ti
       (add-to-list 'exec-path
                    "/db/sds/packagse2/ccls-master")
-      (setq ccls-executable "/db/sds/packages2/ccls-master/ccls")))
+      (setq ccls-executable "/db/sds/packages2/ccls-master/ccls"))
+
+    (with-eval-after-load 'lsp-clangd
+      (add-to-list 'lsp-clients-clangd-args
+                   "-j=16"))
+
+    (add-to-list 'lsp-disabled-clients '(c++-mode . ccls))
+    (add-to-list 'lsp-disabled-clients '(c-mode . ccls))
+    (add-to-list 'lsp-disabled-clients '(objc-mode . ccls)))
 #+end_src
 * Projectile
 #+begin_src emacs-lisp

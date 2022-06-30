@@ -17,7 +17,7 @@
   (setq gnutls-algorithm-priority
 	    "NORMAL:-VERS-TLS1.3"))
 
-(setq gc-cons-threshold 100000000)
+(setq gc-cons-threshold 200000000)
 
 ;; fetch the list of packages available
 (unless package-archive-contents

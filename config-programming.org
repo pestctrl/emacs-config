@@ -5,7 +5,8 @@
   (use-package lsp-mode
     :commands lsp
     :config
-    (setq lsp-lens-enable nil))
+    (setq lsp-lens-enable nil)
+    (setq read-process-output-max (* 1024 1024)))
 
   (use-package lsp-ui
     :after lsp-mode

@@ -106,7 +106,7 @@
   ;; The most efficient cool looking modeline I've found. Faster than even
   ;; smart-mode-line
   (use-package doom-modeline
-    :hook (after-init . doom-modeline-init)
+    :hook (after-init . doom-modeline-mode)
     :config
     (setq doom-modeline-height 24)
 

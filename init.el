@@ -45,6 +45,7 @@
 (require 'libs)
 (require 'emacs-custom-load-or-ask)
 
+(ec/load-or-ask-pred 'my/puppet-p "Are you running on Puppet's computer?")
 (ec/load-or-ask-pred 'my-ec/is-wsl "Are you running Emacs in WSL?")
 (ec/load-or-ask-pred 'my-ec/enable-exwm "Do you want to load EXMW?")
 (ec/load-or-ask-pred 'my-ec/at-ti "Are you at TI for work?")

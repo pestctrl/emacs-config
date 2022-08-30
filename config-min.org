@@ -83,9 +83,10 @@
   (setq fancy-splash-image "~/.emacs.d/res/icon.png")
 
   ;; Disable tool and menu bar, keep the fringe though
-  (tool-bar-mode -1)
-  (menu-bar-mode -1)
-  (scroll-bar-mode -1)
+  (unless my/puppet-p
+    (tool-bar-mode -1)
+    (menu-bar-mode -1)
+    (scroll-bar-mode -1))
   (fringe-mode '(10 . 10))
 
   ;; I like the general feel of calm forest, but...

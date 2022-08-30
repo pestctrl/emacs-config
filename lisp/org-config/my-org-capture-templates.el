@@ -278,14 +278,14 @@
                    :function org-plan-goto
                    :template-file ,(my/org-file "templates/daily-plan-prompt.org"))))
                 ("Cringe" :keys "c"
-                 :file ,(my/org-file "entries/cringe.gpg")
+                 :file ,(my/org-file "gpg/cringe.gpg")
                  :template "* %?")
                 ("Mental Model" :keys "m"
-                 :file ,(my/org-file "entries/mental_models.gpg")
+                 :file ,(my/org-file "gpg/mental_models.gpg")
                  :template "* %?")
                 ("Important Information"
                  :keys "i"
-                 :file ,(my/org-file "entries/important.gpg")
+                 :file ,(my/org-file "gpg/important.gpg")
                  :template "* %?")))
               ("Logging"
                :icon ,(all-the-icons-material "add_to_queue" :face 'all-the-icons-lblue)

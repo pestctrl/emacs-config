@@ -25,13 +25,8 @@
 ;;; Code:
 (require 'my-plaintext-files)
 
-(defconst my/org-folder (expand-file-name "org" my/plaintext-folder))
-(defconst my/org-migration-folder (and my/is-plaintext-migration-folder (expand-file-name "org" my/plaintext-migration-folder)))
-
 (defconst my/agenda-folder
-  (or (and my/org-migration-folder
-           (expand-file-name "org/agenda" my/org-migration-folder))
-      (expand-file-name "org/" my/org-folder)))
+  (my/plaintext-file "org/agenda"))
 
 (defun my/org-file (str)
   (my/plaintext-file (concat (file-name-as-directory "org") str)))

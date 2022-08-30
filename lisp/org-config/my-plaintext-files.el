@@ -24,20 +24,20 @@
 
 ;;; Code:
 
-(ec/load-or-ask-file 'my/plaintext-folder "Where's the MEGASync plaintext directory? ")
-(ec/load-or-ask-pred 'my/is-plaintext-migration-folder "Is there a migration (source controlled) plaintext directory? ")
+(ec/load-or-ask-pred 'my/is-plaintext-mega-folder "Is there a megasync directory? ")
+(ec/load-or-ask-file 'my/plaintext-migration-folder "Where's the migration directory? ")
 
-(when my/is-plaintext-migration-folder
-  (ec/load-or-ask-file 'my/plaintext-migration-folder "Where's the migration directory? "))
+(when my/is-plaintext-mega-folder
+  (ec/load-or-ask-file 'my/plaintext-mega-folder "Where's the megasync directory? "))
 
 (defun my/plaintext-file (str)
-  (let (result)
-    (setq result (expand-file-name str my/plaintext-folder))
-    (when my/is-plaintext-migration-folder
-      (let ((folder (expand-file-name str my/plaintext-migration-folder)))
-        (when (file-exists-p folder)
-          (setq result folder))))
-    result))
+  (let ((result (expand-file-name str my/plaintext-migration-folder)))
+    (if (file-exists-p result)
+        result
+      (when my/is-plaintext-mega-folder
+        (let ((folder (expand-file-name str my/plaintext-mega-folder)))
+          (when (file-exists-p folder)
+            folder))))))
 
 (provide 'my-plaintext-files)
 ;;; my-plaintext-files.el ends here

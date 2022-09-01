@@ -65,7 +65,8 @@
       (advice-add #'lsp--progress-status
                   :filter-return
                   #'(lambda (result)
-                      (concat (string-replace "%%" "%%%%" result) " "))))
+                      (when result
+                        (concat (string-replace "%%" "%%%%" result) " ")))))
 
     (when my-ec/at-ti
       (add-to-list 'exec-path

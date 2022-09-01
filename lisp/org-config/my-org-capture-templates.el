@@ -151,6 +151,11 @@
                  :icon ,(all-the-icons-octicon "inbox" :face 'all-the-icons-yellow :v-adjust 0.01)
                  :file ,(my/agenda-file "refile.org")
                  :template "* STUFF %?\n:PROPERTIES:\n:CREATED: %U\n:VIEWING: %a\n:END:")
+                ("New Puppet Refile Task"
+                 :keys "p"
+                 :icon ,(all-the-icons-octicon "inbox" :face 'all-the-icons-yellow :v-adjust 0.01)
+                 :file ,(my/agenda-file "puppet_refile.org")
+                 :template "* STUFF %?\n:PROPERTIES:\n:CREATED: %U\n:VIEWING: %a\n:END:")
                 ("Task in the same tree"
                  :keys "s"
                  :function place-in-current-tree

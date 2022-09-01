@@ -399,7 +399,8 @@
 #+end_src
 * pdf-tools use isearch
 #+BEGIN_SRC emacs-lisp
-  (when (not (eq system-type 'windows-nt))
+  (when (and (not (eq system-type 'windows-nt))
+             (not my/at-ti))
     (use-package pdf-tools)
     (pdf-tools-install)
     (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)

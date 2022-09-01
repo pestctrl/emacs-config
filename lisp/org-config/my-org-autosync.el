@@ -33,9 +33,9 @@
 (setq gaff/watch-directories (list (list my/agenda-folder "origin/desktop" "origin/gaming-laptop" "origin/puppet" "origin/mobile")))
 
 (setq gac-automatically-add-new-files-p nil)
-(setq-default gac-debounce-interval 300)
+(setq-default gac-debounce-interval 40)
 
-(defmacro defun-cached (name args &rest body)
+(defmacro defun-cached (name time args &rest body)
   (let ((var-name (intern (concat (symbol-name name) "--cached"))))
     `(progn
        (defvar ,var-name t)
@@ -43,7 +43,7 @@
        (defun ,name ,args
          (when ,var-name
            (setq ,var-name nil)
-           (run-with-timer 15 nil #'(lambda () (setq ,var-name t)))
+           (run-with-timer ,time nil #'(lambda () (setq ,var-name t)))
            ,@body)))))
 
 (defun gac-use-magit-push (buffer)
@@ -56,10 +56,10 @@
   ;; (make-variable-buffer-local 'gac-auto-merge-branch-list)
 
 
-(defun-cached gac-run-gaff ()
+(defun-cached 60 gac-run-gaff ()
   (gaff/trigger))
 
-(defun-cached gac-run-ssh-add ()
+(defun-cached 15 gac-run-ssh-add ()
   (rb/ssh-add))
 
 (add-hook 'git-auto-commit-mode-hook

@@ -208,9 +208,23 @@ With a universal argument, prompt to specify which key."
                                 "\n"))
         (message "ssh-add: %s" string))))
 
-  (advice-add #'keychain-refresh-environment
-              :after
-              (lambda (&rest args) (message "Remember to ssh-add!")))
+  (defvar gac-auto-merge-branch-list nil)
+  (make-variable-buffer-local 'gac-auto-merge-branch-list)
+
+  (defun-cached gac-check-changes-merge-all ()
+    (when gac-auto-merge-branch-list
+      (if (not (string-empty-p (shell-command-to-string "git status -suno")))
+          (message "Tried to fast-forward, but there are unstaged changes!")
+        (magit-fast-forward-all))))
+
+  (defun magit-fast-forward-all ()
+    (interactive)
+    (with-current-buffer (current-buffer)
+      (dolist (branch gac-auto-merge-branch-list)
+        (magit-merge-plain branch '("--ff-only")))))
+
+  ;; (add-hook 'hack-local-variables-hook
+  ;;           #'gac-check-changes-merge-all)
 
   (add-hook 'git-auto-commit-mode-hook
             #'gac-use-magit-fetch)

@@ -24,7 +24,9 @@
 
 ;;; Code:
 
+
 (deftheme dark-default)
+
 
 (let ((rainbow-purple  "#9E1CB2")
       (rainbow-green   "#47B04B")
@@ -43,7 +45,9 @@
    '(eldoc-highlight-function-argument ((t :foreground "dodger blue")))
 
    '(sml/charging ((t (:inherit sml/global :foreground "forest green"))))
-   
+
+   ;; TODO: Rework according to prot:
+   ;; https://protesilaos.com/codelog/2020-12-27-modus-themes-review-rainbow-delimiters/
    `(rainbow-delimiters-depth-1-face ((t :foreground ,rainbow-purple)))
    `(rainbow-delimiters-depth-2-face ((t :foreground ,rainbow-green)))
    `(rainbow-delimiters-depth-3-face ((t :foreground ,rainbow-blue)))
@@ -52,7 +56,6 @@
    `(rainbow-delimiters-depth-6-face ((t :foreground ,rainbow-blue)))
    `(rainbow-delimiters-depth-7-face ((t :foreground ,rainbow-red)))
    `(rainbow-delimiters-depth-8-face ((t :foreground ,rainbow-8)))
-   `(rainbow-delimiters-depth-9-face ((t :foreground ,rainbow-purple)))
 
    '(org-todo ((t (:foreground "Pink" :bold t))))
 

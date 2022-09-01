@@ -76,93 +76,6 @@
           ([?\C-/] . ?\C-z)
           ([?\M-s] . ?\C-s)))
 #+end_src
-* theme
-#+begin_src emacs-lisp
-  ;; dashboard looks cool
-  (use-package dashboard)
-  (setq fancy-splash-image "~/.emacs.d/res/icon.png")
-
-  ;; Disable tool and menu bar, keep the fringe though
-  (unless my/puppet-p
-    (tool-bar-mode -1)
-    (menu-bar-mode -1)
-    (scroll-bar-mode -1))
-  (fringe-mode '(10 . 10))
-
-  ;; I like the general feel of calm forest, but...
-  (use-package color-theme-modern)
-  (load-theme 'calm-forest t)
-  ;; I don't like the shade of green for the foreground and the shade of
-  ;; gray for the background. This overrides those
-  (add-to-list 'custom-theme-load-path "~/.emacs.d/lisp/themes")
-  (load-theme 'dark-default)
-  (load-theme 'same-defaults)
-
-  ;; Need to configure all-the-icons so that mode-line doesn't look fat
-  ;; and ugly
-  (use-package all-the-icons
-    :config
-    (setq all-the-icons-scale-factor 1.0))
-
-  ;; The most efficient cool looking modeline I've found. Faster than even
-  ;; smart-mode-line
-  (use-package doom-modeline
-    :hook (after-init . doom-modeline-mode)
-    :config
-    ;; (setq doom-modeline-height 24)
-
-    ;; Removes symlink bug w/ regards to doom-modeline
-    (setq doom-modeline-project-detection 'project)
-
-    ;; (let ((mode-line-size 95))
-    ;;   (set-face-attribute 'mode-line nil :height mode-line-size)
-    ;;   (set-face-attribute 'mode-line-inactive nil :height mode-line-size))
-    )
-
-  ;; Modeline display useful information
-  (setq global-mode-string '(" "))
-  (display-battery-mode t)
-  (display-time-mode t)
-  (setq display-time-day-and-date t)
-  (unless (or (eq 'windows-nt system-type)
-              (not (executable-find "df")))
-    (require 'display-hard-drive-space-mode)
-    (display-hard-drive-space-mode))
-
-  ;;(set-face-attribute 'variable-pitch nil :font '(:family "ETBookOT"))
-
-  ;; I like my unicode to be monospace too, so I use these
-  (set-face-attribute 'default     nil :family "RobotoMono" :weight 'normal ;; :height 95
-                      )
-  (set-face-attribute 'fixed-pitch nil :inherit 'default)
-  (set-fontset-font t 'unicode (font-spec :size 10 :name "FontAwesome"))
-  (set-fontset-font t 'unicode (font-spec :name "SourceCodePro"))
-  ;; HanWangKaiMediumChuIn
-  ;; (set-fontset-font t 'han (font-spec :size 16 :name "HanWangMingMediumChuIn"))
-  ;; (set-fontset-font t 'han (font-spec :size 16 :name "HanWangKaiMediumChuIn-20"))
-  ;; adobe-source-han-sans-otc-fonts
-  (set-fontset-font t 'han (font-spec :size 16 :name "Source Han Sans"))
-  ;; ttf-paratype
-  (set-fontset-font t 'cyrillic (font-spec :size 15 :name "PT Sans Expert"))
-  ;; extra/adobe-source-code-pro-fonts
-  (set-fontset-font t '(9472 . 9599) (font-spec :name "Source Code Pro"))
-
-  (defun my/reading-color ()
-    (interactive)
-    (variable-pitch-mode)
-    (face-remap-add-relative 'default :foreground "white smoke"))
-
-  (add-hook 'Man-mode-hook
-            #'my/reading-color)
-
-  (add-hook 'w3m-mode-hook
-            #'my/reading-color)
-
-  ;; (custom-set-faces
-  ;;  '(default ((t (:family "ETBookOT" :foundry "QUQA"
-  ;;                :slant normal :weight normal :height 120
-  ;;                :width normal :spacing 90)))))
-#+end_src
 * buffer navigation
 #+begin_src emacs-lisp
   ;; Allow minibuffer-ception
@@ -853,73 +766,156 @@
     :config
     (setq-default olivetti-body-width 140))
 #+end_src
-** Change themes on the spot
+* look and feel
+** UI
 #+begin_src emacs-lisp
+    ;; dashboard looks cool
+    (use-package dashboard)
+    (setq fancy-splash-image "~/.emacs.d/res/icon.png")
+
+    ;; Disable tool and menu bar, keep the fringe though
+    (unless my/puppet-p
+      (tool-bar-mode -1)
+      (menu-bar-mode -1)
+      (scroll-bar-mode -1))
+    (fringe-mode '(10 . 10))
+    ;; Need to configure all-the-icons so that mode-line doesn't look fat
+    ;; and ugly
+    (use-package all-the-icons
+      :config
+      (setq all-the-icons-scale-factor 1.0))
+
+    ;; The most efficient cool looking modeline I've found. Faster than even
+    ;; smart-mode-line
+    (use-package doom-modeline
+      :hook (after-init . doom-modeline-mode)
+      :config
+      ;; (setq doom-modeline-height 24)
+
+      ;; Removes symlink bug w/ regards to doom-modeline
+      (setq doom-modeline-project-detection 'project)
+
+      ;; (let ((mode-line-size 95))
+      ;;   (set-face-attribute 'mode-line nil :height mode-line-size)
+      ;;   (set-face-attribute 'mode-line-inactive nil :height mode-line-size))
+      )
+
+    ;; Modeline display useful information
+    (setq global-mode-string '(" "))
+    (setq display-time-day-and-date t)
+
+    (display-battery-mode t)
+    (display-time-mode t)
+    (unless (or (eq 'windows-nt system-type)
+                (not (executable-find "df")))
+      (require 'display-hard-drive-space-mode)
+      (display-hard-drive-space-mode))
+#+end_src
+** font
+#+begin_src emacs-lisp
+  ;;(set-face-attribute 'variable-pitch nil :font '(:family "ETBookOT"))
+
+  ;; I like my unicode to be monospace too, so I use these
+  (set-face-attribute 'default     nil :family "RobotoMono" :weight 'normal ;; :height 95
+                      )
+  (set-face-attribute 'fixed-pitch nil :inherit 'default)
+  (set-fontset-font t 'unicode (font-spec :size 10 :name "FontAwesome"))
+  (set-fontset-font t 'unicode (font-spec :name "SourceCodePro"))
+  ;; HanWangKaiMediumChuIn
+  ;; (set-fontset-font t 'han (font-spec :size 16 :name "HanWangMingMediumChuIn"))
+  ;; (set-fontset-font t 'han (font-spec :size 16 :name "HanWangKaiMediumChuIn-20"))
+  ;; adobe-source-han-sans-otc-fonts
+  (set-fontset-font t 'han (font-spec :size 16 :name "Source Han Sans"))
+  ;; ttf-paratype
+  (set-fontset-font t 'cyrillic (font-spec :size 15 :name "PT Sans Expert"))
+  ;; extra/adobe-source-code-pro-fonts
+  (set-fontset-font t '(9472 . 9599) (font-spec :name "Source Code Pro"))
+
+  ;; (custom-set-faces
+  ;;  '(default ((t (:family "ETBookOT" :foundry "QUQA"
+  ;;                :slant normal :weight normal :height 120
+  ;;                :width normal :spacing 90)))))
+#+end_src
+** theme
+#+begin_src emacs-lisp
+  (use-package color-theme-modern)
+  (load-theme 'calm-forest nil t)
+
+  (use-package modus-themes)
+  (modus-themes-load-themes)
+  (load-theme 'modus-operandi nil t)
+
+  (add-to-list 'custom-theme-load-path "~/.emacs.d/lisp/themes")
   (require 'light-default-theme)
+  (load-theme 'light-default nil t)
   (require 'dark-default-theme)
+  (load-theme 'dark-default nil t)
+  (require 'same-defaults-theme)
+  (load-theme 'same-defaults nil t)
 
   (defvar current-theme 'dark)
-
-  (when (>= emacs-major-version 27)
-    (use-package modus-themes)
-    (defvar light-theme 'modus-operandi))
   (defvar dark-theme 'calm-forest)
+  (defvar light-theme 'modus-operandi)
 
   (defun switch-themes ()
     (interactive)
+    (disable-current-theme)
     (setq current-theme (if (eq current-theme 'dark) 'light 'dark))
-    (disable-theme 'same-defaults)
-    (pcase current-theme
-      ('light
-       (disable-theme 'dark-default)
-       (disable-theme dark-theme)
-       (enable-theme light-theme)
-       (enable-theme 'light-default))
-      ('dark
-       (disable-theme 'light-default)
-       (disable-theme light-theme)
-       (enable-theme dark-theme)
-       (enable-theme 'dark-default)))
-    (enable-theme 'same-defaults)
+    (enable-current-theme)
     (set-background-mode current-theme))
 
   (defun reload-theme ()
     (interactive)
+    (disable-current-theme)
+    (enable-current-theme)
+    (set-background-mode current-theme))
+
+  (defun enable-current-theme ()
+    (pcase current-theme
+      ('light
+       (enable-theme light-theme)
+       (enable-theme 'light-default))
+      ('dark
+       (enable-theme dark-theme)
+       (enable-theme 'dark-default)))
+    (enable-theme 'same-defaults))
+
+  (defun disable-current-theme ()
     (disable-theme 'same-defaults)
     (pcase current-theme
       ('light
        (disable-theme 'light-default)
-       (disable-theme light-theme)
-       (enable-theme light-theme)
-       (enable-theme 'light-default))
+       (disable-theme light-theme))
       ('dark
        (disable-theme 'dark-default)
-       (disable-theme dark-theme)
-       (enable-theme dark-theme)
-       (enable-theme 'dark-default)))
-    (enable-theme 'same-defaults)
-    (set-background-mode current-theme))
-
-  (defun disable-all-theming ()
-    (interactive)
-    (disable-theme 'light-default)
-    (disable-theme light-theme)
-    (disable-theme 'dark-default)
-    (disable-theme dark-theme)
-    (disable-theme 'same-defaults)
-    (set-background-mode 'light)
-    (setq default-theme 'light))
-
-  (ec/load-or-ask-pred 'my/light-default "Use light-theme? ")
+       (disable-theme dark-theme))))
 
   (defun update-frame-background-mode ()
     (mapc 'frame-set-background-mode (frame-list)))
 
   (defun set-background-mode (mode)
-    (setf frame-background-mode mode)
+    (setq frame-background-mode mode)
     (update-frame-background-mode))
 
+  (ec/load-or-ask-pred 'my/light-default "Use light-theme? ")
+
   ;; Executable
-  (when my/light-default
-    (switch-themes))
+  (when (or my/light-default
+            my/puppet-p)
+    (setq current-theme 'light))
+
+  (enable-current-theme)
+#+end_src
+** colors
+#+begin_src emacs-lisp
+  (defun my/reading-color ()
+    (interactive)
+    (variable-pitch-mode)
+    (face-remap-add-relative 'default :foreground "white smoke"))
+
+  (add-hook 'Man-mode-hook
+            #'my/reading-color)
+
+  (add-hook 'w3m-mode-hook
+            #'my/reading-color)
 #+end_src

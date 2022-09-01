@@ -23,8 +23,84 @@
 ;;; Commentary:
 
 ;;; Code:
+(require 'my-org-agenda-files)
 
-gac--debounce-timers
+(defvar gaff/watch-directories (list (list my/agenda-folder "origin/desktop" "origin/gaming-laptop" "origin/puppet" "origin/mobile")))
+
+(defun ga/magit-not-in-progress ()
+  (and (not (magit-rebase-in-progress-p))
+       (not (magit-revert-in-progress-p))
+       (not (magit-am-in-progress-p))
+       (not (magit-merge-in-progress-p))
+       (not (magit-cherry-pick-in-progress-p))
+       (not (magit-sequencer-in-progress-p))
+       (not (magit-bisect-in-progress-p))))
+
+;; TODO depends on what folder ur in
+(defun ga/on-auto-branch ()
+  (member (magit-get-current-branch)
+          '("origin/desktop" "origin/gaming-laptop" "origin/puppet" "origin/mobile")))
+
+(defun ga/should-be-automatic ()
+  (and (if (ga/magit-not-in-progress)
+           t
+         (message "Oops, magit is in progress")
+         nil)
+       (if (ga/on-auto-branch)
+           t
+         (message "Oops, not on automatic branch")
+         nil)))
+
+(defun gaff/get-open-buffers-in (folder)
+  (remove-if-not (lambda (b) (string-prefix-p folder (buffer-file-name b)))
+                 (buffer-list)))
+
+(defun gaff/no-pending-gac-commits (folder)
+  (->> gac--debounce-timers
+       (hash-table-values)
+       (mapcar (lambda (timer) (car (timer--args timer))))
+       (remove-if-not (lambda (buffer) (string-prefix-p folder (buffer-file-name buffer))))
+       (length)
+       (zerop)))
+
+(defun gaff/no-modified-buffers (folder)
+  (->> (gaff/get-open-buffers-in folder)
+       (remove-if-not (lambda (b) (buffer-modified-p b)))
+       (length)
+       (zerop)))
+
+(defun gaff/fetch-fast-forward (repo branches)
+  (let ((default-directory dir))
+    (shell-command "git fetch --all")
+    (dolist (b branches)
+      (shell-command (format "git merge --ff-only %s" b)))))
+
+(defun gaff/trigger ()
+  (interactive)
+  (dolist (info gaff/watch-directories)
+    (let ((dir (car info))
+          (branches (cdr info)))
+      (when (and (ga/should-be-automatic)
+                 (gaff/no-pending-gac-commits dir)
+                 (gaff/no-modified-buffers dir))
+        (let ((buffers (gaff/get-open-buffers-in dir)))
+          (unwind-protect
+              (progn
+                (dolist (b buffers)
+                  (with-current-buffer b
+                    (read-only-mode 1)))
+                (gaff/fetch-fast-forward dir branches))
+            (dolist (b buffers)
+              (with-current-buffer b
+                (read-only-mode -1)))))))))
+
+(defvar gaff/timer nil)
+
+(define-minor-mode git-auto-fast-forward-mode ""
+  nil nil nil
+  (if git-auto-fast-forward-mode
+      (setq gaff/timer (run-at-time nil 300 #'gaff/trigger))
+    (cancel-timer gaff/timer)))
 
 (provide 'git-auto-fast-forward-mode)
 ;;; git-auto-fast-forward-mode.el ends here

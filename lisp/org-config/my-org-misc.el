@@ -131,6 +131,8 @@
 
 (use-package git-auto-commit-mode
   :config
+  (require 'git-auto-fast-forward-mode)
+  (require 'ssh-key-management)
   (use-package keychain-environment)
   (setq gac-automatically-add-new-files-p nil)
   (setq-default gac-debounce-interval 300)
@@ -150,87 +152,22 @@
     (let ((default-directory (file-name-directory (buffer-file-name buffer))))
       (magit-push-current-to-pushremote nil)))
 
-  (defun-cached gac-use-magit-fetch ()
-    (let ((default-directory (file-name-directory (buffer-file-name (current-buffer)))))
-      (magit-fetch-all nil)))
-
   (advice-add #'gac-push :override #'gac-use-magit-push)
 
-  (defvar rb/ssh-default-key (format "~/.ssh/devices/%s/id_rsa" (system-name))
-    "My default SSH key.")
+  ;; (defvar gac-auto-merge-branch-list nil)
+  ;; (make-variable-buffer-local 'gac-auto-merge-branch-list)
 
-  (defun-cached rb/ssh-add (&optional arg)
-    "Add the default ssh-key if it's not present.
+  (defun-cached gac-run-gaff ()
+    (gaff/trigger))
 
-With a universal argument, prompt to specify which key."
-    (interactive "P")
-    (when (or arg
-              (not (rb/ssh-agent-has-keys-p)))
-      (rb/ssh-add-in-emacs
-       (if (not arg)
-           rb/ssh-default-key
-         (read-file-name
-          "Add key: \n" "~/.ssh" nil 't nil
-          (lambda (x)
-            (not (or (string-suffix-p ".pub" x)
-                     (string= "known_hosts" x)))))))))
-
-  (defun rb/ssh-agent-has-keys-p ()
-    "Return t if the ssh-agent has a key."
-    (when (not
-           (string-match-p
-            "No identities"
-            (shell-command-to-string "ssh-add -l")))
-      t))
-
-  (defun rb/ssh-add-in-emacs (key-file)
-    "Run ssh-add to add a key to the running SSH agent."
-    (let ((process-connection-type t)
-          process)
-      (unwind-protect
-          (progn
-            (setq process
-                  (start-process
-                   "ssh-add" nil "ssh-add"
-                   (expand-file-name key-file)))
-            (set-process-filter
-             process 'rb/ssh-add-process-filter)
-            (while (accept-process-output process)))
-        (if (eq (process-status process) 'run)
-            (kill-process process)))))
-
-  (defun rb/ssh-add-process-filter (process string)
-    (save-match-data
-      (if (string-match ":\\s *\\'" string)
-          (process-send-string process
-                               (concat
-                                (read-passwd string)
-                                "\n"))
-        (message "ssh-add: %s" string))))
-
-  (defvar gac-auto-merge-branch-list nil)
-  (make-variable-buffer-local 'gac-auto-merge-branch-list)
-
-  (defun-cached gac-check-changes-merge-all ()
-    (when gac-auto-merge-branch-list
-      (if (not (string-empty-p (shell-command-to-string "git status -suno")))
-          (message "Tried to fast-forward, but there are unstaged changes!")
-        (magit-fast-forward-all))))
-
-  (defun magit-fast-forward-all ()
-    (interactive)
-    (with-current-buffer (current-buffer)
-      (dolist (branch gac-auto-merge-branch-list)
-        (magit-merge-plain branch '("--ff-only")))))
-
-  ;; (add-hook 'hack-local-variables-hook
-  ;;           #'gac-check-changes-merge-all)
+  (defun-cached gac-run-ssh-add ()
+    (rb/ssh-add))
 
   (add-hook 'git-auto-commit-mode-hook
-            #'gac-use-magit-fetch)
+            #'gac-run-gaff)
 
   (add-hook 'git-auto-commit-mode-hook
-            #'rb/ssh-add)
+            #'gac-run-ssh-add)
 
   (add-hook 'git-auto-commit-mode-hook
             #'gac-after-save-func t t)
@@ -245,12 +182,39 @@ With a universal argument, prompt to specify which key."
                '(gac-automatically-push-p . nil))
 
   (defun gac-commit-message (filename)
-    (format "Desktop autocommit: %s\n\n%s"
+    (format "%s autocommit: %s\n\n%s"
+            (system-name)
             (format-time-string "%Y/%m/%d %H:%M:%S")
             filename))
 
   (setq gac-default-message
-        #'gac-commit-message))
+        #'gac-commit-message)
+
+  (defun my/gac--debounced-save ()
+    (let* ((actual-buffer (current-buffer)))
+      (when-let (current-timer (gethash actual-buffer gac--debounce-timers))
+        (remhash actual-buffer gac--debounce-timers)
+        (cancel-timer current-timer))
+      (puthash actual-buffer
+               (run-at-time gac-debounce-interval nil
+                            #'gac--after-save
+                            actual-buffer)
+               gac--debounce-timers)))
+
+  (advice-add #'gac--debounced-save
+              :override
+              #'my/gac--debounced-save)
+
+  (defun gac-debounce-again-if-magit-in-progress (buf)
+    (with-current-buffer buf
+      (if (ga/should-be-automatic)
+          t
+        (gac--debounced-save)
+        nil)))
+
+  (advice-add #'gac--after-save
+              :before-while
+              #'gac-debounce-again-if-magit-in-progress))
 
 (when (eq window-system 'x)
   (define-key org-mode-map

@@ -400,7 +400,7 @@
 * pdf-tools use isearch
 #+BEGIN_SRC emacs-lisp
   (when (and (not (eq system-type 'windows-nt))
-             (not my/at-ti))
+             (not my-ec/at-ti))
     (use-package pdf-tools)
     (pdf-tools-install)
     (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)

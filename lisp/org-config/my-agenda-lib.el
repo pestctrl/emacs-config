@@ -1,9 +1,9 @@
-;;; my-org.el ---  -*- lexical-binding: t -*-
+;;; my-agenda-lib.el ---  -*- lexical-binding: t -*-
 
-;; Copyright (C) 2020 Benson Chu
+;; Copyright (C) 2022 Benson Chu
 
 ;; Author: Benson Chu <bensonchu457@gmail.com>
-;; Created: [2020-05-03 14:42]
+;; Created: [2022-06-13 10:57]
 
 ;; This file is not part of GNU Emacs
 
@@ -23,22 +23,6 @@
 ;;; Commentary:
 
 ;;; Code:
-(require 'org)
-(require 'org-overrides)
 
-(require 'org-loop)
-(require 'org-process)
-(require 'org-project)
-(require 'org-delay)
-
-(require 'my-org-misc)
-(require 'my-org-autosync)
-(require 'my-org-indent)
-(require 'my-org-agenda-commands)
-(require 'my-org-capture-templates)
-(require 'org-other-additions)
-
-(require 'self-chat-mode)
-
-(provide 'my-org)
-;;; my-org.el ends here
+(provide 'my-agenda-lib)
+;;; my-agenda-lib.el ends here

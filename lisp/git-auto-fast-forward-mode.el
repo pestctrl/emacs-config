@@ -23,9 +23,7 @@
 ;;; Commentary:
 
 ;;; Code:
-(require 'my-org-agenda-files)
-
-(defvar gaff/watch-directories (list (list my/agenda-folder "origin/desktop" "origin/gaming-laptop" "origin/puppet" "origin/mobile")))
+(defvar gaff/watch-directories nil)
 
 (defun ga/magit-not-in-progress ()
   (and (not (magit-rebase-in-progress-p))

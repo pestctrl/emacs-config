@@ -242,6 +242,7 @@ With a universal argument, prompt to specify which key."
     #'(lambda () (interactive) (org-back-to-heading))))
 
 (define-key org-mode-map (kbd "M-g o") (lambda () (interactive) (org-back-to-heading)))
+(define-key org-mode-map (kbd "C-M-a") (lambda () (interactive) (org-back-to-heading)))
 
 ;; My replacement for follow mode
 (defun org-agenda-jump-to-heading-show ()

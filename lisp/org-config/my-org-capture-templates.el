@@ -54,10 +54,18 @@
 (add-hook 'kill-emacs-query-functions
           #'warn-active-capture-template)
 
+(defvar my/org-protocol-capture-skip-archive nil)
+
+(defun my/org-protocol-capture-skip-archive ()
+  (interactive)
+  (setq my/org-protocol-capture-skip-archive
+        (not my/org-protocol-capture-skip-archive)))
+
 (defun my/org-board-prompt ()
   (let ((desc (plist-get org-capture-current-plist :description)))
     (when (and (not org-note-abort)
                (string= desc "\tProtocol Link")
+               (not my/org-protocol-capture-skip-archive)
                (y-or-n-p "Do you want to archive the page? "))
       (call-interactively #'org-board-archive))))
 

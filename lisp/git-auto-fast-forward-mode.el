@@ -39,7 +39,7 @@
 ;; TODO depends on what folder ur in
 (defun ga/on-auto-branch ()
   (member (magit-get-current-branch)
-          '("origin/desktop" "origin/gaming-laptop" "origin/puppet" "origin/mobile")))
+          '("desktop" "gaming-laptop" "puppet" "mobile")))
 
 (defun ga/should-be-automatic ()
   (and (if (ga/magit-not-in-progress)
@@ -69,11 +69,15 @@
        (length)
        (zerop)))
 
+(defun gaff/no-git-changes (folder)
+  (string-empty-p (shell-command-to-string "git status -suno")))
+
 (defun gaff/fetch-fast-forward (repo branches)
-  (let ((default-directory dir))
+  (let ((default-directory repo))
     (shell-command "git fetch --all")
     (dolist (b branches)
-      (shell-command (format "git merge --ff-only %s" b)))))
+      (shell-command (format "git merge --ff-only %s" b)))
+    (magit-push-current-to-pushremote nil)))
 
 (defun gaff/trigger ()
   (interactive)
@@ -82,7 +86,8 @@
           (branches (cdr info)))
       (when (and (ga/should-be-automatic)
                  (gaff/no-pending-gac-commits dir)
-                 (gaff/no-modified-buffers dir))
+                 (gaff/no-modified-buffers dir)
+                 (gaff/no-git-changes dir))
         (let ((buffers (gaff/get-open-buffers-in dir)))
           (unwind-protect
               (progn

@@ -48,7 +48,6 @@
  `(org-agenda-files
    '(,(my/agenda-file "plan.org")
      ,(my/agenda-file "refile.org")
-     ,(my/agenda-file "today.org")
      ,(my/agenda-file "sandbox.org")
      ,(my/agenda-file "dev.org")
      ,(my/agenda-file "prod.org"))))

@@ -39,15 +39,16 @@
   (member (magit-get-current-branch)
           '("desktop" "gaming-laptop" "puppet" "mobile")))
 
-(defun ga/should-be-automatic ()
-  (and (if (ga/magit-not-in-progress)
-           t
-         (message "Oops, magit is in progress")
-         nil)
-       (if (ga/on-auto-branch)
-           t
-         (message "Oops, not on automatic branch")
-         nil)))
+(defun ga/should-be-automatic (dir)
+  (let ((default-directory dir))
+    (and (if (ga/magit-not-in-progress)
+             t
+           (message "Oops, magit is in progress")
+           nil)
+         (if (ga/on-auto-branch)
+             t
+           (message "Oops, not on automatic branch")
+           nil))))
 
 (defun gaff/get-open-buffers-in (folder)
   (remove-if-not (lambda (b) (string-prefix-p folder (buffer-file-name b)))
@@ -68,13 +69,17 @@
        (zerop)))
 
 (defun gaff/no-git-changes (folder)
-  (string-empty-p (shell-command-to-string "git status -suno")))
+  (let ((default-directory folder))
+    (string-empty-p (shell-command-to-string "git status -suno"))))
 
 (defun gaff/fetch-fast-forward (repo branches)
   (let ((default-directory repo))
     (shell-command "git fetch --all")
     (dolist (b branches)
-      (shell-command (format "git merge --ff-only %s" b)))
+      (let ((output-buffer (format "*merge-%s*" b)))
+        (when (not (zerop (shell-command (format "git merge --ff-only %s" b) output-buffer)))
+          (pop-to-buffer output-buffer)
+          (user-error "Uh oh, one of the merges resulted in an error!"))))
     (magit-push-current-to-pushremote nil)))
 
 (defun gaff/trigger ()
@@ -82,7 +87,7 @@
   (dolist (info gaff/watch-directories)
     (let ((dir (car info))
           (branches (cdr info)))
-      (when (and (ga/should-be-automatic)
+      (when (and (ga/should-be-automatic dir)
                  (gaff/no-pending-gac-commits dir)
                  (gaff/no-modified-buffers dir)
                  (gaff/no-git-changes dir))

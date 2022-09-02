@@ -35,7 +35,7 @@
 (setq gac-automatically-add-new-files-p nil)
 (setq-default gac-debounce-interval 40)
 
-(defmacro defun-cached (name time args &rest body)
+(defmacro defun-cached (time name args &rest body)
   (let ((var-name (intern (concat (symbol-name name) "--cached"))))
     `(progn
        (defvar ,var-name t)
@@ -106,7 +106,7 @@
 
 (defun gac-debounce-again-if-magit-in-progress (buf)
   (with-current-buffer buf
-    (if (ga/should-be-automatic)
+    (if (ga/should-be-automatic (file-name-directory (buffer-file-name buf)))
         t
       (gac--debounced-save)
       nil)))

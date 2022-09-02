@@ -80,7 +80,9 @@
         (when (not (zerop (shell-command (format "git merge --ff-only %s" b) output-buffer)))
           (pop-to-buffer output-buffer)
           (user-error "Uh oh, one of the merges resulted in an error!"))))
-    (magit-push-current-to-pushremote nil)))
+    ;; TODO: work around this hack
+    (with-current-buffer (dired-noselect repo)
+      (magit-push-current-to-pushremote nil))))
 
 (defun gaff/trigger ()
   (interactive)

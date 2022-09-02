@@ -30,7 +30,8 @@
 (use-package keychain-environment)
 
 (require 'my-org-agenda-files)
-(setq gaff/watch-directories (list (list my/agenda-folder "origin/desktop" "origin/gaming-laptop" "origin/puppet" "origin/mobile")))
+(setq gaff/watch-directories (list (list (file-name-as-directory my/agenda-folder)
+                                         "origin/desktop" "origin/gaming-laptop" "origin/puppet" "origin/mobile")))
 
 (setq gac-automatically-add-new-files-p nil)
 (setq-default gac-debounce-interval 40)

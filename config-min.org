@@ -157,7 +157,7 @@
         (puthash frame size frame-font-size-cache)
         (set-frame-font (format "RobotoMono %s" size))
         (exwm-randr-refresh))))
-  (add-hook 'window-size-change-functions #'hoagie-adjust-font-size)
+  (remove-hook 'window-size-change-functions #'hoagie-adjust-font-size)
 #+end_src
 * buffer navigation new                                             :ARCHIVE:
 #+begin_src

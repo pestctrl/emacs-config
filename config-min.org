@@ -769,47 +769,47 @@
 * look and feel
 ** UI
 #+begin_src emacs-lisp
-    ;; dashboard looks cool
-    (use-package dashboard)
-    (setq fancy-splash-image "~/.emacs.d/res/icon.png")
+  ;; dashboard looks cool
+  (use-package dashboard)
+  (setq fancy-splash-image "~/.emacs.d/res/icon.png")
 
-    ;; Disable tool and menu bar, keep the fringe though
-    (unless my/puppet-p
-      (tool-bar-mode -1)
-      (menu-bar-mode -1)
-      (scroll-bar-mode -1))
-    (fringe-mode '(10 . 10))
-    ;; Need to configure all-the-icons so that mode-line doesn't look fat
-    ;; and ugly
-    (use-package all-the-icons
-      :config
-      (setq all-the-icons-scale-factor 1.0))
+  ;; Disable tool and menu bar, keep the fringe though
+  (unless my/puppet-p
+    (tool-bar-mode -1)
+    (menu-bar-mode -1)
+    (scroll-bar-mode -1))
+  (fringe-mode '(10 . 10))
+  ;; Need to configure all-the-icons so that mode-line doesn't look fat
+  ;; and ugly
+  (use-package all-the-icons
+    :config
+    (setq all-the-icons-scale-factor 1.0))
 
-    ;; The most efficient cool looking modeline I've found. Faster than even
-    ;; smart-mode-line
-    (use-package doom-modeline
-      :hook (after-init . doom-modeline-mode)
-      :config
-      ;; (setq doom-modeline-height 24)
+  ;; The most efficient cool looking modeline I've found. Faster than even
+  ;; smart-mode-line
+  (use-package doom-modeline
+    :hook (after-init . doom-modeline-mode)
+    :config
+    (setq doom-modeline-height 24)
 
-      ;; Removes symlink bug w/ regards to doom-modeline
-      (setq doom-modeline-project-detection 'project)
+    ;; Removes symlink bug w/ regards to doom-modeline
+    (setq doom-modeline-project-detection 'project)
 
-      ;; (let ((mode-line-size 95))
-      ;;   (set-face-attribute 'mode-line nil :height mode-line-size)
-      ;;   (set-face-attribute 'mode-line-inactive nil :height mode-line-size))
-      )
+    ;; (let ((mode-line-size 95))
+    ;;   (set-face-attribute 'mode-line nil :height mode-line-size)
+    ;;   (set-face-attribute 'mode-line-inactive nil :height mode-line-size))
+    )
 
-    ;; Modeline display useful information
-    (setq global-mode-string '(" "))
-    (setq display-time-day-and-date t)
+  ;; Modeline display useful information
+  (setq global-mode-string '(" "))
+  (setq display-time-day-and-date t)
 
-    (display-battery-mode t)
-    (display-time-mode t)
-    (unless (or (eq 'windows-nt system-type)
-                (not (executable-find "df")))
-      (require 'display-hard-drive-space-mode)
-      (display-hard-drive-space-mode))
+  (display-battery-mode t)
+  (display-time-mode t)
+  (unless (or (eq 'windows-nt system-type)
+              (not (executable-find "df")))
+    (require 'display-hard-drive-space-mode)
+    (display-hard-drive-space-mode))
 #+end_src
 ** font
 #+begin_src emacs-lisp

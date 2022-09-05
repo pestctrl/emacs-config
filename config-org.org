@@ -691,7 +691,7 @@
       :straight (:host github :repo "org-roam/org-roam" :branch "main")
       :ensure t
       :custom
-      (org-roam-directory (expand-file-name "org-roam" my/org-folder))
+      (org-roam-directory (my/org-file "org-roam"))
       (org-roam-use-completion-everywhere t)
       :bind (("C-c n h" . org-roam-buffer-toggle)
              ("C-c n f" . org-roam-node-find)

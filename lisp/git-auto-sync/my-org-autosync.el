@@ -26,9 +26,10 @@
 (require 'use-package)
 (use-package git-auto-commit-mode)
 (require 'git-auto-fast-forward-mode)
-(require 'ssh-key-management)
 (use-package keychain-environment)
+(require 'ssh-key-management)
 
+(setq rb/ssh-default-key (format "~/.ssh/devices/%s/id_rsa" (system-name)))
 (require 'my-org-agenda-files)
 (setq gaff/watch-directories (list (list (file-name-as-directory my/agenda-folder)
                                          "origin/desktop" "origin/gaming-laptop" "origin/puppet" "origin/mobile")))
@@ -106,11 +107,12 @@
             #'my/gac--debounced-save)
 
 (defun gac-debounce-again-if-magit-in-progress (buf)
-  (with-current-buffer buf
-    (if (ga/should-be-automatic (file-name-directory (buffer-file-name buf)))
-        t
-      (gac--debounced-save)
-      nil)))
+  ;; Return true if should-be-automatic is true
+  (or (ga/should-be-automatic (file-name-directory (buffer-file-name buf)))
+      ;; Otherwise, debounce again and return nil
+      (and (with-current-buffer buf
+             gac--debounced-save)
+           nil)))
 
 (advice-add #'gac--after-save
             :before-while

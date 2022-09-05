@@ -25,30 +25,30 @@
 ;;; Code:
 (defvar gaff/watch-directories nil)
 
-(defun ga/magit-not-in-progress ()
-  (and (not (magit-rebase-in-progress-p))
-       (not (magit-revert-in-progress-p))
-       (not (magit-am-in-progress-p))
-       (not (magit-merge-in-progress-p))
-       (not (magit-cherry-pick-in-progress-p))
-       (not (magit-sequencer-in-progress-p))
-       (not (magit-bisect-in-progress-p))))
+(defun ga/magit-not-in-progress (dir)
+  (with-current-buffer (dired-noselect dir)
+    (and (not (magit-rebase-in-progress-p))
+         (not (magit-revert-in-progress-p))
+         (not (magit-am-in-progress-p))
+         (not (magit-merge-in-progress-p))
+         (not (magit-cherry-pick-in-progress-p))
+         (not (magit-sequencer-in-progress-p))
+         (not (magit-bisect-in-progress-p)))))
 
-;; TODO depends on what folder ur in
-(defun ga/on-auto-branch ()
-  (member (magit-get-current-branch)
-          '("desktop" "gaming-laptop" "puppet" "mobile")))
+(defun ga/on-auto-branch (dir)
+  (with-current-buffer (dired-noselect dir)
+    (member (magit-get-current-branch)
+            '("desktop" "gaming-laptop" "puppet" "mobile"))))
 
 (defun ga/should-be-automatic (dir)
-  (let ((default-directory dir))
-    (and (if (ga/magit-not-in-progress)
-             t
-           (message "Oops, magit is in progress")
-           nil)
-         (if (ga/on-auto-branch)
-             t
-           (message "Oops, not on automatic branch")
-           nil))))
+  (and (if (ga/magit-not-in-progress dir)
+           t
+         (message "Oops, magit is in progress")
+         nil)
+       (if (ga/on-auto-branch dir)
+           t
+         (message "Oops, not on automatic branch")
+         nil)))
 
 (defun gaff/get-open-buffers-in (folder)
   (remove-if-not (lambda (b) (string-prefix-p folder (buffer-file-name b)))
@@ -73,16 +73,15 @@
     (string-empty-p (shell-command-to-string "git status -suno"))))
 
 (defun gaff/fetch-fast-forward (repo branches)
-  (let ((default-directory repo))
+  ;; TODO: work around this hack
+  (with-current-buffer (dired-noselect repo)
     (shell-command "git fetch --all")
     (dolist (b branches)
       (let ((output-buffer (format "*merge-%s*" b)))
         (when (not (zerop (shell-command (format "git merge --ff-only %s" b) output-buffer)))
           (pop-to-buffer output-buffer)
           (user-error "Uh oh, one of the merges resulted in an error!"))))
-    ;; TODO: work around this hack
-    (with-current-buffer (dired-noselect repo)
-      (magit-push-current-to-pushremote nil))))
+    (magit-push-current-to-pushremote nil))))
 
 (defun gaff/trigger ()
   (interactive)

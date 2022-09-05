@@ -59,9 +59,6 @@
 (add-to-list 'safe-local-variable-values
              '(gac-automatically-push-p . t))
 
-(add-to-list 'safe-local-variable-values
-             '(gac-automatically-push-p . nil))
-
 (defun gac-commit-message (filename)
   (format "%s autocommit: %s\n\n%s"
           (system-name)

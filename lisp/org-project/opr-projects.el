@@ -99,7 +99,7 @@
                         (eq 'project (opr/ambiguous-task-or-project))))
            (if (or (member "_invis_" (org-get-tags))
                    (when-let (d (org-entry-get (point) "DELAYED"))
-                     (org-time> d (org-matcher-time "<now>"))))
+                     (org-time> d (org-matcher-time "<yesterday>"))))
                'invis
              (if (when-let (s (org-entry-get (point) "SCHEDULED"))
                    (org-time> s (org-matcher-time "<now>")))

@@ -1,6 +1,46 @@
 ;; This buffer is for text that is not saved, and for Lisp evaluation.
 ;; To create a file, visit it with C-x C-f and enter text in its buffer.
 
+(defun mocfw/split-element-into-3 (element)
+  (cl-flet ((timestamp-to-str
+             (str)
+             (save-match-data
+               (string-match (rx (and "<"
+                                      (group (= 4 digit)) "-"
+                                      (group (= 2 digit)) "-"
+                                      (group (= 2 digit))
+                                      (optional " " (+ (not ">")))
+                                      ">"))
+                             str)
+               (list (string-to-number (match-string 2 str))
+                     (string-to-number (match-string 3 str))
+                     (string-to-number (match-string 1 str)))))
+            (timestamp-from-element
+             (element)
+             (--> element
+                  (plist-get it 'timestamp)
+                  (plist-get it :raw-value))))
+    (let* ((marker (org-element-property :org-marker element))
+           (heading (with-current-buffer (marker-buffer marker)
+                      (goto-char (marker-position marker))
+                      (org-get-heading)))
+           result)
+      (when-let (scheduled (org-element-property :scheduled element))
+        (push (list (timestamp-to-str (timestamp-from-element scheduled))
+                    heading)
+              result))
+      (when-let (deadline (org-element-property :deadline element))
+        (push (list (timestamp-to-str (timestamp-from-element deadline))
+                    heading)
+              result))
+      (when-let (delayed (with-current-buffer (marker-buffer marker)
+                           (goto-char (marker-position marker))
+                           (org-entry-get (point) "DELAYED")))
+        (push (list (timestamp-to-str delayed)
+                    heading)
+              result))
+      result)))
+
 (defun my/cfw:org-schedule-period-to-calendar (begin end)
   (let* ((start-str (format "%04d-%02d-%02d"
                             (caddr begin)
@@ -20,45 +60,7 @@
                                                         (and (org-time> d (org-matcher-time ,start-str))
                                                              (org-time< d (org-matcher-time ,end-str)))) )))
                                 :order-by '(date priority todo)))
-         (aug-results (mapcan #'(lambda (element)
-                                  (setq debug/result element)
-                                  (cl-flet ((timestamp-to-str
-                                             (str)
-                                             (save-match-data
-                                               (string-match (rx (and "<"
-                                                                      (group (= 4 digit)) "-"
-                                                                      (group (= 2 digit)) "-"
-                                                                      (group (= 2 digit))
-                                                                      (optional " " (+ (not ">")))
-                                                                      ">"))
-                                                             str)
-                                               (list (string-to-number (match-string 2 str))
-                                                     (string-to-number (match-string 3 str))
-                                                     (string-to-number (match-string 1 str))))))
-                                    (let* ((marker (org-element-property :org-marker element))
-                                           (heading (with-current-buffer (marker-buffer marker)
-                                                      (goto-char (marker-position marker))
-                                                      (org-get-heading)))
-                                           result)
-                                      (when-let (scheduled (org-element-property :scheduled element))
-                                        (push (list (timestamp-to-str (--> scheduled
-                                                                           (plist-get it 'timestamp)
-                                                                           (plist-get it :raw-value)))
-                                                    heading)
-                                              result))
-                                      (when-let (deadline (org-element-property :deadline element))
-                                        (push (list (timestamp-to-str (--> deadline
-                                                                           (plist-get it 'timestamp)
-                                                                           (plist-get it :raw-value)))
-                                                    heading)
-                                              result))
-                                      (when-let (delayed (with-current-buffer (marker-buffer marker)
-                                                           (goto-char (marker-position marker))
-                                                           (org-entry-get (point) "DELAYED")))
-                                        (push (list (timestamp-to-str delayed)
-                                                    heading)
-                                              result))
-                                      result)))
+         (aug-results (mapcan #'mocfw/split-element-into-3
                               results))
          alist)
     (dolist (i (reverse aug-results))

@@ -45,6 +45,12 @@
 
 (require 'org-archive-tree-count)
 
+(require 'my-org-calfw)
+
+(advice-add #'cfw:org-schedule-period-to-calendar
+            :override
+            #'my/cfw:org-schedule-period-to-calendar)
+
 (setq org-ql-indentor-function #'get-parent-indent-level)
 
 ;; (add-to-list 'directory-abbrev-alist

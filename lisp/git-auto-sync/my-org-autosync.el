@@ -35,7 +35,7 @@
                                          "origin/desktop" "origin/gaming-laptop" "origin/puppet" "origin/mobile")))
 
 (setq gac-automatically-add-new-files-p nil)
-(setq-default gac-debounce-interval 40)
+(setq-default gac-debounce-interval 20)
 
 (defmacro defun-cached (time name args &rest body)
   (let ((var-name (intern (concat (symbol-name name) "--cached"))))
@@ -106,12 +106,19 @@
             :override
             #'my/gac--debounced-save)
 
+(defun gac-no-lint-errors ()
+  (if (zerop (length (with-current-buffer buf (org-lint))))
+      t
+    (message "Uh oh, lint errors were found! ")
+    nil))
+
 (defun gac-debounce-again-if-magit-in-progress (buf)
-  ;; Return true if should-be-automatic is true
-  (or (ga/should-be-automatic (file-name-directory (buffer-file-name buf)))
+  ;; Return true if should-be-automatic is true, and if there are no org-lint errors
+  (or (and (ga/should-be-automatic (file-name-directory (buffer-file-name buf)))
+           (gac-no-lint-errors))
       ;; Otherwise, debounce again and return nil
       (and (with-current-buffer buf
-             gac--debounced-save)
+             (gac--debounced-save))
            nil)))
 
 (advice-add #'gac--after-save

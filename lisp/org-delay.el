@@ -1,4 +1,4 @@
-;;; org-delay.el ---  -*- lexical-binding: t -*-
+;;; org-delay.el ---
 
 ;; Copyright (C) 2019 Benson Chu
 
@@ -53,7 +53,16 @@
 
 (defun org-delay-until-next-week ()
   (interactive)
-  (let ((time (org-read-date nil nil "fri 17:00")))
+  (let* ((time
+          (let ((org-time-was-given t))
+            (org-read-date nil nil "fri 17:00"))))
+    (org-delay nil time)))
+
+(defun org-delay-one-day ()
+  (interactive)
+  (let ((time
+         (let ((org-time-was-given nil))
+           (org-read-date nil nil "+1d"))))
     (org-delay nil time)))
 
 (define-key org-mode-map (kbd "C-c <C-tab>") #'org-delay)
@@ -97,10 +106,31 @@
     (message "%s" ts)
     (next-line)))
 
+(defun org-agenda-delay-one-day (arg)
+  (interactive "P")
+  (org-agenda-check-type t 'agenda 'todo 'tags 'search)
+  (org-agenda-check-no-diary)
+  (let* ((marker (or (org-get-at-bol 'org-marker)
+                     (org-agenda-error)))
+         (buffer (marker-buffer marker))
+         (pos (marker-position marker))
+         ts)
+    (org-with-remote-undo buffer
+      (with-current-buffer buffer
+        (widen)
+        (goto-char pos)
+        (setq ts (if arg
+                     (org-delay arg)
+                   (org-delay-one-day))))
+      (org-agenda-show-new-time marker ts " D"))
+    (message "%s" ts)
+    (next-line)))
+
 (define-prefix-command '*org-delay-map*)
 (define-key org-agenda-mode-map (kbd "d") '*org-delay-map*)
 
 (define-key *org-delay-map* (kbd "d") #'org-agenda-delay-until-next-week)
+(define-key *org-delay-map* (kbd "1") #'org-agenda-delay-one-day)
 (define-key *org-delay-map* (kbd "D") #'org-agenda-delay)
 (define-key *org-delay-map* (kbd "u") (lambda () (interactive) (org-agenda-delay '(4))))
 

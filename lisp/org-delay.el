@@ -86,8 +86,8 @@
     (next-line)
     (message "%s" ts)))
 
-(defun org-agenda-delay-until-next-week (arg)
-  (interactive "P")
+(defun org-agenda-delay-until-next-week ()
+  (interactive)
   (org-agenda-check-type t 'agenda 'todo 'tags 'search)
   (org-agenda-check-no-diary)
   (let* ((marker (or (org-get-at-bol 'org-marker)
@@ -99,15 +99,13 @@
       (with-current-buffer buffer
         (widen)
         (goto-char pos)
-        (setq ts (if arg
-                     (org-delay arg)
-                   (org-delay-until-next-week))))
+        (setq ts (org-delay-until-next-week)))
       (org-agenda-show-new-time marker ts " D"))
     (message "%s" ts)
     (next-line)))
 
-(defun org-agenda-delay-one-day (arg)
-  (interactive "P")
+(defun org-agenda-delay-one-day ()
+  (interactive)
   (org-agenda-check-type t 'agenda 'todo 'tags 'search)
   (org-agenda-check-no-diary)
   (let* ((marker (or (org-get-at-bol 'org-marker)
@@ -119,9 +117,7 @@
       (with-current-buffer buffer
         (widen)
         (goto-char pos)
-        (setq ts (if arg
-                     (org-delay arg)
-                   (org-delay-one-day))))
+        (setq ts (org-delay-one-day)))
       (org-agenda-show-new-time marker ts " D"))
     (message "%s" ts)
     (next-line)))

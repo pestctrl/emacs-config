@@ -6,6 +6,7 @@
 (setq package-archives '(("melpa" . "http://melpa.org/packages/")
 ;;                         ("org" . "https://orgmode.org/elpa/")
                          ("gnu" . "http://elpa.gnu.org/packages/")
+                         ("nongnu" . "https://elpa.nongnu.org/nongnu/")
                          ("elpa" . "http://tromey.com/elpa/")
                          ;;("marmalade" . "http://marmalade-repo.org/packages/")
                          ))

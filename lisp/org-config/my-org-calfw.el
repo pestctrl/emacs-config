@@ -57,8 +57,8 @@
                                                  (deadline :from ,start-str :to ,end-str)
                                                  (and (property "DELAYED")
                                                       (when-let (d (org-entry-get (point) "DELAYED"))
-                                                        (and (org-time> d (org-matcher-time ,start-str))
-                                                             (org-time< d (org-matcher-time ,end-str)))) )))
+                                                        (and (org-time<= (org-matcher-time ,start-str) d)
+                                                             (org-time<= d (org-matcher-time ,end-str)))) )))
                                 :order-by '(date priority todo)))
          (aug-results (mapcan #'mocfw/split-element-into-3
                               results))

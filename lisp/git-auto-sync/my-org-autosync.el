@@ -106,7 +106,7 @@
             :override
             #'my/gac--debounced-save)
 
-(defun gac-no-lint-errors ()
+(defun gac-no-lint-errors (buf)
   (if (zerop (length (with-current-buffer buf (org-lint))))
       t
     (message "Uh oh, lint errors were found! ")
@@ -115,7 +115,7 @@
 (defun gac-debounce-again-if-magit-in-progress (buf)
   ;; Return true if should-be-automatic is true, and if there are no org-lint errors
   (or (and (ga/should-be-automatic (file-name-directory (buffer-file-name buf)))
-           (gac-no-lint-errors))
+           (gac-no-lint-errors buf))
       ;; Otherwise, debounce again and return nil
       (and (with-current-buffer buf
              (gac--debounced-save))

@@ -110,6 +110,8 @@
   (if (zerop (length (with-current-buffer buf (org-lint))))
       t
     (message "Uh oh, lint errors were found! ")
+    (with-current-buffer buf
+     (call-interactively #'org-lint))
     nil))
 
 (defun gac-debounce-again-if-magit-in-progress (buf)

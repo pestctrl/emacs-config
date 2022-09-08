@@ -83,8 +83,9 @@
                    (and (member (char-after) (mapcar #'string-to-char
                                                      (list "X" " ")))
                         (eq (char-before) (string-to-char "[")))))
-      (save-excursion
-        (org-toggle-checkbox)))))
+      (let ((p (point)))
+        (org-toggle-checkbox)
+        (goto-char p)))))
 
 (define-key org-capture-mode-map (kbd "<mouse-1>") #'org-click-check)
 

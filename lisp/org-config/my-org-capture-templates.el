@@ -80,9 +80,11 @@
     (when (and (org-at-item-p)
                (or (member (char-after) (list (string-to-char "[")
                                               (string-to-char "]")))
-                   (and (eq (char-after) (string-to-char " "))
+                   (and (member (char-after) (mapcar #'string-to-char
+                                                     (list "X" " ")))
                         (eq (char-before) (string-to-char "[")))))
-      (org-toggle-checkbox))))
+      (save-excursion
+        (org-toggle-checkbox)))))
 
 (define-key org-capture-mode-map (kbd "<mouse-1>") #'org-click-check)
 

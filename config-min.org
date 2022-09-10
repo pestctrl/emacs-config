@@ -46,7 +46,7 @@
   (require 'keyboard-toggle)
   (exwm-global-set-key (kbd "s-a") #'my/toggle-keyboard)
 #+end_src
-* buffer navigation new
+* minibuffers
 #+begin_src emacs-lisp
   ;; Allow minibuffer-ception
   (setq enable-recursive-minibuffers t)
@@ -96,7 +96,9 @@
     (marginalia-align-offset 100)
     :init
     (marginalia-mode))
-
+#+end_src
+* navigation
+#+begin_src emacs-lisp
   ;; Scrollkeeper is helpful for scrolling up and down
   (defun window-third-height ()
     (max 1 (/ (1- (window-height (selected-window))) 3)))

@@ -57,6 +57,15 @@
    `(rainbow-delimiters-depth-7-face ((t :foreground ,rainbow-red)))
    `(rainbow-delimiters-depth-8-face ((t :foreground ,rainbow-8)))
 
+
+   '(vertico-current ((t :background "gray30")))
+   '(completions-common-part ((t :background "#555555")))
+
+   '(orderless-match-face-0 ((t :background "#777777")))
+   '(orderless-match-face-0 ((t :background "#777777")))
+   '(orderless-match-face-0 ((t :background "#777777")))
+   '(orderless-match-face-0 ((t :background "#777777")))
+
    '(org-todo ((t (:foreground "Pink" :bold t))))
 
    '(opr/STUFF-todo-face ((t :foreground "goldenrod")))

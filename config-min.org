@@ -61,8 +61,19 @@
     (vertico-multiform-mode)
     (setq vertico-count 8)
 
-    (setq vertico-multiform-categories
-          '((file flat (vertico-cycle . t))))
+    (use-package consult)
+    (setq completion-in-region-function
+        (lambda (&rest args)
+          (apply (if vertico-mode
+                     #'consult-completion-in-region
+                   #'completion--in-region)
+                 args)))
+
+    ;; (setq vertico-multiform-commands nil
+    ;;       '((completion-at-point vertical)))
+
+    ;; (setq vertico-multiform-categories
+    ;;       '((file flat (vertico-cycle . t))))
 
     (use-package embark)
     (define-key *root-map* (kbd "C-o") #'embark-act)

@@ -104,31 +104,6 @@
   (require 'brumlow-goto-char)
   (global-set-key (kbd "M-m") #'jump-to-char)
 #+end_src
-* font configuration
-#+begin_src emacs-lisp
-  (defvar frame-font-size-cache
-    (make-hash-table))
-
-  ;; Font size adjustment
-  (defun hoagie-adjust-font-size (frame)
-    "Inspired by https://emacs.stackexchange.com/a/44930/17066. FRAME is ignored.
-  If I let Windows handle DPI everything looks blurry."
-    ;; Using display names is unreliable...switched to checking the resolution
-    (let* ((attrs (frame-monitor-attributes)) ;; gets attribs for current frame
-           (monitor-name (cdr (assoc 'name attrs)))
-           (width-mm (second (assoc 'mm-size attrs)))
-           (width-px (fourth (assoc 'geometry attrs)))
-           (height-px (fifth (assoc 'geometry attrs)))
-           (size 10)) ;; default for first screen at work
-      (when (eq height-px 2880)
-        (setq size 14))
-      (unless (and (gethash frame frame-font-size-cache)
-                   (= size (gethash frame frame-font-size-cache)))
-        (puthash frame size frame-font-size-cache)
-        (set-frame-font (format "RobotoMono %s" size))
-        (exwm-randr-refresh))))
-  (remove-hook 'window-size-change-functions #'hoagie-adjust-font-size)
-#+end_src
 * buffer navigation new                                             :ARCHIVE:
 #+begin_src
   (use-package vertico
@@ -735,6 +710,31 @@
     :commands olivetti-mode
     :config
     (setq-default olivetti-body-width 140))
+#+end_src
+* font configuration
+#+begin_src emacs-lisp
+  (defvar frame-font-size-cache
+    (make-hash-table))
+
+  ;; Font size adjustment
+  (defun hoagie-adjust-font-size (frame)
+    "Inspired by https://emacs.stackexchange.com/a/44930/17066. FRAME is ignored.
+  If I let Windows handle DPI everything looks blurry."
+    ;; Using display names is unreliable...switched to checking the resolution
+    (let* ((attrs (frame-monitor-attributes)) ;; gets attribs for current frame
+           (monitor-name (cdr (assoc 'name attrs)))
+           (width-mm (second (assoc 'mm-size attrs)))
+           (width-px (fourth (assoc 'geometry attrs)))
+           (height-px (fifth (assoc 'geometry attrs)))
+           (size 10)) ;; default for first screen at work
+      (when (eq height-px 2880)
+        (setq size 14))
+      (unless (and (gethash frame frame-font-size-cache)
+                   (= size (gethash frame frame-font-size-cache)))
+        (puthash frame size frame-font-size-cache)
+        (set-frame-font (format "RobotoMono %s" size))
+        (exwm-randr-refresh))))
+  (remove-hook 'window-size-change-functions #'hoagie-adjust-font-size)
 #+end_src
 * look and feel
 ** UI

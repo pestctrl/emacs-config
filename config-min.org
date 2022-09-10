@@ -715,9 +715,10 @@
     (make-hash-table))
 
   ;; Font size adjustment
-  (defun hoagie-adjust-font-size (frame)
+  (defun hoagie-adjust-font-size (&optional frame)
     "Inspired by https://emacs.stackexchange.com/a/44930/17066. FRAME is ignored.
   If I let Windows handle DPI everything looks blurry."
+    (interactive)
     ;; Using display names is unreliable...switched to checking the resolution
     (let* ((attrs (frame-monitor-attributes)) ;; gets attribs for current frame
            (monitor-name (cdr (assoc 'name attrs)))

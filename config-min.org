@@ -47,7 +47,7 @@
   (exwm-global-set-key (kbd "s-a") #'my/toggle-keyboard)
 #+end_src
 * buffer navigation
-#+begin_src emacs-lisp
+#+begin_src
   ;; Allow minibuffer-ception
   (setq enable-recursive-minibuffers t)
 
@@ -75,41 +75,28 @@
   (global-set-key (kbd "C-c C-r") 'ivy-resume)
   (define-key ivy-minibuffer-map (kbd "<return>") 'ivy-alt-done)
   (define-key ivy-minibuffer-map (kbd "C-<return>") 'ivy-done)
-
-  ;; Scrollkeeper is helpful for scrolling up and down
-  (defun window-third-height ()
-    (max 1 (/ (1- (window-height (selected-window))) 3)))
-
-  (defun scroll-up-third ()
-    (interactive)
-    (pulse-momentary-highlight-one-line (point))
-    (scroll-up (window-third-height)))
-
-  (defun scroll-down-third ()
-    (interactive)
-    (pulse-momentary-highlight-one-line (point))
-    (scroll-down (window-third-height)))
-
-  (global-set-key (kbd "C-v") 'scroll-up-third)
-  (global-set-key (kbd "M-v") 'scroll-down-third)
-  ;; (use-package scrollkeeper)
-  ;; (global-set-key (kbd "C-v") 'scrollkeeper-down)
-  ;; (global-set-key (kbd "M-v") 'scrollkeeper-up)
-
-  ;; Word navigation
-  (global-set-key (kbd "M-f") 'forward-to-word)
-  (global-set-key (kbd "M-F") 'forward-word)
-
-  ;; Goto-char
-  (require 'brumlow-goto-char)
-  (global-set-key (kbd "M-m") #'jump-to-char)
 #+end_src
-* buffer navigation new                                             :ARCHIVE:
-#+begin_src
+* buffer navigation new
+#+begin_src emacs-lisp
+  ;; Allow minibuffer-ception
+  (setq enable-recursive-minibuffers t)
+
+  ;; I like ido for finding files
+  (require 'ido)
+  (ido-mode 'file)
+
   (use-package vertico
     :init
     (vertico-mode)
-    (setq vertico-count 8))
+    (vertico-multiform-mode)
+    (setq vertico-count 8)
+
+    (setq vertico-multiform-categories
+          '((file flat (vertico-cycle . t))))
+
+    (use-package embark)
+    (define-key *root-map* (kbd "C-o") #'embark-act)
+    (define-key embark-buffer-map (kbd "e") #'embark-export))
 
   ;; Optionally use the `orderless' completion style. See
   ;; `+orderless-dispatch' in the Consult wiki for an advanced Orderless style
@@ -139,6 +126,34 @@
     (marginalia-align-offset 100)
     :init
     (marginalia-mode))
+
+  ;; Scrollkeeper is helpful for scrolling up and down
+  (defun window-third-height ()
+    (max 1 (/ (1- (window-height (selected-window))) 3)))
+
+  (defun scroll-up-third ()
+    (interactive)
+    (pulse-momentary-highlight-one-line (point))
+    (scroll-up (window-third-height)))
+
+  (defun scroll-down-third ()
+    (interactive)
+    (pulse-momentary-highlight-one-line (point))
+    (scroll-down (window-third-height)))
+
+  (global-set-key (kbd "C-v") 'scroll-up-third)
+  (global-set-key (kbd "M-v") 'scroll-down-third)
+  ;; (use-package scrollkeeper)
+  ;; (global-set-key (kbd "C-v") 'scrollkeeper-down)
+  ;; (global-set-key (kbd "M-v") 'scrollkeeper-up)
+
+  ;; Word navigation
+  (global-set-key (kbd "M-f") 'forward-to-word)
+  (global-set-key (kbd "M-F") 'forward-word)
+
+  ;; Goto-char
+  (require 'brumlow-goto-char)
+  (global-set-key (kbd "M-m") #'jump-to-char)
 #+end_src
 * window manipulation
 #+begin_src emacs-lisp

@@ -81,7 +81,7 @@
     :init   (progn
               (setq projectile-enable-caching t)
               (setq projectile-git-submodule-command nil)
-              (setq projectile-completion-system 'ivy)
+              (setq projectile-completion-system 'default)
 
               ;; (setq counsel-projectile-switch-project-action 'projectile-vc)
               (setq projectile-switch-project-action 'projectile-dired)

@@ -77,7 +77,10 @@
 
     (use-package embark)
     (define-key *root-map* (kbd "C-o") #'embark-act)
-    (define-key embark-buffer-map (kbd "e") #'embark-export))
+    (define-key embark-buffer-map (kbd "e") #'embark-export)
+    (set-face-attribute 'vertico-current nil :background "gray30")
+    ;; (set-face-attribute 'vertico-current nil :foreground "black" :background "#65a7e2")
+    (set-face-attribute 'completions-common-part nil :background "#555555"))
 
   ;; Optionally use the `orderless' completion style. See
   ;; `+orderless-dispatch' in the Consult wiki for an advanced Orderless style
@@ -91,8 +94,13 @@
     ;; (setq orderless-style-dispatchers '(+orderless-dispatch)
     ;;       orderless-component-separator #'orderless-escapable-split-on-space)
     (setq completion-styles '(orderless)
-          completion-category-defaults nil
-          completion-category-overrides '((file (styles partial-completion)))))
+      completion-category-defaults nil
+      completion-category-overrides '((file (styles partial-completion))))
+    :config
+    (set-face-attribute 'orderless-match-face-0 nil :background "#777777")
+    (set-face-attribute 'orderless-match-face-1 nil :background "#777777")
+    (set-face-attribute 'orderless-match-face-2 nil :background "#777777")
+    (set-face-attribute 'orderless-match-face-3 nil :background "#777777"))
 
   ;; Persist history over Emacs restarts. Vertico sorts by history position.
   (use-package savehist

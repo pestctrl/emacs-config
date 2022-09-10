@@ -41,40 +41,10 @@
   ;; Show the column number!
   (column-number-mode t)
 #+end_src
-* keybindings
+* switching keyboards
 #+begin_src emacs-lisp
-  (defun lock-screen ()
-    (interactive)
-    (shell-command "~/Github/my-projects/i3lock-fancy/i3lock-fancy & disown"))
-
-  (exwm-global-set-key (kbd "s-r") #'exwm-reset)
   (require 'keyboard-toggle)
   (exwm-global-set-key (kbd "s-a") #'my/toggle-keyboard)
-
-  (setq exwm-input-simulation-keys
-        '(;; movement
-          ([?\C-b] . left)
-          ([?\M-b] . C-left)
-          ([?\C-f] . right)
-          ([?\M-f] . C-right)
-          ([?\C-p] . up)
-          ([?\C-n] . down)
-          ([?\C-a] . home)
-          ([?\C-e] . end)
-          ([?\M-v] . prior)
-          ([?\C-v] . next)
-          ([?\C-d] . delete)
-          ([?\M-d] . backspace)
-          ([?\C-k] . (S-end delete))
-          ;; cut/paste.
-          ([?\C-w] . ?\C-x)
-          ([?\M-w] . ?\C-c)
-          ([?\C-y] . ?\C-v)
-          ;; search
-          ([?\C-s] . ?\C-f)
-          ([?\C-.] . ?\C-w)
-          ([?\C-/] . ?\C-z)
-          ([?\M-s] . ?\C-s)))
 #+end_src
 * buffer navigation
 #+begin_src emacs-lisp

@@ -80,8 +80,11 @@
  (expand-file-name "config-min.org"
                    user-emacs-directory))
 
-(when my-ec/load-full-config
+(setq my-switch-found (member "-min" command-line-args))
+(setq command-line-args (delete "-min" command-line-args))
 
+(when (and (not my-switch-found)
+           my-ec/load-full-config)
   ;; Load additional exwm stuff that changes constantly
   (use-exwm
    :config

@@ -107,12 +107,23 @@
             #'my/gac--debounced-save)
 
 (defun gac-no-lint-errors (buf)
-  (if (zerop (length (with-current-buffer buf (org-lint))))
-      t
-    (message "Uh oh, lint errors were found! ")
-    (with-current-buffer buf
-     (call-interactively #'org-lint))
-    nil))
+  (let ((lint-errors (with-current-buffer buf (org-lint))))
+    (if (--> lint-errors
+             (remove-if-not (lambda (x)
+                              (string= "high"
+                                       (aref (cadr x)
+                                             1)))
+                            it)
+             (length it)
+             (zerop it))
+        (progn
+          (when (not (zerop (length lint-errors)))
+            (message "Minor lint errors were found, but we're letting it slide"))
+          t)
+      (message "Uh oh, lint errors were found! ")
+      (with-current-buffer buf
+        (call-interactively #'org-lint))
+      nil)))
 
 (defun gac-debounce-again-if-magit-in-progress (buf)
   ;; Return true if should-be-automatic is true, and if there are no org-lint errors

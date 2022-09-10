@@ -61,10 +61,10 @@
    '(vertico-current ((t :background "gray30")))
    '(completions-common-part ((t :background "#555555")))
 
-   '(orderless-match-face-0 ((t :background "#777777")))
-   '(orderless-match-face-0 ((t :background "#777777")))
-   '(orderless-match-face-0 ((t :background "#777777")))
-   '(orderless-match-face-0 ((t :background "#777777")))
+   `(orderless-match-face-0 ((t :foreground "#72a4ff" :background "#555555")))
+   `(orderless-match-face-1 ((t :foreground "#ed92f8" :background "#555555")))
+   `(orderless-match-face-2 ((t :foreground "#90d800" :background "#555555")))
+   `(orderless-match-face-3 ((t :foreground "#f0ce43" :background "#555555")))
 
    '(org-todo ((t (:foreground "Pink" :bold t))))
 

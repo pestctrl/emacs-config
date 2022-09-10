@@ -46,36 +46,6 @@
   (require 'keyboard-toggle)
   (exwm-global-set-key (kbd "s-a") #'my/toggle-keyboard)
 #+end_src
-* buffer navigation
-#+begin_src
-  ;; Allow minibuffer-ception
-  (setq enable-recursive-minibuffers t)
-
-  ;; I like ido for finding files
-  (require 'ido)
-  (global-set-key (kbd "C-x C-f") #'ido-find-file)
-  (ido-mode t)
-
-  ;; But I've grown occustomed to ivy for M-x
-  (use-package ivy)
-  (use-package counsel)
-  (ivy-mode t)
-  ;; This lets counsel-M-x keep history
-  (use-package smex)
-
-  ;; These commands don't need a carrot(^) at the beginning, usually I
-  ;; don't need a starting string when doing these
-  (add-to-list 'ivy-initial-inputs-alist '(org-refile . ""))
-  (add-to-list 'ivy-initial-inputs-alist '(org-agenda-refile . ""))
-  (add-to-list 'ivy-initial-inputs-alist '(org-capture-refile . ""))
-  (add-to-list 'ivy-initial-inputs-alist '(counsel-M-x . ""))
-
-  (global-set-key (kbd "M-x") 'counsel-M-x)
-  (global-set-key (kbd "C-x b") 'ivy-switch-buffer)
-  (global-set-key (kbd "C-c C-r") 'ivy-resume)
-  (define-key ivy-minibuffer-map (kbd "<return>") 'ivy-alt-done)
-  (define-key ivy-minibuffer-map (kbd "C-<return>") 'ivy-done)
-#+end_src
 * buffer navigation new
 #+begin_src emacs-lisp
   ;; Allow minibuffer-ception

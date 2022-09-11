@@ -156,5 +156,27 @@
   (define-key org-agenda-mode-map (kbd "j")
     #'org-agenda-jump-to-heading-show))
 
+(require 'org-ql-find)
+(define-key *root-map* (kbd "F") #'org-ql-find-in-agenda)
+
+(defun org-ql-clock-in ()
+  (interactive)
+  (let ((marker (org-ql-completing-read (org-agenda-files)
+                  :query-prefix nil
+                  :query-filter nil
+                  :prompt "Clock into entry: ")))
+    (with-current-buffer (marker-buffer marker)
+      (goto-char marker)
+      (org-clock-in))))
+
+(define-prefix-command '*org-clock-map*)
+
+(define-key *org-clock-map* (kbd "i") #'org-ql-clock-in)
+(define-key *org-clock-map* (kbd "c") #'org-resolve-clocks)
+(define-key *root-map* (kbd "C") '*org-clock-map*)
+
+(define-key *root-map* (kbd "j") 'org-clock-goto)
+(define-key *root-map* (kbd "o") 'org-agenda)
+
 (provide 'my-org-misc)
 ;;; my-org-misc.el ends here

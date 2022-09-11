@@ -78,7 +78,18 @@
     (use-package embark)
     (define-key *root-map* (kbd "C-o") #'embark-act)
     (define-key embark-buffer-map (kbd "e") #'embark-export)
+
     ;; (set-face-attribute 'vertico-current nil :foreground "black" :background "#65a7e2")
+
+    ;; (defun org-embark-clock-in (target)
+    ;;   (let ((a 1))
+    ;;     a))
+
+    ;; (embark-define-keymap embark-org-map
+    ;;   nil
+    ;;   ("c" org-embark-clock-in))
+
+    ;; (add-to-list 'embark-keymap-alist '(org . embark-org-map))
     )
 
   ;; Optionally use the `orderless' completion style. See
@@ -93,8 +104,8 @@
     ;; (setq orderless-style-dispatchers '(+orderless-dispatch)
     ;;       orderless-component-separator #'orderless-escapable-split-on-space)
     (setq completion-styles '(orderless)
-      completion-category-defaults nil
-      completion-category-overrides '((file (styles partial-completion)))))
+          completion-category-defaults nil
+          completion-category-overrides '((file (styles partial-completion)))))
 
   ;; Persist history over Emacs restarts. Vertico sorts by history position.
   (use-package savehist

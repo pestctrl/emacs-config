@@ -56,9 +56,6 @@
 (define-key *root-map* (kbd "C-n") 'switch-window)
 (define-key *root-map* (kbd "i") 'org-mru-clock-in)
 (define-key *root-map* (kbd "C-i") 'leaving-computer)
-(define-key *root-map* (kbd "C") 'org-resolve-clocks)
-(define-key *root-map* (kbd "j") 'org-clock-goto)
-(define-key *root-map* (kbd "o") 'org-agenda)
 (define-key *root-map* (kbd "RET") 'dired-jump)
 (define-key *root-map* (kbd "C-b") 'previous-buffer)
 

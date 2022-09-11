@@ -346,7 +346,7 @@ https://github.com/org-trello/org-trello/issues/258
   #+end_src
 * org clock added new time prompt and new away prompt
 #+begin_src emacs-lisp
-  (defun org-clock-resolve (clock &optional prompt-fn last-valid fail-quietly)
+  (defun my/org-clock-resolve (clock &optional prompt-fn last-valid fail-quietly)
     "Resolve an open Org clock.
   An open clock was found, with `dangling' possibly being non-nil.
   If this function was invoked with a prefix argument, non-dangling
@@ -389,7 +389,7 @@ https://github.com/org-trello/org-trello/issues/258
            different from `k': it clocks you out from the beginning of
            the idle period and clock you back in X minutes ago.
 
-  a/A      Like `g', except don't take the idle timer into account. 
+  a/A      Like `g', except don't take the idle timer into account.
 
   s/S      Subtract the idle time from the current clock.  This is the
            same as keeping 0 minutes.
@@ -472,4 +472,8 @@ https://github.com/org-trello/org-trello/issues/258
          (and start-over
               (not (memq ch '(?K ?G ?S ?C))))
          fail-quietly)))))
+
+  (advice-add #'org-clock-resolve
+              :override
+              #'my/org-clock-resolve)
 #+end_src

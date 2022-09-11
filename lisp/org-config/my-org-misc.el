@@ -157,7 +157,6 @@
     #'org-agenda-jump-to-heading-show))
 
 (require 'org-ql-find)
-(define-key *root-map* (kbd "F") #'org-ql-find-in-agenda)
 
 (defun org-ql-clock-in ()
   (interactive)
@@ -183,9 +182,14 @@
     (goto-char target)
     (org-clock-in)))
 
+(defun org-embark-goto (target)
+  (switch-to-buffer (marker-buffer target))
+  (goto-char target))
+
 (embark-define-keymap embark-org-map
   nil
-  ("c" org-embark-clock-in))
+  ("c" org-embark-clock-in)
+  ("RET" org-embark-goto))
 
 (add-to-list 'embark-keymap-alist '(org . embark-org-map))
 
@@ -194,12 +198,17 @@
   (let* ((marker (org-ql-completing-read (org-agenda-files)
                    :query-prefix nil
                    :query-filter nil
-                   :prompt "Clock into entry: "))
-         (action (embark--prompt
-                  (mapcar #'funcall embark-indicators)
-                  (embark--action-keymap 'org nil)
-                  (list marker))))
-    (embark--act action (list :target marker) nil)))
+                   :prompt "Find entry: "))
+         (action (read-char "[RET]Goto, [c]lock")))
+    (pcase action
+      (13 (progn
+            (switch-to-buffer (marker-buffer marker))
+            (goto-char marker)))
+      (99 (with-current-buffer (marker-buffer marker)
+            (goto-char marker)
+            (org-clock-in))))))
+
+(define-key *root-map* (kbd "F") #'org-ql-embark)
 
 (provide 'my-org-misc)
 ;;; my-org-misc.el ends here

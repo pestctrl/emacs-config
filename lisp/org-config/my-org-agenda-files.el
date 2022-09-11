@@ -57,6 +57,13 @@
   (cons (my/agenda-file "eternal.org")
         org-agenda-files))
 
+;; TODO fix org-ql-refile's assumption about symbols
+(defun my/all-agenda-files ()
+  my/all-agenda-files)
+
+(defun my/aux-refile-files ()
+  my/aux-refile-files)
+
 (setq my/all-agenda-files
       (mapcar #'(lambda (x)
                   (replace-regexp-in-string

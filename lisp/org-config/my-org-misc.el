@@ -178,5 +178,28 @@
 (define-key *root-map* (kbd "j") 'org-clock-goto)
 (define-key *root-map* (kbd "o") 'org-agenda)
 
+(defun org-embark-clock-in (target)
+  (with-current-buffer (marker-buffer target)
+    (goto-char target)
+    (org-clock-in)))
+
+(embark-define-keymap embark-org-map
+  nil
+  ("c" org-embark-clock-in))
+
+(add-to-list 'embark-keymap-alist '(org . embark-org-map))
+
+(defun org-ql-embark ()
+  (interactive)
+  (let* ((marker (org-ql-completing-read (org-agenda-files)
+                   :query-prefix nil
+                   :query-filter nil
+                   :prompt "Clock into entry: "))
+         (action (embark--prompt
+                  (mapcar #'funcall embark-indicators)
+                  (embark--action-keymap 'org nil)
+                  (list marker))))
+    (embark--act action (list :target marker) nil)))
+
 (provide 'my-org-misc)
 ;;; my-org-misc.el ends here

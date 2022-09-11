@@ -80,16 +80,6 @@
     (define-key embark-buffer-map (kbd "e") #'embark-export)
 
     ;; (set-face-attribute 'vertico-current nil :foreground "black" :background "#65a7e2")
-
-    ;; (defun org-embark-clock-in (target)
-    ;;   (let ((a 1))
-    ;;     a))
-
-    ;; (embark-define-keymap embark-org-map
-    ;;   nil
-    ;;   ("c" org-embark-clock-in))
-
-    ;; (add-to-list 'embark-keymap-alist '(org . embark-org-map))
     )
 
   ;; Optionally use the `orderless' completion style. See

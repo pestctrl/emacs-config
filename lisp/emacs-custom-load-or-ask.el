@@ -43,16 +43,17 @@
                  ec/my-variables-list))
      (add-to-list 'ec/my-variables-list
                   (list ',type ,@args))
-     (when (or override (not (boundp ,(car args))))
-       ,@body)))
+     (if (or override (not (boundp ,(car args))))
+         ,@body
+       (eval ,(car args)))))
 
 (defun-prompt ec/load-or-ask-pred predicate (sym prompt)
   (customize-save-variable sym (y-or-n-p prompt)))
 
 (defun-prompt ec/load-or-ask-key key (key key-key prompt)
   (let ((keygen (read-key prompt)))
-      (customize-save-variable key-key keygen)
-      (customize-save-variable key (char-to-string keygen))))
+    (customize-save-variable key-key keygen)
+    (customize-save-variable key (char-to-string keygen))))
 
 (defun-prompt ec/load-or-ask-file file (sym prompt)
   (customize-save-variable sym (read-file-name prompt)))

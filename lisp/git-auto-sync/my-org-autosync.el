@@ -55,8 +55,11 @@
 (advice-add #'gac-push :override #'gac-use-magit-push)
 
   ;; (defvar gac-auto-merge-branch-list nil)
-  ;; (make-variable-buffer-local 'gac-auto-merge-branch-list)
+;; (make-variable-buffer-local 'gac-auto-merge-branch-list)
 
+(when my/puppet-p
+  (add-to-list 'emacs-startup-hook
+               #'gaff/trigger))
 
 (defun-cached 60 gac-run-gaff ()
   (gaff/trigger))

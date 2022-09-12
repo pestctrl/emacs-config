@@ -177,6 +177,8 @@
 (define-key *root-map* (kbd "j") 'org-clock-goto)
 (define-key *root-map* (kbd "o") 'org-agenda)
 
+(use-package embark)
+
 (defun org-embark-clock-in (target)
   (with-current-buffer (marker-buffer target)
     (goto-char target)

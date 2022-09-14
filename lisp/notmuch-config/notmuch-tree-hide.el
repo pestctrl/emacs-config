@@ -1,4 +1,4 @@
-;;; notmuch-tree-hide.el ---  -*- lexical-binding: t -*-
+;;; notmuch-tree-hide.el ---
 
 ;; Copyright (C) 2020 Benson Chu
 
@@ -83,7 +83,7 @@
     (funcall orig forest-thread))
   (message "Filter function end: %s" notmuch-tree-show-filter-function))
 
-(defun notmuch-tree (&optional query query-context target buffer-name open-target unthreaded parent-buffer filter-function)
+(defun my/notmuch-tree (&optional query query-context target buffer-name open-target unthreaded parent-buffer filter-function)
   "Display threads matching QUERY in tree view.
 
 The arguments are:
@@ -116,6 +116,10 @@ The arguments are:
   (notmuch-tree-worker query query-context target open-target unthreaded)
   (setq notmuch-tree-parent-buffer parent-buffer)
   (setq truncate-lines t))
+
+(advice-add #'notmuch-tree
+            :override
+            #'my/notmuch-tree)
 
 (advice-add #'notmuch-tree-insert-forest-thread
             :around

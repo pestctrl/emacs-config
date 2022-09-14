@@ -77,10 +77,8 @@
 
     (use-package embark)
     (define-key *root-map* (kbd "C-o") #'embark-act)
-    (define-key embark-buffer-map (kbd "e") #'embark-export)
+    (define-key embark-buffer-map (kbd "e") #'embark-export))
 
-    ;; (set-face-attribute 'vertico-current nil :foreground "black" :background "#65a7e2")
-    )
 
   ;; Optionally use the `orderless' completion style. See
   ;; `+orderless-dispatch' in the Consult wiki for an advanced Orderless style

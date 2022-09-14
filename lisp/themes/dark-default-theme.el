@@ -57,7 +57,7 @@
    `(rainbow-delimiters-depth-7-face ((t :foreground ,rainbow-red)))
    `(rainbow-delimiters-depth-8-face ((t :foreground ,rainbow-8)))
 
-
+   ;; '(vertico-current ((t :foreground "black" :background "#65a7e2")))
    '(vertico-current ((t :background "gray30")))
    '(completions-common-part ((t :background "#555555")))
 

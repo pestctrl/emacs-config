@@ -79,6 +79,16 @@
     (define-key *root-map* (kbd "C-o") #'embark-act)
     (define-key embark-buffer-map (kbd "e") #'embark-export))
 
+  (use-package vertico-directory
+    :after vertico
+    :ensure nil
+    ;; More convenient directory navigation commands
+    :bind (:map vertico-map
+                ("RET" . vertico-directory-enter)
+                ("DEL" . vertico-directory-delete-char)
+                ("M-DEL" . vertico-directory-delete-word))
+    ;; Tidy shadowed file names
+    :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
 
   ;; Optionally use the `orderless' completion style. See
   ;; `+orderless-dispatch' in the Consult wiki for an advanced Orderless style

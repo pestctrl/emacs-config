@@ -366,6 +366,36 @@
                  #'run-offlineimap
                  t))
 #+end_src
+** debbugs
+#+begin_src emacs-lisp
+  (use-package debbugs)
+
+  (defun my/debbugs-gnu-select-report ()
+    "Select the report on the current line."
+    (interactive)
+    (when (mouse-event-p last-input-event) (mouse-set-point last-input-event))
+    ;; We open the report messages.
+    (let* ((status (debbugs-gnu-current-status))
+           (id (alist-get 'id status))
+           (merged (alist-get 'mergedwith status)))
+      (setq merged (if (listp merged) merged (list merged)))
+      (cond
+       ((not id)
+        (message "No bug report on the current line"))
+       ((eq debbugs-gnu-mail-backend 'rmail)
+        (debbugs-gnu-read-emacs-bug-with-rmail id status merged))
+       ((eq debbugs-gnu-mail-backend 'gnus)
+        (debbugs-gnu-read-emacs-bug-with-gnus id status merged))
+       ((eq debbugs-gnu-mail-backend 'notmuch)
+        (notmuch-tree (concat "tag:bug-gnu-emacs " (format "subject:\"bug#%s\"" id))))
+       (t (error "No valid mail backend specified")))))
+
+  (setq debbugs-gnu-mail-backend 'notmuch)
+
+  (advice-add #'debbugs-gnu-select-report
+              :override
+              #'my/debbugs-gnu-select-report)
+#+end_src
 ** erc
 #+begin_src emacs-lisp
   (use-package erc)

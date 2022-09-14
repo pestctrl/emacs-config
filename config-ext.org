@@ -181,7 +181,7 @@
     (require 'notmuch-nav)
     (require 'notmuch-tree-hide)
     (require 'notmuch-tree)
-    (require 'notmuch-fold)
+    ;; (require 'notmuch-fold)
 
     (setq notmuch-draft-tags '("+drafts"))
 

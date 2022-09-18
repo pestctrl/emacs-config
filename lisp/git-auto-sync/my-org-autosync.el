@@ -34,6 +34,8 @@
 (setq gaff/watch-directories (list (list (file-name-as-directory my/agenda-folder)
                                          "origin/desktop" "origin/gaming-laptop" "origin/puppet" "origin/mobile")))
 
+(run-at-time nil 300 #'gaff/trigger)
+
 (setq gac-automatically-add-new-files-p nil)
 (setq-default gac-debounce-interval 20)
 

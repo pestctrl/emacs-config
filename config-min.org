@@ -119,6 +119,18 @@
     (marginalia-align-offset 100)
     :init
     (marginalia-mode))
+
+  ;; (defun basic-remote-try-completion (string table pred point)
+  ;;   (and (vertico--remote-p string)
+  ;;        (completion-basic-try-completion string table pred point)))
+  ;; (defun basic-remote-all-completions (string table pred point)
+  ;;   (and (vertico--remote-p string)
+  ;;        (completion-basic-all-completions string table pred point)))
+  ;; (add-to-list
+  ;;  'completion-styles-alist
+  ;;  '(basic-remote basic-remote-try-completion basic-remote-all-completions nil))
+  ;; (setq completion-styles '(orderless basic)
+  ;;       completion-category-overrides '((file (styles basic-remote partial-completion))))
 #+end_src
 * navigation
 #+begin_src emacs-lisp

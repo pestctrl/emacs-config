@@ -52,8 +52,8 @@
   (setq enable-recursive-minibuffers t)
 
   ;; I like ido for finding files
-  (require 'ido)
-  (ido-mode 'file)
+  ;; (require 'ido)
+  ;; (ido-mode 'file)
 
   (use-package vertico
     :init
@@ -72,8 +72,8 @@
     ;; (setq vertico-multiform-commands nil
     ;;       '((completion-at-point vertical)))
 
-    ;; (setq vertico-multiform-categories
-    ;;       '((file flat (vertico-cycle . t))))
+    (setq vertico-multiform-categories
+          '((file flat (vertico-cycle . t))))
 
     (use-package embark)
     (define-key *root-map* (kbd "C-o") #'embark-act)
@@ -86,7 +86,8 @@
     :bind (:map vertico-map
                 ("RET" . vertico-directory-enter)
                 ("DEL" . vertico-directory-delete-char)
-                ("M-DEL" . vertico-directory-delete-word))
+                ("M-DEL" . vertico-directory-delete-word)
+                ("C-s" . vertico-next))
     ;; Tidy shadowed file names
     :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
 
@@ -101,9 +102,9 @@
     ;; Configure a custom style dispatcher (see the Consult wiki)
     ;; (setq orderless-style-dispatchers '(+orderless-dispatch)
     ;;       orderless-component-separator #'orderless-escapable-split-on-space)
-    (setq completion-styles '(orderless)
+    (setq completion-styles '(orderless basic)
           completion-category-defaults nil
-          completion-category-overrides '((file (styles partial-completion)))))
+          completion-category-overrides '((file (styles basic partial-completion)))))
 
   ;; Persist history over Emacs restarts. Vertico sorts by history position.
   (use-package savehist

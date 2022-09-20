@@ -61,7 +61,13 @@
 
 (when my/puppet-p
   (add-to-list 'emacs-startup-hook
-               #'gaff/trigger))
+               #'gaff/trigger)
+
+  (add-hook 'emacs-startup-hook
+            #'gac-run-ssh-add)
+
+  (add-hook 'emacs-startup-hook
+            #'keychain-refresh-environment))
 
 (defun-cached 60 gac-run-gaff ()
   (gaff/trigger))
@@ -73,10 +79,10 @@
           #'gac-run-gaff)
 
 (add-hook 'git-auto-commit-mode-hook
-          #'gac-run-ssh-add)
+          #'gac-after-save-func t t)
 
 (add-hook 'git-auto-commit-mode-hook
-          #'gac-after-save-func t t)
+          #'gac-run-ssh-add)
 
 (add-hook 'git-auto-commit-mode-hook
           #'keychain-refresh-environment)

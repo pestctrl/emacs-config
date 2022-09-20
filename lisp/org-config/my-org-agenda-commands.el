@@ -269,6 +269,8 @@
            ((org-agenda-show-log '(closed clock))
             (org-agenda-files `(,(my/agenda-file "leisure.org")))))
           ,@(minimal-agenda-suite "Today" "t" "today" `((org-agenda-files ',(cons (my/agenda-file "today.org") org-agenda-files))))
+          ,@(agenda-suite "Trial" "r" "test"
+              `((org-agenda-files ',(list (my/agenda-file "test.org")))))
           ("L" "\tLog" agenda ""
            ((org-agenda-start-with-log-mode 'only)))
           ("m" . "\tMaintainence")

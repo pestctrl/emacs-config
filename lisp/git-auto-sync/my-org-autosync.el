@@ -102,6 +102,9 @@
 (setq gac-default-message
       #'gac-commit-message)
 
+(defun my/gac--wait-for-idle (buffer)
+  (run-with-idle-timer 2 nil #'gac--after-save buffer))
+
 (defun my/gac--debounced-save ()
   (let* ((actual-buffer (current-buffer)))
     (when-let (current-timer (gethash actual-buffer gac--debounce-timers))
@@ -109,7 +112,7 @@
       (cancel-timer current-timer))
     (puthash actual-buffer
              (run-at-time gac-debounce-interval nil
-                          #'gac--after-save
+                          #'my/gac--wait-for-idle
                           actual-buffer)
              gac--debounce-timers)))
 

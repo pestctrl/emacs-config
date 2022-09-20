@@ -151,6 +151,8 @@
       (unless (or tab-explicit-name
                   (cdr (assoc 'unsplittable
                               (frame-parameters nil))))
+        (when my-ec/is-wsl
+          (set-frame-size frame 80 30))
         (tab-bar-rename-tab "scratch")
         (tab-bar-new-tab -1)
         (tab-bar-rename-tab "emacs-devel")

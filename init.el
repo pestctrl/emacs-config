@@ -1,6 +1,3 @@
-(add-to-list 'default-frame-alist '(width  . 200))
-(add-to-list 'default-frame-alist '(height . 60))
-
 (setq package-list '(org use-package))
 ;; list the repositories containing them
 (setq package-archives '(("melpa" . "http://melpa.org/packages/")
@@ -72,6 +69,10 @@
 
 (ec/load-or-ask-pred 'my-ec/load-full-config "Do you want to load full config for emacs?")
 (ec/load-or-ask-pred 'my-ec/load-org-config "Do you want to load org config?")
+
+(when (not my-ec/is-wsl)
+  (add-to-list 'default-frame-alist '(width  . 200))
+  (add-to-list 'default-frame-alist '(height . 60)))
 
 ;; It is imperative that this be loaded for a nice emacs
 ;; experience. Only SUPER stable stuff goes in this file, and should

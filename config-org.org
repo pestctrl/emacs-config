@@ -202,7 +202,8 @@
 #+end_src
 ** Open links with firefox
 #+begin_src emacs-lisp
-  (setq browse-url-browser-function 'browse-url-firefox)
+  (when (not my-ec/is-wsl)
+    (setq browse-url-browser-function 'browse-url-firefox))
 #+end_src
 ** org-export
 #+begin_src emacs-lisp

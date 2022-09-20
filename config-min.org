@@ -69,7 +69,7 @@
                      #'completion--in-region)
                    args)))
 
-    ;; (setq vertico-multiform-commands nil
+    ;; (setq vertico-multiform-commands
     ;;       '((completion-at-point vertical)))
 
     (setq vertico-multiform-categories

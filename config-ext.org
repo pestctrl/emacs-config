@@ -807,7 +807,7 @@
 
   (setq
      split-height-threshold 4
-     split-width-threshold 160
+     split-width-threshold (if my/puppet-p 100 160)
      split-window-preferred-function 'split-window-really-sensibly)
 
 #+end_src

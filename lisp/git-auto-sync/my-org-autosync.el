@@ -37,7 +37,7 @@
 (run-at-time nil 300 #'gaff/trigger)
 
 (setq gac-automatically-add-new-files-p nil)
-(setq-default gac-debounce-interval 20)
+(setq-default gac-debounce-interval 120)
 
 (defmacro defun-cached (time name args &rest body)
   (let ((var-name (intern (concat (symbol-name name) "--cached"))))

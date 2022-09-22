@@ -111,7 +111,15 @@
                  :icon ,(all-the-icons-material "timer" :face 'all-the-icons-red)
                  :keys "t" :clock-in t :clock-keep t
                  :function org-notes-find-file
-                 :template "* %?"))))))
+                 :template "* %?")))
+              ("Protocol"
+               :keys "p"
+               :file "~/org/refile.org"
+               :template "* STUFF %^{Title}\n:PROPERTIES:\n:CREATED: %U\n:URL: %:link\n:END:\n#+begin_example\n%i\n#+end_example\n%?")
+              ("Protocol Link"
+               :keys "L"
+               :file "~/org/refile.org"
+               :template "* STUFF %? [[%:link][%:description]]\n:PROPERTIES:\n:CREATED: %U\n:URL: %:link\n:END:"))))
 
 (defun agenda-suite (name key tag &rest additional)
   (declare (indent 3))
@@ -205,7 +213,14 @@
 (setq org-outline-path-complete-in-steps nil)
 (setq org-refile-use-outline-path t)
 
-(setq org-refile-targets `((nil :maxlevel . 9)))
+(setq org-agenda-files
+      (list "~/org/refile.org"
+            "~/org/all.org"))
+
+(setq org-refile-targets `((nil :maxlevel . 9)
+                           (org-agenda-files :maxlevel . 9)))
+
+(require 'org-protocol)
 
 ;; (defun wait-mark-blocking-tasks (change-plist)
 ;;   (when (string= "WAIT"

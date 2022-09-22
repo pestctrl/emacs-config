@@ -63,12 +63,12 @@
     (setq ccls-initialization-options
           '(:index (:trackDependency 1 :threads 32)))
 
-    (with-eval-after-load 'doom-modeline
-      (advice-add #'lsp--progress-status
-                  :filter-return
-                  #'(lambda (result)
-                      (when result
-                        (concat (string-replace "%%" "%%%%" result) " ")))))
+    ;; (with-eval-after-load 'doom-modeline
+    ;;   (advice-add #'lsp--progress-status
+    ;;               :filter-return
+    ;;               #'(lambda (result)
+    ;;                   (when result
+    ;;                     (concat (string-replace "%%" "%%%%" result) " ")))))
 
     (when my-ec/at-ti
       (add-to-list 'exec-path

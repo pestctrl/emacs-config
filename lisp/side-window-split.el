@@ -23,53 +23,91 @@
 ;;; Commentary:
 
 ;;; Code:
-(require 'cl)
+(require 'cl-lib)
 
-(defvar left-side-window-count -1)
-(defvar right-side-window-count -1)
-(defvar bottom-side-window-count -1)
-(defvar top-side-window-count -1)
-
-(defun side-window-op (side slot &optional size buffer)
-  (let ((prev-win (selected-window))
-        (win (display-buffer-in-side-window
-              (or buffer (current-buffer))
-              `((side . ,side)
-                (slot . ,slot)
-                (dedicated . t)
-                (window-parameters (no-delete-other-windows . t))))))
-    (select-window win)
-    ;; (set-window-dedicated-p win t)
-    ;; (set-window-parameter win 'no-delete-other-windows t)
-    (when size
-      (window-resize win (- size (window-pixel-width)) t nil t))
-    (select-window prev-win)))
-
-(defun side-left-window ()
-  (interactive)
-  (side-window-op 'left (cl-incf left-side-window-count)))
-
-(defun side-right-window ()
-  (interactive)
-  (side-window-op 'right (cl-incf right-side-window-count)))
-
-(defun side-bottom-window ()
-  (interactive)
-  (side-window-op 'bottom (cl-incf bottom-side-window-count)))
-
-(defun side-top-window ()
-  (interactive)
-  (side-window-op 'top (cl-incf top-side-window-count)))
+(defvar my/side-window-slot-map
+  '((left 0)
+    (right 0)
+    (top 0)
+    (bottom 0)))
 
 (defun side-window-delete-all ()
   (interactive)
-  (setq left-side-window-count -1
-        right-side-window-count -1
-        bottom-side-window-count -1
-        top-side-window-count -1)
+  (setq my/side-window-slot-map
+        '((left 0)
+          (right 0)
+          (top 0)
+          (bottom 0)))
   (call-interactively #'window-toggle-side-windows))
 
-(setq window-sides-vertical t)
+(defun my/emacs-read-side ()
+  (pcase (read-key "[k] Top [j] Bottom [h] Left [r] Right")
+    (?k 'top)
+    (?j 'bottom)
+    (?h 'left)
+    (?r 'right)))
+
+(defmacro cl-incf-post (place)
+  `(prog1 ,place
+     (setf ,place (1+ ,place))))
+
+(defun my/display-buffer-in-side-window (side buffer-or-name &optional slot-override)
+  (interactive
+   (list (my/emacs-read-side)
+         (read-buffer-to-switch "Switch to buffer in side window: ")))
+  (let ((buffer (if (bufferp buffer-or-name)
+                    buffer-or-name
+                  (get-buffer buffer-or-name)))
+        (slot (or slot-override
+                  (cl-incf-post (car (alist-get side my/side-window-slot-map))))))
+    (display-buffer-in-side-window
+     buffer
+     `((side . ,side)
+       (slot . ,slot)
+       (dedicated . t)
+       (window-parameters (no-delet-other-windows . t))))
+    (with-current-buffer buffer
+      (when (eq major-mode 'exwm-mode)
+        (delete-window)))))
+
+(defun my/find-file-side-window (side filename &optional slot-override)
+  (interactive
+   (list (my/emacs-read-side)
+         (read-file-name "Find file in side window: " nil default-directory (confirm-nonexistent-file-or-buffer))))
+  (let ((buffer (find-file-noselect filename)))
+    (my/display-buffer-in-side-window side buffer slot-override)))
+
+(defun side-left-window ()
+  (interactive)
+  (my/display-buffer-in-side-window
+   'left
+   (read-buffer "Switch to buffer in side window: "
+                (current-buffer)
+                (confirm-nonexistent-file-or-buffer))))
+
+(defun side-right-window ()
+  (interactive)
+  (my/display-buffer-in-side-window
+   'right
+   (read-buffer "Switch to buffer in side window: "
+                (current-buffer)
+                (confirm-nonexistent-file-or-buffer))))
+
+(defun side-bottom-window ()
+  (interactive)
+  (my/display-buffer-in-side-window
+   'bottom
+   (read-buffer "Switch to buffer in side window: "
+                (current-buffer)
+                (confirm-nonexistent-file-or-buffer))))
+
+(defun side-top-window ()
+  (interactive)
+  (my/display-buffer-in-side-window
+   'top
+   (read-buffer "Switch to buffer in side window: "
+                (current-buffer)
+                (confirm-nonexistent-file-or-buffer))))
 
 (provide 'side-window-split)
 ;;; side-window-split.el ends here

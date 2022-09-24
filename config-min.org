@@ -116,7 +116,7 @@
     :custom
     (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
     (marginalia-align 'left)
-    (marginalia-align-offset 100)
+    (marginalia-align-offset (if my/puppet-p 20 100))
     :init
     (marginalia-mode))
 

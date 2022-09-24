@@ -23,7 +23,26 @@
 ;;; Commentary:
 
 ;;; Code:
+(require 'emacs-custom-load-or-ask)
 
+(ec/load-or-ask-pred 'my-ec/is-wsl "Are you running Emacs in WSL?")
+(ec/load-or-ask-pred 'my/puppet-p "Are you running on Puppet's computer?")
+(ec/load-or-ask-pred 'my-ec/enable-exwm "Do you want to load EXMW?")
+(ec/load-or-ask-pred 'my-ec/at-ti "Are you at TI for work?")
+(defvar is-windows (or my-ec/is-wsl
+                       (eq system-type
+                           'windows-nt)))
+
+(ec/load-or-ask-pred 'my-ec/add-info-dir "Do you want an auxiliary info dir? ")
+
+(when my-ec/add-info-dir
+  (ec/load-or-ask-dir 'my-ec/info-dir "Info Directory? ")
+  (add-to-list 'Info-directory-list my-ec/info-dir))
+
+(setq my-ec/enable-exwm (and my-ec/enable-exwm (eq 'x window-system)))
+
+(ec/load-or-ask-pred 'my-ec/load-full-config "Do you want to load full config for emacs?")
+(ec/load-or-ask-pred 'my-ec/load-org-config "Do you want to load org config?")
 
 (provide 'my-predicates)
 ;;; my-predicates.el ends here

@@ -76,6 +76,20 @@
 (define-key *root-map* (kbd "n") 'toggle-notifications)
 
 (when (<= 27 emacs-major-version)
-  (require 'switch-tabs))
+  (require 'switch-tabs)
+
+  (defun projectile-switch-switch-tab (project arg)
+    (let* ((dir-name (-> project
+                        (directory-file-name)
+                        (file-name-nondirectory)))
+           (tab-name
+            (cond ((member dir-name '("emacs-config" ".emacs.d")) "emacs-devel")
+                  ((member dir-name '("agenda" "org" "work")) "org"))))
+      (when tab-name
+        (switch-or-create-tab tab-name))))
+
+  (advice-add #'projectile-switch-project-by-name
+              :before
+              #'projectile-switch-switch-tab))
 
 (provide 'keymap)

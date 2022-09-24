@@ -376,7 +376,7 @@
                    url))
 
   ;;(setq browse-url-browser-function #'my/browse-url-qutebrowser)
-  (setq browse-url-browser-function #'browse-url-firefox)
+  ;;(setq browse-url-browser-function #'browse-url-firefox)
 #+end_src
 * new headline set property
 #+begin_src emacs-lisp

@@ -140,9 +140,11 @@
       nil)))
 
 (defun gac-debounce-again-if-magit-in-progress (buf)
-  ;; Return true if should-be-automatic is true, and if there are no org-lint errors
+  ;; Return true if should-be-automatic is true, AND
   (or (and (ga/should-be-automatic (file-name-directory (buffer-file-name buf)))
-           (gac-no-lint-errors buf))
+           ;; there's no org-lint errors if we're in an org buffer
+           (or (not (with-current-buffer buf (eq major-mode 'org-mode)))
+               (gac-no-lint-errors buf)))
       ;; Otherwise, debounce again and return nil
       (and (with-current-buffer buf
              (gac--debounced-save))

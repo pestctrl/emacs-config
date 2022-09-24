@@ -47,7 +47,8 @@
          nil)
        (if (ga/on-auto-branch dir)
            t
-         (message "Oops, not on automatic branch")
+         (message "Oops, repo %s is on branch %s, which is not an automatic branch"
+                  dir (magit-get-current-branch))
          nil)))
 
 (defun gaff/get-open-buffers-in (folder)

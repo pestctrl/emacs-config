@@ -103,7 +103,7 @@
       #'gac-commit-message)
 
 (defun my/gac--wait-for-idle (buffer)
-  (run-with-idle-timer 2 nil #'gac--after-save buffer))
+  (run-with-idle-timer 3 nil #'gac--after-save buffer))
 
 (defun my/gac--debounced-save ()
   (let* ((actual-buffer (current-buffer)))

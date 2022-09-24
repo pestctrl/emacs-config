@@ -733,6 +733,10 @@
                       (interactive)
                       (w3m-goto-url "https://google.com"))))
 #+end_src
+** ztree, for directory diffing
+#+begin_src emacs-lisp
+  (use-package ztree)
+#+end_src
 * font configuration
 #+begin_src emacs-lisp
   (defvar frame-font-size-cache

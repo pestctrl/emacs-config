@@ -76,3 +76,6 @@
 [submodule "submodule/conceal"]
 	path = submodule/conceal
 	url = https://github.com/lepisma/conceal
+[submodule "lisp/emacs-fast-selection"]
+	path = lisp/emacs-fast-selection
+	url = git@github.com:pestctrl/emacs-fast-selection

@@ -1,5 +1,4 @@
-;;; my-org-agenda-commands.el ---  -*- lexical-binding: t -*-
-
+;;; my-org-agenda-commands.el
 ;; Copyright (C) 2020 Benson Chu
 
 ;; Author: Benson Chu <bensonchu457@gmail.com>
@@ -316,6 +315,14 @@
                                 (my/ambiguous-todo))
                           ((org-ql-block-header "sandbox")))))
           ("c" "\tCalfw 2 weeks" cfw:open-org-2week-calendar "")
+          ("C" . "\torg-agenda clocking views")
+          ("Ch" "\torg-agenda history" agenda ""
+           ((org-agenda-start-with-clockreport-mode nil)
+            (org-agenda-start-with-log-mode 'only)
+            (org-agenda-log-mode-items '(state clock closed))))
+          ("Cc" "\torg-agenda clock-report" agenda ""
+           ((org-agenda-start-with-clockreport-mode t)
+            (org-agenda-start-with-log-mode 'clockcheck)))
           ("f" . "\tFlip through")
           ("fc" "\tComms" tags-todo "datetime"
            ((org-agenda-overriding-header "Comms")))

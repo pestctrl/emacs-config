@@ -60,15 +60,17 @@
                   (get-buffer buffer-or-name)))
         (slot (or slot-override
                   (cl-incf-post (car (alist-get side my/side-window-slot-map))))))
+    (when-let (window (and (with-current-buffer buffer
+                             (eq major-mode 'exwm-mode))
+                           (get-buffer-window buffer)))
+      (with-selected-window window
+        (previous-buffer)))
     (display-buffer-in-side-window
      buffer
      `((side . ,side)
        (slot . ,slot)
        (dedicated . t)
-       (window-parameters (no-delet-other-windows . t))))
-    (with-current-buffer buffer
-      (when (eq major-mode 'exwm-mode)
-        (delete-window)))))
+       (window-parameters (no-delet-other-windows . t))))))
 
 (defun my/find-file-side-window (side filename &optional slot-override)
   (interactive

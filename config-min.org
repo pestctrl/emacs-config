@@ -171,6 +171,16 @@
   ;; Side-window stuff
   (use-package resize-window)
   (require 'side-window-split)
+
+  (advice-add #'display-buffer-in-side-window
+              :before
+              #'(lambda (buffer alist)
+                  (when-let (window (and (with-current-buffer buffer
+                                           (eq major-mode 'exwm-mode))
+                                         (get-buffer-window buffer)))
+                    (with-selected-window window
+                      (previous-buffer)))))
+
   (setq window-sides-vertical t)
   (define-key *window-map* (kbd "j") 'side-bottom-window)
   (define-key *window-map* (kbd "h") 'side-left-window)

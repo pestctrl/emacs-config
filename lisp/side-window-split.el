@@ -60,11 +60,6 @@
                   (get-buffer buffer-or-name)))
         (slot (or slot-override
                   (cl-incf-post (car (alist-get side my/side-window-slot-map))))))
-    (when-let (window (and (with-current-buffer buffer
-                             (eq major-mode 'exwm-mode))
-                           (get-buffer-window buffer)))
-      (with-selected-window window
-        (previous-buffer)))
     (display-buffer-in-side-window
      buffer
      `((side . ,side)

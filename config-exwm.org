@@ -17,8 +17,8 @@
        :config
        (exwm-global-set-key (kbd "s-e") #'exwm-edit--compose))
 
-     (push ?\M-q exwm-input-prefix-keys)
      (define-key exwm-mode-map (kbd "M-q") #'exwm-input-send-next-key)
+     ;; (add-to-list 'exwm-input-global-keys (cons (kbd "M-q") #'exwm-input-send-next-key))
 
      ;; System tray
      (require 'exwm-systemtray)

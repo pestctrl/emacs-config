@@ -417,9 +417,10 @@
   (autoload 'cider--make-result-overlay "cider-overlays")
 
   (defun endless/eval-overlay (value point)
-    (cider--make-result-overlay (format "%S" value)
-      :where point
-      :duration 'command)
+    (let ((comment-start ";;"))
+      (cider--make-result-overlay (format "%S" value)
+        :where point
+        :duration 'command))
     value)
 
   (advice-add 'eval-region :around

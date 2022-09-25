@@ -800,7 +800,7 @@
   ;; The most efficient cool looking modeline I've found. Faster than even
   ;; smart-mode-line
   (use-package doom-modeline
-    :hook (after-init . doom-modeline-mode)
+    :init (doom-modeline-mode 1)
     :config
     (setq doom-modeline-height 24)
 

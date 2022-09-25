@@ -188,9 +188,9 @@
   (define-key *window-map* (kbd "d") 'side-window-delete-all)
   (define-key *window-map* (kbd "r") 'resize-window)
 
-  (exwm-global-set-key (kbd "C-x 4 B") #'my/display-buffer-in-side-window)
-  (exwm-global-set-key (kbd "C-x 4 F") #'my/find-file-side-window)
-  (exwm-global-set-key (kbd "C-x 4 )") #'side-window-delete-all)
+  (global-set-key (kbd "C-x 4 B") #'my/display-buffer-in-side-window)
+  (global-set-key (kbd "C-x 4 F") #'my/find-file-side-window)
+  (global-set-key (kbd "C-x 4 )") #'side-window-delete-all)
 
   ;; Dedicated window
   (defun my/toggle-dedicated-window ()

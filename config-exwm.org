@@ -85,9 +85,7 @@
      ;; This lets me do rapid emacs iteration
      (defun ignore-emacs ()
        (when (and exwm-class-name (string= exwm-class-name "Emacs"))
-         (call-interactively #'exwm-input-release-keyboard)
-         (make-local-variable 'exwm-mode-map)
-         (setq exwm-mode-map nil)))
+         (call-interactively #'exwm-input-release-keyboard)))
 
      (add-hook 'exwm-manage-finish-hook
                #'ignore-emacs)))

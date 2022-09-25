@@ -88,7 +88,7 @@
               (setq projectile-require-project-root t)
               (setq projectile-indexing-method 'hybrid)
               (setq projectile-auto-update-cache nil)
-              (exwm-global-set-key (kbd (if (and (not (daemonp))
+              (global-set-key (kbd (if (and (not (daemonp))
                                                  (null window-system))
                                             "C-c ."
                                           "C-c C-."))

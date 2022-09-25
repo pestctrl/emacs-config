@@ -782,8 +782,8 @@
 ** UI
 #+begin_src emacs-lisp
   ;; dashboard looks cool
-  (use-package dashboard)
-  (setq fancy-splash-image "~/.emacs.d/res/icon.png")
+  ;; (use-package dashboard)
+  ;; (setq fancy-splash-image "~/.emacs.d/res/icon.png")
 
   ;; Disable tool and menu bar, keep the fringe though
   (unless my/puppet-p

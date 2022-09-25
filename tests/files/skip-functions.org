@@ -1,0 +1,5 @@
+#+FILETAGS: prod
+* TASK Active tasks shouldn't be skipped, unless calling skip function with other tag
+SCHEDULED: <2022-09-25 Sun>
+* TASK However, there was a bug where the last task, if active, would show up in all tag views
+SCHEDULED: <2022-09-25 Sun>

@@ -63,6 +63,10 @@
 (org-test/parents-should "empty-invis.org"
   (should (eq 'invis (opr/type-of-project))))
 
+(org-test/parents-should "skip-functions.org"
+  (should (null (my/org-agenda-skip-unless-prod-tag)))
+  (should (not (null (my/org-agenda-skip-unless-dev-tag)))))
+
 (ert-run-tests-interactively t)
 
 ;; (progn (setq org-disabled-tests nil) (mapcar (lambda (sym) (put sym 'ert--test nil)) (apropos-internal "" #'ert-test-boundp)))

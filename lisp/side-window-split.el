@@ -65,7 +65,7 @@
      `((side . ,side)
        (slot . ,slot)
        (dedicated . t)
-       (window-parameters (no-delet-other-windows . t))))))
+       (window-parameters (no-delete-other-windows . t))))))
 
 (defun my/find-file-side-window (side filename &optional slot-override)
   (interactive

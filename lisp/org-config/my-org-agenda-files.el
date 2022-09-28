@@ -75,5 +75,9 @@
                            (expand-file-name "~/") x))
                       my/all-agenda-files)))
 
+(require 'org-id)
+
+(setq org-id-locations-file (my/org-file ".org-id-locations"))
+
 (provide 'my-org-agenda-files)
 ;;; my-org-agenda-files.el ends here

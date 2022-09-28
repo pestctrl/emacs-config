@@ -19,6 +19,8 @@
 
      (define-key exwm-mode-map (kbd "M-q") #'exwm-input-send-next-key)
      ;; (add-to-list 'exwm-input-global-keys (cons (kbd "M-q") #'exwm-input-send-next-key))
+     ;; M-ESC?
+     ;; exwm-input--set-key
 
      ;; System tray
      (require 'exwm-systemtray)

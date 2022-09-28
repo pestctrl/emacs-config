@@ -31,7 +31,7 @@
 
 (setq rb/ssh-default-key (format "~/.ssh/devices/%s/id_rsa" (system-name)))
 (require 'my-org-agenda-files)
-(setq gaff/watch-directories (list (list (file-name-as-directory my/agenda-folder)
+(setq gaff/watch-directories (list (list (file-name-as-directory my/org-folder)
                                          "origin/desktop" "origin/gaming-laptop" "origin/puppet" "origin/mobile")))
 
 (run-at-time nil 300 #'gaff/trigger)

@@ -25,6 +25,9 @@
 ;;; Code:
 (require 'my-plaintext-files)
 
+(defconst my/org-folder
+  (my/plaintext-file "org"))
+
 (defconst my/agenda-folder
   (my/plaintext-file "org/agenda"))
 

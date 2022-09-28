@@ -779,6 +779,11 @@
         (exwm-randr-refresh))))
   (remove-hook 'window-size-change-functions #'hoagie-adjust-font-size)
 #+end_src
+* time zones
+#+begin_src emacs-lisp
+  (when my/puppet-p
+    (setenv "TZ" "CST6CDT"))
+#+end_src
 * look and feel
 ** UI
 #+begin_src emacs-lisp

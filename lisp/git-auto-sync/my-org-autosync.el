@@ -141,7 +141,8 @@
 
 (defun gac-debounce-again-if-magit-in-progress (buf)
   ;; Return true if should-be-automatic is true, AND
-  (or (and (ga/should-be-automatic (file-name-directory (buffer-file-name buf)))
+  (or (and (buffer-file-name buf)
+           (ga/should-be-automatic (file-name-directory (buffer-file-name buf)))
            ;; there's no org-lint errors if we're in an org buffer
            (or (not (with-current-buffer buf (eq major-mode 'org-mode)))
                (gac-no-lint-errors buf)))

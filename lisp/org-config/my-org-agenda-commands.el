@@ -495,5 +495,15 @@
 
 (define-key org-agenda-mode-map (kbd "<tab>") #'org-agenda-goto-disable-follow)
 
+(when my/puppet-p
+  (advice-add #'org-agenda-redo-all
+              :before
+              #'org-save-all-org-buffers)
+  (advice-add #'org-agenda-redo-all
+              :before
+              #'org-save-all-org-buffers)
+
+  (run-at-time 60 nil #'org-save-all-org-buffers))
+
 (provide 'my-org-agenda-commands)
 ;;; my-org-agenda-commands.el ends here

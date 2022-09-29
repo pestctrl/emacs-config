@@ -67,6 +67,12 @@
   (should (null (my/org-agenda-skip-unless-prod-tag)))
   (should (not (null (my/org-agenda-skip-unless-dev-tag)))))
 
+(org-test/parents-should "wait-stuck.org"
+  (should (eq 'stuck (opr/type-of-task))))
+
+(org-test/parents-should "wait-active.org"
+  (should (eq 'wait-active (opr/type-of-task))))
+
 (ert-run-tests-interactively t)
 
 ;; (progn (setq org-disabled-tests nil) (mapcar (lambda (sym) (put sym 'ert--test nil)) (apropos-internal "" #'ert-test-boundp)))

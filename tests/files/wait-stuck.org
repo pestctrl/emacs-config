@@ -1,0 +1,5 @@
+
+* WAIT tasks are stuck if there is no schedule
+
+* WAIT tasks are stuck if their scheduled date has passed
+SCHEDULED: <1970-01-01 Thu>

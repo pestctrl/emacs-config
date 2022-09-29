@@ -70,8 +70,11 @@
 (org-test/parents-should "wait-stuck.org"
   (should (eq 'stuck (opr/type-of-task))))
 
+(org-test/parents-should "wait-wait.org"
+  (should (eq 'wait (opr/type-of-task))))
+
 (org-test/parents-should "wait-active.org"
-  (should (eq 'wait-active (opr/type-of-task))))
+  (should (eq 'active (opr/type-of-task))))
 
 (ert-run-tests-interactively t)
 

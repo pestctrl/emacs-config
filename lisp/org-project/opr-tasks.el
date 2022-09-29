@@ -60,9 +60,10 @@
       ("NEXT" 'active)
       ("DONE" 'done)
       ("COMPLETE" 'done)
-      ("WAIT" (if (when-let (d (org-entry-get (point) "SCHEDULED"))
-                    (org-time> d (org-matcher-time "<today>")))
-                  'wait-active ;; BENSON_UPDATE_THIS: Change this to active?
+      ("WAIT" (if-let (d (org-entry-get (point) "SCHEDULED"))
+                  (if (org-time> d (org-matcher-time "<today>"))
+                      'wait
+                    'active)
                 'stuck))
       (_ (when (or (member state opr/strict-tasks)
                    (and (member state opr/ambiguous)

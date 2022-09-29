@@ -6,7 +6,3 @@
 * SEQ should be stuck if there are multiple stuck tasks
 ** TASK Next task 1
 ** TASK Next task 2
-* SEQ should be stuck if there is a wait task in the past
-** WAIT Waiting task
-SCHEDULED: <1997-01-01 Wed>
-** TASK Next Task

@@ -14,3 +14,7 @@ SCHEDULED: <1997-01-01 Wed>
 *** TASK Active Task
 SCHEDULED: <1997-01-01 Wed>
 ** TASK Next Task
+* SEQ should be active if there is a wait task in the past
+** WAIT Waiting task
+SCHEDULED: <1997-01-01 Wed>
+** TASK Next Task

@@ -61,7 +61,7 @@
             (eq 'active (opr/type-of-project))))
       'active
     (if (olc/any-todo-children?
-          (or (eq 'wait-active (opr/type-of-task))
+          (or (eq 'wait (opr/type-of-task))
               (eq 'invis (opr/type-of-project))))
       'invis
       'stuck)))

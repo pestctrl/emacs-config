@@ -1,0 +1,41 @@
+* WAIT tasks are stuck if there is no schedule
+#+begin_src emacs-lisp
+  (should (eq 'stuck (opr/type-of-task)))
+#+end_src
+* WAIT tasks are active if their scheduled date has passed
+SCHEDULED: <1970-01-01 Thu>
+#+begin_src emacs-lisp
+  (should (eq 'active (opr/type-of-task)))
+#+end_src
+* WAIT tasks are wait if their scheduled date is in the future
+SCHEDULED: <2037-01-01 Thu>
+#+begin_src emacs-lisp
+  (should (eq 'wait (opr/type-of-task)))
+#+end_src
+* META should be stuck if there is one single WAIT task that is scheduled, and no other tasks
+#+begin_src emacs-lisp
+  (should (eq 'stuck (opr/type-of-project)))
+#+end_src
+** WAIT for this thing
+SCHEDULED: <2037-12-31 Thu>
+* META should be stuck if there are past-due waiting tasks
+#+begin_src emacs-lisp
+  (should (eq 'active (opr/type-of-project)))
+#+end_src
+** WAIT for this to happen
+SCHEDULED: <1970-01-01 Thu>
+- State "WAIT"       from              [2022-09-29 Thu 16:53]
+* META should be active, as long as one componenent is active, since WAIT is "invisible"
+#+begin_src emacs-lisp
+  (should (eq 'active (opr/type-of-project)))
+#+end_src
+** WAIT for this thing
+SCHEDULED: <2037-12-31 Thu>
+** TASK Active task
+SCHEDULED: <1970-01-01 Thu>
+* SEQ should be invisible if there is a wait task in the future
+#+begin_src emacs-lisp
+  (should (eq 'invis (opr/type-of-project)))
+#+end_src
+** WAIT Waiting task
+SCHEDULED: <3000-01-01 Wed>

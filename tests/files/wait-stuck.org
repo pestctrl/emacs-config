@@ -1,2 +1,0 @@
-
-* WAIT tasks are stuck if there is no schedule

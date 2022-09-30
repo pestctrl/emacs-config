@@ -8,12 +8,3 @@ DEADLINE: <1997-01-01 Wed>
 ** META Subproject
 *** TASK Active task
 SCHEDULED: <1997-01-01 Wed>
-* META should be active if there are past-due waiting tasks
-** WAIT for this to happen
-SCHEDULED: <1970-01-01 Thu>
-- State "WAIT"       from              [2022-09-29 Thu 16:53]
-* META should be active, as long as one componenent is active, since WAIT is "invisible"
-** WAIT for this thing
-SCHEDULED: <2037-12-31 Thu>
-** TASK Active task
-SCHEDULED: <1970-01-01 Thu>

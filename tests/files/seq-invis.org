@@ -1,4 +1,0 @@
-* SEQ should be invisible if there is a wait task in the future
-** WAIT Waiting task
-SCHEDULED: <3000-01-01 Wed>
-

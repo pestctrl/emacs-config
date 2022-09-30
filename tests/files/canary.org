@@ -1,0 +1,17 @@
+
+* This test should pass
+#+begin_src emacs-lisp
+  (should t)
+#+end_src
+
+* This test should also pass
+DEADLINE: <2022-09-30 Fri> SCHEDULED: <2022-09-30 Fri>
+:PROPERTIES:
+:HELLO:    WORLD
+:END:
+#+begin_src common-lisp
+  (should nil)
+#+end_src
+#+begin_src emacs-lisp
+  (should t)
+#+end_src

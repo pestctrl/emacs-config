@@ -611,8 +611,9 @@
       (define-key *root-map* "c" #'shell)
     (use-package vterm
       :commands vterm find-vterm vterm-kill
-      :bind (:map *root-map*
-                  ("c" . #'find-vterm))
+      :bind (("C-x 4 t" . #'find-vterm-other-window)
+             :map *root-map*
+             ("c" . #'find-vterm))
       :config
       (setq ansi-color-names-vector
             ["black" "red3" "green3" "yellow3" "DodgerBlue2" "magenta3" "cyan3" "gray90"])
@@ -622,20 +623,26 @@
 
       (define-key vterm-mode-map my/keymap-key nil)
 
-      (if (<= 27 emacs-major-version)
-          (defun find-vterm ()
-            (interactive)
-            (let* ((current-tab (alist-get 'name (tab-bar--current-tab)))
-                   (term-name (concat current-tab "-term")))
-              (if-let (b (get-buffer term-name))
-                  (switch-to-buffer b)
-                (vterm)
-                (rename-buffer term-name))))
-        (defun find-vterm ()
-          (interactive)
-          (if-let (b (get-buffer "vterm"))
-              (switch-to-buffer b)
-            (vterm))))
+      (defun get-vterm-buffer (name)
+        (if-let (buf (get-buffer name))
+            buf
+          (let ((buf (vterm--internal #'(lambda (_x) nil))))
+            (with-current-buffer buf
+              (rename-buffer name))
+            buf)))
+
+      (defun get-tab-vterm-buffer ()
+        (let* ((current-tab (alist-get 'name (tab-bar--current-tab)))
+               (term-name (concat current-tab "-term")))
+          (get-vterm-buffer term-name)))
+
+      (defun find-vterm ()
+        (interactive)
+        (switch-to-buffer (get-tab-vterm-buffer)))
+
+      (defun find-vterm-other-window ()
+        (interactive)
+        (switch-to-buffer-other-window (get-tab-vterm-buffer)))
 
       (setq vterm-kill-buffer-on-exit t)
 

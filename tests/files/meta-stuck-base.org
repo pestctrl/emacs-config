@@ -13,3 +13,6 @@
 * META should be stuck even if there are deadlined dones
 ** DONE Deadlined done task
 DEADLINE: <2021-06-21 Mon>
+* META should be stuck if there is one single WAIT task that is scheduled, and no other tasks
+** WAIT for this thing
+SCHEDULED: <2037-12-31 Thu>

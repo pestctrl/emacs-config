@@ -50,8 +50,8 @@
          (not (olc/any-todo-children? t))
          ;; All todo children are done? Stuck!
          (not (olc/any-todo-children?
-                (not (eq 'done
-                         (cdr (opr/get-type-and-state)))))))
+                (not (member (cdr (opr/get-type-and-state))
+                             '(done wait))))))
         'stuck
       'active)))
 

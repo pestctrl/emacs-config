@@ -492,6 +492,7 @@
      nil
      nil
      (my/org-roam-filter-by-tag "Project")
+     nil
      :templates
      '(("p" "project" plain ""
         :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}: %^{Description}\n#+category: ${title}\n#+filetags: Project")

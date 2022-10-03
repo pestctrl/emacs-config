@@ -790,3 +790,61 @@
   (add-to-list 'load-path "~/.emacs.d/submodule/elgantt")
   (require 'elgantt)
 #+end_src
+* org-kanban
+#+begin_src emacs-lisp
+  (use-package org-kanban)
+  (defun my/org-dblock-write:kanban (params)
+    "Create the kanban dynamic block.
+  PARAMS may contain `:mirrored`, `:match`, `:scope`, `:layout`, `:range`, `:depth` and `:compressed`."
+    (insert
+     (let*
+         (
+          (mirrored (plist-get params :mirrored))
+          (compressed (plist-get params :compressed))
+          (match (plist-get params :match))
+          (range (plist-get params :range))
+          (depth (org-kanban--params-depth params))
+          (layout (org-kanban//params-layout params))
+          (files (org-kanban//params-files params))
+          (scope (org-kanban//params-scope params files))
+          (todo-keywords (split-string (plist-get params :todo) "|"))
+          (sort-spec-string (plist-get params :sort))
+          (sort-spec (org-kanban--prepare-comparator sort-spec-string todo-keywords))
+          (todo-infos (org-map-entries 'org-kanban//todo-info-extract match scope))
+          (sorted-todo-infos (if sort-spec (-sort sort-spec todo-infos) todo-infos))
+          (filtered-todo-infos (-filter (lambda (todo-info)
+                                          (org-kanban//range-fun
+                                           (org-kanban--todo-info-get-keyword todo-info)
+                                           (org-kanban//todo-info-get-keywords todo-info)
+                                           (car range)
+                                           (cdr range)))
+                                        sorted-todo-infos))
+          (filtered-todo-infos (-filter (lambda (todo-info)
+                                          (if (eq scope 'tree)
+                                              (let* (
+                                                     (tree-info (nth 0 todo-infos))
+                                                     (tree-level (org-kanban--todo-info-get-level tree-info)))
+                                                (< (org-kanban--todo-info-get-level todo-info) (+ depth tree-level)))
+                                            (<= (org-kanban--todo-info-get-level todo-info) depth))) filtered-todo-infos))
+          (filtered-todo-infos (-filter (lambda (todo-info) (nth 4 (org-kanban//todo-info-get-heading todo-info))) filtered-todo-infos))
+          (row-for (lambda (todo-info) (org-kanban//row-for todo-info todo-keywords layout)))
+          (table-title (string-join todo-keywords "|"))
+          (filtered (-filter (lambda (todo-info)
+                               (-intersection
+                                (list (org-kanban//heading-get-todo-keyword (org-kanban//todo-info-get-heading todo-info)))
+                                (org-kanban//todo-info-get-keywords todo-info)))
+                             filtered-todo-infos))
+          (table (if compressed
+                     (org-kanban//compressed-rows (-map row-for filtered))
+                   (let* ((rows (-map row-for filtered)))
+                     (if rows
+                         (--reduce (format "%s\n%s" acc it) rows)
+                       ""
+                       )))))
+       (format "|%s|\n|--|\n%s" table-title table)))
+    (org-table-align))
+
+  (advice-add #'org-dblock-write:kanban
+              :override
+              #'my/org-dblock-write:kanban)
+#+end_src

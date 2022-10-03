@@ -99,7 +99,8 @@
                 (dolist (b buffers)
                   (with-current-buffer b
                     (read-only-mode 1)))
-                (gaff/fetch-fast-forward dir branches))
+                (gaff/fetch-fast-forward dir branches)
+                (org-id-update-id-locations (directory-files-recursively "~/plaintext/org/" "^[^#].*.org$")))
             (dolist (b buffers)
               (with-current-buffer b
                 (read-only-mode -1)))))))))

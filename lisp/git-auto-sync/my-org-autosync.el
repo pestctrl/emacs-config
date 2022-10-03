@@ -155,5 +155,11 @@
             :before-while
             #'gac-debounce-again-if-magit-in-progress)
 
+;; (add-hook 'gaff/after-merge-hook
+;;           (lambda ()
+;;             (org-id-update-id-locations
+;;              (directory-files-recursively
+;;               "~/plaintext/org/" "^[^#].*.org$"))))
+
 (provide 'my-org-autosync)
 ;;; my-org-autosync.el ends here

@@ -818,3 +818,20 @@
     (bind-key "C-c C-r" 'dired-rsync dired-mode-map)
     (add-to-list 'global-mode-string 'dired-rsync-modeline-status t))
 #+end_src
+* keyfreq
+#+begin_src emacs-lisp
+  (use-package keyfreq
+    :init
+    (setq keyfreq-excluded-commands
+          '(self-insert-command
+            org-self-insert-command
+            exwm-input-send-simulation-key
+            tab-bar-mouse-1
+            abort-recursive-edit
+            forward-char
+            backward-char
+            previous-line
+            next-line))
+    (keyfreq-mode 1)
+    (keyfreq-autosave-mode 1))
+#+end_src

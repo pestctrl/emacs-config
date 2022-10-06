@@ -706,7 +706,7 @@
     (helm :sources
           '(helm-source-info-emacs helm-source-info-elisp helm-source-info-cl)))
 
-  (global-set-key (kbd "C-c C-h") #'helm-info-emacs-stuff)
+  (global-set-key (kbd "C-c h") #'helm-info-emacs-stuff)
 #+end_src
 ** helpful
 #+begin_src emacs-lisp

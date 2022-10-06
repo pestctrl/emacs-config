@@ -808,22 +808,22 @@
   ;; and ugly
   (use-package all-the-icons
     :config
-    (setq all-the-icons-scale-factor 1.0))
+    (setq all-the-icons-scale-factor 0.9))
 
   ;; The most efficient cool looking modeline I've found. Faster than even
   ;; smart-mode-line
   (use-package doom-modeline
     :init (doom-modeline-mode 1)
     :config
-    (setq doom-modeline-height 24)
-
     ;; Removes symlink bug w/ regards to doom-modeline
     (setq doom-modeline-project-detection 'project)
 
-    ;; (let ((mode-line-size 95))
-    ;;   (set-face-attribute 'mode-line nil :height mode-line-size)
-    ;;   (set-face-attribute 'mode-line-inactive nil :height mode-line-size))
-    )
+    (when (not my-ec/at-ti)
+      (setq doom-modeline-height 24)
+
+      (let ((mode-line-size 93))
+        (set-face-attribute 'mode-line nil :height mode-line-size)
+        (set-face-attribute 'mode-line-inactive nil :height mode-line-size))))
 
   ;; Modeline display useful information
   (setq global-mode-string '(" "))

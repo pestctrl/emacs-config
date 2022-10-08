@@ -72,7 +72,8 @@
 
 (defun empty-status? ()
   (if (olc/any-todo-children?
-        (eq 'stuck (opr/type-of-task)))
+        (or (eq 'stuck (opr/type-of-task))
+            (eq 'stuck (opr/type-of-project))))
       'stuck
     'invis))
 

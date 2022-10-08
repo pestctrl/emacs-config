@@ -67,9 +67,6 @@
 [submodule "submodule/k-useless"]
 	path = submodule/k-useless
 	url = https://github.com/BlueFlo0d/k-useless/
-[submodule "submodule/org-mode"]
-	path = submodule/org-mode
-	url = https://code.orgmode.org/bzg/org-mode
 [submodule "submodule/elgantt"]
 	path = submodule/elgantt
 	url = https://github.com/legalnonsense/elgantt/

@@ -450,7 +450,7 @@
   (unless my-ec/at-ti
     (use-package banner-comment
       :commands banner-comment
-      :bind (("C-c h" . #'banner-comment))))
+      :bind (("C-c b" . #'banner-comment))))
 
   (add-hook 'lisp-mode-hook
             (lambda () (setq comment-start ";; ")))

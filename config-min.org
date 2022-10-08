@@ -819,7 +819,7 @@
     (setq doom-modeline-project-detection 'project)
 
     (when (not my-ec/at-ti)
-      (setq doom-modeline-height 24)
+      (setq doom-modeline-height 30)
 
       (let ((mode-line-size 93))
         (set-face-attribute 'mode-line nil :height mode-line-size)

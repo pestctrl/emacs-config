@@ -92,4 +92,4 @@
               :before
               #'projectile-switch-switch-tab))
 
-(provide 'keymap)
+(provide 'my-keymap)

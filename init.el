@@ -44,7 +44,7 @@
 (require 'emacs-custom-load-or-ask)
 (require 'my-predicates)
 
-(require 'keymap)
+(require 'my-keymap)
 
 (when (boundp 'face--new-frame-defaults)
   (define-obsolete-variable-alias

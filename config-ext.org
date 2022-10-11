@@ -582,12 +582,12 @@
 #+end_src
 ** find-file-view
 #+begin_src emacs-lisp
-  (defun view-file ()
+  (defun view-mode-file ()
     (interactive)
     (call-interactively #'ido-find-file)
     (view-mode))
 
-  (global-set-key (kbd "C-c C-v") #'view-file)
+  (global-set-key (kbd "C-c C-v") #'view-mode-file)
 #+end_src
 ** rmsbolt
 #+begin_src emacs-lisp

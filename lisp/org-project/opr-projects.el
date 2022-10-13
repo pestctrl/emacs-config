@@ -105,14 +105,18 @@
              (if (when-let (s (org-entry-get (point) "SCHEDULED"))
                    (org-time> s (org-matcher-time "<now>")))
                  'active
-               (pcase state
-                 ("EMPTY" (empty-status?))
-                 ("SEQ" (seq-status?))
-                 ("META" (meta-status? greedy-active))
-                 ("ONE" (when (eq 'project (opr/ambiguous-task-or-project))
-                          (seq-status?)))
-                 ("TODO" (when (eq 'project (opr/ambiguous-task-or-project))
-                           (seq-status?)))))))))))
+               (let ((status (pcase state
+                               ("EMPTY" (empty-status?))
+                               ("SEQ" (seq-status?))
+                               ("META" (meta-status? greedy-active))
+                               ("ONE" (when (eq 'project (opr/ambiguous-task-or-project))
+                                        (seq-status?)))
+                               ("TODO" (when (eq 'project (opr/ambiguous-task-or-project))
+                                         (seq-status?))))))
+                 (if (and (member "invis_when_active" (org-get-tags))
+                          (eq status 'active))
+                     'invis
+                   status)))))))))
 
 (provide 'opr-projects)
 ;;; opr-projects.el ends here

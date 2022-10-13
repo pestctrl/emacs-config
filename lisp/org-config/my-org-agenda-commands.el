@@ -259,8 +259,8 @@
   (setq org-agenda-custom-commands
         `(("p" . "\tprod")
           ,@(agenda-suite "all" "pa" "prod")
-          ,@(agenda-suite "school" "ps" "time")
-          ,@(agenda-suite "family" "pf" "time")
+          ,@(agenda-suite "school" "ps" "school")
+          ,@(agenda-suite "family" "pf" "family")
           ,@(agenda-suite "dev" "d" "dev")
           ("l" "\tLeisure"
            ,(org-agenda-compound-view "leisure")

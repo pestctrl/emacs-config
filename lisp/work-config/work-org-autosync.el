@@ -1,4 +1,4 @@
-;;; my-org-autosync.el ---  -*- lexical-binding: t -*-
+;;; work-org-autosync.el ---  -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2022 Benson Chu
 
@@ -25,10 +25,11 @@
 ;;; Code:
 (require 'use-package)
 (use-package git-auto-commit-mode)
+(require 'git-auto-fast-forward-mode)
 (use-package keychain-environment)
 
 (setq gac-automatically-add-new-files-p nil)
-(setq-default gac-debounce-interval 300)
+(setq-default gac-debounce-interval 10)
 
 (defmacro defun-cached (name args &rest body)
   (let ((var-name (intern (concat (symbol-name name) "--cached"))))
@@ -79,20 +80,29 @@
                           actual-buffer)
              gac--debounce-timers)))
 
+(defun work-ga/on-auto-branch (dir)
+  t)
+
+(advice-add #'ga/on-auto-branch
+            :override
+            #'work-ga/on-auto-branch)
+
 (advice-add #'gac--debounced-save
             :override
             #'my/gac--debounced-save)
 
 (defun gac-debounce-again-if-magit-in-progress (buf)
-  (with-current-buffer buf
-    (if (ga/should-be-automatic)
-        t
-      (gac--debounced-save)
-      nil)))
+  ;; Return true if should-be-automatic is true, AND
+  (or (and (buffer-file-name buf)
+           (ga/should-be-automatic (file-name-directory (buffer-file-name buf))))
+      ;; Otherwise, debounce again and return nil
+      (and (with-current-buffer buf
+             (gac--debounced-save))
+           nil)))
 
 (advice-add #'gac--after-save
             :before-while
             #'gac-debounce-again-if-magit-in-progress)
 
-(provide 'my-org-autosync)
-;;; my-org-autosync.el ends here
+(provide 'work-org-autosync)
+;;; work-org-autosync.el ends here

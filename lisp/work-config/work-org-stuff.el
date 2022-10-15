@@ -37,6 +37,7 @@
 ;; Redef some of org-ql stuff
 (load-file "~/.emacs.d/lisp/work-config/work-specific-org-project-redefs.el")
 (require 'org-scan-tags-indent)
+(require 'work-org-autosync)
 
 (require 'ob-shell)
 

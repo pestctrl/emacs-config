@@ -76,3 +76,6 @@
 [submodule "lisp/emacs-fast-selection"]
 	path = lisp/emacs-fast-selection
 	url = git@github.com:pestctrl/emacs-fast-selection
+[submodule "lisp/ti-config/libraries"]
+	path = lisp/ti-config/libraries
+	url = git@github.com:pestctrl/work-emacs

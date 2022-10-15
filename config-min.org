@@ -828,13 +828,18 @@
            (height-px (fifth (assoc 'geometry attrs)))
            (size 10)) ;; default for first screen at work
       (when (eq height-px 2880)
-        (setq size 14))
-      (unless (and (gethash frame frame-font-size-cache)
-                   (= size (gethash frame frame-font-size-cache)))
-        (puthash frame size frame-font-size-cache)
-        (set-frame-font (format "RobotoMono %s" size))
-        (exwm-randr-refresh))))
-  (remove-hook 'window-size-change-functions #'hoagie-adjust-font-size)
+        (let ((f (selected-frame)))
+          (set-face-attribute 'default f :height 130)
+          (set-face-attribute 'mode-line f :height 130)
+          (set-face-attribute 'mode-line-inactive f :height 130)
+          (setq doom-modeline-height 30))
+        (exwm-randr-refresh))
+      ;; (unless (and (gethash frame frame-font-size-cache)
+      ;;              (= size (gethash frame frame-font-size-cache)))
+      ;;   (puthash frame size frame-font-size-cache))
+      ))
+  ;; (remove-hook 'window-size-change-functions #'hoagie-adjust-font-size)
+
 #+end_src
 * time zones
 #+begin_src emacs-lisp
@@ -869,11 +874,7 @@
     (setq doom-modeline-project-detection 'project)
 
     (when (not my-ec/at-ti)
-      (setq doom-modeline-height 30)
-
-      (let ((mode-line-size 93))
-        (set-face-attribute 'mode-line nil :height mode-line-size)
-        (set-face-attribute 'mode-line-inactive nil :height mode-line-size))))
+      (setq doom-modeline-height 24)))
 
   ;; Modeline display useful information
   (setq global-mode-string '(" "))

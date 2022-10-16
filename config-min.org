@@ -463,10 +463,11 @@
   (define-key emacs-lisp-mode-map (kbd "C-c C-e") 'my/eval-and-replace)
 
   ;; Use cider's eval expression
-  ;; (use-package cider)
-  (add-to-list 'load-path
-               (expand-file-name "submodule/cider"
-                                 user-emacs-directory))
+  (quelpa-use-package-activate-advice)
+  (use-package cider
+    :ensure nil
+    :quelpa (cider :fetcher "github-ssh" :repo "pestctrl/cider" :branch "consecutive-overlays"))
+  (quelpa-use-package-deactivate-advice)
   (autoload 'cider--make-result-overlay "cider-overlays")
 
   (defun endless/eval-overlay (value point)

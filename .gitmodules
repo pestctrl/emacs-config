@@ -79,3 +79,6 @@
 [submodule "lisp/ti-config/libraries"]
 	path = lisp/ti-config/libraries
 	url = git@github.com:pestctrl/work-emacs
+[submodule "submodule/cider"]
+	path = submodule/cider
+	url = git@github.com:pestctrl/cider

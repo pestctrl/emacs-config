@@ -463,21 +463,24 @@
   (define-key emacs-lisp-mode-map (kbd "C-c C-e") 'my/eval-and-replace)
 
   ;; Use cider's eval expression
-  (use-package cider)
+  ;; (use-package cider)
+  (add-to-list 'load-path
+               (expand-file-name "submodule/cider"
+                                 user-emacs-directory))
   (autoload 'cider--make-result-overlay "cider-overlays")
 
   (defun endless/eval-overlay (value point)
     (let ((comment-start ";;"))
       (cider--make-result-overlay (format "%S" value)
         :where point
-        :duration 'command)))
+        :duration 'command))
+    value)
 
   (advice-add 'eval-region :around
               (lambda (f beg end &rest r)
-                (let ((res (apply f beg end r)))
-                  (when (called-interactively-p)
-                    (endless/eval-overlay res end))
-                  res)))
+                (endless/eval-overlay
+                 (apply f beg end r)
+                 end)))
 
   (advice-add 'eval-last-sexp :filter-return
               (lambda (r)

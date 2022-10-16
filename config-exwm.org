@@ -5,7 +5,6 @@
   ;; This will be the hardest to write :/
   (when my-ec/enable-exwm
     (use-exwm
-     :load-path "~/.emacs.d/submodule/exwm/"
      :config
      (use-package exwm-x)
      (exwm-global-set-key (kbd "s-e") #'exwm-edit--compose)

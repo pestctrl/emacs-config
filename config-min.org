@@ -41,6 +41,7 @@
   ;; Show the column number!
   (column-number-mode t)
 #+end_src
+
 * switching keyboards
 #+begin_src emacs-lisp
   (require 'keyboard-toggle)

@@ -30,8 +30,9 @@
 
 (defmacro use-exwm (&rest body)
   `(use-package exwm
-     :load-path "~/.emacs.d/submodule/exwm"
+     :ensure nil
      :defer t
+     :quelpa (exwm :fetcher "github-ssh" :repo "pestctrl/exwm")
      ,@body))
 
 (provide 'use-exwm)

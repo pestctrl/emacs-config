@@ -13,9 +13,6 @@
 [submodule "custom/emacs-memoize"]
 	path = submodule/emacs-memoize
 	url = https://github.com/skeeto/emacs-memoize
-[submodule "custom/exwm"]
-	path = submodule/exwm
-	url = https://github.com/ch11ng/exwm
 [submodule "custom/xelb"]
 	path = submodule/xelb
 	url = https://github.com/ch11ng/xelb

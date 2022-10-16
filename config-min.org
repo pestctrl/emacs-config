@@ -210,8 +210,9 @@
 * dired
 #+begin_src emacs-lisp
   ;; I like dired+'s formatting for listing files
-  (add-to-list 'load-path
-               "~/.emacs.d/submodule/dired-plus")
+  (use-package dired+
+    :ensure nil
+    :quelpa (dired+ :fetcher "github" :repo "emacsmirror/dired-plus" :branch "master"))
   (require 'dired+)
   (setq diredp-hide-details-initially-flag nil)
   (setq diredp-hide-details-propagate-flag nil)
@@ -471,11 +472,16 @@
   (define-key emacs-lisp-mode-map (kbd "C-c C-e") 'my/eval-and-replace)
 
   ;; Use cider's eval expression
-  (quelpa-use-package-activate-advice)
-  (use-package cider
-    :ensure nil
-    :quelpa (cider :fetcher "github-ssh" :repo "pestctrl/cider" :branch "consecutive-overlays"))
-  (quelpa-use-package-deactivate-advice)
+  (let ((quelpa-build-default-files-spec
+         '("*.el" "lisp/*.el"
+           "dir" "*.info" "*.texi" "*.texinfo"
+           "doc/dir" "doc/*.info" "doc/*.texi" "doc/*.texinfo"
+           "docs/dir" "docs/*.info" "docs/*.texi" "docs/*.texinfo"
+           (:exclude
+            ".dir-locals.el" "lisp/.dir-locals.el"))))
+    (use-package cider
+      :ensure nil
+      :quelpa (cider :fetcher "github-ssh" :repo "pestctrl/cider" :branch "consecutive-overlays")))
   (autoload 'cider--make-result-overlay "cider-overlays")
 
   (defun endless/eval-overlay (value point)

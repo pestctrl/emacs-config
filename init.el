@@ -28,6 +28,9 @@
 
 (require 'org)
 (require 'use-package)
+(require 'quelpa)
+(require 'quelpa-use-package)
+
 (setq use-package-always-ensure t)
 
 ;; Add my modules

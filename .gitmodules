@@ -4,9 +4,6 @@
 [submodule "custom/youtube-dl-emacs"]
 	path = submodule/youtube-dl-emacs
 	url = https://github.com/skeeto/youtube-dl-emacs
-[submodule "custom/dired-plus"]
-	path = submodule/dired-plus
-	url = https://github.com/emacsmirror/dired-plus
 [submodule "custom/bookmark-plus"]
 	path = submodule/bookmark-plus
 	url = https://github.com/emacsmirror/bookmark-plus

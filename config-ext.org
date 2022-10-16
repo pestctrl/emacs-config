@@ -835,3 +835,10 @@
     (keyfreq-mode 1)
     (keyfreq-autosave-mode 1))
 #+end_src
+* the best function
+#+begin_src emacs-lisp
+  (add-to-list 'load-path
+               (expand-file-name "secrets"
+                                 user-emacs-directory))
+  (require 'secret-function)
+#+end_src

@@ -24,6 +24,7 @@
 
 ;;; Code:
 (require 'use-package)
+(use-package magit)
 (use-package git-auto-commit-mode)
 (require 'git-auto-fast-forward-mode)
 (use-package keychain-environment)

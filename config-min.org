@@ -1,5 +1,12 @@
 #+PROPERTY: header-args:emacs-lisp :tangle "~/.emacs.d/config-min.el" :comments both
 
+* setup ssh keys
+#+begin_src emacs-lisp
+  (use-package keychain-environment)
+  (require 'ssh-key-management)
+  (keychain-refresh-environment)
+  (rb/ssh-add)
+#+end_src
 * misc emacs settings
 #+begin_src emacs-lisp
   (setq backup-directory-alist `(("." . ,(concat user-emacs-directory "backups"))))

@@ -655,11 +655,6 @@
       ;; '((swiper . 24)))
       ))
 
-  (use-package ivy-rich
-    :requires ivy
-    :config
-    (ivy-rich-mode 1)
-    (setq ivy-rich-project-root-cache-mode t))
 #+end_src
 ** Elfeed
 #+begin_src
@@ -834,11 +829,4 @@
             next-line))
     (keyfreq-mode 1)
     (keyfreq-autosave-mode 1))
-#+end_src
-* the best function
-#+begin_src emacs-lisp
-  (add-to-list 'load-path
-               (expand-file-name "secrets"
-                                 user-emacs-directory))
-  (require 'secret-function)
 #+end_src

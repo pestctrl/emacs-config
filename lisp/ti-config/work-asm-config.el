@@ -26,6 +26,10 @@
 (require 'use-package)
 (use-package asm-mode)
 
+(add-hook 'asm-mode-hook
+          (lambda ()
+            (setq tab-width 8)))
+
 (setq asm-font-lock-keywords
       (append
        (list '("^\\(\\(\\sw\\|\\s_\\)+\\)\\>:?[ \t]*\\(\\sw+\\(\\.\\sw+\\)*\\)?"
@@ -34,32 +38,6 @@
              (list
               (rx line-start (group "." (+ (or (syntax word) (syntax symbol)))) symbol-end ":")
               1 font-lock-function-name-face)
-             ;; '("^\\((\\sw+)\\)?\\s +\\(\\(\\.?\\sw\\|\\s_\\)+\\(\\.\\sw+\\)*\\)"
-             ;;   2 font-lock-keyword-face)
-             (list (rx line-start
-                       (optional
-                        (* space)
-                        (+ alphanumeric))
-                       (+ space)
-                       (group
-                        (and "."
-                             (+ (or "_" alphanumeric))))
-                       (or (and (+ space)
-                                nonl)
-                           line-end))
-                   1 font-lock-keyword-face)
-             (list (rx line-start
-                       (optional
-                        (* space)
-                        (+ alphanumeric))
-                       (+ space)
-                       (group
-                        (+ (or "_"
-                               (and (optional ".")
-                                    alphanumeric))))
-                       (+ space)
-                       nonl)
-                   1 font-lock-keyword-face)
              (list (rx line-start
                        (optional
                         (* space)
@@ -76,6 +54,13 @@
                        nonl)
                    '(1 font-lock-comment-face)
                    '(2 font-lock-keyword-face))
+             (list (rx line-start
+                       (optional (group "(" (+ (syntax word)) ")"))
+                       (+ (syntax whitespace))
+                       (group (group (+ (or (and (optional ".") (syntax word))
+                                            (syntax symbol))))
+                              (* (group "." (+ (syntax word))))))
+                   2 font-lock-keyword-face)
              ;; directive started from ".".
              '("^\\(\\.\\(\\sw\\|\\s_\\)+\\)\\>[^:]?"
                1 font-lock-keyword-face)

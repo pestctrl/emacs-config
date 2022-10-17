@@ -72,6 +72,13 @@
 (load-file? "/scratch/benson/tools2/llvm_cgt/llvm-project/llvm/utils/emacs/tablegen-mode.el")
 (load-file? "/scratch/benson/tools2/llvm_cgt/llvm-project/llvm/utils/emacs/emacs.el")
 
+(defface llvm-separator-face `((t (:background "gray25" :inherit font-lock-warning-face)))
+  nil)
+
+(add-to-list 'llvm-font-lock-keywords
+             `(,(rx line-start (optional "# ") "***" (+ nonl) "***" (optional ":") line-end) . 'llvm-separator-face)
+             t)
+
 (add-to-list 'auto-mode-alist
              '("\\.dsls$" . json-mode))
 

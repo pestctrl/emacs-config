@@ -25,17 +25,25 @@
 ;;; Code:
 
 (setq kwds
-      `(("\\<IR Dump\\>" . font-lock-function-name-face)
+      `((,(rx line-start (optional "# ") "***" (+ nonl) "***" (optional ":") line-end) . font-lock-warning-face)
+        ("\\<IR Dump\\>" . font-lock-function-name-face)
         ("\\<Before\\>" . font-lock-doc-face)
         ("\\<After\\>" . font-lock-doc-face)
         ("\\<Machine code for function\\>" . font-lock-function-name-face)
         ("\\<End machine code for function\\>" . font-lock-doc-face)))
+
+(defvar llvm-ir-mode-syntax-table
+  (let ((st (make-syntax-table)))
+    ;; (modify-syntax-entry ?* "<" st)
+    st)
+  "Syntax table used while in Asm mode.")
 
 ;; (face-remap-add-relative 'stripe-highlight '(:foreground "black" :background "yellow"))
 
 (define-minor-mode llvm-ir-minor-mode
   "Doc string."
   :lighter "llvm-debug"
+  (set-syntax-table (make-syntax-table llvm-ir-mode-syntax-table))
   (font-lock-add-keywords nil kwds)
 
   (if (fboundp 'font-lock-flush)

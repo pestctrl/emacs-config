@@ -26,6 +26,7 @@
 (require 'my-org-misc)
 (require 'work-org-stuff)
 (require 'work-commentor)
+(require 'work-asm-config)
 (require 'ti-lib)
 (require 'ti-build-tool)
 (require 'ti-debug-compile)

@@ -28,49 +28,53 @@
 
 (add-hook 'asm-mode-hook
           (lambda ()
-            (setq tab-width 8)))
+            (setq tab-width 10)))
 
 (setq asm-font-lock-keywords
       (append
        (list '("^\\(\\(\\sw\\|\\s_\\)+\\)\\>:?[ \t]*\\(\\sw+\\(\\.\\sw+\\)*\\)?"
                (1 font-lock-function-name-face) (3 font-lock-keyword-face nil t))
              ;; label started from ".".
-             (list
-              (rx line-start (group "." (+ (or (syntax word) (syntax symbol)))) symbol-end ":")
-              1 font-lock-function-name-face)
-             (list (rx line-start
-                       (optional
-                        (* space)
-                        (+ alphanumeric))
-                       (+ space)
-                       (group
-                        (optional "||")
-                        (+ space))
-                       (group
-                        (+ (or "_"
-                               (and (optional ".")
-                                    alphanumeric))))
-                       (+ space)
-                       nonl)
-                   '(1 font-lock-comment-face)
-                   '(2 font-lock-keyword-face))
-             (list (rx line-start
-                       (optional (group "(" (+ (syntax word)) ")"))
-                       (+ (syntax whitespace))
-                       (group (group (+ (or (and (optional ".") (syntax word))
-                                            (syntax symbol))))
-                              (* (group "." (+ (syntax word))))))
-                   2 font-lock-keyword-face)
+             `(,(rx line-start (group "." (+ (or (syntax word) (syntax symbol)))) symbol-end ":")
+               (1 font-lock-function-name-face))
+             `(,(rx line-start
+                    (optional (* space) (+ alphanumeric))
+                    (+ space)
+                    (group (optional "||") (+ space))
+                    (group
+                     (+ (or "_"
+                            (and (optional ".")
+                                 alphanumeric))))
+                    (+ space)
+                    nonl)
+               (1 'asm-vliw-bar)
+               (2 font-lock-keyword-face))
+             `(,(rx line-start
+                    (optional (group "(" (+ (syntax word)) ")"))
+                    (+ (syntax whitespace))
+                    (group (group (+ (or (and (optional ".") (syntax word))
+                                         (syntax symbol))))
+                           (* (group "." (+ (syntax word))))))
+               (2 font-lock-keyword-face))
              ;; directive started from ".".
              '("^\\(\\.\\(\\sw\\|\\s_\\)+\\)\\>[^:]?"
                1 font-lock-keyword-face)
              ;; %register
-             (cons (rx (or "TA" "TDM" "M" "A")
-                       (or (+ digit)
-                           ".GT"
-                           ".LT"))
-                   font-lock-variable-name-face))
+             `(,(rx "ADDR1") . font-lock-type-face)
+             `(,(rx (or "TA" "TDM" "M" "A" "D")
+                    (or (+ digit) ".GT" ".LT" ".EQ"))
+               . font-lock-variable-name-face)
+             `(,(rx "@" (group (+ (or (syntax word) (syntax symbol)))) symbol-end) (1 font-lock-function-name-face))
+             `(,(rx "#" (optional "-") "0x" (+ alphanumeric)) . font-lock-constant-face))
        cpp-font-lock-keywords))
+
+(defface asm-vliw-bar `((t (:background "gray25" :inherit font-lock-comment-face))) nil)
+
+(defun asm-clean-up ()
+  (interactive)
+  (save-excursion
+    (replace-regexp (rx (group (or alphanumeric ")")) "," (group (or alphanumeric "#" "*")))
+                    "\\1,  \\2")))
 
 (provide 'work-asm-config)
 ;;; work-asm-config.el ends here

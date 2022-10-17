@@ -141,7 +141,8 @@
     (setq tab-switch-mode-map map)))
 
 (define-minor-mode tab-switch-mode ""
-  nil nil tab-switch-mode-map :global t)
+  :keymap tab-switch-mode-map
+  :global t)
 
 (defun init-tab-name (&optional frame)
   (interactive)

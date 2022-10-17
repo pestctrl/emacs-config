@@ -33,7 +33,7 @@
     map))
 
 (define-minor-mode quick-bury-mode ""
-  nil nil quick-bury-mode-map)
+  :keymap quick-bury-mode-map)
 
 (provide 'quick-bury)
 ;;; quick-bury.el ends here

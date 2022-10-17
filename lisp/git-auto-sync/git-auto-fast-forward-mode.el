@@ -112,7 +112,7 @@
 (defvar gaff/timer nil)
 
 (define-minor-mode git-auto-fast-forward-mode ""
-  nil nil nil
+  :lighter "gaff"
   (if git-auto-fast-forward-mode
       (setq gaff/timer (run-at-time nil 300 #'gaff/trigger))
     (cancel-timer gaff/timer)))

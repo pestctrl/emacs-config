@@ -35,7 +35,7 @@
 
 (define-minor-mode llvm-ir-minor-mode
   "Doc string."
-  nil "blah" nil
+  :lighter "llvm-debug"
   (font-lock-add-keywords nil kwds)
 
   (if (fboundp 'font-lock-flush)

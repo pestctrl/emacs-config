@@ -41,3 +41,5 @@
                org-agenda-finalize-entries
                insert))
         (insert "\n")))))
+
+(provide 'work-org-ql)

@@ -480,7 +480,7 @@
            "docs/dir" "docs/*.info" "docs/*.texi" "docs/*.texinfo"
            (:exclude
             ".dir-locals.el" "lisp/.dir-locals.el"))))
-    (quelpa cider :repo "pestctrl/cider" :branch "consecutive-overlays" :fetcher fetcher))
+    (quelpa 'cider :repo "pestctrl/cider" :branch "consecutive-overlays" :fetcher fetcher))
   (autoload 'cider--make-result-overlay "cider-overlays")
 
   (defun endless/eval-overlay (value point)

@@ -35,7 +35,7 @@
 (require 'org-ql-custom-stuck-projects)
 (require 'org-delay)
 ;; Redef some of org-ql stuff
-(load-file "~/.emacs.d/lisp/work-config/work-specific-org-project-redefs.el")
+(require 'work-org-ql)
 (require 'org-scan-tags-indent)
 (require 'work-org-autosync)
 

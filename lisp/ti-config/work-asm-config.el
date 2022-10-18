@@ -37,18 +37,20 @@
              ;; label started from ".".
              `(,(rx line-start (group "." (+ (or (syntax word) (syntax symbol)))) symbol-end ":")
                (1 font-lock-function-name-face))
+             `(,(rx line-start (* space) "||" (+ space)) . 'asm-vliw-bar)
              `(,(rx line-start
-                    (optional (* space) (+ alphanumeric))
-                    (+ space)
-                    (group (optional "||") (+ space))
+                    (optional (* space) (+ alphanumeric)) (+ space)
+                    (optional "||" (+ space))
                     (group
-                     (+ (or "_"
-                            (and (optional ".")
-                                 alphanumeric))))
+                     (group
+                      (+ (or (syntax symbol)
+                             (and (optional ".")
+                                  (syntax word)))))
+                     (group
+                      (* (and "." (+ (syntax word))))))
                     (+ space)
                     nonl)
-               (1 'asm-vliw-bar)
-               (2 font-lock-keyword-face))
+               (1 font-lock-keyword-face))
              `(,(rx line-start
                     (optional (group "(" (+ (syntax word)) ")"))
                     (+ (syntax whitespace))
@@ -64,11 +66,11 @@
              `(,(rx (or "TA" "TDM" "M" "A" "D")
                     (or (+ digit) ".GT" ".LT" ".EQ"))
                . font-lock-variable-name-face)
-             `(,(rx "@" (group (+ (or (syntax word) (syntax symbol)))) symbol-end) (1 font-lock-function-name-face))
+             `(,(rx "@" (optional "($") (group (+ (or (syntax word) (syntax symbol)))) (or ")" symbol-end)) (1 font-lock-function-name-face))
              `(,(rx "#" (optional "-") "0x" (+ alphanumeric)) . font-lock-constant-face))
        cpp-font-lock-keywords))
 
-(defface asm-vliw-bar `((t (:background "gray25" :inherit font-lock-comment-face))) nil)
+(defface asm-vliw-bar `((t (:background "gray25" :extend t :inherit font-lock-comment-face))) nil)
 
 (defun asm-clean-up ()
   (interactive)

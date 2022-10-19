@@ -30,6 +30,7 @@
 (require 'ti-lib)
 (require 'ti-build-tool)
 (require 'ti-debug-compile)
+(require 'ti-tools-backup)
 
 ;; (setq url-proxy-services '(("http" . "http://webproxy.ext.ti.com:80")
 ;;                            ("https" . "http://webproxy.ext.ti.com:80")))

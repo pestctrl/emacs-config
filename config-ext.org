@@ -405,6 +405,10 @@
     (when (y-or-n-p "Connect to IRC? ")
       (freenode-connect "pest-ctrl" (get-authinfo "irc.freenode.net" "6667"))))
 #+end_src
+** font-lock-studio
+#+begin_src emacs-lisp
+  (use-package font-lock-studio)
+#+end_src
 * pdf-tools use isearch
 #+BEGIN_SRC emacs-lisp
   (when (and (not (eq system-type 'windows-nt))

@@ -28,7 +28,7 @@
 
 (add-hook 'asm-mode-hook
           (lambda ()
-            (setq tab-width 10)))
+            (setq tab-width 8)))
 
 ;; (setq asm-font-lock-keywords
 ;;       (append

@@ -1,4 +1,4 @@
-;;; work-asm-config.el ---  -*- lexical-binding: t -*-
+;;; work-asm-config.el ---
 
 ;; Copyright (C) 2022 Benson Chu
 
@@ -71,24 +71,32 @@
 ;;        cpp-font-lock-keywords))
 
 (setq asm-font-lock-keywords
-      `((,(rx line-start (group (>= 2 (any "0-9A-f"))) " " (group (+ (or (syntax word) (syntax symbol)))) symbol-end ":")
+      `(;; Labels
+        (,(rx line-start (group (>= 2 (any "0-9A-f"))) " " (group (+ (or (syntax word) (syntax symbol)))) symbol-end ":")
          (1 font-lock-warning-face) (2 font-lock-function-name-face))
+        ;; Hex Encoding for instructions
         (,(rx line-start (group (>= 2 (any "0-9A-f"))) ":" (* space) (group (+ " " (and  (= 4 (any "0-9A-f"))))))
          (1 font-lock-warning-face) (2 font-lock-constant-face))
+        ;; Instructions
         (,(rx line-start (* space) (* (+ (any "0-9A-f")) (+ (or ":" space))) (+ space) (optional "||" (+ space)) (group (+ (or (syntax word) (syntax symbol) "."))))
          (1 font-lock-keyword-face))
+        ;; Dot directives
         (,(rx line-start (group (+ (or "." (syntax word) (syntax symbol)))) ":") (1 font-lock-function-name-face))
-        (,(rx "ADDR1") . font-lock-type-face)
-        (,(rx symbol-start
-              (or "TA" "TDM" "M" "A" "D")
-              (or (+ digit) ".GT" ".LT" ".EQ" ".HI" ".NEQ" ".MAP")
-              (optional (or ".NZ" ".Z"))
-              symbol-end)
-          . font-lock-variable-name-face)
+        (,(rx "ADDR" digit) . font-lock-type-face)
+        (,(rx word-start
+              (or (and (or "TDM" "TA" "UNC")
+                       (optional digit)
+                       (optional (or ".MAP" ".NZ" ".Z")))
+                  (and (or "XM" "XD")
+                       (+ digit))
+                  (and (or "M" "A" "D")
+                       (or (+ digit)
+                           ".GT" ".LT" ".GEQ" ".LEQ" ".EQ" ".NEQ" ".HI" ".LO")))
+              word-end)
+         . font-lock-variable-name-face)
         (,(rx "@" (optional "(") (group (optional "(") (+ (or (syntax word) (syntax symbol)))) (or ")" symbol-end)) (1 font-lock-function-name-face))
         (,(rx "#" (optional "-") "0x" (+ alphanumeric)) . font-lock-constant-face)
-        (,(rx line-start (* space) "||" (+ space)) . 'asm-vliw-bar)
-        ;; (,(rx (* space) "\n" (* space) "||" (+ space)) . 'asm-vliw-bar)
+        (,(rx (or (* space)) "\n" (* space) "||" (+ space)) . 'asm-vliw-bar)
         ))
 
 (defface asm-vliw-bar `((t (:background "gray25" :extend t :inherit font-lock-comment-face))) nil)
@@ -96,6 +104,7 @@
 (defun asm-clean-up ()
   (interactive)
   (save-excursion
+    (beginning-of-buffer)
     (replace-regexp (rx (group (or alphanumeric ")")) "," (group (or alphanumeric "#" "*")))
                     "\\1,  \\2")))
 
@@ -115,6 +124,32 @@
       (beginning-of-line)
       (setq end (point)))
     (narrow-to-region start end)))
+
+(add-hook 'asm-mode-hook
+          (lambda ()
+            (set (make-local-variable 'font-lock-multiline) t)
+            ;; (add-hook 'font-lock-extend-region-functions
+            ;;           'test-font-lock-extend-region)
+            ))
+
+;; (defun test-font-lock-extend-region ()
+;;   "Extend the search region to include an entire block of text."
+;;   ;; Avoid compiler warnings about these global variables from font-lock.el.
+;;   ;; See the documentation for variable `font-lock-extend-region-functions'.
+;;   (eval-when-compile (defvar font-lock-beg) (defvar font-lock-end))
+;;   (save-excursion
+;;     (let ((beg font-lock-beg)
+;;           (end font-lock-end))
+;;       (goto-char font-lock-beg)
+;;       (setq font-lock-beg (point-at-bol))
+;;       (forward-line)
+;;       (beginning-of-line)
+;;       (when (looking-at (rx (+ space) "||" (+ space)))
+;;         (setq font-lock-end (match-end 0)))
+;;       ;; (or (not (= beg font-lock-beg))
+;;       ;;     (not (= end font-lock-end)))
+;;       nil))
+;;   nil)
 
 (provide 'work-asm-config)
 ;;; work-asm-config.el ends here

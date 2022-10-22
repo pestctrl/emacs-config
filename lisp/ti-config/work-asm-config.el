@@ -96,8 +96,7 @@
          . font-lock-variable-name-face)
         (,(rx "@" (optional "(") (group (optional "(") (+ (or (syntax word) (syntax symbol)))) (or ")" symbol-end)) (1 font-lock-function-name-face))
         (,(rx "#" (optional "-") "0x" (+ alphanumeric)) . font-lock-constant-face)
-        (,(rx (or (* space)) "\n" (* space) "||" (+ space)) . 'asm-vliw-bar)
-        ))
+        (,(rx (or (* space)) "\n" (* space) "||" (+ space)) . 'asm-vliw-bar)))
 
 (defface asm-vliw-bar `((t (:background "gray25" :extend t :inherit font-lock-comment-face))) nil)
 

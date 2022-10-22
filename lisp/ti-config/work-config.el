@@ -31,10 +31,12 @@
 (require 'ti-build-tool)
 (require 'ti-debug-compile)
 (require 'ti-tools-backup)
+(require 'argo-fastsim-dump-mode)
 
 (add-to-list 'auto-mode-alist '("\\.map$" . ti-linker-map-mode))
 (add-to-list 'auto-mode-alist '("\\.cdis$" . asm-mode))
 (add-to-list 'auto-mode-alist '("\\.cmd$" . conf-mode))
+(add-to-list 'auto-mode-alist '("\\.fsdump$" . argo-fastsim-dump-mode))
 
 ;; (setq url-proxy-services '(("http" . "http://webproxy.ext.ti.com:80")
 ;;                            ("https" . "http://webproxy.ext.ti.com:80")))

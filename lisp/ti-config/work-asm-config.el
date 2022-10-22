@@ -73,14 +73,15 @@
 (setq asm-font-lock-keywords
       `((,(rx line-start (group (>= 2 (any "0-9A-f"))) " " (group (+ (or (syntax word) (syntax symbol)))) symbol-end ":")
          (1 font-lock-warning-face) (2 font-lock-function-name-face))
-        (,(rx line-start (group (>= 2 (any "0-9A-f"))) ":" (+ space) (group (+ (and  (= 4 (any "0-9A-f")) (+ space)))))
+        (,(rx line-start (group (>= 2 (any "0-9A-f"))) ":" (* space) (group (+ " " (and  (= 4 (any "0-9A-f"))))))
          (1 font-lock-warning-face) (2 font-lock-constant-face))
         (,(rx line-start (* space) (* (+ (any "0-9A-f")) (+ (or ":" space))) (+ space) (optional "||" (+ space)) (group (+ (or (syntax word) (syntax symbol) "."))))
          (1 font-lock-keyword-face))
         (,(rx line-start (group (+ (or "." (syntax word) (syntax symbol)))) ":") (1 font-lock-function-name-face))
         (,(rx "ADDR1") . font-lock-type-face)
-        (,(rx (or "TA" "TDM" "M" "A" "D")
-              (or (+ digit) ".GT" ".LT" ".EQ" ".HI")
+        (,(rx symbol-start
+              (or "TA" "TDM" "M" "A" "D")
+              (or (+ digit) ".GT" ".LT" ".EQ" ".HI" ".NEQ" ".MAP")
               (optional (or ".NZ" ".Z"))
               symbol-end)
           . font-lock-variable-name-face)
@@ -97,6 +98,23 @@
   (save-excursion
     (replace-regexp (rx (group (or alphanumeric ")")) "," (group (or alphanumeric "#" "*")))
                     "\\1,  \\2")))
+
+(defun asm-narrow-to-function ()
+  (interactive)
+  (let ((r (rx line-start (= 8 (any "0-9a-f")) " <" (not "$")))
+        start end)
+    (save-excursion
+      (next-line)
+      (re-search-backward r)
+      (beginning-of-line)
+      (setq start (point))
+
+      (next-line)
+      (re-search-forward r)
+      (previous-line)
+      (beginning-of-line)
+      (setq end (point)))
+    (narrow-to-region start end)))
 
 (provide 'work-asm-config)
 ;;; work-asm-config.el ends here

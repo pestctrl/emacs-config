@@ -105,6 +105,16 @@
     (switch-or-create-tab temp-name)
     (tab-bar-rename-tab switch-tab)))
 
+(defvar my/scratch-tab-number 0)
+
+(defun my/tab-bar-clone ()
+  (interactive)
+  (let ((wc (current-window-configuration)))
+    (tab-bar-new-tab)
+    (tab-bar-rename-tab (format "*scratch-%d*" my/scratch-tab-number))
+    (incf my/scratch-tab-number)
+    (set-window-configuration wc)))
+
 (defun tab-bar-jump ()
   (interactive)
   (let ((char (read-char "[e]macs-devel [s]cratch [o]rg")))
@@ -126,6 +136,7 @@
 (define-key *tab-map* (kbd "h") (lambda () (interactive) (tab-bar-move-tab -1)))
 (define-key *tab-map* (kbd "l") (lambda () (interactive) (tab-bar-move-tab 1)))
 
+(define-key *tab-map* (kbd "c") #'my/tab-bar-clone)
 (define-key *tab-map* (kbd "n") #'tab-bar-switch-to-next-tab)
 (define-key *tab-map* (kbd "s") #'my/tab-bar-swap-tabs)
 (define-key *tab-map* (kbd "p") #'tab-bar-switch-to-prev-tab)

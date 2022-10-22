@@ -30,46 +30,6 @@
           (lambda ()
             (setq tab-width 8)))
 
-;; (setq asm-font-lock-keywords
-;;       (append
-;;        (list '("^\\(\\(\\sw\\|\\s_\\)+\\)\\>:?[ \t]*\\(\\sw+\\(\\.\\sw+\\)*\\)?"
-;;                (1 font-lock-function-name-face) (3 font-lock-keyword-face nil t))
-;;              label started from ".".
-;;              `(,(rx line-start (optional (= 8 (any "0-9A-f"))) (group "." (+ (or (syntax word) (syntax symbol)))) symbol-end ":")
-;;                (1 font-lock-function-name-face))
-;;              `(,(rx line-start (* space) "||" (+ space)) . 'asm-vliw-bar)
-;;              `(,(rx line-start
-;;                     (optional (* space) (+ alphanumeric)) (+ space)
-;;                     (optional "||" (+ space))
-;;                     (group
-;;                      (group
-;;                       (+ (or (syntax symbol)
-;;                              (and (optional ".")
-;;                                   (syntax word)))))
-;;                      (group
-;;                       (* (and "." (+ (syntax word))))))
-;;                     (+ space)
-;;                     nonl)
-;;                (1 font-lock-keyword-face))
-;;              `(,(rx line-start
-;;                     (optional (group "(" (+ (syntax word)) ")"))
-;;                     (+ (syntax whitespace))
-;;                     (group (group (+ (or (and (optional ".") (syntax word))
-;;                                          (syntax symbol))))
-;;                            (* (group "." (+ (syntax word))))))
-;;                (2 font-lock-keyword-face))
-;;              directive started from ".".
-;;              '("^\\(\\.\\(\\sw\\|\\s_\\)+\\)\\>[^:]?"
-;;                1 font-lock-keyword-face)
-;;              %register
-;;              `(,(rx "ADDR1") . font-lock-type-face)
-;;              `(,(rx (or "TA" "TDM" "M" "A" "D")
-;;                     (or (+ digit) ".GT" ".LT" ".EQ"))
-;;                . font-lock-variable-name-face)
-;;              `(,(rx "@" (optional "($") (group (+ (or (syntax word) (syntax symbol)))) (or ")" symbol-end)) (1 font-lock-function-name-face))
-;;              `(,(rx "#" (optional "-") "0x" (+ alphanumeric)) . font-lock-constant-face))
-;;        cpp-font-lock-keywords))
-
 (setq asm-font-lock-keywords
       `(;; Labels
         (,(rx line-start (group (>= 2 (any "0-9A-f"))) " " (group (+ (or (syntax word) (syntax symbol)))) symbol-end ":")

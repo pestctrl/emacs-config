@@ -30,6 +30,13 @@
                 ("C-c d m" . #'dap-java-debug-test-class)
                 ("C-c r t" . #'mvn-test)))
 #+end_src
+* Yasnippets
+#+BEGIN_SRC emacs-lisp
+  (let ((fetcher (if my-ec/at-ti "github" "github-ssh")))
+    (quelpa `(yasnippet :repo "pestctrl/yasnippet" :branch "quit-undo-tree" :fetcher ,fetcher)))
+  (use-package java-snippets)
+#+END_SRC
+
 * c++
 #+begin_src emacs-lisp
   (use-package lsp-mode

@@ -209,7 +209,7 @@
             (:name "inbox today" :query "date:2020-07-25.. and tag:inbox" :key "t")
             (:name "work" :query "tag:work" :key "w")
             (:name "mailing lists" :query "tag:mlist" :key "m")
-            (:name "emacs-devel" :query "tag:emacs-devel" :key "e")
+            (:name "emacs-devel" :query "tag:emacs-devel and date:6M.." :key "e" :sort-order newest-first)
             (:name "emacs bugs" :query "tag:bug-gnu-emacs and date:30d.." :key "E")
             (:name "emacs help" :query "tag:help-gnu-emacs and date:30d.." :key "h")
             (:name "org-mode" :query "tag:org-mode" :key "o")

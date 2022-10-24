@@ -121,7 +121,8 @@
   (interactive)
   (let ((name (or name cmd)))
     (setq my/window-name name)
-    (start-process-shell-command cmd nil cmd)))
+    (start-process-shell-command cmd nil cmd)
+    (run-at-time 30 nil #'(lambda () (setq my/window-name nil)))))
 
 (defun exwm-rename-buffer ()
   (interactive)

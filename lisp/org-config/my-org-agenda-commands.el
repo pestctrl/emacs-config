@@ -22,6 +22,9 @@
 ;;; Commentary:
 
 ;;; Code:
+(require 'use-package)
+(use-package quelpa)
+
 (require 'org-agenda)
 (require 'org-get-time)
 (require 'my-org-agenda-files)
@@ -37,6 +40,8 @@
 (use-package peg)
 (use-package ov)
 (use-package dash-functional)
+(let ((fetcher (if my-ec/at-ti "github" "github-ssh")))
+  (quelpa `(org-ql :repo "pestctrl/org-ql" :branch "my-changes" :fetcher ,fetcher)))
 (require 'org-ql)
 (require 'org-ql-search)
 (require 'org-ql-custom-stuck-projects)

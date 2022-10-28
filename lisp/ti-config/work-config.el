@@ -27,6 +27,7 @@
 (require 'work-org-stuff)
 (require 'work-commentor)
 (require 'work-asm-config)
+(require 'ti-keymap)
 (require 'ti-lib)
 (require 'ti-build-tool)
 (require 'ti-debug-compile)

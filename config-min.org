@@ -474,13 +474,8 @@
   ;; Use cider's eval expression
   (let ((fetcher (if my-ec/at-ti "github" "github-ssh"))
         (quelpa-build-default-files-spec
-         '("*.el" "lisp/*.el"
-           "dir" "*.info" "*.texi" "*.texinfo"
-           "doc/dir" "doc/*.info" "doc/*.texi" "doc/*.texinfo"
-           "docs/dir" "docs/*.info" "docs/*.texi" "docs/*.texinfo"
-           (:exclude
-            ".dir-locals.el" "lisp/.dir-locals.el"))))
-    (quelpa `(cider :repo "pestctrl/cider" :branch "consecutive-overlays" :fetcher ,fetcher)))
+         '("*.el" (:exclude ".dir-locals.el"))))
+    (quelpa `(cider :repo "clojure-emacs/cider" :branch "master" :fetcher ,fetcher)))
   (autoload 'cider--make-result-overlay "cider-overlays")
 
   (defun endless/eval-overlay (value point)

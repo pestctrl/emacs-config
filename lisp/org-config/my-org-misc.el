@@ -34,6 +34,7 @@
 (setq org-agenda-skip-scheduled-if-deadline-is-shown t)
 
 (setq org-src-window-setup 'current-window)
+(setq org-agenda-window-setup 'other-window)
 
 (setq org-list-allow-alphabetical t)
 (setq org-todo-repeat-to-state t)

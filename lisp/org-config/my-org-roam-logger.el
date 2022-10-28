@@ -48,10 +48,14 @@
   (when (or (null my/current-logger-cache) (equal arg '(16)))
     (setq my/current-logger-cache
           (org-roam-node-read nil my/org-roam-logger-filter-fun)))
-  (org-roam-capture-
-   :goto (when (equal arg '(4)) arg)
-   :node my/current-logger-cache
-   :templates my/org-roam-logger-templates))
+  (if (equal arg '(4))
+      (-> my/current-logger-cache
+          (org-roam-node-file)
+          (find-file-noselect)
+          (pop-to-buffer-same-window))
+    (org-roam-capture-
+     :node my/current-logger-cache
+     :templates my/org-roam-logger-templates)))
 
 (provide 'my-org-roam-logger)
 ;;; my-org-roam-logger.el ends here

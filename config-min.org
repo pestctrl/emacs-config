@@ -676,7 +676,9 @@
 #+begin_src emacs-lisp
   (if (eq system-type 'windows-nt)
       (define-key *root-map* "c" #'shell)
+    (quelpa '(vterm))
     (use-package vterm
+      :ensure nil
       :commands vterm find-vterm vterm-kill
       :bind (("C-x 4 t" . #'find-vterm-other-window)
              :map *root-map*

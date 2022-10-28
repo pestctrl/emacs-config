@@ -216,13 +216,6 @@
   (use-package org-jira)
   (setq jiralib-url "https://wenningbai.atlassian.net/")
 #+END_SRC
-** org-board
-#+begin_src emacs-lisp
-  (use-package org-board)
-  (add-to-list 'org-board-agent-header-alist
-               '("Linux" . "--user-agent=\"Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.6) Gecko/20070802 SeaMonkey/1.1.4\""))
-  (setq org-board-wget-show-buffer nil)
-#+end_src
 ** org-now
 #+begin_src emacs-lisp
   (add-to-list 'load-path "~/.emacs.d/submodule/org-now")
@@ -659,6 +652,7 @@
            ("C-c n T" . org-roam-dailies-goto-today)
            ("C-c n t" . org-roam-dailies-capture-today)
            ("C-c n i" . org-roam-node-insert)
+           ("C-c n w" . org-roam-refile)
            :map org-mode-map
            ("C-M-i" . completion-at-point))
     :init

@@ -27,6 +27,7 @@
 
 (require 'org-protocol)
 (require 'my-org-agenda-files)
+(require 'my-org-board)
 (require 'org-capture)
 
 ;; Defines 3 things:
@@ -357,15 +358,6 @@
           (substring match i))))))
 
 (defvar yearly-theme "Thought")
-
-(defun my/org-add-tag (tag)
-  (org-set-tags (cons tag (org-get-tags nil t))))
-
-(defun org-board-add-offline-tag (&rest args)
-  (my/org-add-tag "offline"))
-
-(advice-add #'org-board-archive :after
-            #'org-board-add-offline-tag)
 
 (provide 'my-org-capture-templates)
 ;;; my-org-capture-templates.el ends here

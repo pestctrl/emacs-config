@@ -44,17 +44,19 @@
 (defun switch-or-create-tab (tab-name)
   (interactive
    (list (my/read-tab-name)))
-  (let ((tab-index  (tab-bar--tab-index-by-name tab-name)))
-    (if tab-index
-        (progn
-          (cl-incf tab-index)
-          (tab-bar-select-tab tab-index)
-          tab-index)
-      (let* ((spec (member tab-name switch-tabs/special-tabs))
-             (tab-bar-new-tab-to (if spec 'leftmost 'rightmost)))
-        (tab-bar-new-tab))
-      (tab-bar-rename-tab tab-name)
-      (tab-bar--current-tab-index))))
+  (if (active-minibuffer-window)
+      (message "Minibuffer still active. Close before switching tabs... ")
+    (let ((tab-index (tab-bar--tab-index-by-name tab-name)))
+      (if tab-index
+          (progn
+            (cl-incf tab-index)
+            (tab-bar-select-tab tab-index)
+            tab-index)
+        (let* ((spec (member tab-name switch-tabs/special-tabs))
+               (tab-bar-new-tab-to (if spec 'leftmost 'rightmost)))
+          (tab-bar-new-tab))
+        (tab-bar-rename-tab tab-name)
+        (tab-bar--current-tab-index)))))
 
 (defun last-tab ()
   (interactive)

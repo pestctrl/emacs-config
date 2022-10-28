@@ -160,7 +160,7 @@
            (setf (alist-get category db)
                  (point-marker))
            nil)
-       (let* ((category-name (completing-read "Category? " (sort (mapcar #'car db) #'ivy-string<)))
+       (let* ((category-name (ivy-completing-read "Category? " (sort (mapcar #'car db) #'ivy-string<)))
               (category (intern category-name))
               (entry (assoc category db)))
          (unless entry ;; New category! 
@@ -169,7 +169,6 @@
                    refile-location)))
          (when-let (location (alist-get category db))
            (op/refile-to-point (buffer-file-name) location)))))))
-
 
 (use-exwm
   :config

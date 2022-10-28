@@ -166,6 +166,8 @@
                             (and (eq type 'project)
                                  (eq state 'invis))))
                     ((org-ql-block-header "Invisible projects")))
+      (org-ql-block '(todo "BLOCKED")
+                    ((org-ql-block-header "Blocked projects")))
       (org-ql-block '(and (tags ,tag)
                           (or (todo "HOLD")
                               (descendants (todo "HOLD"))))

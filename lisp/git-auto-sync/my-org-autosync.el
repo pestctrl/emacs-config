@@ -146,7 +146,9 @@
            (ga/should-be-automatic (file-name-directory (buffer-file-name buf)))
            ;; there's no org-lint errors if we're in an org buffer
            (or (not (with-current-buffer buf (eq major-mode 'org-mode)))
-               (gac-no-lint-errors buf)))
+               (gac-no-lint-errors buf))
+           ;; AND we're not in an exwm buffer
+           (not (eq major-mode 'exwm-mode)))
       ;; Otherwise, debounce again and return nil
       (and (with-current-buffer buf
              (gac--debounced-save))

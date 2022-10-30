@@ -92,4 +92,8 @@
               :before
               #'projectile-switch-switch-tab))
 
+(when my/puppet-p
+  (define-key *root-map* (kbd "C-x C-s") #'org-save-all-org-buffers)
+  (define-key *root-map* (kbd "C-f") #'next-buffer))
+
 (provide 'my-keymap)

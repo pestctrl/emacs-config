@@ -872,6 +872,12 @@
     (tool-bar-mode -1)
     (menu-bar-mode -1)
     (scroll-bar-mode -1))
+
+  (when my/puppet-p
+    (tool-bar-add-item "left-arrow" #'previous-buffer 'puppet-previous-buffer)
+    (tool-bar-add-item "right-arrow" #'next-buffer 'puppet-next-buffer)
+    (tool-bar-add-item "saveas" #'org-save-all-org-buffers 'puppet-save))
+
   (fringe-mode '(10 . 10))
   ;; Need to configure all-the-icons so that mode-line doesn't look fat
   ;; and ugly

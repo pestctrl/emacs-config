@@ -76,7 +76,7 @@
 (defun gaff/fetch-fast-forward (repo branches)
   ;; TODO: work around this hack
   (with-current-buffer (dired-noselect repo)
-    (shell-command "git fetch --all")
+    (shell-command "git fetch --all" "*git-fetch*")
     (dolist (b branches)
       (let ((output-buffer (format "*merge-%s*" b)))
         (if (get-buffer-process output-buffer)

@@ -882,6 +882,7 @@
     (scroll-bar-mode -1))
 
   (when my/puppet-p
+    (tool-bar-add-item "separator" 'menu-bar-separator 'separator-4)
     (tool-bar-add-item "left-arrow" #'previous-buffer 'puppet-previous-buffer)
     (tool-bar-add-item "right-arrow" #'next-buffer 'puppet-next-buffer)
     (tool-bar-add-item "saveas" #'save-some-buffers 'puppet-save))

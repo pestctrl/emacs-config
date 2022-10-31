@@ -86,10 +86,10 @@
 
 
 (setq org-agenda-hide-tags-regexp
-      (mapconcat #'identity (list "time" "nontime" "prod" "dev" "sandbox"
-                                  "refile"
-                                  "short" "long" "watch" "read" "grow" "rest" "active" "idle")
-                 "\\|"))
+      (rx (or "time" "nontime" "prod" "dev" "sandbox"
+              "refile"
+              "short" "long" "watch" "read" "grow" "rest" "active" "idle"
+              (and symbol-start "_" (+ nonl) "_" symbol-end))))
 
 (defconst category-tags '("computers"))
 

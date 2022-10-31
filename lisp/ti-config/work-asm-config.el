@@ -58,6 +58,15 @@
         (,(rx "#" (optional "-") "0x" (+ alphanumeric)) . font-lock-constant-face)
         (,(rx (or (* space)) "\n" (* space) "||" (+ space)) . 'asm-vliw-bar)))
 
+(defun my/asm-back-to-label (arg)
+  (interactive "P")
+  (if arg
+      (re-search-backward (rx "<" (not "$") (+ nonl) (not digit) ">:"))
+    (re-search-backward (rx "<" (+ nonl) ">:")))
+  (beginning-of-line))
+
+(define-key asm-mode-map (kbd "C-M-a") #'my/asm-back-to-label)
+
 (defface asm-vliw-bar `((t (:background "gray25" :extend t :inherit font-lock-comment-face))) nil)
 
 (defun asm-clean-up ()

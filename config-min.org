@@ -334,6 +334,14 @@
   (transient-append-suffix 'magit-push "m"
     '("a" "all remotes" my/magit-push-all))
 
+  ;; Update all submodules
+  (defun magit-submodule-update-recursive ()
+    (interactive)
+    (magit-run-git-async "submodule" "update" "--init" "--recursive"))
+
+  (transient-append-suffix 'magit-submodule "u"
+    '("U" "Update all (recursively)" magit-submodule-update-recursive))
+
   ;; Magit uses ediff
   (with-eval-after-load 'ediff
     (setq ediff-window-setup-function 'ediff-setup-windows-plain)

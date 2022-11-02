@@ -104,7 +104,9 @@
                 (gaff/fetch-fast-forward dir branches))
             (dolist (b buffers)
               (with-current-buffer b
-                (read-only-mode -1))))))))
+                (read-only-mode -1)
+                (when (not (userlock--check-content-unchanged (buffer-file-name (current-buffer))))
+                  (revert-buffer-quick)))))))))
   (run-hooks 'gaff/after-merge-hook))
 
 (defvar gaff/after-merge-hook nil)

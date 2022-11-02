@@ -621,7 +621,7 @@
                                  default-directory))))
       (call-interactively #'ido-find-file)))
 
-  (define-key ibuffer-mode-map (kbd "C-x C-f") #'ibuffer-find-file-with-ido)
+  ;; (define-key ibuffer-mode-map (kbd "C-x C-f") #'ibuffer-find-file-with-ido)
 #+end_src
 * useful tools
 ** org-mode

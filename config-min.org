@@ -904,8 +904,10 @@
   ;; The most efficient cool looking modeline I've found. Faster than even
   ;; smart-mode-line
   (use-package doom-modeline
-    :init (doom-modeline-mode 1)
+    :hook (window-setup . doom-modeline-mode)
     :config
+    (advice-add #'fit-window-to-buffer :before #'doom-modeline-redisplay)
+
     ;; Removes symlink bug w/ regards to doom-modeline
     (setq doom-modeline-project-detection 'project)
 

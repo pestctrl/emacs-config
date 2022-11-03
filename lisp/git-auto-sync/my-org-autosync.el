@@ -53,7 +53,9 @@
            ,@body)))))
 
 (defun gac-use-magit-push (buffer)
-  (let ((default-directory (file-name-directory (buffer-file-name buffer))))
+  (let ((default-directory (file-name-directory (buffer-file-name buffer)))
+        (magit-pre-start-git-hook (memq 'magit-maybe-save-repository-buffers
+                                        magit-pre-start-git-hook)))
     (magit-push-current-to-pushremote nil)))
 
 (advice-add #'gac-push :override #'gac-use-magit-push)

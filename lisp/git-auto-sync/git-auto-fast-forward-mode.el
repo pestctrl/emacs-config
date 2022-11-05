@@ -56,22 +56,28 @@
                  (buffer-list)))
 
 (defun gaff/no-pending-gac-commits (folder)
-  (->> gac--debounce-timers
-       (hash-table-values)
-       (mapcar (lambda (timer) (car (timer--args timer))))
-       (remove-if-not (lambda (buffer) (string-prefix-p folder (buffer-file-name buffer))))
-       (length)
-       (zerop)))
+  (or (->> gac--debounce-timers
+           (hash-table-values)
+           (mapcar (lambda (timer) (car (timer--args timer))))
+           (remove-if-not (lambda (buffer) (string-prefix-p folder (buffer-file-name buffer))))
+           (length)
+           (zerop))
+      (and (message "There are pending gac timers")
+           nil)))
 
 (defun gaff/no-modified-buffers (folder)
-  (->> (gaff/get-open-buffers-in folder)
-       (remove-if-not (lambda (b) (buffer-modified-p b)))
-       (length)
-       (zerop)))
+  (or (->> (gaff/get-open-buffers-in folder)
+           (remove-if-not (lambda (b) (buffer-modified-p b)))
+           (length)
+           (zerop))
+      (and (message "There are modified buffers")
+           nil)))
 
 (defun gaff/no-git-changes (folder)
   (let ((default-directory folder))
-    (string-empty-p (shell-command-to-string "git status -suno"))))
+    (or (string-empty-p (shell-command-to-string "git status -suno"))
+        (and (message "There are pending git changes")
+             nil))))
 
 (defun gaff/fetch-fast-forward (repo branches)
   ;; TODO: work around this hack
@@ -103,11 +109,12 @@
                 (dolist (b buffers)
                   (with-current-buffer b
                     (read-only-mode 1)))
-                (gaff/fetch-fast-forward dir branches))
+                (gaff/fetch-fast-forward dir branches)
+                (message "Done fast-forwarding!"))
             (dolist (b buffers)
               (with-current-buffer b
                 (read-only-mode -1)
-                (when (not (userlock--check-content-unchanged (buffer-file-name (current-buffer))))
+                (when (not (verify-visited-file-modtime (current-buffer)))
                   (revert-buffer-quick)))))))))
   (run-hooks 'gaff/after-merge-hook))
 

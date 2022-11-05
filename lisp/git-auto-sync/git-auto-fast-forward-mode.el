@@ -38,18 +38,19 @@
 (defun ga/on-auto-branch (dir)
   (with-current-buffer (dired-noselect dir)
     (member (magit-get-current-branch)
-            '("desktop" "gaming-laptop" "puppet" "mobile"))))
+            '("desktop" "gaming-laptop" "puppet" "mobile" "laptop"))))
 
 (defun ga/should-be-automatic (dir)
-  (and (if (ga/magit-not-in-progress dir)
-           t
-         (message "Oops, magit is in progress")
-         nil)
-       (if (ga/on-auto-branch dir)
-           t
-         (message "Oops, repo %s is on branch %s, which is not an automatic branch"
-                  dir (magit-get-current-branch))
-         nil)))
+  (with-current-buffer (dired-noselect dir)
+    (and (if (ga/magit-not-in-progress dir)
+             t
+           (message "Oops, magit is in progress")
+           nil)
+         (if (ga/on-auto-branch dir)
+             t
+           (message "Oops, repo %s is on branch %s, which is not an automatic branch"
+                    dir (magit-get-current-branch))
+           nil))))
 
 (defun gaff/get-open-buffers-in (folder)
   (remove-if-not (lambda (b) (string-prefix-p folder (buffer-file-name b)))

@@ -86,6 +86,8 @@
             (user-error "Uh oh, one of the merges resulted in an error!")))))
     (magit-push-current-to-pushremote nil)))
 
+(load "userlock")
+
 (defun gaff/trigger ()
   (interactive)
   (dolist (info gaff/watch-directories)

@@ -68,14 +68,9 @@
 (setq my-switch-found (member "-min" command-line-args))
 (setq command-line-args (delete "-min" command-line-args))
 
+;; Load additional exwm stuff that changes constantly
 (when (and (not my-switch-found)
            my-ec/load-full-config)
-  ;; Load additional exwm stuff that changes constantly
-  (use-exwm
-   :config
-   (org-babel-load-file
-    (expand-file-name "config-exwm.org"
-                      user-emacs-directory)))
 
   (org-babel-load-file
    (expand-file-name "config-programming.org"
@@ -97,6 +92,11 @@
   (org-babel-load-file
    (expand-file-name "my-redefs.org"
                      user-emacs-directory))
+  (use-exwm
+   :config
+   (org-babel-load-file
+    (expand-file-name "config-exwm.org"
+                      user-emacs-directory)))
 
   (when my-ec/enable-exwm
     (require 'exwm)))

@@ -97,13 +97,13 @@
       (car result))))
 
 (defmacro quickrun-lambda (cmd instance)
-  (if (null instance)
-      `(lambda ()
-         (interactive)
-         (exwmx-quickrun ,cmd))
-    `(lambda ()
+  (let ((name-gensym (intern (format "quickrun-%s"
+                                     (or instance cmd)))))
+    `(defun ,name-gensym ()
        (interactive)
-       (exwmx-quickrun ,cmd nil '(:class ".*" :instance ,instance)))))
+       (exwmx-quickrun ,cmd
+                       ,@(and instance
+                              (list nil `'(:class ".*" :instance ,instance)))))))
 
 (defun exwmx-launch-program (command &optional process-name)
   (interactive (list (read-program)))

@@ -67,9 +67,14 @@
   :bind (:map *root-map*
               ("d" . #'zeal-at-point)))
 
+(defun my/reset-default-directory ()
+  (interactive)
+  (setq default-directory (expand-file-name "~/")))
+
 (define-key *root-map* (kbd "C-t") #'simulate-C-t)
 (define-key *root-map* (kbd "C-p") #'exwmx-launch-program)
 (define-key *root-map* (kbd "r") #'exwmx-name-buffer)
+(define-key *root-map* (kbd "D") #'my/reset-default-directory)
 
 (define-key *root-map* (kbd "C-d") (quickrun-lambda "zeal" "zeal"))
 (define-key *root-map* (kbd "e") (quickrun-lambda "emacs" "emacs"))

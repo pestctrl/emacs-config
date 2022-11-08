@@ -24,20 +24,29 @@
 
 ;;; Code:
 (defvar exwm-startup-programs
-  '(("megasync" "QT_SCALE_FACTOR=1 megasync") 
-    "deadd-notification-center"
+  '(("megasync" "QT_SCALE_FACTOR=1 megasync")
     "/usr/lib/kdeconnectd"
     ("compton" "compton -f -i .7 -b")
     ;; ("compton -f -i .7 -b --backend glx --blur-background --blur-method kawase --blur-strength 2")
-    "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
-    "/usr/lib/notification-daemon-1.0/notification-daemon"
-    "nm-applet"
     "start-pulseaudio-x11;pactl upload-sample /usr/share/sounds/gnome/default/alerts/drip.ogg beep; pactl load-module module-x11-bell sample=beep; xset b 100"
     "kdeconnect-indicator"
     "qtox"
     ))
 
+(defvar exwm-computer-programs
+  '("dunst"
+    "nm-applet"
+    "/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1"
+    "/usr/lib/notification-daemon-1.0/notification-daemon"))
+
+(defun start-minimum-programs ()
+  (dolist (program exwm-computer-programs)
+    (if (listp program)
+        (start-process-shell-command (car program) nil (cadr program))
+      (start-process-shell-command (file-name-nondirectory program) nil program))))
+
 (defun call-startup-programs ()
+  (start-minimum-programs)
   (when (y-or-n-p "Run startup programs? ")
     (dolist (program exwm-startup-programs)
       (if (listp program)

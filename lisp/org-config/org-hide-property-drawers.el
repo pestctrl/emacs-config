@@ -2,6 +2,8 @@
 
 (setq org-startup-folded 'nofold)
 
+(defvar previous-line nil)
+
 (defun org-cycle-hide-drawers (state)
   "Re-hide all drawers after a visibility state change."
   (when (and (derived-mode-p 'org-mode)
@@ -44,6 +46,11 @@
   (let ((goal-column 0) eoh eol eos has-children children-skipped struct)
     ;; First, determine end of headline (EOH), end of subtree or item
     ;; (EOS), and if item or heading has children (HAS-CHILDREN).
+    (when-let ((current-line (line-number-at-pos))
+               ((or (not previous-line)
+                    (not (eq previous-line current-line)))))
+      (setq previous-line current-line
+            org-cycle-subtree-status nil))
     (save-excursion
       (if (org-at-item-p)
 	      (progn

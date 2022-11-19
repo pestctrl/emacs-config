@@ -212,7 +212,7 @@
             (:name "emacs-devel" :query "tag:emacs-devel and date:6M.." :key "e" :sort-order newest-first)
             (:name "emacs bugs" :query "tag:bug-gnu-emacs and date:30d.." :key "E")
             (:name "emacs help" :query "tag:help-gnu-emacs and date:30d.." :key "h")
-            (:name "org-mode" :query "tag:org-mode" :key "o")
+            (:name "org-mode" :query "tag:org-mode and date:6M.." :key "o" :sort-order newest-first)
             (:name "recruiting" :query "tag:recruiting" :key "r")
             (:name "unread" :query "tag:unread" :key "u")
             (:name "flagged" :query "tag:flagged" :key "f")

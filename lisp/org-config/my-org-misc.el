@@ -157,6 +157,8 @@
   (define-key org-agenda-mode-map (kbd "j")
     #'org-agenda-jump-to-heading-show))
 
+(let ((fetcher (if my-ec/at-ti "github" "github-ssh")))
+  (quelpa `(org-ql :repo "pestctrl/org-ql" :branch "my-changes" :fetcher ,fetcher)))
 (require 'org-ql-find)
 
 (defun org-ql-clock-in ()

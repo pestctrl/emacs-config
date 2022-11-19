@@ -84,8 +84,7 @@
   nil)
 
 (add-to-list 'llvm-font-lock-keywords
-             `(,(rx line-start (optional "# ") "***" (+ nonl) "***" (optional ":") "\n") . 'llvm-separator-face)
-             t)
+             `(,(rx line-start (optional "# ") "***" (+ nonl) "***" (optional ":") "\n") . 'llvm-separator-face))
 
 (add-to-list 'auto-mode-alist
              '("\\.dsls$" . json-mode))

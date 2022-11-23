@@ -748,7 +748,7 @@
   (shackle-mode 1)
 
   (defun get-the-plan ()
-    (with-current-buffer (find-file-noselect "~/MEGA/org/agenda/plan.org")
+    (with-current-buffer (find-file-noselect (my/agenda-file "plan.org"))
       (rename-buffer "the_plan")
       (current-buffer)))
 

@@ -56,9 +56,10 @@
 
 (add-to-list 'auto-mode-alist '("\\.mir$" . llvm-mode))
 
-(when (executable-find "rg")
+(when-let (exe (executable-find "rg"))
   (use-package deadgrep
     :config
+    (setq deadgrep-executable exe)
     (setq deadgrep-project-root-function
           #'(lambda ()
               (if current-prefix-arg

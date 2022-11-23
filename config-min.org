@@ -486,9 +486,11 @@
     (let ((count 0))
       (while (get-buffer (format "*scratch%d*" count))
         (cl-incf count))
-      (switch-to-buffer (get-buffer-create (format "*scratch%d*" count)))
-      (lisp-interaction-mode)
-      (insert (substitute-command-keys initial-scratch-message))))
+      (let ((buff (get-buffer-create (format "*scratch%d*" count))))
+        (with-current-buffer buff
+          (lisp-interaction-mode)
+          (insert (substitute-command-keys initial-scratch-message)))
+        (display-buffer-same-window buff nil))))
 
   ;; Eval and replace
   (defun my/eval-and-replace ()
@@ -734,7 +736,7 @@
 
       (defun find-vterm ()
         (interactive)
-        (switch-to-buffer (get-tab-vterm-buffer)))
+        (display-buffer-same-window (get-tab-vterm-buffer) nil))
 
       (defun find-vterm-other-window ()
         (interactive)
@@ -1065,4 +1067,32 @@
           browse-url-generic-args     '("/c" "start")
           browse-url-browser-function 'browse-url-generic
           search-web-default-browser 'browse-url-generic))
+#+end_src
+* buffer-window management
+:PROPERTIES:
+:DELAYED:  <2022-11-25 17:00>
+:END:
+#+begin_src emacs-lisp
+  (setq switch-to-buffer-obey-display-actions t)
+
+  (add-to-list 'display-buffer-alist
+               `(,(rx line-start "*deadgrep" (+ nonl) "*" line-end)
+                 display-buffer-in-side-window
+                 (side . right)
+                 (slot . 0)
+                 (window-parameters . ((no-delete-other-windows . t)))
+                 (window-width . 100)))
+
+  (defun my/is-compilation-buffer (buffer)
+    (with-current-buffer buffer
+      (or compilation-minor-mode
+          (eq major-mode 'compilation-mode))))
+
+  (add-to-list 'display-buffer-alist
+               `(my/is-compilation-buffer
+                 display-buffer-in-side-window
+                 (side . right)
+                 (slot . 1)
+                 (window-parameters . ((no-delete-other-windows . t)))
+                 (window-width . 80)))
 #+end_src

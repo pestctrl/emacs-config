@@ -816,11 +816,7 @@
   (global-set-key (kbd "C-h v") #'helpful-variable)
   (global-set-key (kbd "C-h k") #'helpful-key)
   (global-set-key (kbd "C-h o") #'helpful-symbol)
-  (setq helpful-switch-buffer-function
-        #'(lambda (buffer)
-            (if (eq major-mode 'helpful-mode)
-                (switch-to-buffer buffer)
-              (pop-to-buffer buffer))))
+  (setq helpful-switch-buffer-function #'pop-to-buffer)
 #+end_src
 ** Ace jump
 #+BEGIN_SRC emacs-lisp
@@ -1103,6 +1099,13 @@
                  (side . right)
                  (slot . 2)
                  (window-parameters . ((no-delete-other-windows . t)))
+                 (window-width . 80)))
+
+  (add-to-list 'display-buffer-alist
+               `((major-mode . helpful-mode)
+                 display-buffer-in-side-window
+                 (side . right)
+                 (slot . 3)
                  (window-width . 80)))
 
   ;; (pop display-buffer-alist)

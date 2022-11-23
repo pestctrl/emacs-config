@@ -1069,9 +1069,6 @@
           search-web-default-browser 'browse-url-generic))
 #+end_src
 * buffer-window management
-:PROPERTIES:
-:DELAYED:  <2022-11-25 17:00>
-:END:
 #+begin_src emacs-lisp
   (setq switch-to-buffer-obey-display-actions t)
 

@@ -889,3 +889,9 @@
                                  (notify "Time for a sit-down...")
                                  (play-sound-file "~/Misc/Sounds/relax.wav")))))
 #+end_src
+* Auto dim buffers
+#+begin_src emacs-lisp
+  (use-package auto-dim-other-buffers)
+
+  (set-face-attribute 'auto-dim-other-buffers-face nil :background "#700CB3")
+#+end_src

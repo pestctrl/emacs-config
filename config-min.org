@@ -101,7 +101,7 @@
               (eq major-mode symbol)
             (eval symbol)))))
 
-    (defface vertico-current-mode-enabled `((t (:background "gray25" :extend t :inherit font-lock-keyword-face))) nil)
+    (defface vertico-current-mode-enabled `((t (:foreground "cyan" :extend t :inherit vertico-current))) nil)
 
     (defun my/highlight-active-mode (orig cand prefix suffix index _start)
       (let ((res (funcall orig cand prefix suffix index _start)))

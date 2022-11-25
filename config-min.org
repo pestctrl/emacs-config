@@ -25,6 +25,9 @@
   ;; I don't care about backup files, stop bothering me
   (setq delete-old-versions t)
 
+  ;; Stop creating lock files
+  (setq create-lockfiles nil)
+
   ;; Undo tree is useful
   (use-package undo-tree)
   (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo")))

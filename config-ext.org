@@ -895,3 +895,9 @@
 
   (set-face-attribute 'auto-dim-other-buffers-face nil :background "#700CB3")
 #+end_src
+* code-compass?
+#+begin_src emacs-lisp
+  (quelpa '(code-compass :repo "ag91/code-compass" :branch "main" :fetcher "github"))
+  (use-package simple-httpd)
+  (require 'code-compass)
+#+end_src

@@ -99,7 +99,12 @@
                       user-emacs-directory)))
 
   (when my-ec/enable-exwm
-    (require 'exwm)))
+    (require 'exwm))
+
+  ;; Ideally as a last step, load all things in submodule directory
+  (org-babel-load-file
+   (expand-file-name "config-submodules.org"
+                     user-emacs-directory)))
 
 (setq my/finished t)
 ;; Testing pull from windows

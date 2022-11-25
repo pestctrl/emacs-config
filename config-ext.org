@@ -530,20 +530,6 @@
   (use-package e2wm
     :bind (("M-+" . e2wm:start-management)))
 #+end_src
-** Youtube-dl
-#+BEGIN_SRC emacs-lisp
-  (when (executable-find "youtube-dl")
-    (add-to-list 'load-path "~/.emacs.d/submodule/youtube-dl-emacs/")
-    (require 'youtube-dl)
-
-    (defun youtube-dl-song (url)
-      (interactive
-       (list (read-from-minibuffer
-              "URL: " (or (thing-at-point 'url)
-                          (when interprogram-paste-function
-                            (funcall interprogram-paste-function))))))
-      (async-shell-command (format "youtube-dl -x -f \"bestaudio[ext=m4a]\" \"%s\"; tageditor -s album=\"youtube-dl\" -f *.m4a" url))))
-#+END_SRC
 ** set-default-directory
 #+begin_src emacs-lisp
   (defun set-default-directory (dir)
@@ -894,12 +880,4 @@
   (use-package auto-dim-other-buffers)
 
   (set-face-attribute 'auto-dim-other-buffers-face nil :background "#700CB3")
-#+end_src
-* code-compass?
-#+begin_src emacs-lisp
-  (add-to-list 'load-path
-               (expand-file-name "submodule/code-compass"
-                                 user-emacs-directory))
-  (use-package simple-httpd)
-  (require 'code-compass)
 #+end_src

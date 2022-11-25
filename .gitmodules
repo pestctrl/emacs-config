@@ -73,3 +73,6 @@
 [submodule "elpa"]
 	path = elpa
 	url = git@github.com:pestctrl/emacs-elpa-folder
+[submodule "submodule/code-compass"]
+	path = submodule/code-compass
+	url = https://github.com/ag91/code-compass

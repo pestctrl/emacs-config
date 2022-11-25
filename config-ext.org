@@ -897,7 +897,9 @@
 #+end_src
 * code-compass?
 #+begin_src emacs-lisp
-  (quelpa '(code-compass :repo "ag91/code-compass" :branch "main" :fetcher "github"))
+  (add-to-list 'load-path
+               (expand-file-name "submodule/code-compass"
+                                 user-emacs-directory))
   (use-package simple-httpd)
   (require 'code-compass)
 #+end_src

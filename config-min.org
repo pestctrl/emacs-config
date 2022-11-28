@@ -1072,12 +1072,28 @@
   (setq switch-to-buffer-obey-display-actions t)
 
   (add-to-list 'display-buffer-alist
-               `((major-mode . magit-status-mode)
+               `("COMMIT_EDITMSG"
                  display-buffer-in-side-window
                  (side . right)
                  (slot . 0)
                  (window-parameters . ((no-delete-other-windows . t)))
                  (window-width . 80)))
+
+  (add-to-list 'display-buffer-alist
+               `((major-mode . magit-status-mode)
+                 display-buffer-in-side-window
+                 (side . right)
+                 (slot . 1)
+                 (window-parameters . ((no-delete-other-windows . t)))
+                 (window-width . 80)))
+
+  (add-to-list 'display-buffer-alist
+               `((major-mode . magit-log-mode)
+                 display-buffer-in-side-window
+                 (side . right)
+                 (slot . 2)
+                 (window-parameters . ((no-delete-other-windows . t)))
+                 (window-width . 100)))
 
   (defun my/is-compilation-buffer (buffer)
     (with-current-buffer buffer
@@ -1089,7 +1105,7 @@
                `((major-mode . deadgrep-mode)
                  display-buffer-in-side-window
                  (side . right)
-                 (slot . 1)
+                 (slot . 3)
                  (window-parameters . ((no-delete-other-windows . t)))
                  (window-width . 100)))
 
@@ -1097,7 +1113,7 @@
                `(my/is-compilation-buffer
                  display-buffer-in-side-window
                  (side . right)
-                 (slot . 2)
+                 (slot . 4)
                  (window-parameters . ((no-delete-other-windows . t)))
                  (window-width . 80)))
 
@@ -1105,7 +1121,7 @@
                `((major-mode . helpful-mode)
                  display-buffer-in-side-window
                  (side . right)
-                 (slot . 3)
+                 (slot . 5)
                  (window-width . 80)))
 
   ;; (pop display-buffer-alist)

@@ -1124,5 +1124,12 @@
                  (slot . 5)
                  (window-width . 80)))
 
+  (add-to-list 'display-buffer-alist
+               `((major-mode . Info-mode)
+                 display-buffer-in-side-window
+                 (side . right)
+                 (slot . 6)
+                 (window-width . 80)))
+
   ;; (pop display-buffer-alist)
 #+end_src

@@ -33,7 +33,7 @@
 (require 'ti-debug-compile)
 (require 'ti-tools-backup)
 (require 'argo-fastsim-dump-mode)
-(require 'restore-frame)
+(require 'frame-restore)
 
 (add-to-list 'auto-mode-alist '("\\.map$" . ti-linker-map-mode))
 (add-to-list 'auto-mode-alist '("\\.cdis$" . asm-mode))

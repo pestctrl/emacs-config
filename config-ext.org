@@ -163,7 +163,16 @@
 
     (advice-add #'ledger-fully-complete-xact
                 :after
-                #'my/ledger-complete-xact--remove-stars))
+                #'my/ledger-complete-xact--remove-stars)
+
+    (defun my/ledger-clean-commodity ()
+      (save-excursion
+        (beginning-of-buffer)
+        (replace-regexp (rx "  -$") "  $-")))
+
+    (advice-add #'ledger-mode-clean-buffer
+                :after
+                #'my/ledger-clean-commodity))
 #+end_src
 ** Credit Card Statement Macro
 #+begin_src emacs-lisp

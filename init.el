@@ -79,6 +79,9 @@
    (expand-file-name "config-programming.org"
                      user-emacs-directory))
 
+  (when (file-exists-p "~/.config/emacs-mail.el")
+    (load-file "~/.config/emacs-mail.el"))
+
   (org-babel-load-file
    (expand-file-name "config-ext.org"
                      user-emacs-directory))

@@ -217,12 +217,12 @@
                 ("D" . #'notmuch-search-delete-all)
                 ("f" . #'notmuch-search-filter-for-domain)
                 ("F" . #'notmuch-search-filter-for-sender)
+                ("d" . #'my/notmuch-search-delete-mail)
                 ("<mouse-1>" . nil)
                 :map notmuch-tree-mode-map
                 ("<tab>" . #'notmuch-tree-explore-here)
                 ("<down>" . #'notmuch-tree-next-message)
                 ("<up>" . #'notmuch-tree-prev-message)
-                ("d" . #'my/notmuch-delete-mail)
                 ("U" . #'notmuch-tree-unfold-all)
                 ("u" . #'notmuch-tree-up-thread)
                 ("N" . #'notmuch-tree-next-sibling)
@@ -237,7 +237,15 @@
     (require 'notmuch-tree)
     ;; (require 'notmuch-fold)
 
-    (setq notmuch-draft-tags '("+drafts"))
+    (defun my/notmuch-search-delete-mail ()
+      (interactive)
+      (cond ((string-match-p "tag:inbox" notmuch-search-query-string)
+             (notmuch-search-add-tag '("-inbox" "+archive")))
+            (t
+             (user-error "Haven't designated a tag for deleting mail in this folder")))
+      (next-line))
+
+    (setq notmuch-draft-tags '("+draft"))
 
     (custom-set-faces
      '(notmuch-tree-match-tree-face ((t (:family "Source Code Pro"))) t)
@@ -284,16 +292,16 @@
           '((:name "inbox" :query "tag:inbox" :key "i")
             (:name "inbox today" :query "date:2020-07-25.. and tag:inbox" :key "t")
             (:name "work" :query "tag:work" :key "w")
-            (:name "mailing lists" :query "tag:mlist" :key "m")
-            (:name "emacs-devel" :query "tag:emacs-devel and date:6M.." :key "e" :sort-order newest-first)
-            (:name "emacs bugs" :query "tag:bug-gnu-emacs and date:30d.." :key "E")
-            (:name "emacs help" :query "tag:help-gnu-emacs and date:30d.." :key "h")
-            (:name "org-mode" :query "tag:org-mode and date:6M.." :key "o" :sort-order newest-first)
-            (:name "recruiting" :query "tag:recruiting" :key "r")
+            (:name "mailing lists" :query "tag:lists" :key "m")
+            (:name "emacs-devel" :query "tag:lists/emacs-devel and date:6M.." :key "e" :sort-order newest-first)
+            (:name "emacs bugs" :query "tag:lists/bug-gnu-emacs and date:30d.." :key "E")
+            (:name "emacs help" :query "tag:lists/help-gnu-emacs and date:30d.." :key "h")
+            (:name "org-mode" :query "tag:lists/emacs-orgmode and date:6M.." :key "o" :sort-order newest-first)
             (:name "unread" :query "tag:unread" :key "u")
             (:name "flagged" :query "tag:flagged" :key "f")
             (:name "cs" :query "tag:cs" :key "c")
             (:name "receipts" :query "tag:receipts" :key "R")
+            (:name "tracking" :query "tag:tracking" :key "T")
             (:name "voicemail" :query "from:vm@italkbb.com" :key "v")
             ;; (:name "sent" :query "tag:sent" :key "s")
             ;; (:name "drafts" :query "tag:draft" :key "d")
@@ -380,45 +388,56 @@
       (find-file (notmuch-show-get-filename))))
 
   (use-exwm
-    :config
-    (defvar offlineimap-timer nil)
-    (defvar offlineimap-process nil)
+   :config
+   ;; (defvar offlineimap-timer nil)
+   ;; (defvar offlineimap-process nil)
 
-    (defun run-offlineimap ()
-      (interactive)
-      (if (and (processp offlineimap-process)
-               (process-live-p offlineimap-process))
-          (message "offlineimap already running...")
-        (message "offlineimap starting...")
-        (when (and (timerp offlineimap-timer)
-                   (not (timer--triggered offlineimap-timer)))
-          (cancel-timer offlineimap-timer))
-        (call-process-shell-command "timedatectl" nil "*offlineimap-output*")
-        (set-process-sentinel
-         (setq offlineimap-process
-               (start-process-shell-command "offlineimap" "*offlineimap-output*" "offlineimap"))
-         #'(lambda (process event)
-             (when (string-match-p "exited abnormally with code 1" event)
-               (with-current-buffer (process-buffer offlineimap-process)
-                 (when (string-match-p "get_password_emacs"(buffer-string))
-                   (erase-buffer)
-                   (message "Oops, didn't grab a password. ")
-                   (setq offlineimap-timer (run-with-timer 300 nil #'run-offlineimap)))))
-             (when (string-match-p "^finished" event)
-               (message "Offlineimap finished")
-               (setq offlineimap-timer (run-with-timer 300 nil #'run-offlineimap)))))))
+   ;; (defun run-offlineimap ()
+   ;;   (interactive)
+   ;;   (if (and (processp offlineimap-process)
+   ;;            (process-live-p offlineimap-process))
+   ;;       (message "offlineimap already running...")
+   ;;     (message "offlineimap starting...")
+   ;;     (when (and (timerp offlineimap-timer)
+   ;;                (not (timer--triggered offlineimap-timer)))
+   ;;       (cancel-timer offlineimap-timer))
+   ;;     (call-process-shell-command "timedatectl" nil "*offlineimap-output*")
+   ;;     (set-process-sentinel
+   ;;      (setq offlineimap-process
+   ;;            (start-process-shell-command "offlineimap" "*offlineimap-output*" "offlineimap"))
+   ;;      #'(lambda (process event)
+   ;;          (when (string-match-p "exited abnormally with code 1" event)
+   ;;            (with-current-buffer (process-buffer offlineimap-process)
+   ;;              (when (string-match-p "get_password_emacs"(buffer-string))
+   ;;                (erase-buffer)
+   ;;                (message "Oops, didn't grab a password. ")
+   ;;                (setq offlineimap-timer (run-with-timer 300 nil #'run-offlineimap)))))
+   ;;          (when (string-match-p "^finished" event)
+   ;;            (message "Offlineimap finished")
+   ;;            (setq offlineimap-timer (run-with-timer 300 nil #'run-offlineimap)))))))
 
-    (defun stop-offlineimap ()
-      (interactive)
-      (when (timerp offlineimap-timer)
-        (cancel-timer offlineimap-timer))
-      (when (processp offlineimap-process)
-        (set-process-sentinel offlineimap-process
-                              nil)))
+   ;; (defun stop-offlineimap ()
+   ;;   (interactive)
+   ;;   (when (timerp offlineimap-timer)
+   ;;     (cancel-timer offlineimap-timer))
+   ;;   (when (processp offlineimap-process)
+   ;;     (set-process-sentinel offlineimap-process
+   ;;                           nil)))
 
-    (add-to-list 'exwm-init-hook
-                 #'run-offlineimap
-                 t))
+   ;; (add-to-list 'exwm-init-hook
+   ;;              #'run-offlineimap
+   ;;              t)
+
+   (defun run-mbsync ()
+     (interactive)
+     (when (not (and (executable-find "afew")
+                     (executable-find "mbsync")
+                     (executable-find "notmuch"))))
+     (start-process-shell-command "mbsync" "*mbsync*"
+                                  (expand-file-name "shell/update-mail.sh"
+                                                    user-emacs-directory)))
+
+   (run-at-time 60 t #'run-mbsync))
 #+end_src
 ** debbugs
 #+begin_src emacs-lisp

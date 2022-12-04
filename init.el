@@ -54,6 +54,9 @@
     'face-new-frame-defaults 'face--new-frame-defaults
     "28.1"))
 
+(when my/puppet-p
+  (setq warning-minimum-level :emergency))
+
 (when (not my-ec/is-wsl)
   (add-to-list 'default-frame-alist '(width  . 200))
   (add-to-list 'default-frame-alist '(height . 60)))

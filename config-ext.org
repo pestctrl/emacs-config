@@ -1,5 +1,72 @@
 #+PROPERTY: header-args:emacs-lisp :tangle "~/.emacs.d/config-ext.el" :comments both
 
+* buffer-window management
+#+begin_src emacs-lisp
+  (setq switch-to-buffer-obey-display-actions t)
+
+  (add-to-list 'display-buffer-alist
+	       `("COMMIT_EDITMSG"
+		 display-buffer-in-side-window
+		 (side . right)
+		 (slot . 0)
+		 (window-parameters . ((no-delete-other-windows . t)))
+		 (window-width . 80)))
+
+  (add-to-list 'display-buffer-alist
+	       `((major-mode . magit-status-mode)
+		 display-buffer-in-side-window
+		 (side . right)
+		 (slot . 1)
+		 (window-parameters . ((no-delete-other-windows . t)))
+		 (window-width . 80)))
+
+  (add-to-list 'display-buffer-alist
+	       `((major-mode . magit-log-mode)
+		 display-buffer-in-side-window
+		 (side . right)
+		 (slot . 2)
+		 (window-parameters . ((no-delete-other-windows . t)))
+		 (window-width . 100)))
+
+  ;; TODO: This should be fixed in future versions of emacs
+  (defun my/is-compilation-buffer (buffer &optional _rest)
+    (with-current-buffer buffer
+      (or compilation-minor-mode
+	  (eq major-mode 'compilation-mode))))
+
+  ;; TODO: Show multiple deadgrep buffers in side-window
+  (add-to-list 'display-buffer-alist
+	       `((major-mode . deadgrep-mode)
+		 display-buffer-in-side-window
+		 (side . right)
+		 (slot . 3)
+		 (window-parameters . ((no-delete-other-windows . t)))
+		 (window-width . 100)))
+
+  (add-to-list 'display-buffer-alist
+	       `(my/is-compilation-buffer
+		 display-buffer-in-side-window
+		 (side . right)
+		 (slot . 4)
+		 (window-parameters . ((no-delete-other-windows . t)))
+		 (window-width . 80)))
+
+  (add-to-list 'display-buffer-alist
+	       `((major-mode . helpful-mode)
+		 display-buffer-in-side-window
+		 (side . right)
+		 (slot . 5)
+		 (window-width . 80)))
+
+  (add-to-list 'display-buffer-alist
+	       `((major-mode . Info-mode)
+		 display-buffer-in-side-window
+		 (side . right)
+		 (slot . 6)
+		 (window-width . 80)))
+
+  ;; (pop display-buffer-alist)
+#+end_src
 * Various tools
 ** ledger
 #+begin_src emacs-lisp

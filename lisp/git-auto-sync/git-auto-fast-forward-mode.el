@@ -89,8 +89,9 @@
         (if (get-buffer-process output-buffer)
             (user-error "Umm, there was a merge that didn't complete. Debug?")
           (when (not (zerop (shell-command (format "git merge --ff-only %s" b) output-buffer)))
-            (pop-to-buffer output-buffer)
-            (user-error "Uh oh, one of the merges resulted in an error!")))))
+            (when (not my/puppet-p)
+              (pop-to-buffer output-buffer))
+            (message "Merging to branch '%s' in repo '%s' failed" b dir)))))
     (magit-push-current-to-pushremote nil)))
 
 (load "userlock")

@@ -102,10 +102,6 @@
                         (eq 'project (opr/ambiguous-task-or-project))))
            (cond ((member "_invis_" tags)
                   'invis)
-                 ((and (member "_invis_when_empty_" tags)
-                       (not (olc/any-todo-children?
-                              (member (org-get-todo-state) org-not-done-keywords))))
-                  'invis)
                  ((when-let (d (org-entry-get (point) "DELAYED"))
                     (org-time> d (org-matcher-time "<yesterday>")))
                   'invis)
@@ -121,10 +117,15 @@
                                            (seq-status?)))
                                   ("TODO" (when (eq 'project (opr/ambiguous-task-or-project))
                                             (seq-status?))))))
-                    (if (and (member "invis_when_active" (org-get-tags))
-                             (eq status 'active))
-                        'invis
-                      status))))))))))
+                    (cond ((and (member "_invis_when_empty_" tags)
+                                (not (eq status 'active))
+                                (not (olc/any-todo-children?
+                                       (member (org-get-todo-state) org-not-done-keywords))))
+                           'invis)
+                          ((and (member "invis_when_active" (org-get-tags))
+                                (eq status 'active))
+                           'invis)
+                          (t status)))))))))))
 
 (provide 'opr-projects)
 ;;; opr-projects.el ends here

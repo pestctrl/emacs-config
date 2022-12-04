@@ -728,3 +728,19 @@
 
   (set-face-attribute 'auto-dim-other-buffers-face nil :background "#700CB3")
 #+end_src
+* Splitting functions
+#+begin_src emacs-lisp
+  (defun mp-split-below (arg)
+    "Split window below from the parent or from root with ARG."
+    (interactive "P")
+    (split-window (if arg (frame-root-window)
+                    (window-parent (selected-window)))
+                  nil 'below nil))
+
+  (defun mp-split-left (arg)
+    "Split window below from the parent or from root with ARG."
+    (interactive "P")
+    (split-window (if arg (frame-root-window)
+                    (window-parent (selected-window)))
+                  nil 'left nil))
+#+end_src

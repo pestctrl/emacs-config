@@ -176,7 +176,10 @@
 #+begin_src emacs-lisp
   (use-package cargo)
   (use-package rust-mode)
-  (use-package rustic)
+  ;; For some reason, rustic is causing weird dialogue issues on
+  ;; puppet's computer.
+  (when (not my/puppet-p)
+    (use-package rustic))
 #+end_src
 * golang
 #+begin_src emacs-lisp

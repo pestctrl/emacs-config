@@ -174,6 +174,8 @@
         (tab-bar-rename-tab "org")
         (switch-or-create-tab "scratch")))))
 
+(set-face-attribute 'tab-bar-tab nil :box (list :line-width 3 :color "gray6"))
+
 (add-hook 'emacs-startup-hook
           #'(lambda () (init-tab-name (selected-frame))))
 

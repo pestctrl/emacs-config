@@ -80,7 +80,7 @@
                      user-emacs-directory))
 
   (when (file-exists-p "~/.config/emacs-mail.el")
-    (load-file "~/.config/emacs-mail.el"))
+    (require 'emacs-mail))
 
   (org-babel-load-file
    (expand-file-name "config-ext.org"

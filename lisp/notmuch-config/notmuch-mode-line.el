@@ -51,7 +51,7 @@
 (defun notmuch-get-unread-string ()
   (let ((count
          (setq notmuch-unread-inbox-count
-               (notmuch-count-query "tag:inbox AND tag:unread")))
+               (notmuch-count-query "tag:inbox and thread:{tag:unread}")))
         (all (notmuch-count-query "tag:inbox")))
     (format " %s [%d/%d] "
             (if (zerop count) "" "")

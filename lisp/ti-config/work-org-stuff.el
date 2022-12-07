@@ -210,7 +210,8 @@
 (setq org-agenda-span 'day)
 
 (setq org-agenda-custom-commands
-      `(,@(agenda-suite "Production" "p" "prod")))
+      `(("p" . "\tprod")
+        ,@(agenda-suite "all" "pa" "prod")))
 
 (setq org-outline-path-complete-in-steps nil)
 (setq org-refile-use-outline-path t)

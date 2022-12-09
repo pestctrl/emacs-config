@@ -79,7 +79,8 @@
            (user-error "Haven't designated a tag for deleting mail in this folder")))
     (next-line))
 
-  (setq notmuch-draft-tags '("+draft"))
+  (setq notmuch-draft-tags '("+draft")
+        notmuch-fcc-dirs "fastmail/Sent")
 
   (custom-set-faces
    '(notmuch-tree-match-tree-face ((t (:family "Source Code Pro"))) t)

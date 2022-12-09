@@ -91,7 +91,7 @@
           (when (not (zerop (shell-command (format "git merge --ff-only %s" b) output-buffer)))
             (when (not my/puppet-p)
               (pop-to-buffer output-buffer))
-            (message "Merging to branch '%s' in repo '%s' failed" b dir)))))
+            (message "Merging to branch '%s' in repo '%s' failed" b repo)))))
     (magit-push-current-to-pushremote nil)))
 
 (load "userlock")

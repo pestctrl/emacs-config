@@ -30,7 +30,6 @@
 (require 'ti-keymap)
 (require 'ti-lib)
 (require 'ti-build-tool)
-(require 'ti-debug-compile)
 (require 'ti-tools-backup)
 (require 'argo-fastsim-dump-mode)
 (require 'frame-restore)

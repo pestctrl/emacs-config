@@ -39,25 +39,42 @@
 
 (defvar lls/llvm-root-dir nil)
 (defvar lls/llvm-build-dirs nil)
+(defvar lls/llvm-bin-dirs nil)
 
 (defvar lls/target-init-fun
   nil)
 
-(defun lls/init-llvm-shared (root-dir build-dirs)
-  (setq lls/llvm-build-dirs (or build-dirs
-                                (read-file-name "build directory? "))
-        lls/llvm-root-dir (or root-dir
-                              (read-file-name "llvm-project directory? "))))
+(defun lls/init-llvm-shared (root-dir build-dirs &optional bindirs)
+  (let ((r (rx (or "RelWithAsserts" "Release"))))
+    (setq lls/llvm-root-dir (or root-dir
+                                (read-file-name "llvm-project directory? "))
+          lls/llvm-build-dirs
+          (sort build-dirs
+                #'(lambda (x y)
+                    (cond ((string-match-p r y) nil)
+                          ((string-match-p r x) t)
+                          (t (string< x y)))))
+          lls/llvm-bin-dirs bindirs)))
 
 (defun lls/get-llvm-root-dir ()
   (or lls/llvm-root-dir
-      (funcall lls/target-init-fun #'lls/init-llvm-shared)
-      lls/llvm-root-dir))
+      (and (funcall lls/target-init-fun #'lls/init-llvm-shared)
+           lls/llvm-root-dir)))
 
 (defun lls/get-llvm-build-dirs ()
   (or lls/llvm-build-dirs
-      (funcall lls/target-init-fun #'lls/init-llvm-shared)
-      lls/llvm-build-dirs))
+      (and (funcall lls/target-init-fun #'lls/init-llvm-shared)
+           lls/llvm-build-dirs)))
+
+(defun lls/get-llvm-bin-dir ()
+  (car (lls/get-llvm-bin-dirs)))
+
+(defun lls/get-llvm-bin-dirs ()
+  (append (mapcar #'(lambda (x) (expand-file-name "bin" x))
+                  (lls/get-llvm-build-dirs))
+          (or lls/llvm-bin-dirs
+              (and (funcall lls/target-init-fun #'lls/init-llvm-shared)
+                   lls/llvm-bin-dirs))))
 
 (defun lls/get-llvm-build-dir ()
   (car (lls/get-llvm-build-dirs)))
@@ -74,7 +91,7 @@
   (cl-mapcan #'(lambda (dir)
                  (directory-files dir t tool-regexp))
              (or directories
-                 (lls/get-llvm-build-dirs))))
+                 (lls/get-llvm-bin-dirs))))
 
 (defvar lls/get-clang-command-fun
   (lambda (compiler file action &optional rest)

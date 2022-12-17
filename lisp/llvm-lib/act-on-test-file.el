@@ -58,10 +58,10 @@
 
 (defun ll/get-required-binaries-for-test (file)
   (->> (ll/get-test-run-commands file)
-       (mapcan #'(lambda (x) (string-split x "|")))
+       (mapcan #'(lambda (x) (split-string x "|")))
        (mapcar #'string-trim)
        (mapcar #'(lambda (x)
-                   (let ((str (car (string-split x " "))))
+                   (let ((str (car (split-string x " "))))
                      (if (string= str "%clang_cc1")
                          "clang"
                        str))))

@@ -25,12 +25,79 @@
 ;;; Code:
 
 (require 'magit)
-(defvar lls/llvm-root-dir nil)
 
-;; ========================= LLVM Build Dirs =========================
+;; =========================== LLVM Rebuild ==========================
+
+(defvar llvm-core-count 8)
+
+(defun lls/ninja-build-tools (build-dir tools-list)
+  (format "cd %s && ninja -j %d %s"
+          build-dir llvm-core-count
+          (string-join tools-list " ")))
+
+;; =============================== Init ==============================
+
+(defvar lls/llvm-root-dir nil)
 (defvar lls/llvm-build-dirs nil)
 
-(defun lls/guess-build-dirs ()
+(defvar lls/target-init-fun
+  nil)
+
+(defun lls/init-llvm-shared (root-dir build-dirs)
+  (setq lls/llvm-build-dirs (or build-dirs
+                                (read-file-name "build directory? "))
+        lls/llvm-root-dir (or root-dir
+                              (read-file-name "llvm-project directory? "))))
+
+(defun lls/get-llvm-root-dir ()
+  (or lls/llvm-root-dir
+      (funcall lls/target-init-fun #'lls/init-llvm-shared)
+      lls/llvm-root-dir))
+
+(defun lls/get-llvm-build-dirs ()
+  (or lls/llvm-build-dirs
+      (funcall lls/target-init-fun #'lls/init-llvm-shared)
+      lls/llvm-build-dirs))
+
+(defun lls/get-llvm-build-dir ()
+  (car (lls/get-llvm-build-dirs)))
+
+(defun lls/add-llvm-build-dir (dir)
+  (interactive
+   (list (read-file-name "Where? ")))
+  (add-to-list 'lls/llvm-build-dirs
+               dir))
+
+;; =============================== Misc ==============================
+
+(defun lls/get-tool (tool-regexp &optional directories)
+  (cl-mapcan #'(lambda (dir)
+                 (directory-files dir t tool-regexp))
+             (or directories
+                 (lls/get-llvm-build-dirs))))
+
+(defvar lls/get-clang-command-fun
+  (lambda (compiler file action &optional rest)
+    (string-join (list compiler
+                       (string-join rest " ")
+                       file
+                       (pcase action
+                         ('compile "-c")
+                         ('assemble "-S")
+                         ('preprocess "-E")
+                         ('llvm-ir "-S -emit-llvm"))
+                       "-o -")
+                 " ")))
+
+;; ========================= LLVM Build Dirs =========================
+
+(setq lls/target-init-fun
+      (lambda (callback)
+        (funcall callback
+                 (funcall lls/guess-root-dir-fun)
+                 (funcall lls/guess-build-dirs-fun))))
+
+(defun lls/guess-build-dirs-fun ()
   (when-let ((toplevel (magit-toplevel (buffer-file-name (current-buffer)))))
     (and (string-match-p "llvm-project" toplevel)
          (let ((build-dir (expand-file-name "build" toplevel)))
@@ -45,61 +112,6 @@
                                (cond ((string-match-p "^Release$" (file-name-nondirectory y)) nil)
                                      ((string-match-p "^Release$" (file-name-nondirectory x)) t)
                                      (t (string< x y)))))))))))
-
-(defvar lls/init-build-dirs
-  (lambda ()
-    (or lls/llvm-build-dirs
-        (append (lls/guess-build-dirs) '("/usr/bin"))
-        (list (read-file-name "Where is llvm build directory? ")))))
-
-(defvar lls/get-build-dirs-fun
-  #'(lambda ()
-      (when (null lls/llvm-build-dirs)
-        (setq lls/llvm-build-dirs
-              (funcall lls/init-build-dirs)))
-      lls/llvm-build-dirs))
-
-(defun lls/add-build-directory (dir)
-  (interactive
-   (list (read-file-name "Where? ")))
-  (add-to-list 'lls/llvm-build-dirs
-               dir))
-
-;; =========================== LLVM Rebuild ==========================
-
-(defvar llvm-core-count 8)
-
-(defun lls/ninja-build-tools (build-dir tools-list)
-  (format "cd %s && ninja -j %d %s"
-          build-dir llvm-core-count
-          (string-join tools-list " ")))
-
-;; =============================== Misc ==============================
-
-(defun lls/get-tool (tool-regexp &optional directories)
-  (cl-mapcan #'(lambda (dir)
-                 (directory-files dir t tool-regexp))
-             (or directories
-                 (funcall lls/get-build-dirs-fun))))
-
-(defvar lls/get-build-dir-fun
-  #'(lambda ()
-      (car (funcall lls/get-build-dirs-fun))))
-
-(defvar lls/get-clang-command-fun
-  (lambda (compiler file action &optional rest)
-    (format "%s %s %s %s"
-            compiler
-            file
-            (concat
-             (pcase action
-               ('compile "-c ")
-               ('assemble "-S ")
-               ('preprocess "-E ")
-               ('llvm-ir "-S -emit-llvm "))
-             "-o -")
-            " "
-            (string-join rest " "))))
 
 (provide 'llvm-shared)
 ;;; llvm-shared.el ends here

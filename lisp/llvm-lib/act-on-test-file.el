@@ -68,7 +68,7 @@
        (seq-uniq)))
 
 (defun ll/test-ensure-binary-built (file)
-  (let ((dir (funcall lls/get-build-dir-fun))
+  (let ((dir (lls/get-llvm-build-dir))
         (tools (ll/get-required-binaries-for-test file)))
     (lls/ninja-build-tools dir tools)))
 

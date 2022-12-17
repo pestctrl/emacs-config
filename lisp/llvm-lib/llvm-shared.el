@@ -130,8 +130,12 @@
 (setq lls/target-init-fun
       (lambda (callback)
         (funcall callback
-                 (funcall lls/guess-root-dir-fun)
-                 (funcall lls/guess-build-dirs-fun))))
+                 (lls/guess-root-dir-fun)
+                 (lls/guess-build-dirs-fun))))
+
+(defun lls/guess-root-dir-fun ()
+  ;; TODO: constant
+  "~/workspace/llvm-project")
 
 (defun lls/guess-build-dirs-fun ()
   (when-let ((toplevel (magit-toplevel (buffer-file-name (current-buffer)))))

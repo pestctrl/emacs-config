@@ -1,5 +1,5 @@
 /*.el
-/*.elc
+**/*.elc
 \#*\#
 *~
 custom.el

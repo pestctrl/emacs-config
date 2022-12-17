@@ -45,6 +45,7 @@
   nil)
 
 (defun lls/init-llvm-shared (root-dir build-dirs &optional bindirs)
+  ;; TODO: make interactive
   (let ((r (rx (or "RelWithAsserts" "Release"))))
     (setq lls/llvm-root-dir (or root-dir
                                 (read-file-name "llvm-project directory? "))
@@ -128,6 +129,7 @@
 ;; ========================= LLVM Build Dirs =========================
 
 (setq lls/target-init-fun
+      ;; TODO: load llvm-mode
       (lambda (callback)
         (funcall callback
                  (lls/guess-root-dir-fun)
@@ -138,7 +140,8 @@
   "~/workspace/llvm-project")
 
 (defun lls/guess-build-dirs-fun ()
-  (when-let ((toplevel (magit-toplevel (buffer-file-name (current-buffer)))))
+  (when-let ((toplevel ;;(magit-toplevel (buffer-file-name (current-buffer)))
+              (lls/guess-root-dir-fun)))
     (and (string-match-p "llvm-project" toplevel)
          (let ((build-dir (expand-file-name "build" toplevel)))
            (when (file-exists-p build-dir)

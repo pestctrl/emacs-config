@@ -24,6 +24,7 @@
 
 ;;; Code:
 (require 'llvm-ir-mode)
+(require 'llvm-shared)
 (require 'action-map-lib)
 
 (defvar ll/c-file-action-map
@@ -39,13 +40,15 @@
         (compiler (completing-read
                    "Which clang? "
                    (lls/get-tool "clang$"))))
-    (concat (funcall lls/get-clang-command-fun compiler file compiler-action)
-            (pcase action
-              ('debug (format "-mllvm -debug-only=%s" (read-string "Which pass? ")))
-              ('before-after (let ((pass (read-string "Which pass? ")))
-                               (format "-mllvm -print-before=%s -mllvm -print-after=%s" pass pass)))
-              ('changed "-mllvm -print-before-all"))
-            " ")))
+    (string-join
+     (list (funcall lls/get-clang-command-fun compiler file compiler-action)
+           (pcase action
+             ('debug (format "-mllvm -debug-only=%s" (read-string "Which pass? ")))
+             ('before-after (let ((pass (read-string "Which pass? ")))
+                              (format "-mllvm -print-before=%s -mllvm -print-after=%s" pass pass)))
+             ('changed "-mllvm -print-before-all"))
+           " ")
+     " ")))
 
 (defun ll/act-on-c-file (file)
   (let* ((action (aml/read-action-map ll/c-file-action-map)))

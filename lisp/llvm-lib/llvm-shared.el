@@ -87,14 +87,27 @@
 
 ;; =============================== Misc ==============================
 
+(defun my/completing-read (prompt collection)
+  (let ((len (length collection)))
+    (cond ((< len 1)
+           (user-error "Uhhh, no %ss? " prompt))
+          ((= len 1) (car collection))
+          (t (completing-read (format "Which %s? " prompt)
+                              collection)))))
+
+(defun lls/prompt-tool (tool-regexp &optional directories)
+  (my/completing-read tool-regexp
+                      (lls/get-tool tool-regexp directories)))
+
 (defun lls/get-tool (tool-regexp &optional directories)
   (cl-mapcan #'(lambda (dir)
-                 (directory-files dir t tool-regexp))
+                 (when (file-exists-p dir)
+                   (directory-files dir t tool-regexp)))
              (or directories
                  (lls/get-llvm-bin-dirs))))
 
 (defvar lls/get-clang-command-fun
-  (lambda (compiler file action &optional rest)
+  (lambda (compiler file action &optional output rest)
     (string-join (list compiler
                        (string-join rest " ")
                        file
@@ -103,8 +116,14 @@
                          ('assemble "-S")
                          ('preprocess "-E")
                          ('llvm-ir "-S -emit-llvm"))
-                       "-o -")
+                       (format "-o %s"
+                               (or output "-")))
                  " ")))
+
+(defvar lls/get-llc-command-fun
+  (lambda (file _action)
+    (concat "llc -o - "
+            file " ")))
 
 ;; ========================= LLVM Build Dirs =========================
 

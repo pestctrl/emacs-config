@@ -24,6 +24,10 @@
 
 ;;; Code:
 (require 'llvm-shared)
+(require 'llvm-dirs)
+(require 'act-on-test-file)
+(require 'act-on-c-file)
+(require 'act-on-ll-file)
 
 (define-prefix-command '*llvm-map*)
 (define-key *root-map* (kbd "C-w") '*llvm-map*)
@@ -33,6 +37,7 @@
 (defun ll/act-on-file (file)
   (interactive (list (or (buffer-file-name (current-buffer))
                          (read-file-name "File? "))))
+  (funcall ll/init-working-dirs)
   (when (null file)
     (setq file (make-temp-file nil nil ".ll"))
     (write-file file))

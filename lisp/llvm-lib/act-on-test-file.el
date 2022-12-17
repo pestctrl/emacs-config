@@ -24,6 +24,8 @@
 
 ;;; Code:
 (require 'llvm-shared)
+(require 'action-map-lib)
+(require 'dash)
 
 (defvar ll/test-file-action-map
   '((normal       :key ?\^M :major-mode nil :buffer-string "run"  :description "[RET] run test")
@@ -66,9 +68,9 @@
        (seq-uniq)))
 
 (defun ll/test-ensure-binary-built (file)
-  (let ((dir (funcall ll/get-build-dir-fun))
+  (let ((dir (funcall lls/get-build-dir-fun))
         (tools (ll/get-required-binaries-for-test file)))
-    (ll/ninja-build-tools dir tools)))
+    (lls/ninja-build-tools dir tools)))
 
 (defun ll/build-test-command (file action)
   (mapconcat #'identity

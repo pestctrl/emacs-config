@@ -39,6 +39,7 @@
                                ))))
  `(mode-line ((t (:family "Roboto Mono" :height ,my/fixed-pitch-height))))
  `(mode-line-inactive ((t (:family "Roboto Mono" :height ,my/fixed-pitch-height))))
+ `(tab-bar-tab ((t (:box (:line-width 2 :color "gray6")))))
  ;; '(org-todo ((((class color) (min-colors 16) (background light)) (:foreground "Red1" :bold t :inherit fixed-pitch))
  ;;             (((class color) (min-colors 16) (background dark))  (:foreground "Pink" :bold t :inherit fixed-pitch))
  ;;             (((class color) (min-colors 8)  (background light)) (:foreground "red"  :bold t :inherit fixed-pitch))

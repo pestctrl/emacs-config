@@ -57,25 +57,29 @@
                           (t (string< x y)))))
           lls/llvm-bin-dirs bindirs)))
 
+(defun lls/uninitialized? ()
+  (not (and lls/llvm-root-dir
+            lls/llvm-build-dirs)))
+
 (defun lls/get-llvm-root-dir ()
-  (or lls/llvm-root-dir
-      (and (funcall lls/target-init-fun #'lls/init-llvm-shared)
-           lls/llvm-root-dir)))
+  (when (lls/uninitialized?)
+    (funcall lls/target-init-fun #'lls/init-llvm-shared))
+  lls/llvm-root-dir)
 
 (defun lls/get-llvm-build-dirs ()
-  (or lls/llvm-build-dirs
-      (and (funcall lls/target-init-fun #'lls/init-llvm-shared)
-           lls/llvm-build-dirs)))
+  (when (lls/uninitialized?)
+    (funcall lls/target-init-fun #'lls/init-llvm-shared))
+  lls/llvm-build-dirs)
 
 (defun lls/get-llvm-bin-dir ()
   (car (lls/get-llvm-bin-dirs)))
 
 (defun lls/get-llvm-bin-dirs ()
+  (when (lls/uninitialized?)
+    (funcall lls/target-init-fun #'lls/init-llvm-shared))
   (append (mapcar #'(lambda (x) (expand-file-name "bin" x))
                   (lls/get-llvm-build-dirs))
-          (or lls/llvm-bin-dirs
-              (and (funcall lls/target-init-fun #'lls/init-llvm-shared)
-                   lls/llvm-bin-dirs))))
+          lls/llvm-bin-dirs))
 
 (defun lls/get-llvm-build-dir ()
   (car (lls/get-llvm-build-dirs)))

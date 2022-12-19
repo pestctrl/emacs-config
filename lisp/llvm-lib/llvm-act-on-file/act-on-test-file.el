@@ -35,7 +35,7 @@
 
 (defun ll/is-test-file (file)
   (and (member (file-name-extension file)
-               '("ll" "c"))
+               '("ll" "c" "mir"))
        (string-match-p ".*llvm-project.*test.*" file)))
 
 (defun ll/get-test-run-commands (file)
@@ -43,7 +43,7 @@
                            (find-file-noselect file))
     (save-excursion
       (goto-char (point-min))
-      (let ((r (rx line-start (+ (or "|" ";" "/")) (+ " ") "RUN:" (+ space) (group(+ nonl) line-end)))
+      (let ((r (rx line-start (+ (or "|" ";" "/" "#")) (+ " ") "RUN:" (+ space) (group(+ nonl) line-end)))
             (temp "")
             l)
         (while (re-search-forward r nil t)
@@ -68,19 +68,46 @@
        (seq-uniq)))
 
 (defun ll/test-ensure-binary-built (file)
+  ;; TODO: assumed build-dir constant, should take as argument and prompt
+  ;; further up
   (let ((dir (lls/get-llvm-build-dir))
         (tools (ll/get-required-binaries-for-test file)))
     (lls/ninja-build-tools dir tools)))
 
+(defun ll/build-lit-command (file action)
+  (format "./bin/llvm-lit %s %s"
+          (pcase action
+            ('verbose "-v")
+            ('all "-a")
+            (_ ""))
+          file ))
+
+(defun ll/prompt-test-action (file action)
+  ;; TODO: assumed build-dir constant, should take as argument and prompt
+  ;; further up
+  (let* ((dir (lls/get-llvm-build-dir))
+         (commands
+          (--> (ll/get-test-run-commands file)
+               ;; TODO: assumed that first command will DWIM
+               (mapcar #'(lambda (x) (car (split-string x "|"))) it)
+               (mapcar #'(lambda (x) (string-trim x)) it)
+               ;; TODO: assuming all commands will be llc
+               (mapcar #'(lambda (x)
+                           (string-replace "llc"
+                                           (expand-file-name "bin/llc" dir)
+                                           x))
+                       it)
+               (mapcar #'(lambda (x)
+                           (string-replace "%s" file x))
+                       it))))
+    (my/completing-read "Which command? " commands)))
+
 (defun ll/build-test-command (file action)
   (mapconcat #'identity
              `(,(ll/test-ensure-binary-built file)
-               ,(format "./bin/llvm-lit %s %s"
-                        (pcase action
-                          ('verbose "-v")
-                          ('all "-a")
-                          (_ ""))
-                        file))
+               ,(if (eq action 'test-action)
+                    (ll/prompt-test-action file action)
+                  (ll/build-lit-command file action)))
              " && "))
 
 (defun ll/act-on-test-file (file)

@@ -26,6 +26,7 @@
 (require 'llvm-act-on-file)
 (require 'llvm-build-tool)
 (require 'llvm-gdb-command)
+(require 'llvm-show-instr-info)
 
 (define-prefix-command '*llvm-map*)
 ;; (define-key *root-map* (kbd "C-w") '*llvm-map*)
@@ -33,6 +34,7 @@
 (define-key *llvm-map* (kbd "a") #'ll/act-on-file)
 (define-key *llvm-map* (kbd "c") #'ll/llvm-build-tool)
 (define-key *llvm-map* (kbd "M-w") #'ll/kill-gdb-command)
+(define-key *llvm-map* (kbd "i") #'ll/show-instr-info)
 
 (provide 'llvm-lib)
 ;;; llvm-lib.el ends here

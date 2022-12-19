@@ -24,20 +24,20 @@
 
 ;;; Code:
 (use-package banner-comment)
-(global-set-key (kbd "C-c h") #'banner-comment)
+(global-set-key (kbd "C-c h") #'work-banner-comment)
 
-(defun banner-switch-char ()
+(defun work-banner-switch-char ()
   (interactive)
-  (setq banner-comment-char
+  (setq work-banner-comment-char
         (if (= banner-comment-char ?-)
             ?*
           ?-)))
 
-(setq banner-comment-char ?-)
-(setq banner-comment-start "/*")
-(setq banner-comment-end "*/")
+(setq work-banner-comment-char ?-)
+(setq work-banner-comment-start "/*")
+(setq work-banner-comment-end "*/")
 
-(defun banner-comment (&optional end-column)
+(defun work-banner-comment (&optional end-column)
   "Turn line at point into a banner comment.
 
 Called on an existing banner comment, will reformat it.

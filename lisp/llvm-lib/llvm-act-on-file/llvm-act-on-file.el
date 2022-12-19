@@ -24,6 +24,7 @@
 
 ;;; Code:
 (require 'llvm-shared)
+(require 'my-comp-minor-mode)
 (require 'act-on-test-file)
 (require 'act-on-c-file)
 (require 'act-on-ll-file)

@@ -101,10 +101,11 @@
   (dolist (info gaff/watch-directories)
     (let ((dir (car info))
           (branches (cdr info)))
-      (when (and (ga/should-be-automatic dir)
-                 (gaff/no-pending-gac-commits dir)
-                 (gaff/no-modified-buffers dir)
-                 (gaff/no-git-changes dir))
+      (if (not (and (ga/should-be-automatic dir)
+                    (gaff/no-pending-gac-commits dir)
+                    (gaff/no-modified-buffers dir)
+                    (gaff/no-git-changes dir)))
+          (message "Can't fast-forward for %s" dir)
         (let ((buffers (gaff/get-open-buffers-in dir)))
           (unwind-protect
               (progn

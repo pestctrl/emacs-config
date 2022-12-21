@@ -35,20 +35,28 @@
     (before-after :key ?p  :major-mode llvm-mode :buffer-string "print-before-after" :description "[p]rint before/after"     :compiler-action assemble)
     (changed      :key ?A  :major-mode llvm-mode :buffer-string "print-changed"      :description "print before/after [A]ll" :compiler-action assemble)))
 
+(defun ll/ensure-clang-binary-built (dir)
+  ;; TODO: assumed build-dir constant, should take as argument and prompt
+  ;; further up
+  (lls/ninja-build-tools dir '("clang")))
+
 (defun ll/build-clang-command (file action)
   (let ((compiler-action (aml/get-map-prop ll/c-file-action-map action :compiler-action))
-        (compiler (completing-read
-                   "Which clang? "
-                   (lls/get-tool "clang$"))))
-    (string-join
-     (list (funcall lls/get-clang-command-fun compiler file compiler-action)
-           (pcase action
-             ('debug (format "-mllvm -debug-only=%s" (read-string "Which pass? ")))
-             ('before-after (let ((pass (read-string "Which pass? ")))
-                              (format "-mllvm -print-before=%s -mllvm -print-after=%s" pass pass)))
-             ('changed "-mllvm -print-before-all"))
-           " ")
-     " ")))
+        (compiler (lls/prompt-tool "clang$")))
+    (concat ;; (ll/ensure-clang-binary-built
+            ;;  (file-name-directory
+            ;;   (directory-file-name
+            ;;    (file-name-directory compiler))))
+            ;; " && "
+            (string-join
+             (list (funcall lls/get-clang-command-fun compiler file compiler-action)
+                   (pcase action
+                     ('debug (format "-mllvm -debug-only=%s" (read-string "Which pass? ")))
+                     ('before-after (let ((pass (read-string "Which pass? ")))
+                                      (format "-mllvm -print-before=%s -mllvm -print-after=%s" pass pass)))
+                     ('changed "-mllvm -print-before-all"))
+                   " ")
+             " "))))
 
 (defun ll/act-on-c-file (file)
   (let* ((action (aml/read-action-map ll/c-file-action-map)))

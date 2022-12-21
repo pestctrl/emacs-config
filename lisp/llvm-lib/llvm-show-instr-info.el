@@ -61,8 +61,8 @@
      (re-search-forward ,rx)
      (push (match-string 1) ,place)))
 
-(defun ll/show-instr-read ()
-  (let ((l (ll/get-instructions-list (ll/ISA-filename)))
+(defun ll/show-instr-read (target)
+  (let ((l (ll/get-instructions-list (ll/ISA-filename target)))
         (sym (symbol-name (symbol-at-point))))
     (if (member sym l)
         (completing-read (format "Which instruction? (default: %s) "
@@ -71,16 +71,17 @@
       (completing-read "Which Instruction? "
                        l))))
 
-(defun ll/show-instr-info (instr)
-  (interactive
-   (list
-    (ll/show-instr-read)))
+(defun ll/prompt-for-instr-info ()
+  (interactive)
+  (let* ((target (read-string "Target? ")) ;; TODO: Add some indirection
+         (instr (ll/show-instr-read target)))
+    (ll/show-instr-info target instr)))
+
+(defun ll/show-instr-info (target instr)
   (save-restriction
-    (let ((buf (get-buffer-create (format "*%s-instr-info*" instr)))
-          ;; TODO: Add some indirection
-          (target (read-string "Target? "))
-          itin
-          l)
+    (let* ((buf (get-buffer-create (format "*%s-instr-info*" instr)))
+           itin
+           l)
       (with-current-buffer (ll/get-tablegen-file ISA target)
         (save-excursion
           (goto-char (point-min))

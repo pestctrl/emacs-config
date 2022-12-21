@@ -65,6 +65,17 @@
                  (slot . 6)
                  (window-width . 80)))
 
+  ;; (defun my/is-org-capture-buffer (buffer &optional _rest)
+  ;;   (with-current-buffer buffer
+  ;;     org-capture-mode))
+
+  ;; (add-to-list 'display-buffer-alist
+  ;;              `(my/is-org-capture-buffer
+  ;;                display-buffer-in-side-window
+  ;;                (side . left)
+  ;;                (slot . 0)
+  ;;                (window-width . 80)))
+
   ;; (pop display-buffer-alist)
 #+end_src
 * Various tools

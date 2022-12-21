@@ -37,9 +37,13 @@ commands of Compilation major mode are available.  See
     (compilation--unsetup)))
 
 (defun my/enable-comp-keys-if-separate-mode (orig &rest args)
-  (with-current-buffer (apply orig args)
+  (let ((buf (apply orig args)))
     (when (cadr args)
-      (compilation-minor-mode))))
+      (with-current-buffer buf
+        (compilation-minor-mode)))
+    buf))
+
+(defvar compilation-process-sentinel)
 
 (advice-add #'compilation-start
             :around

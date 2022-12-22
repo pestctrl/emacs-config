@@ -56,7 +56,7 @@
 	      (progn
 	        (beginning-of-line)
 	        (setq struct (org-list-struct))
-	        (setq eoh (point-at-eol))
+	        (setq eoh (line-end-position))
 	        (setq eos (org-list-get-item-end-before-blank (point) struct))
 	        (setq has-children (org-list-has-child-p (point) struct)))
 	    (org-back-to-heading)
@@ -70,43 +70,50 @@
 	           (save-excursion
 		         (let ((level (funcall outline-level)))
 		           (outline-next-heading)
-		           (and (org-at-heading-p t)
+		           (and (org-at-heading-p)
 			            (> (funcall outline-level) level))))
 	           (and (eq org-cycle-include-plain-lists 'integrate)
 		            (save-excursion
 		              (org-list-search-forward (org-item-beginning-re) eos t))))))
       ;; Determine end invisible part of buffer (EOL)
       (beginning-of-line 2)
-      (while (and (not (eobp))          ;this is like `next-line'
-		          (get-char-property (1- (point)) 'invisible))
-	    (goto-char (next-single-char-property-change (point) 'invisible))
-	    (and (eolp) (beginning-of-line 2)))
+      (if (eq org-fold-core-style 'text-properties)
+          (while (and (not (eobp))		;this is like `next-line'
+		              (org-fold-folded-p (1- (point))))
+	        (goto-char (org-fold-next-visibility-change nil nil t))
+	        (and (eolp) (beginning-of-line 2)))
+        (while (and (not (eobp))		;this is like `next-line'
+		            (get-char-property (1- (point)) 'invisible))
+	      (goto-char (next-single-char-property-change (point) 'invisible))
+	      (and (eolp) (beginning-of-line 2))))
       (setq eol (point)))
     ;; Find out what to do next and set `this-command'
     (cond
      ((= eos eoh)
       ;; Nothing is hidden behind this heading
       (unless (org-before-first-heading-p)
-	    (run-hook-with-args 'org-pre-cycle-hook 'empty))
+	    (run-hook-with-args 'org-cycle-pre-hook 'empty))
       (org-unlogged-message "EMPTY ENTRY")
       (setq org-cycle-subtree-status nil)
       (save-excursion
 	    (goto-char eos)
-	    (outline-next-heading)
-	    (when (org-invisible-p) (org-flag-heading nil))))
+        (org-with-limited-levels
+	     (outline-next-heading))
+	    (when (org-invisible-p) (org-fold-heading nil))))
      ((and (or (>= eol eos)
-	           (not (string-match "\\S-" (buffer-substring eol eos))))
+	           (save-excursion (goto-char eol) (skip-chars-forward "[:space:]" eos) (= (point) eos)))
 	       (or has-children
 	           (not (setq children-skipped
 			              org-cycle-skip-children-state-if-no-children))))
       ;; Entire subtree is hidden in one line: children view
       (unless (org-before-first-heading-p)
-	    (run-hook-with-args 'org-pre-cycle-hook 'children))
+        (org-with-limited-levels
+	     (run-hook-with-args 'org-cycle-pre-hook 'children)))
       (if (org-at-item-p)
-	      (org-list-set-item-visibility (point-at-bol) struct 'children)
-	    (org-show-entry)
-	    (org-with-limited-levels (org-show-children))
-	    (org-show-set-visibility 'tree)
+	      (org-list-set-item-visibility (line-beginning-position) struct 'children)
+	    (org-fold-show-entry)
+	    (org-with-limited-levels (org-fold-show-children))
+	    (org-fold-show-set-visibility 'tree)
 	    ;; Fold every list in subtree to top-level items.
 	    (when (eq org-cycle-include-plain-lists 'integrate)
 	      (save-excursion
@@ -122,8 +129,15 @@
       (org-unlogged-message "CHILDREN")
       (save-excursion
 	    (goto-char eos)
-	    (outline-next-heading)
-	    (when (org-invisible-p) (org-flag-heading nil)))
+        (org-with-limited-levels
+	     (outline-next-heading))
+	    (when (and
+               ;; Subtree does not end at the end of visible section of the
+               ;; buffer.
+               (< (point) (point-max))
+               (org-invisible-p))
+          ;; Reveal the following heading line.
+          (org-fold-heading nil)))
       (setq org-cycle-subtree-status 'children)
       (unless (org-before-first-heading-p)
 	    (run-hook-with-args 'org-cycle-hook 'children)))
@@ -138,7 +152,7 @@
       ;; now show everything.
       (unless (org-before-first-heading-p)
 	    (run-hook-with-args 'org-pre-cycle-hook 'subtree))
-      (org-flag-region eoh eos nil 'outline)
+      (org-fold-region eoh eos nil 'outline)
       (org-unlogged-message
        (if children-skipped "SUBTREE (NO CHILDREN)" "SUBTREE"))
       (setq org-cycle-subtree-status 'subtree)
@@ -146,8 +160,8 @@
 	    (run-hook-with-args 'org-cycle-hook 'subtree)))
      (t
       ;; Default action: hide the subtree.
-      (run-hook-with-args 'org-pre-cycle-hook 'folded)
-      (org-flag-region eoh eos t 'outline)
+      (run-hook-with-args 'org-cycle-pre-hook 'folded)
+      (org-fold-region eoh eos t 'outline)
       (org-unlogged-message "FOLDED")
       (setq org-cycle-subtree-status 'folded)
       (unless (org-before-first-heading-p)

@@ -65,6 +65,24 @@
       (prog1 (re-search-forward (rx (and "#include \"" (group (+ (not space))) "\"")) nil t)
         (message "Couldn't find %s header file" (match-string 1))))))
 
+(defun ll/add-include-file ()
+  (interactive)
+  (when (not (or compilation-minor-mode
+                 (eq major-mode
+                     'compilation-mode)))
+    (user-error "Wrong buffer idiot"))
+
+  (when (not (ll/buffer-has-include-error (current-buffer)))
+    (user-error "The problem is not an include file..."))
+
+  (let ((new-dir (read-directory-name "directory? ")))
+    (setq compilation-arguments
+          (cons (concat (car compilation-arguments)
+                        (format " -I%s "
+                                new-dir))
+                (cdr compilation-arguments)))
+    (call-interactively #'recompile)))
+
 (defun ll/c-file-sentinel (process event)
   (let ((pb (process-buffer process)))
     (when (and (string-match-p "exited abnormally with code 1" event)
@@ -80,16 +98,16 @@
             (call-interactively #'recompile)))))))
 
 (defun ll/act-on-c-file (file)
-  (let ((action (aml/read-action-map ll/c-file-action-map))
-        (buf
-         (--> (ll/build-clang-command file action)
-              (compilation-start
-               it
-               (aml/get-map-prop ll/c-file-action-map action :major-mode)
-               (lambda (x)
-                 (format "*%s-%s*"
-                         (file-name-nondirectory file)
-                         (aml/get-map-prop ll/c-file-action-map action :buffer-string)))))))
+  (let* ((action (aml/read-action-map ll/c-file-action-map))
+         (buf
+          (--> (ll/build-clang-command file action)
+               (compilation-start
+                it
+                (aml/get-map-prop ll/c-file-action-map action :major-mode)
+                (lambda (x)
+                  (format "*%s-%s*"
+                          (file-name-nondirectory file)
+                          (aml/get-map-prop ll/c-file-action-map action :buffer-string)))))))
     ;; (set-process-sentinel (get-buffer-process buf)
     ;;                       #'ll/c-file-sentinel)
     ))

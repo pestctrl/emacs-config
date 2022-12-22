@@ -31,7 +31,7 @@
 (defvar llvm-core-count 8)
 
 (defun lls/ninja-build-tools (build-dir tools-list)
-  (format "cd %s && ninja -j %d %s"
+  (format "ninja -C %s -j %d %s"
           build-dir llvm-core-count
           (string-join tools-list " ")))
 

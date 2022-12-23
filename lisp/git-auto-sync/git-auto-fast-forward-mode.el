@@ -57,14 +57,17 @@
                  (buffer-list)))
 
 (defun gaff/no-pending-gac-commits (folder)
-  (or (->> gac--debounce-timers
-           (hash-table-values)
-           (mapcar (lambda (timer) (car (timer--args timer))))
-           (remove-if-not (lambda (buffer) (string-prefix-p folder (buffer-file-name buffer))))
-           (length)
-           (zerop))
-      (and (message "There are pending gac timers")
-           nil)))
+  (let ((bufs
+         (->> gac--debounce-timers
+              (hash-table-values)
+              (mapcar (lambda (timer) (car (timer--args timer))))
+              (remove-if-not (lambda (buffer) (string-prefix-p folder (buffer-file-name buffer)))))))
+    (or (zerop (length bufs))
+        (and (message "There are pending gac timers for: %s"
+                      (--> bufs
+                           (mapcar #'buffer-file-name it)
+                           (string-join it ", ")))
+             nil))))
 
 (defun gaff/no-modified-buffers (folder)
   (or (->> (gaff/get-open-buffers-in folder)

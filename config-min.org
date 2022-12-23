@@ -833,7 +833,10 @@
   (use-package olivetti
     :commands olivetti-mode
     :config
-    (setq-default olivetti-body-width 140))
+    (setq-default olivetti-body-width 140)
+    (add-hook 'prog-mode-hook 'olivetti-mode)
+    (add-hook 'org-mode-hook 'olivetti-mode)
+    (add-hook 'org-agenda-mode-hook 'olivetti-mode))
 #+end_src
 ** w3m
 #+begin_src emacs-lisp

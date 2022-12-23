@@ -167,8 +167,8 @@
       (unless (org-before-first-heading-p)
 	    (run-hook-with-args 'org-cycle-hook 'folded))))))
 
-(advice-add #'org-cycle-internal-local
-            :override
-            #'my/org-cycle-internal-local)
+;; (advice-add #'org-cycle-internal-local
+;;             :override
+;;             #'my/org-cycle-internal-local)
 
 (provide 'org-hide-property-drawers)

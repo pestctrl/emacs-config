@@ -82,6 +82,15 @@
       (add-to-list 'exec-path
                    "/db/sds/packagse2/ccls-master")
       (setq ccls-executable "/db/sds/packages2/ccls-master/ccls")))
+
+  (use-package tree-sitter)
+  (use-package tree-sitter-langs)
+
+  ;; (when (and (boundp 'treesit-available-p)
+  ;;            (treesit-available-p))
+  ;;   (require 'treesit)
+  ;;   (when (treesit-ready-p 'cpp)
+  ;;     (require 'c-ts-mode)))
 #+end_src
 * Projectile
 #+begin_src emacs-lisp

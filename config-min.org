@@ -419,6 +419,9 @@
   (use-package rainbow-delimiters)
   (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
 
+  ;; Which function
+  (add-hook 'prog-mode-hook #'which-function-mode)
+
   ;; Macroexpander
   (use-package macrostep)
 

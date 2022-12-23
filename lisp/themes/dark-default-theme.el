@@ -88,7 +88,9 @@
    
    '(tab-bar ((t :foreground "#70FF00" :background "dark slate gray")))
    '(tab-bar-tab ((t :background "gray6")))
-   '(tab-bar-tab-inactive ((t :background "dark slate gray"))))
+   '(tab-bar-tab-inactive ((t :background "dark slate gray")))
+
+   '(which-func ((t :foreground "cyan"))))
   )
 
 ;;###autoload

@@ -62,8 +62,12 @@
   (with-current-buffer buffer
     (save-excursion
       (beginning-of-buffer)
-      (prog1 (re-search-forward (rx (and "#include \"" (group (+ (not space))) "\"")) nil t)
-        (message "Couldn't find %s header file" (match-string 1))))))
+      (let ((r
+             (rx (and "#include "
+                      (or "\"" "<") (group (+ (not space))) (or "\"" ">")))))
+        (when-let ((res (re-search-forward r nil t)))
+          (message "Couldn't find %s header file" (match-string 1))
+          res)))))
 
 (defun ll/add-include-file ()
   (interactive)

@@ -420,7 +420,7 @@
   (add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
 
   ;; Which function
-  (add-hook 'prog-mode-hook #'which-function-mode)
+  (which-function-mode 1)
 
   ;; Macroexpander
   (use-package macrostep)

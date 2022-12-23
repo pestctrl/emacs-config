@@ -30,9 +30,10 @@
 
 (defvar llvm-core-count 8)
 
-(defun lls/ninja-build-tools (build-dir tools-list)
-  (format "ninja -C %s -j %d %s"
+(defun lls/ninja-build-tools (build-dir tools-list &optional verbose)
+  (format "ninja -C %s -j %d %s %s"
           build-dir llvm-core-count
+          (if verbose "-v" "")
           (string-join tools-list " ")))
 
 ;; =============================== Init ==============================

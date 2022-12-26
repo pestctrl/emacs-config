@@ -757,3 +757,16 @@
                     (window-parent (selected-window)))
                   nil 'left nil))
 #+end_src
+* Tramp configuration
+This is sort of implicit in the code, but I
+#+begin_src emacs-lisp
+  ;; This is sort the default in tramp, but I wanted to keep this here
+  ;; as a reminder that THIS is the way to communicate to a shell that
+  ;; we want a plain vanilla experience.
+
+  ;; The way to check this is in shell is as follows:
+  ;; if [[ "$TERM" != "dumb" ]]; then
+  ;;    # vterm configuration, etc.
+  ;; fi
+  (setq tramp-terminal-type "dumb")
+#+end_src

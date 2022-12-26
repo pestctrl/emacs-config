@@ -769,4 +769,9 @@ This is sort of implicit in the code, but I
   ;;    # vterm configuration, etc.
   ;; fi
   (setq tramp-terminal-type "dumb")
+
+  ;; To debug tramp, set the following variable (max value 11).
+
+  ;; (setq tramp-verbose 3)
+  ;; (setq tramp-verbose 9)
 #+end_src

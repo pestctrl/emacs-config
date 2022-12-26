@@ -719,6 +719,9 @@
              :map *root-map*
              ("c" . #'find-vterm))
       :config
+      (add-to-list 'vterm-tramp-shells
+                   '("ssh" "/bin/bash"))
+
       (setq ansi-color-names-vector
             ["black" "red3" "green3" "yellow3" "DodgerBlue2" "magenta3" "cyan3" "gray90"])
 

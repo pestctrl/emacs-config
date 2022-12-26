@@ -48,6 +48,20 @@
   (when (or (null my/current-logger-cache) (equal arg '(16)))
     (setq my/current-logger-cache
           (org-roam-node-read nil my/org-roam-logger-filter-fun)))
+
+  ;; On NEW nodes, org-roam-node-read generates an empty struct with
+  ;; only a few things, one of which being an id. Do a sanity check to
+  ;; make sure that we re-init the current node with a node that has
+  ;; the file name. Only do this initialization if we have an ID for
+  ;; the org-roam.
+  ;;
+  ;; ASSUMPTION: org-roam-capture- initializes node with
+  ;; org-roam-node-id field.
+  (when (and (null (org-roam-node-file my/current-logger-cache))
+             (org-roam-node-id my/current-logger-cache))
+    (setq my/current-logger-cache
+          (org-roam-node-from-id (org-roam-node-id my/current-logger-cache))))
+
   (if (equal arg '(4))
       (-> my/current-logger-cache
           (org-roam-node-file)

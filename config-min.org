@@ -124,7 +124,29 @@
                 ("M-DEL" . vertico-directory-delete-word)
                 ("C-s" . vertico-next))
     ;; Tidy shadowed file names
-    :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
+    :hook (rfn-eshadow-update-overlay . vertico-directory-tidy)
+    :config
+    (defun my/vertico-directory-up (&optional n)
+      (interactive "p")
+      (when (and (> (point) (minibuffer-prompt-end))
+                 (eq (char-before) ?/)
+                 (not (eq (char-before (- (point) 1)) ?:))
+                 (eq 'file (vertico--metadata-get 'category)))
+        (let ((path (buffer-substring (minibuffer-prompt-end) (point))) found)
+          (when (string-match-p "\\`~[^/]*/\\'" path)
+            (delete-minibuffer-contents)
+            (insert (expand-file-name path)))
+          (dotimes (_ n found)
+            (save-excursion
+              (let ((end (point)))
+                (goto-char (1- end))
+                (when (search-backward "/" (minibuffer-prompt-end) t)
+                  (delete-region (1+ (point)) end)
+                  (setq found t))))))))
+
+    (advice-add #'vertico-directory-up
+                :override
+                #'my/vertico-directory-up))
 
   ;; Optionally use the `orderless' completion style. See
   ;; `+orderless-dispatch' in the Consult wiki for an advanced Orderless style

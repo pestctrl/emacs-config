@@ -130,7 +130,6 @@
       (interactive "p")
       (when (and (> (point) (minibuffer-prompt-end))
                  (eq (char-before) ?/)
-                 (not (eq (char-before (- (point) 1)) ?:))
                  (eq 'file (vertico--metadata-get 'category)))
         (let ((path (buffer-substring (minibuffer-prompt-end) (point))) found)
           (when (string-match-p "\\`~[^/]*/\\'" path)

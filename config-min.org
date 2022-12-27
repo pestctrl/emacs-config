@@ -140,7 +140,7 @@
             (save-excursion
               (let ((end (point)))
                 (goto-char (1- end))
-                (when (search-backward "/" (minibuffer-prompt-end) t)
+                (when (re-search-backward (rx (or "/" ":")) (minibuffer-prompt-end) t)
                   (delete-region (1+ (point)) end)
                   (setq found t))))))))
 

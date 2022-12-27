@@ -32,6 +32,11 @@
   (use-package undo-tree)
   (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo")))
   (global-undo-tree-mode t)
+  (add-to-list 'undo-tree-incompatible-major-modes
+               'vterm-mode)
+  (add-to-list 'undo-tree-incompatible-major-modes
+               'compilation-mode)
+  (setq undo-tree-limit 8000000)
 
   ;; Beacon-mode
   (use-package beacon)

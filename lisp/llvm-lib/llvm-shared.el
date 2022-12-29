@@ -131,6 +131,11 @@
     (concat "llc -o - "
             file " ")))
 
+(defvar lls/get-dis-command-fun
+  (lambda (file _action)
+    (concat "llvm-objdump --disassemble "
+            file " ")))
+
 ;; ========================= LLVM Build Dirs =========================
 
 (setq lls/target-init-fun

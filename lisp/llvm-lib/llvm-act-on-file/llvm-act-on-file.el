@@ -28,6 +28,7 @@
 (require 'act-on-test-file)
 (require 'act-on-c-file)
 (require 'act-on-ll-file)
+(require 'act-on-obj-file)
 
 (defun ll/act-on-file (file)
   (interactive (list (or (and (eq major-mode 'dired-mode)
@@ -40,6 +41,7 @@
   (pcase (file-name-extension file)
     ((and _ (guard (ll/is-test-file file)))
      (ll/act-on-test-file file))
+    ("o" (ll/act-on-obj-file file))
     ("c" (ll/act-on-c-file file))
     ("ll" (ll/act-on-ll-file file))
     (_ (message "Not sure what you'd like me to do with this file"))))

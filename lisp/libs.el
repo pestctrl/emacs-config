@@ -3,12 +3,13 @@
 (use-package mmt)
 (use-package f)
 (use-package s)
-(use-package dash)
 (use-package memoize)
 (use-package hydra)
 
 ;; I would like common lisp and the library of alexandria
-(require 'cl)
+(use-package dash)
+(use-package anaphora)
+(require 'cl-lib)
 (require 'subr-x)
 
 ;; This is helpful, for exwm-related loading

@@ -310,3 +310,9 @@
 
   (auto-insert-mode)
 #+end_src
+* Copilot?
+#+begin_src emacs-lisp
+  (quelpa '(copilot :fetcher "github" :repo "zerolfx/copilot.el" :files ("dist" "*.el")))
+  ;; Run copilot-login
+  (add-hook 'prog-mode-mook 'copilot-mode)
+#+end_src

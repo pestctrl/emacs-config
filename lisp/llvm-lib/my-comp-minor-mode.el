@@ -23,7 +23,7 @@
 ;;; Commentary:
 
 ;;; Code:
-
+(require 'anaphora)
 
 (define-minor-mode compilation-minor-mode
   "Toggle Compilation minor mode.
@@ -37,13 +37,10 @@ commands of Compilation major mode are available.  See
     (compilation--unsetup)))
 
 (defun my/enable-comp-keys-if-separate-mode (orig &rest args)
-  (let ((buf (apply orig args)))
+  (aprog1 (apply orig args)
     (when (cadr args)
-      (with-current-buffer buf
-        (compilation-minor-mode)))
-    buf))
-
-(defvar compilation-process-sentinel)
+      (with-current-buffer it
+        (compilation-minor-mode)))))
 
 (advice-add #'compilation-start
             :around

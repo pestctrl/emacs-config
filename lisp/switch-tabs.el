@@ -23,7 +23,7 @@
 ;;; Commentary:
 
 ;;; Code:
-(require 'cl)
+(require 'cl-lib)
 
 (setq tab-bar-show nil
       tab-bar-close-tab-select 'recent
@@ -114,7 +114,7 @@
   (let ((wc (current-window-configuration)))
     (tab-bar-new-tab)
     (tab-bar-rename-tab (format "*scratch-%d*" my/scratch-tab-number))
-    (incf my/scratch-tab-number)
+    (cl-incf my/scratch-tab-number)
     (set-window-configuration wc)))
 
 (defun tab-bar-jump ()

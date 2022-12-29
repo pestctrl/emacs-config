@@ -30,7 +30,9 @@
 (require 'act-on-ll-file)
 
 (defun ll/act-on-file (file)
-  (interactive (list (or (buffer-file-name (current-buffer))
+  (interactive (list (or (and (eq major-mode 'dired-mode)
+                              (dired-get-filename nil 'NO-ERROR))
+                         (buffer-file-name (current-buffer))
                          (read-file-name "File? "))))
   (when (null file)
     (setq file (make-temp-file nil nil ".ll"))

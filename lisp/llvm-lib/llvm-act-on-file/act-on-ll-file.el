@@ -22,7 +22,9 @@
 
 ;;; Commentary:
 
-;;; Code:(require 'action-map-lib)
+;;; Code:
+(require 'llvm-shared)
+(require 'action-map-lib)
 
 (defvar ll/ll-file-action-map
   '((assembly     :key ?a  :major-mode asm-mode  :buffer-string "assembly"  :description "[a]ssembly")

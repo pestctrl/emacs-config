@@ -90,7 +90,8 @@
   ;;            (treesit-available-p))
   ;;   (require 'treesit)
   ;;   (when (treesit-ready-p 'cpp)
-  ;;     (require 'c-ts-mode)))
+  ;;     (require 'c-ts-mode)
+  ;;     (push '(c++-mode . c++-ts-mode) major-mode-remap-alist)))
 #+end_src
 * Projectile
 #+begin_src emacs-lisp

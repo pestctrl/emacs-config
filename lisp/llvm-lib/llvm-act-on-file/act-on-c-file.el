@@ -30,7 +30,7 @@
 (defvar ll/c-file-action-map
   '((debug        :key ?d  :major-mode llvm-mode :buffer-string "debug"              :description "[d]ebug pass"             :compiler-action assemble)
     (assembly     :key ?a  :major-mode asm-mode  :buffer-string "assembly"           :description "[a]ssembly"               :compiler-action assemble)
-    (output-dis   :key ?D  :major-mode asm-mode  :buffer-string "dissasembly"        :description "output-[D]issemble"       :compiler-action nil)
+    (output-dis   :key ?A  :major-mode asm-mode  :buffer-string "dissasembly"        :description "output-dis[A]ssemble"       :compiler-action nil)
     (preprocess   :key ?P  :major-mode c-mode    :buffer-string "preprocess"         :description "[l]lvm-ir"                :compiler-action preprocess)
     (LLVMIR       :key ?l  :major-mode llvm-mode :buffer-string "llvm-ir"            :description "[P]reprocess"             :compiler-action llvm-ir)
     (before-after :key ?p  :major-mode llvm-mode :buffer-string "print-before-after" :description "[p]rint before/after"     :compiler-action assemble)

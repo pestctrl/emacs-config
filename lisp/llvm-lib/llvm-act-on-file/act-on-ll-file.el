@@ -32,7 +32,7 @@
     (stop-before  :key ?S  :major-mode llvm-mode :buffer-string "before-%s" :description "[S]top-before")))
 
 (defun ll/build-llc-command (file _action)
-  (funcall lls/get-clang-command-fun file action))
+  (funcall lls/get-llc-command-fun file action))
 
 (defun ll/act-on-ll-file (file)
   (let* ((action (aml/read-action-map ll/ll-file-action-map))

@@ -31,6 +31,7 @@
 (require 'ti-lib)
 (require 'ti-tools-backup)
 (require 'argo-fastsim-dump-mode)
+(require 'machine-scheduler-debug-mode)
 (require 'frame-restore)
 
 (add-to-list 'auto-mode-alist '("\\.map$" . ti-linker-map-mode))
@@ -85,6 +86,9 @@
 
 (add-to-list 'llvm-font-lock-keywords
              `(,(rx line-start (optional "# ") "***" (+ nonl) "***" (optional ":") "\n") . 'llvm-separator-face))
+
+(add-to-list 'llvm-font-lock-keywords
+             `(,(rx " = " (group (+ (or "_" alphanumeric)))) (1 font-lock-keyword-face)))
 
 (add-to-list 'auto-mode-alist
              '("\\.dsls$" . json-mode))

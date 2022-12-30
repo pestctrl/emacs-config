@@ -30,7 +30,7 @@
 (defvar ll/obj-file-action-map
   '((disassemble     :key ?d  :major-mode asm-mode  :buffer-string "asm"  :description "[d]isassemble")))
 
-(defun ll/build-obj-command (file _action)
+(defun ll/build-obj-command (file action)
   (funcall lls/get-dis-command-fun file action))
 
 (defun ll/act-on-obj-file (file)

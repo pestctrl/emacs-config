@@ -103,7 +103,10 @@
 
 (defun lls/prompt-tool (tool-regexp &optional directories)
   (my/completing-read tool-regexp
-                      (lls/get-tool tool-regexp directories)))
+                      (lls/get-tool tool-regexp
+                                    (or (and (eq 'string (type-of directories))
+                                             (list directories))
+                                        directories))))
 
 (defun lls/get-tool (tool-regexp &optional directories)
   (cl-mapcan #'(lambda (dir)

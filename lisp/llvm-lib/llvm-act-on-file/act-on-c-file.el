@@ -112,6 +112,7 @@
                     (aml/get-map-prop ll/c-file-action-map action
                                       :buffer-string))))
          (with-current-buffer it
+           ;; TODO: This doesn't ACTUALLY survive a call to #'recompile
            (make-variable-buffer-local 'compilation-finish-functions)
            (add-to-list 'compilation-finish-functions
                         #'ll/c-file-sentinel)))))

@@ -106,9 +106,8 @@
       (let ((new-dir (read-directory-name "directory? ")))
         (with-current-buffer buffer
           (setq compilation-arguments
-                (cons (concat (car compilation-arguments)
-                              (format " -I%s "
-                                      new-dir))
+                (cons (string-replace "-I" (format "-I%s -I" new-dir)
+                                      (car compilation-arguments))
                       (cdr compilation-arguments)))
           (call-interactively #'recompile))))))
 

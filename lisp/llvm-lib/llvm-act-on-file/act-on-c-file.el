@@ -30,6 +30,7 @@
 (defvar ll/c-file-action-map
   '((debug        :key ?d  :major-mode llvm-mode :buffer-string "debug"              :description "[d]ebug pass"             :compiler-action assemble)
     (assembly     :key ?a  :major-mode asm-mode  :buffer-string "assembly"           :description "[a]ssembly"               :compiler-action assemble)
+    (output-dis   :key ?D  :major-mode asm-mode  :buffer-string "dissasembly"        :description "output-[D]issemble"       :compiler-action nil)
     (preprocess   :key ?P  :major-mode c-mode    :buffer-string "preprocess"         :description "[l]lvm-ir"                :compiler-action preprocess)
     (LLVMIR       :key ?l  :major-mode llvm-mode :buffer-string "llvm-ir"            :description "[P]reprocess"             :compiler-action llvm-ir)
     (before-after :key ?p  :major-mode llvm-mode :buffer-string "print-before-after" :description "[p]rint before/after"     :compiler-action assemble)
@@ -40,23 +41,34 @@
   ;; further up
   (lls/ninja-build-tools dir '("clang")))
 
+(defun ll/clang-output-disassemble-command (file)
+  (let ((compiler (lls/prompt-tool "clang$" (lls/get-llvm-bin-dir)))
+        (tmp-file (make-temp-file (file-name-sans-extension (file-name-nondirectory file)))))
+    (string-join
+     (list (funcall lls/get-clang-command-fun compiler file 'compile
+                    :output tmp-file)
+           (funcall lls/get-dis-command-fun tmp-file nil))
+     " && ")))
+
 (defun ll/build-clang-command (file action)
-  (let ((compiler-action (aml/get-map-prop ll/c-file-action-map action :compiler-action))
-        (compiler (lls/prompt-tool "clang$")))
-    (concat ;; (ll/ensure-clang-binary-built
-            ;;  (file-name-directory
-            ;;   (directory-file-name
-            ;;    (file-name-directory compiler))))
-            ;; " && "
-            (string-join
-             (list (funcall lls/get-clang-command-fun compiler file compiler-action)
-                   (pcase action
-                     ('debug (format "-mllvm -debug-only=%s" (read-string "Which pass? ")))
-                     ('before-after (let ((pass (read-string "Which pass? ")))
-                                      (format "-mllvm -print-before=%s -mllvm -print-after=%s" pass pass)))
-                     ('changed "-mllvm -print-before-all"))
-                   " ")
-             " "))))
+  (if (eq action 'output-dis)
+      (ll/clang-output-disassemble-command file)
+    (let ((compiler-action (aml/get-map-prop ll/c-file-action-map action :compiler-action))
+          (compiler (lls/prompt-tool "clang$")))
+      (concat ;; (ll/ensure-clang-binary-built
+              ;;  (file-name-directory
+              ;;   (directory-file-name
+              ;;    (file-name-directory compiler))))
+              ;; " && "
+              (string-join
+               (list (funcall lls/get-clang-command-fun compiler file compiler-action)
+                     (pcase action
+                       ('debug (format "-mllvm -debug-only=%s" (read-string "Which pass? ")))
+                       ('before-after (let ((pass (read-string "Which pass? ")))
+                                        (format "-mllvm -print-before=%s -mllvm -print-after=%s" pass pass)))
+                       ('changed "-mllvm -print-before-all"))
+                     " ")
+               " ")))))
 
 (defun ll/buffer-has-include-error (buffer)
   (with-current-buffer buffer
@@ -112,6 +124,10 @@
                     (aml/get-map-prop ll/c-file-action-map action
                                       :buffer-string))))
          (with-current-buffer it
+           (when (eq 'output-dis action)
+             (make-variable-buffer-local 'compilation-error-regexp-alist)
+             (setq compilation-error-regexp-alist nil))
+
            ;; TODO: This doesn't ACTUALLY survive a call to #'recompile
            (make-variable-buffer-local 'compilation-finish-functions)
            (add-to-list 'compilation-finish-functions

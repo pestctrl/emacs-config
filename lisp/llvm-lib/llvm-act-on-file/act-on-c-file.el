@@ -127,7 +127,6 @@
              (make-variable-buffer-local 'compilation-error-regexp-alist)
              (setq compilation-error-regexp-alist nil))
 
-           ;; TODO: This doesn't ACTUALLY survive a call to #'recompile
            (make-variable-buffer-local 'compilation-finish-functions)
            (add-to-list 'compilation-finish-functions
                         #'ll/c-file-sentinel)))))

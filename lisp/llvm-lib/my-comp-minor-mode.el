@@ -37,10 +37,16 @@ commands of Compilation major mode are available.  See
     (compilation--unsetup)))
 
 (defun my/enable-comp-keys-if-separate-mode (orig &rest args)
-  (aprog1 (apply orig args)
-    (when (cadr args)
-      (with-current-buffer it
-        (compilation-minor-mode)))))
+  (let ((hook compilation-finish-functions))
+    (aprog1 (apply orig args)
+      (when (cadr args)
+        (with-current-buffer it
+          (compilation-minor-mode))
+
+        (setq-local compilation-finish-functions
+                    (seq-uniq
+                     (append compilation-finish-functions
+                             hook)))))))
 
 (advice-add #'compilation-start
             :around

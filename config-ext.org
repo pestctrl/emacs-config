@@ -2,6 +2,14 @@
 
 * buffer-window management
 #+begin_src emacs-lisp
+  (defun switch-to-buffer-force-same-window (buffer)
+    (interactive
+     (list (read-buffer-to-switch "Switch to buffer: ")))
+    (let ((switch-to-buffer-obey-display-actions nil))
+      (switch-to-buffer buffer nil t)))
+
+  (global-set-key (kbd "C-x B") #'switch-to-buffer-force-same-window)
+
   (setq switch-to-buffer-obey-display-actions t)
 
   (add-to-list 'display-buffer-alist

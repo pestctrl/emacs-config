@@ -35,7 +35,7 @@
                       (list (funcall
                              lls/get-clang-command-fun
                              clang file 'compile
-                             (make-temp-file nil nil ".o"))
+                             :output (make-temp-file nil nil ".o"))
                             "-v")
                       " ")))
         (shell-command command buffer))

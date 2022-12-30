@@ -113,18 +113,19 @@
                  (lls/get-llvm-bin-dirs))))
 
 (defvar lls/get-clang-command-fun
-  (lambda (compiler file action &optional output rest)
-    (string-join (list compiler
-                       (string-join rest " ")
-                       file
-                       (pcase action
-                         ('compile "-c")
-                         ('assemble "-S")
-                         ('preprocess "-E")
-                         ('llvm-ir "-S -emit-llvm"))
-                       (format "-o %s"
-                               (or output "-")))
-                 " ")))
+  (cl-function
+   (lambda (compiler file action &key output rest)
+     (string-join (list compiler
+                        (string-join rest " ")
+                        file
+                        (pcase action
+                          ('compile "-c")
+                          ('assemble "-S")
+                          ('preprocess "-E")
+                          ('llvm-ir "-S -emit-llvm"))
+                        (format "-o %s"
+                                (or output "-")))
+                  " "))))
 
 (defvar lls/get-llc-command-fun
   (lambda (file _action)

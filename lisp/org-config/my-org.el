@@ -38,6 +38,8 @@
 (require 'my-org-capture-templates)
 (require 'org-other-additions)
 
+(require 'my-org-capture-shouldnt-mess-windows)
+
 (require 'self-chat-mode)
 
 (provide 'my-org)

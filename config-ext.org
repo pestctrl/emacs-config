@@ -73,6 +73,22 @@
                  (slot . 6)
                  (window-width . 80)))
 
+  (defun my/is-org-capture-buffer (buffer &optional _rest)
+    (with-current-buffer buffer
+      (and (eq major-mode 'org-mode)
+           org-capture-mode)))
+
+  (add-to-list 'display-buffer-alist
+               `(my/is-org-capture-buffer
+                 display-buffer-in-side-window
+                 (side . right)
+                 (select . t)
+                 (slot . 7)
+                 (window-width . 80)
+                 (window-parameters
+                  . ((no-delete-other-windows . t)
+                     (dedicated . t)))))
+
   ;; (defun my/is-org-capture-buffer (buffer &optional _rest)
   ;;   (with-current-buffer buffer
   ;;     org-capture-mode))

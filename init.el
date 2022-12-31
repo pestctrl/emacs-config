@@ -93,11 +93,16 @@
   (when (and (not my-ec/at-ti) my-ec/load-org-config)
     (org-babel-load-file
      (expand-file-name "config-org.org"
+                       user-emacs-directory))
+
+    (org-babel-load-file
+     (expand-file-name "helpers.org"
                        user-emacs-directory)))
 
   (org-babel-load-file
    (expand-file-name "my-redefs.org"
                      user-emacs-directory))
+
   (use-exwm
    :config
    (org-babel-load-file

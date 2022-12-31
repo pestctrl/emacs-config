@@ -1,0 +1,46 @@
+
+* Separate tasks
+#+begin_src emacs-lisp
+  (use-package doct)
+  (require 'org)
+
+  (defvar my/custom-task-templates
+    (doct `(("convert [p]aycheck"
+             :keys "p"
+             :file ,(my/agenda-file "puppet.org")
+             :template-file ,(my/org-file "templates/puppet/paycheck.org")))))
+
+  (defun my/run-custom-tasks ()
+    (interactive)
+    (let ((org-capture-templates my/custom-task-templates))
+      (call-interactively #'org-capture)))
+
+  (when my/puppet-p
+    (global-set-key (kbd "<f1>") #'my/run-custom-tasks))
+#+end_src
+
+* Add Ledger
+#+begin_src emacs-lisp
+  (defun paycheck->ledger (file)
+    (interactive
+     (list (read-file-name "Paycheck file? ")))
+    (unless (string= "ledger.ledger"
+                     (file-name-nondirectory
+                      (buffer-file-name (current-buffer))))
+      (user-error "You're in the wrong file..."))
+
+    (unless (string= "pdf" (file-name-extension file))
+      (user-error "Oops, that's not a pdf file..."))
+
+    (let* ((buf (get-buffer-create "*output*"))
+           (res
+            (save-window-excursion
+              (shell-command (format "ledger-convert.el '%s'" file)
+                             buf nil))))
+      (unless (eq res 0)
+        (user-error "Something went wrong with that file... Maybe ask Lambda?"))
+
+      (let ((str (with-current-buffer buf (buffer-string))))
+        (goto-char (point-max))
+        (insert "\n" str))))
+#+end_src

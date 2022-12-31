@@ -34,7 +34,9 @@
 (require 'my-org-agenda-files)
 (setq gaff/watch-directories (list (list (file-name-as-directory my/org-folder)
                                          "origin/desktop" "origin/gaming-laptop" "origin/puppet" "origin/mobile"
-                                         "origin/laptop")))
+                                         "origin/laptop")
+                                   (list (file-name-as-directory (my/plaintext-file "ledger-finance"))
+                                         "origin/gaming-laptop" "origin/puppet")))
 
 (run-at-time nil 300 #'gaff/trigger)
 

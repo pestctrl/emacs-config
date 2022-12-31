@@ -19,6 +19,17 @@
     (global-set-key (kbd "<f1>") #'my/run-custom-tasks))
 #+end_src
 
+* Some Extra Bindings
+#+begin_src emacs-lisp
+  (when my/puppet-p
+    (global-set-key (kbd "<f2>")
+                    #'org-roam-node-find)
+    (global-set-key (kbd "<f3>")
+                    #'(lambda ()
+                        (interactive)
+                        (find-file "~/plaintext/org/random/things_puppet_should_remember.org"))))
+#+end_src
+
 * Add Ledger
 #+begin_src emacs-lisp
   (defun paycheck->ledger (file)

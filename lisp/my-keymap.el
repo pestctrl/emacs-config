@@ -65,7 +65,8 @@
                                        (org-time-stamp-inactive t))))
 
 (define-prefix-command '*lazy-map*)
-(exwm-global-set-key (kbd "<f1>") '*lazy-map*)
+(unless my/puppet-p
+  (exwm-global-set-key (kbd "<f1>") '*lazy-map*))
 
 (define-key *lazy-map* (kbd "1") #'org-capture)
 (define-key *lazy-map* (kbd "2") #'org-agenda)

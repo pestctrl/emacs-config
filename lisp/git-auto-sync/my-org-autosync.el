@@ -70,7 +70,7 @@
 
 (when my/puppet-p
   (add-to-list 'emacs-startup-hook
-               #'(lambda (x)
+               #'(lambda ()
                    (run-at-time 30 300 #'gaff/trigger)))
 
   (add-hook 'emacs-startup-hook

@@ -73,6 +73,8 @@
                  (slot . 6)
                  (window-width . 80)))
 
+  (require 'org-capture)
+
   (defun my/is-org-capture-buffer (buffer &optional _rest)
     (with-current-buffer buffer
       (and (eq major-mode 'org-mode)

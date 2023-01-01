@@ -38,7 +38,10 @@
                                    (list (file-name-as-directory (my/plaintext-file "ledger-finance"))
                                          "origin/gaming-laptop" "origin/puppet")))
 
-(run-at-time nil 300 #'gaff/trigger)
+;; TODO: apparently this messes with exwm initialization somehow. Not
+;; sure how. Even running 10 seconds after messes with exwm init.
+
+;;(run-at-time nil 300 #'gaff/trigger)
 
 (setq gac-automatically-add-new-files-p nil)
 (setq-default gac-debounce-interval 120)
@@ -67,7 +70,8 @@
 
 (when my/puppet-p
   (add-to-list 'emacs-startup-hook
-               #'gaff/trigger)
+               #'(lambda (x)
+                   (run-at-time 30 300 #'gaff/trigger)))
 
   (add-hook 'emacs-startup-hook
             #'gac-run-ssh-add)

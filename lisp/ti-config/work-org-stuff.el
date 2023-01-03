@@ -39,6 +39,9 @@
 (require 'org-scan-tags-indent)
 (require 'work-org-autosync)
 
+;; Useful org-capture window stuff
+(require 'my-org-capture-shouldnt-mess-windows)
+
 (require 'ob-shell)
 
 (defvar org-ql-indent-levels nil)

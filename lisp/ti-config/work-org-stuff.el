@@ -149,7 +149,10 @@
                                    (org-matcher-time "<now>")))
                   ((org-ql-block-header "Delayed projects")))
     (org-ql-block '(and (tags ,tag)
-                        (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
+                        ;; TODO: What if "EMPTY" project was delayed?
+                        ;; Different subclasses of invisible? Maybe should be
+                        ;; core part of API.
+                        (todo "TODO" "ONE" "META" "META1" "SEQ") ;; "EMPTY"
                         (not (property "DELAYED"))
                         (let* ((ts (opr/get-type-and-state))
                                (type (car ts))

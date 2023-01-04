@@ -24,7 +24,9 @@
 
 ;;; Code:
 
+(require 'act-on-c-file)
 (require 'llvm-shared)
+(require 'anaphora)
 
 (defun ll/get-cc1-command (file)
   (let* ((fname (file-name-nondirectory file))
@@ -38,7 +40,13 @@
                              :output (make-temp-file nil nil ".o"))
                             "-v")
                       " ")))
-        (shell-command command buffer))
+        (while
+            (progn
+              (shell-command command buffer)
+              (aprog1 (ll/buffer-has-include-error buffer)
+                (when it
+                  (setq command
+                        (ll/add-include-folder-to-command command)))))))
       (with-current-buffer (get-buffer buffer)
         (beginning-of-buffer)
         (re-search-forward (rx "\"" (literal clang) "\" "
@@ -48,9 +56,10 @@
 (defun ll/kill-gdb-command (file)
   (interactive
    (list
-    (--> (current-buffer)
-         (buffer-file-name)
-         (read-file-name "Which file? " nil))))
+    (or (let ((fname (buffer-file-name (current-buffer))))
+          (and (string= "c" (file-name-extension fname))
+               fname))
+        (read-file-name "Which file? "))))
   (let ((fname (file-name-nondirectory file)))
     (kill-new
      (format "r %s"

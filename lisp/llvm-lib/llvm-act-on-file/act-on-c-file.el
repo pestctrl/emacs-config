@@ -26,6 +26,7 @@
 (require 'llvm-ir-mode)
 (require 'llvm-shared)
 (require 'action-map-lib)
+(require 'anaphora)
 
 (defvar ll/c-file-action-map
   '((debug        :key ?d  :major-mode llvm-mode :buffer-string "debug"              :description "[d]ebug pass"             :compiler-action assemble)
@@ -75,29 +76,15 @@
     (save-excursion
       (beginning-of-buffer)
       (let ((r
-             (rx (and "#include "
-                      (or "\"" "<") (group (+ (not space))) (or "\"" ">")))))
-        (when-let ((res (re-search-forward r nil t)))
-          (message "Couldn't find %s header file" (match-string 1))
-          res)))))
+             (rx (and "fatal error: '" (group (+ (not space))) "' file not found"))))
+        (aprog1 (re-search-forward r nil t)
+          (message "Couldn't find '%s' header file" (match-string 1)))))))
 
-(defun ll/add-include-file ()
-  (interactive)
-  (when (not (or compilation-minor-mode
-                 (eq major-mode
-                     'compilation-mode)))
-    (user-error "Wrong buffer idiot"))
-
-  (when (not (ll/buffer-has-include-error (current-buffer)))
-    (user-error "The problem is not an include file..."))
-
-  (let ((new-dir (read-directory-name "directory? ")))
-    (setq compilation-arguments
-          (cons (concat (car compilation-arguments)
-                        (format " -I%s "
-                                new-dir))
-                (cdr compilation-arguments)))
-    (call-interactively #'recompile)))
+(defun ll/add-include-folder-to-command (command)
+  (let ((directory (read-directory-name "directory? ")))
+    (string-replace "-I" (format "-I%s -I"
+                                 directory)
+                    command)))
 
 (defun ll/c-file-sentinel (buffer msg)
   (when (and (string-match-p "exited abnormally with code 1" msg)
@@ -106,8 +93,8 @@
       (let ((new-dir (read-directory-name "directory? ")))
         (with-current-buffer buffer
           (setq compilation-arguments
-                (cons (string-replace "-I" (format "-I%s -I" new-dir)
-                                      (car compilation-arguments))
+                (cons (ll/add-include-folder-to-command
+                       (car compilation-arguments))
                       (cdr compilation-arguments)))
           (call-interactively #'recompile))))))
 

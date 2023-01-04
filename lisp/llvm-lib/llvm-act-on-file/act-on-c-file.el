@@ -31,11 +31,11 @@
 (defvar ll/c-file-action-map
   '((debug        :key ?d  :major-mode llvm-mode :buffer-string "debug"              :description "[d]ebug pass"             :compiler-action assemble)
     (assembly     :key ?a  :major-mode asm-mode  :buffer-string "assembly"           :description "[a]ssembly"               :compiler-action assemble)
-    (output-dis   :key ?A  :major-mode asm-mode  :buffer-string "dissasembly"        :description "output-dis[A]ssemble"       :compiler-action nil)
-    (preprocess   :key ?P  :major-mode c-mode    :buffer-string "preprocess"         :description "[l]lvm-ir"                :compiler-action preprocess)
-    (LLVMIR       :key ?l  :major-mode llvm-mode :buffer-string "llvm-ir"            :description "[P]reprocess"             :compiler-action llvm-ir)
+    (output-dis   :key ?A  :major-mode asm-mode  :buffer-string "dissasembly"        :description "output-dis[A]ssemble"     :compiler-action nil)
+    (preprocess   :key ?e  :major-mode c-mode    :buffer-string "preprocess"         :description "pr[e]process"             :compiler-action preprocess)
+    (LLVMIR       :key ?l  :major-mode llvm-mode :buffer-string "llvm-ir"            :description "[l]lvm-ir"                :compiler-action llvm-ir)
     (before-after :key ?p  :major-mode llvm-mode :buffer-string "print-before-after" :description "[p]rint before/after"     :compiler-action assemble)
-    (changed      :key ?A  :major-mode llvm-mode :buffer-string "print-changed"      :description "print before/after [A]ll" :compiler-action assemble)))
+    (changed      :key ?P  :major-mode llvm-mode :buffer-string "print-changed"      :description "[P]rint before/after all" :compiler-action assemble)))
 
 (defun ll/ensure-clang-binary-built (dir)
   ;; TODO: assumed build-dir constant, should take as argument and prompt
@@ -90,13 +90,12 @@
   (when (and (string-match-p "exited abnormally with code 1" msg)
              (ll/buffer-has-include-error buffer))
     (when (y-or-n-p "Add another include directory? ")
-      (let ((new-dir (read-directory-name "directory? ")))
-        (with-current-buffer buffer
-          (setq compilation-arguments
-                (cons (ll/add-include-folder-to-command
-                       (car compilation-arguments))
-                      (cdr compilation-arguments)))
-          (call-interactively #'recompile))))))
+      (with-current-buffer buffer
+        (setq compilation-arguments
+              (cons (ll/add-include-folder-to-command
+                     (car compilation-arguments))
+                    (cdr compilation-arguments)))
+        (call-interactively #'recompile)))))
 
 (defun ll/act-on-c-file (file)
   (let* ((action (aml/read-action-map ll/c-file-action-map)))

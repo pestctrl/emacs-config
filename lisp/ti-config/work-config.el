@@ -88,7 +88,18 @@
              `(,(rx line-start (optional "# ") "***" (+ nonl) "***" (optional ":") "\n") . 'llvm-separator-face))
 
 (add-to-list 'llvm-font-lock-keywords
-             `(,(rx " = " (group (+ (or "_" alphanumeric)))) (1 font-lock-keyword-face)))
+             `(,(rx " = " (optional "nsw ") (group (+ (or "_" alphanumeric)))) (1 font-lock-keyword-face)))
+
+(add-to-list 'llvm-font-lock-keywords
+             `(,(rx "$" (+ alphanumeric)) . font-lock-variable-name-face))
+
+(add-to-list 'llvm-font-lock-keywords
+             `(,(rx (or "renamable" "implicit-def" "implicit")) . 'shadow))
+
+(add-to-list 'llvm-font-lock-keywords
+             `(,(rx "!" (+ digit)) . 'font-lock-variable-name-face))
+
+;; (pop llvm-font-lock-keywords)
 
 (add-to-list 'auto-mode-alist
              '("\\.dsls$" . json-mode))

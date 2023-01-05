@@ -36,12 +36,12 @@
      (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
                     "#+title: ${title}\n"
                     ("Journal" "%<%b %d, %Y>")))
-    ("s" "source location" entry "* %<%H:%M> %?\n%a"
+    ("s" "source location" entry "* %^{Short Description? }\n:PROPERTIES:\n:DATE: [%<%Y-%m-%d %H:%M>]\n:LOCATION: %a\n:END:\n\n%?"
      :unnarrowed t
      :target
      (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
                     "#+title: ${title}\n"
-                    ("Journal" "%<%b %d, %Y>")))))
+                    ("Reference")))))
 
 (defun my/org-roam-logger-capture-current (arg)
   (interactive "P")

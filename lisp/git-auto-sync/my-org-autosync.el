@@ -36,7 +36,7 @@
                                          "origin/desktop" "origin/gaming-laptop" "origin/puppet" "origin/mobile"
                                          "origin/laptop")
                                    (list (file-name-as-directory (my/plaintext-file "ledger-finance"))
-                                         "origin/gaming-laptop" "origin/puppet")))
+                                         "origin/gaming-laptop" "origin/puppet" "origin/desktop")))
 
 ;; TODO: apparently this messes with exwm initialization somehow. Not
 ;; sure how. Even running 10 seconds after messes with exwm init.

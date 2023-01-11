@@ -864,14 +864,16 @@
 #+END_SRC
 ** olivetti
 #+begin_src emacs-lisp
-  (use-package olivetti
-    :commands olivetti-mode
-    :hook ((prog-mode  . olivetti-mode)
-           (org-mode   . olivetti-mode)
-           (dired-mode . olivetti-mode)
-           (org-agenda . olivetti-mode))
-    :config
-    (setq-default olivetti-body-width 140))
+  (use-package olivetti)
+
+  (require 'olivetti)
+
+  (add-hook 'prog-mode-hook   'olivetti-mode)
+  (add-hook 'org-mode-hook    'olivetti-mode)
+  (add-hook 'dired-mode-hook  'olivetti-mode)
+  (add-hook 'org-agenda-hook  'olivetti-mode)
+
+  (setq-default olivetti-body-width 140)
 #+end_src
 ** w3m
 #+begin_src emacs-lisp

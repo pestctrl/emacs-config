@@ -104,7 +104,7 @@
              `(,(rx "$" (+ alphanumeric)) . font-lock-variable-name-face))
 
 (add-to-list 'llvm-font-lock-keywords
-             `(,(rx (or "renamable" "implicit-def" "implicit")) . 'shadow))
+             `(,(rx (or "renamable" "implicit-def" "implicit" "debug-location")) . 'shadow))
 
 (add-to-list 'llvm-font-lock-keywords
              `(,(rx "!" (+ digit)) . 'font-lock-variable-name-face))

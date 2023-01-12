@@ -28,42 +28,48 @@
 (require 'llvm-shared)
 (require 'anaphora)
 
-(defun ll/get-cc1-command (file)
-  (let* ((fname (file-name-nondirectory file))
-         (buffer (format "*cc1-%s*" fname))
-         (clang (lls/prompt-tool "clang$")))
-    (save-window-excursion
-      (let ((command (string-join
-                      (list (funcall
-                             lls/get-clang-command-fun
-                             clang file 'compile
-                             :output (make-temp-file nil nil ".o"))
-                            "-v")
-                      " ")))
-        (while
-            (progn
-              (shell-command command buffer)
-              (aprog1 (ll/buffer-has-include-error buffer)
-                (when it
-                  (setq command
-                        (ll/add-include-folder-to-command command)))))))
-      (with-current-buffer (get-buffer buffer)
-        (beginning-of-buffer)
-        (re-search-forward (rx "\"" (literal clang) "\" "
-                               (group "-cc1" (+ nonl))))
-        (match-string 1)))))
+(defun ll/get-cc1-command (clang command)
+  (let ((buffer (get-buffer-create "*cc1*")))
+    (while
+        (progn
+          (shell-command command buffer)
+          (aprog1 (ll/buffer-has-include-error buffer)
+            (when it
+              (setq command
+                    (ll/add-include-folder-to-command command))))))
+    (with-current-buffer (get-buffer buffer)
+      (beginning-of-buffer)
+      (re-search-forward (rx "\"" (literal clang) "\" "
+                             (group "-cc1" (+ nonl))))
+      (match-string 1))))
 
-(defun ll/kill-gdb-command (file)
-  (interactive
-   (list
-    (or (let ((fname (buffer-file-name (current-buffer))))
-          (and (string= "c" (file-name-extension fname))
-               fname))
-        (read-file-name "Which file? "))))
-  (let ((fname (file-name-nondirectory file)))
+(defun ll/get-clang-command-for-file (clang file)
+  (string-join
+   (list (funcall
+          lls/get-clang-command-fun
+          clang file 'compile
+          :output (make-temp-file nil nil ".o"))
+         "-v")
+   " "))
+
+(defun ll/kill-gdb-command ()
+  (interactive)
+  (let* ((buf (current-buffer))
+         (fname (buffer-file-name buf))
+         (clang (lls/prompt-tool "clang$"))
+         (command
+          (with-current-buffer buf
+            (cond ((or compilation-minor-mode
+                       (eq major-mode 'compilation-mode))
+                   (concat (car compilation-arguments) " -v"))
+                  ((string= "c" (file-name-extension fname))
+                   (ll/get-clang-command-for-file clang fname))
+                  (t
+                   (ll/get-clang-command-for-file clang
+                    (read-file-name "File? ")))))))
     (kill-new
      (format "r %s"
-             (ll/get-cc1-command file)))))
+             (ll/get-cc1-command clang command)))))
 
 (provide 'llvm-gdb-command)
 ;;; llvm-gdb-command.el ends here

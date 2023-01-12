@@ -32,9 +32,11 @@ When Compilation minor mode is enabled, all the error-parsing
 commands of Compilation major mode are available.  See
 `compilation-mode'."
   :lighter " Compilation" :keymap compilation-mode-map
-  (if compilation-minor-mode
-      (compilation-setup t)
-    (compilation--unsetup)))
+  (if (not compilation-minor-mode)
+      (compilation--unsetup)
+    (compilation-setup t)
+    (font-lock-remove-keywords nil (compilation-mode-font-lock-keywords))
+    (font-lock-flush)))
 
 (defun my/enable-comp-keys-if-separate-mode (orig &rest args)
   (let ((hook compilation-finish-functions))

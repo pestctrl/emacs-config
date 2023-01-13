@@ -38,17 +38,27 @@ commands of Compilation major mode are available.  See
     (font-lock-remove-keywords nil (compilation-mode-font-lock-keywords))
     (font-lock-flush)))
 
-(defun my/enable-comp-keys-if-separate-mode (orig &rest args)
-  (let ((hook compilation-finish-functions))
-    (aprog1 (apply orig args)
-      (when (cadr args)
-        (with-current-buffer it
-          (compilation-minor-mode))
+(defvar-local compilation-finish-local-transient nil)
+(defvar-local compilation-finish-local-sticky nil)
 
-        (setq-local compilation-finish-functions
-                    (seq-uniq
-                     (append compilation-finish-functions
-                             hook)))))))
+(add-hook 'compilation-finish-functions
+          'compilation-run-local-hooks)
+
+(defun compilation-run-local-hooks (buf msg)
+  (with-current-buffer buf
+    (run-hook-with-args 'compilation-finish-local-transient buf msg)
+    (setq compilation-finish-local-transient nil)
+    (run-hook-with-args 'compilation-finish-local-sticky buf msg)))
+
+(defun my/enable-comp-keys-if-separate-mode (orig &rest args)
+  (let ((ht compilation-finish-local-transient)
+        (hs compilation-finish-local-sticky))
+    (aprog1 (apply orig args)
+      (with-current-buffer it
+        (when (cadr args)
+          (compilation-minor-mode)
+          (setq compilation-finish-local-sticky hs)
+          (setq compilation-finish-local-transient ht))))))
 
 (advice-add #'compilation-start
             :around

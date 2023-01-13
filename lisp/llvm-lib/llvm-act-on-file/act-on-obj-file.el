@@ -37,21 +37,16 @@
   (let* ((action (aml/read-action-map ll/obj-file-action-map))
          (stop (when (member action '(stop-after stop-before))
                  (read-string "Which pass? "))))
-    (aprog1
-        (compilation-start
-         (ll/build-obj-command file action)
-         (aml/get-map-prop ll/obj-file-action-map action :major-mode)
-         `(lambda (_)
-            ,(format "*%s-%s*"
-                     (file-name-nondirectory file)
-                     (let ((str (aml/get-map-prop ll/obj-file-action-map action :buffer-string)))
-                       (if (not (member action '(stop-before stop-after)))
-                           str
-                         (format str stop))))))
-      (with-current-buffer it
-        (make-variable-buffer-local 'compilation-error-regexp-alist)
-        (setq compilation-error-regexp-alist
-              nil)))))
+    (compilation-start
+     (ll/build-obj-command file action)
+     (aml/get-map-prop ll/obj-file-action-map action :major-mode)
+     `(lambda (_)
+        ,(format "*%s-%s*"
+                 (file-name-nondirectory file)
+                 (let ((str (aml/get-map-prop ll/obj-file-action-map action :buffer-string)))
+                   (if (not (member action '(stop-before stop-after)))
+                       str
+                     (format str stop))))))))
 
 (provide 'act-on-obj-file)
 ;;; act-on-obj-file.el ends here

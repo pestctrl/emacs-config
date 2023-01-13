@@ -109,13 +109,8 @@
                     (aml/get-map-prop ll/c-file-action-map action
                                       :buffer-string))))
          (with-current-buffer it
-           (when (eq 'output-dis action)
-             (make-variable-buffer-local 'compilation-error-regexp-alist)
-             (setq compilation-error-regexp-alist nil))
-
-           (make-variable-buffer-local 'compilation-finish-functions)
-           (add-to-list 'compilation-finish-functions
-                        #'ll/c-file-sentinel)))))
+           (add-hook 'compilation-finish-local-sticky
+                     #'ll/c-file-sentinel)))))
 
 (provide 'act-on-c-file)
 ;;; act-on-c-file.el ends here

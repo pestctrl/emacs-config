@@ -104,10 +104,18 @@
              `(,(rx "$" (+ alphanumeric)) . font-lock-variable-name-face))
 
 (add-to-list 'llvm-font-lock-keywords
-             `(,(rx (or "renamable" "implicit-def" "implicit" "debug-location")) . 'shadow))
+             `(,(rx (or "renamable" "implicit-def" "implicit" "debug-location" "nsw" "align")) . 'shadow))
 
 (add-to-list 'llvm-font-lock-keywords
-             `(,(rx "!" (+ digit)) . 'font-lock-variable-name-face))
+             `(,(rx "!" (+ alphanumeric)) . 'font-lock-variable-name-face))
+
+(-->
+ "\\b[-]?[0-9]+\\b"
+ (assoc it llvm-font-lock-keywords)
+ (cl-position it llvm-font-lock-keywords)
+ (nth it llvm-font-lock-keywords)
+ (setf it
+       `(,(rx word-boundary (optional "-") ))))
 
 ;; (pop llvm-font-lock-keywords)
 

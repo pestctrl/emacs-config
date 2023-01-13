@@ -104,6 +104,21 @@
 
   ;; (pop display-buffer-alist)
 #+end_src
+* delete-other-side-windows
+#+begin_src emacs-lisp
+  (defun my/delete-other-windows (arg)
+    (interactive "p")
+    (if (not (window-parameter nil 'window-side))
+        (delete-other-windows)
+      (if (= arg 1)
+          (delete-other-windows-vertically)
+        (let ((buf (current-buffer)))
+          (window-toggle-side-windows)
+          (let ((switch-to-buffer-obey-display-actions nil))
+            (switch-to-buffer buf))))))
+
+  (define-key pestctrl-minor-mode-map (kbd "C-x 1") #'my/delete-other-windows)
+#+end_src
 * Various tools
 ** ledger
 #+begin_src emacs-lisp

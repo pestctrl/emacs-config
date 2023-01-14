@@ -167,6 +167,17 @@
             :before-while
             #'gac-debounce-again-if-magit-in-progress)
 
+(defun gac-activate-all-timers (&rest _)
+  (interactive)
+  (dolist (k (hash-table-keys gac--debounce-timers))
+    (let ((timer (gethash k gac--debounce-timers)))
+      (setf (timer--function timer) #'gac--after-save)
+      (timer-event-handler timer))
+    (remhash k gac--debounce-timers)))
+
+(add-hook 'kill-emacs-hook
+          'gac-activate-all-timers)
+
 ;; (add-hook 'gaff/after-merge-hook
 ;;           (lambda ()
 ;;             (org-id-update-id-locations

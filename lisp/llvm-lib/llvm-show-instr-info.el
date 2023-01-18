@@ -35,11 +35,24 @@
 (ll/def-tablegen-file ISA "llvm/lib/Target/%s/%sISA.td")
 (ll/def-tablegen-file Schedule "llvm/lib/Target/%s/%sSchedule.td")
 (ll/def-tablegen-file InstrInfo "llvm/lib/Target/%s/%sInstrInfo.td")
+(ll/def-tablegen-file RegisterInfo "llvm/lib/Target/%s/%sRegisterInfo.td")
 
 (defmacro ll/get-tablegen-file (sym target)
   (let ((fun (intern (format "ll/%s-filename" (symbol-name sym)))))
     `(let ((file (,fun ,target)))
        (find-file-noselect file))))
+
+(defconst ll/ibase-regexp
+  (rx (seq "IBase<"
+           (+? (not ",")) "," (*? (or white "\n"))
+           "(outs" (optional " " (group (+ (not ")")))) ")," (*? (or white "\n"))
+           "(ins" (optional " " (group (+ (not ")")))) ")," (*? (or white "\n"))
+           "\"" (group (+ (not "\""))) "\""
+           (+? (not ">"))
+           ">," (* space) "\n")))
+
+(defconst ll/tablegen-def
+  (rx (group "def %s" (+? anything)) "\n\n"))
 
 (defun ll/get-instructions-list (file)
   (with-current-buffer (find-file-noselect file)
@@ -48,9 +61,13 @@
       (let ((r (rx line-start "def " (group (+ (or alphanumeric "_")))))
             l)
         (while (re-search-forward r nil t)
-          (let ((str (match-string 1)))
-            (set-text-properties 0 (length str) nil str)
-            (push str l)))
+          (let ((instr (match-string 1)))
+            (re-search-forward ll/ibase-regexp nil t)
+            (let* ((repr (->> (match-string 3)
+                              (string-replace "\\t" " ")))
+                   (str (format "%-40s%s" instr repr)))
+              (set-text-properties 0 (length str) nil str)
+              (push str l))))
         l))))
 
 (defmacro push-single-match (place rx)
@@ -62,12 +79,15 @@
 (defun ll/show-instr-read (target)
   (let ((l (ll/get-instructions-list (ll/ISA-filename target)))
         (sym (symbol-name (symbol-at-point))))
-    (if (member sym l)
-        (completing-read (format "Which instruction? (default: %s) "
-                                 sym)
-                         l nil t nil nil sym)
-      (completing-read "Which Instruction? "
-                       l))))
+    (car
+     (string-split
+      (if (member sym l)
+          (completing-read (format "Which instruction? (default: %s) "
+                                   sym)
+                           l nil t nil nil sym)
+        (completing-read "Which Instruction? "
+                         l))
+      " "))))
 
 (defun ll/get-codegen-targets ()
   (-->
@@ -84,16 +104,59 @@
          (instr (ll/show-instr-read target)))
     (ll/show-instr-info target instr)))
 
+(defun ll/get-dag-classes (target classes)
+  (string-join (mapcar #'(lambda (class)
+                           (or (with-current-buffer (ll/get-tablegen-file InstrInfo target)
+                                 (save-excursion
+                                   (beginning-of-buffer)
+                                   (when (re-search-forward (format ll/tablegen-def class) nil t)
+                                     (match-string 1))))
+                               (with-current-buffer (ll/get-tablegen-file RegisterInfo target)
+                                 (save-excursion
+                                   (beginning-of-buffer)
+                                   (when (re-search-forward (format ll/tablegen-def class) nil t)
+                                     (match-string 1))))))
+                       classes)
+               "\n\n"))
+
 (defun ll/show-instr-info (target instr)
   (save-restriction
     (let* ((buf (get-buffer-create (format "*%s-instr-info*" instr)))
-           itin
+           itin ins outs dag-classes
            l)
       (with-current-buffer (ll/get-tablegen-file ISA target)
         (save-excursion
           (goto-char (point-min))
-          (re-search-forward (rx (group "def " (literal instr) (+? anything)) "\n\n"))
+          (re-search-forward (format ll/tablegen-def instr))
           (let ((str (match-string 1)))
+            (save-match-data
+              (string-match ll/ibase-regexp str)
+              (-->
+               (list (match-string 3 str)
+                     (concat "inputs: " (setq ins (match-string 2 str)))
+                     (concat "outputs: " (setq outs (match-string 1 str))))
+               (string-join it "\n")
+               (string-replace "\\t" " " it)
+               (cons "Literal Representation" it)
+               (push it l)))
+
+            (setq dag-classes
+                  (-->
+                   (append (string-split (or ins "") ",")
+                           (string-split (or outs "") ","))
+                   (remove-if #'string-empty-p it)
+                   (mapcar #'(lambda (x)
+                               (set-text-properties 0 (length x) nil x)
+                               x)
+                           it)
+                   (mapcar #'string-trim it)
+                   (mapcar #'(lambda (x)
+                               (car (string-split x ":")))
+                           it)
+                   (seq-uniq it)))
+
+            (push (cons "DAG classes" (ll/get-dag-classes target dag-classes)) l)
+
             (string-match (rx "ItinClass<" (group (+ (or alphanumeric "_"))) ">") str)
             (setq itin (match-string 1 str))
             (push (cons "ISA definition" str) l))))

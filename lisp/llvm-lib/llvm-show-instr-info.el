@@ -39,12 +39,10 @@
 (defmacro ll/get-tablegen-file (sym target)
   (let ((fun (intern (format "ll/%s-filename" (symbol-name sym)))))
     `(let ((file (,fun ,target)))
-       (or (find-buffer-visiting file)
-           (find-file-noselect file)))))
+       (find-file-noselect file))))
 
 (defun ll/get-instructions-list (file)
-  (with-current-buffer (or (find-buffer-visiting file)
-                           (find-file-noselect file))
+  (with-current-buffer (find-file-noselect file)
     (save-excursion
       (goto-char (point-min))
       (let ((r (rx line-start "def " (group (+ (or alphanumeric "_")))))

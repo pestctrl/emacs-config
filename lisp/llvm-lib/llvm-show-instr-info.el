@@ -177,12 +177,13 @@
       (with-current-buffer buf
         (erase-buffer)
         (tablegen-mode)
-        (dolist (i (reverse l))
-          (insert (car i))
-          (let ((fill-column 77))
-            (banner-comment))
-          (insert "\n\n")
-          (insert (cdr i) "\n\n")))
+        (save-excursion
+          (dolist (i (reverse l))
+            (insert (car i))
+            (let ((fill-column 77))
+              (banner-comment))
+            (insert "\n\n")
+            (insert (cdr i) "\n\n"))))
 
       (display-buffer-in-side-window
        buf '((side . right)

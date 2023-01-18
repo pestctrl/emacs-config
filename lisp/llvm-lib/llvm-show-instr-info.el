@@ -71,9 +71,18 @@
       (completing-read "Which Instruction? "
                        l))))
 
+(defun ll/get-codegen-targets ()
+  (-->
+   (lls/get-llvm-root-dir)
+   (expand-file-name "llvm/lib/Target" it)
+   (directory-files it t "[^.]")
+   (remove-if-not #'file-directory-p it)
+   (mapcar #'file-name-nondirectory it)))
+
 (defun ll/prompt-for-instr-info ()
   (interactive)
-  (let* ((target (read-string "Target? ")) ;; TODO: Add some indirection
+  (let* ((target (completing-read "Target? "
+                                  (ll/get-codegen-targets)))
          (instr (ll/show-instr-read target)))
     (ll/show-instr-info target instr)))
 

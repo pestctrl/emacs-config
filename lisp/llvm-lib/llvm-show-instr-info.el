@@ -105,19 +105,24 @@
     (ll/show-instr-info target instr)))
 
 (defun ll/get-dag-classes (target classes)
-  (string-join (mapcar #'(lambda (class)
-                           (or (with-current-buffer (ll/get-tablegen-file InstrInfo target)
-                                 (save-excursion
-                                   (beginning-of-buffer)
-                                   (when (re-search-forward (format ll/tablegen-def class) nil t)
-                                     (match-string 1))))
-                               (with-current-buffer (ll/get-tablegen-file RegisterInfo target)
-                                 (save-excursion
-                                   (beginning-of-buffer)
-                                   (when (re-search-forward (format ll/tablegen-def class) nil t)
-                                     (match-string 1))))))
-                       classes)
-               "\n\n"))
+  (--> classes
+       (mapcar #'(lambda (class)
+                   (or (with-current-buffer (ll/get-tablegen-file InstrInfo target)
+                         (save-excursion
+                           (beginning-of-buffer)
+                           (when (re-search-forward (format ll/tablegen-def class) nil t)
+                             (let ((str "// InstrInfo.td\n"))
+                               (add-text-properties 0 (length str) '(face font-lock-comment-face) str)
+                               (concat str (match-string 1))))))
+                       (with-current-buffer (ll/get-tablegen-file RegisterInfo target)
+                         (save-excursion
+                           (beginning-of-buffer)
+                           (when (re-search-forward (format ll/tablegen-def class) nil t)
+                             (let ((str "// RegisterInfo.td\n"))
+                               (add-text-properties 0 (length str) '(face font-lock-comment-face) str)
+                               (concat str (match-string 1))))))))
+               it)
+       (string-join it "\n\n")))
 
 (defun ll/show-instr-info (target instr)
   (save-restriction
@@ -129,7 +134,7 @@
           (goto-char (point-min))
           (re-search-forward (format ll/tablegen-def instr))
           (let ((str (match-string 1)))
-            (save-match-data
+            (when my-ec/at-ti
               (string-match ll/ibase-regexp str)
               (-->
                (list (match-string 3 str)
@@ -138,24 +143,24 @@
                (string-join it "\n")
                (string-replace "\\t" " " it)
                (cons "Literal Representation" it)
-               (push it l)))
+               (push it l))
 
-            (setq dag-classes
-                  (-->
-                   (append (string-split (or ins "") ",")
-                           (string-split (or outs "") ","))
-                   (remove-if #'string-empty-p it)
-                   (mapcar #'(lambda (x)
-                               (set-text-properties 0 (length x) nil x)
-                               x)
-                           it)
-                   (mapcar #'string-trim it)
-                   (mapcar #'(lambda (x)
-                               (car (string-split x ":")))
-                           it)
-                   (seq-uniq it)))
+              (setq dag-classes
+                    (-->
+                     (append (string-split (or ins "") ",")
+                             (string-split (or outs "") ","))
+                     (remove-if #'string-empty-p it)
+                     (mapcar #'(lambda (x)
+                                 (set-text-properties 0 (length x) nil x)
+                                 x)
+                             it)
+                     (mapcar #'string-trim it)
+                     (mapcar #'(lambda (x)
+                                 (car (string-split x ":")))
+                             it)
+                     (seq-uniq it)))
 
-            (push (cons "DAG classes" (ll/get-dag-classes target dag-classes)) l)
+              (push (cons "DAG classes" (ll/get-dag-classes target dag-classes)) l))
 
             (string-match (rx "ItinClass<" (group (+ (or alphanumeric "_"))) ">") str)
             (setq itin (match-string 1 str))

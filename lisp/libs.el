@@ -15,4 +15,7 @@
 ;; This is helpful, for exwm-related loading
 (require 'use-exwm)
 
+;; Register my own rx forms
+(require 'my-rx-forms)
+
 (provide 'libs)

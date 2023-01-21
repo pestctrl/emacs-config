@@ -29,6 +29,7 @@
 (require 'git-auto-fast-forward-mode)
 (use-package keychain-environment)
 (require 'ssh-key-management)
+(require 'anaphora)
 
 (setq rb/ssh-default-key (format "~/.ssh/devices/%s/id_rsa" (system-name)))
 (require 'my-org-agenda-files)
@@ -150,18 +151,22 @@
       nil)))
 
 (defun gac-debounce-again-if-magit-in-progress (buf)
-  ;; Return true if should-be-automatic is true, AND
-  (or (and (buffer-file-name buf)
-           (ga/should-be-automatic (file-name-directory (buffer-file-name buf)))
-           ;; there's no org-lint errors if we're in an org buffer
-           (or (not (with-current-buffer buf (eq major-mode 'org-mode)))
-               (gac-no-lint-errors buf))
-           ;; AND we're not in an exwm buffer
-           (not (eq major-mode 'exwm-mode)))
-      ;; Otherwise, debounce again and return nil
-      (and (with-current-buffer buf
-             (gac--debounced-save))
-           nil)))
+  ;; If all of the following conditions apply, we don't need to
+  ;; debounce.
+               ;; We should not be in an exwm buffer
+  (aprog1 (and (not (eq major-mode 'exwm-mode))
+               ;; The buffer should be a real file
+               (buffer-file-name buf)
+               ;; Check if we should be automatically pushing/pulling
+               (ga/should-be-automatic (file-name-directory (buffer-file-name buf)))
+               ;; there's no org-lint errors if we're in an org buffer
+               (or (not (with-current-buffer buf (eq major-mode 'org-mode)))
+                   (gac-no-lint-errors buf)))
+    ;; One of the conditions was false, so we should debounce the save
+    ;; again.
+    (when (not it)
+      (with-current-buffer buf
+        (gac--debounced-save)))))
 
 (advice-add #'gac--after-save
             :before-while

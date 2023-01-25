@@ -41,6 +41,8 @@
   (pcase (file-name-extension file)
     ((and _ (guard (ll/is-test-file file)))
      (ll/act-on-test-file file))
+    ((and _ (guard (ll/is-llvm-source-file file)))
+     (ll/act-on-llvm-source-file file))
     ("o" (ll/act-on-obj-file file))
     ("c" (ll/act-on-c-file file))
     ("ll" (ll/act-on-ll-file file))

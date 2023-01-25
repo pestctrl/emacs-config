@@ -27,6 +27,7 @@
 (require 'llvm-build-tool)
 (require 'llvm-gdb-command)
 (require 'llvm-show-instr-info)
+(require 'llvm-jump-to-tablegen)
 
 (define-prefix-command '*llvm-map*)
 ;; (define-key *root-map* (kbd "C-w") '*llvm-map*)

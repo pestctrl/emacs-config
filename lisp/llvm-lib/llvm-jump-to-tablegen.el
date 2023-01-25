@@ -28,11 +28,14 @@
 (defconst ll/def-keywords
   (rx (or "class" "multiclass"
           "def" "defm"
-          "defvar")
+          "defvar"
+          (seq "defset"
+               (+ (or space "\n"))
+               (+ (or alphanumeric ">" "<" "_"))))
       (+ (or space "\n"))
       (group (+ (or alphanumeric "_")))
-      (+ (or space "\n"))
-      (or "{" "<" ":"))) ;; defset is special
+      (* (+ (or space "\n")))
+      (or "{" "<" ":" "="))) ;; defset is special
 
 (defvar ll/def-class-hash (make-hash-table :test #'equal))
 
@@ -41,29 +44,50 @@
     (remhash target ll/def-class-hash))
 
   (or (gethash target ll/def-class-hash)
-      (let ((l (make-hash-table :test #'equal)))
-        (-->
-         (lls/get-llvm-root-dir)
-         (expand-file-name "llvm/lib/Target/" it)
-         (expand-file-name target it)
-         (dolist (file (directory-files it t ".*\\.td$"))
-           (with-current-buffer (find-file-noselect file)
-             (save-excursion
-               (goto-char (point-min))
-               (while (re-search-forward ll/def-keywords nil t)
-                 (let ((str (match-string 1)))
-                   (set-text-properties 0 (length str) nil str)
-                   (puthash str (point-marker) l)))))))
+      (let* ((l (make-hash-table))
+             (td-regexp (rx (+ anything) ".td" line-end))
+             (target-dir
+              (-->
+               (lls/get-llvm-root-dir)
+               (expand-file-name "llvm/lib/Target/" it)
+               (expand-file-name target it)
+               (directory-files it t td-regexp)))
+             (gen-dir
+              (-->
+               (lls/get-llvm-root-dir)
+               (expand-file-name "llvm/include/llvm/Target" it)
+               (directory-files it t td-regexp))))
+
+        (dolist (file (append gen-dir target-dir))
+          (with-current-buffer (find-file-noselect file)
+            (save-excursion
+              (goto-char (point-min))
+              (while (re-search-forward ll/def-keywords nil t)
+                (goto-char (match-beginning 1))
+                (puthash (intern (match-string 1)) (point-marker) l)))))
         (puthash target l ll/def-class-hash)
         l)))
 
+(defun ll/read-tablegen-target ()
+  (if (string-match (rx "llvm/lib/Target/" (group (+ alphanumeric)) "/") default-directory)
+      (match-string 1 default-directory)
+    (completing-read "Target? "
+                     (ll/get-codegen-targets))))
+
+(defun ll/read-tablegen-symbol (target arg)
+  (let ((map (ll/get-defs-and-classes target arg))
+        (cur (symbol-at-point)))
+    (or (gethash cur map)
+        (-->
+         (completing-read "Symbol? " (hash-table-keys map) nil t)
+         (intern it)
+         (gethash it map)))))
+
 (defun ll/jump-to-tablegen (arg)
   (interactive "P")
-  (let* ((target (completing-read "Target? "
-                                  (ll/get-codegen-targets)))
-         (p (ll/get-defs-and-classes target arg))
-         (symbol (completing-read "Symbol? " (hash-table-keys p)))
-         (marker (gethash symbol p)))
+  (let* ((target (ll/read-tablegen-target))
+         (marker (ll/read-tablegen-symbol target arg)))
+    (xref--push-markers)
     (display-buffer-same-window (marker-buffer marker) nil)
     (goto-char (marker-position marker))
     (recenter)))

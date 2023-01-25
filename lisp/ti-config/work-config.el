@@ -144,5 +144,9 @@
       (insert comment-end)
       (indent-for-comment))))
 
+(require 'llvm-jump-to-tablegen)
+
+(define-key tablegen-mode-map (kbd "M-.") #'ll/jump-to-tablegen)
+
 (provide 'work-config)
 ;;; work-config.el ends here

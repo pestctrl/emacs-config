@@ -35,6 +35,7 @@
 (define-key *llvm-map* (kbd "c") #'ll/llvm-build-tool)
 (define-key *llvm-map* (kbd "M-w") #'ll/kill-gdb-command)
 (define-key *llvm-map* (kbd "i") #'ll/prompt-for-instr-info)
+(define-key *llvm-map* (kbd "t") #'ll/jump-to-tablegen)
 
 (provide 'llvm-lib)
 ;;; llvm-lib.el ends here

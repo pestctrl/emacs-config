@@ -190,3 +190,24 @@
         (shell-command "emacs & disown")
         (kill-emacs))))
 #+end_src
+* exwm fix
+#+begin_src emacs-lisp
+  (defun my/exwm-input--fake-last-command ()
+    "Fool some packages into thinking there is a change in the buffer."
+    (setq last-command #'exwm-input--noop)
+    (condition-case hook-error
+        (progn
+          (run-hooks 'pre-command-hook)
+          (run-hooks 'post-command-hook))
+      ((error)
+       (exwm--log "Error occurred while running command hooks: %s\n\nBacktrace:\n\n%s"
+                  hook-error
+                  (with-temp-buffer
+                    (setq-local standard-output (current-buffer))
+                    (backtrace)
+                    (buffer-string))))))
+
+  (advice-add #'exwm-input--fake-last-command
+              :override
+              #'my/exwm-input--fake-last-command)
+#+end_src

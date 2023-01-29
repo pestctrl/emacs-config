@@ -88,7 +88,10 @@
   (with-current-buffer (dired-noselect repo)
     (shell-command "git fetch --all" "*git-fetch*")
     (dolist (b branches)
-      (let ((output-buffer (format "*merge-%s*" b)))
+      (let ((output-buffer (--> repo
+                                (directory-file-name it)
+                                (file-name-nondirectory it)
+                                (format "*merge-%s--%s*" it b))))
         (if (get-buffer-process output-buffer)
             (user-error "Umm, there was a merge that didn't complete. Debug?")
           (when (not (zerop (shell-command (format "git merge --ff-only %s" b) output-buffer)))

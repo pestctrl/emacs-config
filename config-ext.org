@@ -143,7 +143,8 @@
             ("payee" "%(binary) -f %(ledger-file) reg @%(payee)")
             ("lia1" "%(binary) -f %(ledger-file) bal ^Lia --cleared")
             ("lia2" "%(binary) -f %(ledger-file) reg ^Lia --uncleared")
-            ("Ast:AR" "%(binary) -f %(ledger-file) bal ^Ast:AR")))
+            ("Ast:AR" "%(binary) -f %(ledger-file) bal ^Ast:AR")
+            ("earned-money" "%(binary) -f %(ledger-file) bal ^Rev:TI ^Exp:Necessary:Tax ^Exp:Necessary:Insurance ^Exp:Necessary:GroupLife")))
 
     (setq dynamic-reports
           '(("budgetcal" "%(binary) -f ~/MEGA/org/entries/food.ledger --daily --add-budget reg Expenses")))

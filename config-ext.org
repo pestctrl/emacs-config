@@ -225,7 +225,37 @@
 
     (advice-add #'ledger-mode-clean-buffer
                 :after
-                #'my/ledger-clean-commodity))
+                #'my/ledger-clean-commodity)
+
+    (defun my/ledger-convert-alias (account)
+      (save-excursion
+        (goto-char (point-min))
+        (let ((regexp
+               (rx line-start
+                   "alias " (literal account) "="
+                   (group (+ (or alphanumeric ":" "_")))
+                   (* space)
+                   line-end)))
+          (or (and (re-search-forward regexp nil t)
+                   (aprog1 (match-string 1)
+                     (set-text-properties 0 (length it) nil it)))
+              account))))
+
+    (advice-add #'ledger-read-account-with-prompt
+                :filter-return
+                #'my/ledger-convert-alias)
+
+    (defun my/ledger-field (orig context field)
+      (let ((res (funcall orig context field)))
+        (if (or (not (eq field 'account))
+                (null res)
+                (not (string-match (rx (group (separated-list ":" (separated-list " " (+ alphanumeric)))) "  ") res)) )
+            res
+          (match-string 1 res))))
+
+    (advice-add #'ledger-context-field-value
+                :around
+                #'my/ledger-field))
 #+end_src
 ** Credit Card Statement Macro
 #+begin_src emacs-lisp

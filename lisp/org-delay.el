@@ -28,6 +28,7 @@
 (require 'org-agenda)
 
 (require 'org-project)
+(require 'org-delay-today)
 
 (defun org-delay (arg &optional time)
   (interactive "P")
@@ -128,7 +129,11 @@
 (define-key *org-delay-map* (kbd "d") #'org-agenda-delay-until-next-week)
 (define-key *org-delay-map* (kbd "1") #'org-agenda-delay-one-day)
 (define-key *org-delay-map* (kbd "D") #'org-agenda-delay)
-(define-key *org-delay-map* (kbd "u") (lambda () (interactive) (org-agenda-delay '(4))))
+(define-key *org-delay-map* (kbd "u") (lambda () (interactive)
+                                        (save-excursion
+                                          (org-agenda-delay '(4)))
+                                        (org-agenda-delay-today '(4))))
+(define-key *org-delay-map* (kbd "t") #'org-agenda-delay-today)
 
 
 (provide 'org-delay)

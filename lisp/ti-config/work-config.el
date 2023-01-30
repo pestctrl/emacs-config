@@ -78,7 +78,6 @@
              user-emacs-directory))
 
 (load-file? "/scratch/benson/tools2/llvm_cgt/llvm-project/llvm/utils/emacs/llvm-mode.el")
-(load-file? "/scratch/benson/tools2/llvm_cgt/llvm-project/llvm/utils/emacs/tablegen-mode.el")
 (load-file? "/scratch/benson/tools2/llvm_cgt/llvm-project/llvm/utils/emacs/emacs.el")
 
 (defface llvm-separator-face `((t (:background "gray25" :extend t :inherit font-lock-warning-face)))
@@ -145,6 +144,7 @@
       (indent-for-comment))))
 
 (require 'llvm-jump-to-tablegen)
+(require 'my-tablegen-mode)
 
 (define-key tablegen-mode-map (kbd "M-.") #'ll/jump-to-tablegen)
 

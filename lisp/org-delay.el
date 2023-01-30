@@ -129,10 +129,10 @@
 (define-key *org-delay-map* (kbd "d") #'org-agenda-delay-until-next-week)
 (define-key *org-delay-map* (kbd "1") #'org-agenda-delay-one-day)
 (define-key *org-delay-map* (kbd "D") #'org-agenda-delay)
-(define-key *org-delay-map* (kbd "u") (lambda () (interactive)
-                                        (save-excursion
-                                          (org-agenda-delay '(4)))
-                                        (org-agenda-delay-today '(4))))
+(define-key *org-delay-map* (kbd "u") #'(lambda () (interactive)
+                                          (save-excursion
+                                            (org-agenda-delay '(4)))
+                                          (org-agenda-delay-today '(4))))
 (define-key *org-delay-map* (kbd "t") #'org-agenda-delay-today)
 
 

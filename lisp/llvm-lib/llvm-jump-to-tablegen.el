@@ -88,7 +88,7 @@
   (let* ((target (ll/read-tablegen-target))
          (marker (ll/read-tablegen-symbol target arg)))
     (xref--push-markers)
-    (display-buffer-same-window (marker-buffer marker) nil)
+    (switch-to-buffer (marker-buffer marker))
     (goto-char (marker-position marker))
     (recenter)))
 

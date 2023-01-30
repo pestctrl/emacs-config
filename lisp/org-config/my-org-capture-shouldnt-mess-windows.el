@@ -24,9 +24,16 @@
 
 ;;; Code:
 
+(defun my/side-window-p (window)
+  (window-parameter window 'window-side))
+
 (defun my/org-capture-shouldnt-mess-windows (fun &rest args)
   (let ((buffer
          (save-window-excursion
+           (--> (window-list)
+                (remove-if #'my/side-window-p it)
+                (car it)
+                (select-window it))
            (apply fun args)
            (current-buffer))))
     (pop-to-buffer buffer)))
@@ -42,6 +49,20 @@
 (advice-add #'org-capture-finalize
             :around
             #'my/org-capture-finalize-shouldnt-mess-windows)
+
+(defun my/org-todo-side-window-hack (fun &rest args)
+  (save-window-excursion
+    (let ((b (current-buffer)))
+      (--> (window-list)
+           (remove-if #'my/side-window-p it)
+           (car it)
+           (select-window it))
+      (switch-to-buffer b)
+      (apply fun args))))
+
+(advice-add #'org-todo
+            :around
+            #'my/org-todo-side-window-hack)
 
 (provide 'my-org-capture-shouldnt-mess-windows)
 ;;; my-org-capture-shouldnt-mess-windows.el ends here

@@ -83,5 +83,30 @@ commands of Compilation major mode are available.  See
             :around
             #'my/recompile-save-windows)
 
+(defun compilation-set-mode ()
+  (interactive)
+  (when (not (eq major-mode 'compilation-mode))
+    (user-error "Yo, switch to a compilation-buffer"))
+
+  (let ((mode
+         (intern (completing-read
+                  "Major mode? "
+                  (let (l)
+                    (mapatoms
+                     (lambda (x)
+                       (and (or (eq x 'fundamental-mode)
+                                (get x 'derived-mode-parent))
+                            (push x l))))
+                    l)))))
+    (setf (cadr compilation-arguments)
+          mode
+          (caddr compilation-arguments)
+          `(lambda (_)
+             ,(buffer-name (current-buffer))))
+    (let ((args compilation-arguments))
+      (call-interactively mode)
+      (compilation-minor-mode)
+      (setq compilation-arguments args))))
+
 (provide 'my-comp-minor-mode)
 ;;; my-comp-minor-mode.el ends here

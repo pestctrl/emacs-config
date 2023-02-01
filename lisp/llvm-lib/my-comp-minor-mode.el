@@ -73,8 +73,11 @@ commands of Compilation major mode are available.  See
             #'my/compilation-start-should-goto-end-of-buffer)
 
 (defun my/recompile-save-windows (fun &rest args)
-  (save-window-excursion
-    (apply fun args)))
+  (display-buffer-same-window
+   (save-window-excursion
+     (apply fun args)
+     (current-buffer))
+   nil))
 
 (advice-add #'recompile
             :around

@@ -64,7 +64,7 @@ commands of Compilation major mode are available.  See
             :around
             #'my/enable-comp-keys-if-separate-mode)
 
-(defun my/compilation-start-should-goto-end-of-buffer (_command &optional mode)
+(defun my/compilation-start-should-goto-end-of-buffer (_command &optional mode &rest _)
   (unless mode
     (goto-char (point-max))))
 

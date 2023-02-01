@@ -72,5 +72,13 @@ commands of Compilation major mode are available.  See
             :after
             #'my/compilation-start-should-goto-end-of-buffer)
 
+(defun my/recompile-save-windows (fun &rest args)
+  (save-window-excursion
+    (apply fun args)))
+
+(advice-add #'recompile
+            :around
+            #'my/recompile-save-windows)
+
 (provide 'my-comp-minor-mode)
 ;;; my-comp-minor-mode.el ends here

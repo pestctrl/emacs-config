@@ -29,6 +29,7 @@
 (require 'act-on-c-file)
 (require 'act-on-ll-file)
 (require 'act-on-obj-file)
+(require 'act-on-llvm-source-file)
 
 (defun ll/act-on-file (file)
   (interactive (list (or (and (eq major-mode 'dired-mode)

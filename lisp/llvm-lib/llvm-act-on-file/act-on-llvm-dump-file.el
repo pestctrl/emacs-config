@@ -23,6 +23,10 @@
 ;;; Commentary:
 
 ;;; Code:
+(require 'action-map-lib)
+
+(defvar ll/dump-file-action-map
+  '((assembly :key ?a  :major-mode asm-mode  :buffer-string "assembly" :description "[a]ssembly")))
 
 (defun ll/is-dump-file (fname)
   (and (string= "/tmp/"
@@ -38,8 +42,22 @@
                (file-name-sans-extension)))
    (file-name-directory fname)))
 
+(defun ll/dump-extract-command (fname)
+  (with-current-buffer (find-file-noselect fname)
+    (save-excursion
+      (goto-char (point-min))
+      (re-search-forward "^[^#]")
+      (kill-ring-save (point-at-bol) (point-at-eol))
+      (current-kill 0))))
+
 (defun ll/act-on-llvm-dump-file (fname)
-  (message "You haven't implemented me yet, stoopid"))
+  (let* ((action (aml/read-action-map ll/dump-file-action-map))
+         (command (ll/dump-extract-command (ll/dump-to-sh-file fname))))
+    (compilation-start
+     (concat command " -S -o -")
+     'asm-mode
+     `(lambda (_)
+        ,(format "*%s*" fname)))))
 
 (provide 'act-on-llvm-dump-file)
 ;;; act-on-llvm-dump-file.el ends here

@@ -30,6 +30,7 @@
 (require 'act-on-ll-file)
 (require 'act-on-obj-file)
 (require 'act-on-llvm-source-file)
+(require 'act-on-llvm-dump-file)
 
 (defun ll/act-on-file (file)
   (interactive (list (or (and (eq major-mode 'dired-mode)
@@ -44,6 +45,8 @@
      (ll/act-on-test-file file))
     ((and _ (guard (ll/is-llvm-source-file file)))
      (ll/act-on-llvm-source-file file))
+    ((and _ (guard (ll/is-dump-file file)))
+     (ll/act-on-llvm-dump-file file))
     ("o" (ll/act-on-obj-file file))
     ("c" (ll/act-on-c-file file))
     ("ll" (ll/act-on-ll-file file))

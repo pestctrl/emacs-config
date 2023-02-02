@@ -83,9 +83,12 @@ commands of Compilation major mode are available.  See
             :around
             #'my/recompile-save-windows)
 
+(define-key compilation-mode-map (kbd "m") #'compilation-set-mode)
+
 (defun compilation-set-mode ()
   (interactive)
-  (when (not (eq major-mode 'compilation-mode))
+  (when (not (or (eq major-mode 'compilation-mode)
+                 compilation-minor-mode))
     (user-error "Yo, switch to a compilation-buffer"))
 
   (let ((mode
@@ -95,6 +98,7 @@ commands of Compilation major mode are available.  See
                     (mapatoms
                      (lambda (x)
                        (and (or (eq x 'fundamental-mode)
+                                (eq x 'compilation-mode)
                                 (get x 'derived-mode-parent))
                             (push x l))))
                     l)))))
@@ -105,7 +109,8 @@ commands of Compilation major mode are available.  See
              ,(buffer-name (current-buffer))))
     (let ((args compilation-arguments))
       (call-interactively mode)
-      (compilation-minor-mode)
+      (when (not (eq mode 'compilation-mode))
+        (compilation-minor-mode t))
       (setq compilation-arguments args))))
 
 (provide 'my-comp-minor-mode)

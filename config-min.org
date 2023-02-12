@@ -30,13 +30,12 @@
 
   ;; Undo tree is useful
   (use-package undo-tree)
-  (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo")))
+  (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo"))
+        undo-tree-limit 8000000
+        undo-tree-auto-save-history nil)
   (global-undo-tree-mode t)
-  (add-to-list 'undo-tree-incompatible-major-modes
-               'vterm-mode)
-  (add-to-list 'undo-tree-incompatible-major-modes
-               'compilation-mode)
-  (setq undo-tree-limit 8000000)
+  (add-to-list 'undo-tree-incompatible-major-modes 'vterm-mode)
+  (add-to-list 'undo-tree-incompatible-major-modes 'compilation-mode)
 
   ;; Beacon-mode
   (use-package beacon)

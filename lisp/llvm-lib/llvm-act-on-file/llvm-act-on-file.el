@@ -48,6 +48,8 @@
     ((and _ (guard (ll/is-dump-file file)))
      (ll/act-on-llvm-dump-file file))
     ("o" (ll/act-on-obj-file file))
+    ("out" (ll/act-on-obj-file file))
+    ("tiout" (ll/act-on-obj-file file))
     ("c" (ll/act-on-c-file file))
     ("ll" (ll/act-on-ll-file file))
     (_ (message "Not sure what you'd like me to do with this file"))))

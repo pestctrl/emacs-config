@@ -31,7 +31,7 @@
     (stop-after   :key ?s  :major-mode llvm-mode :buffer-string "after-%s"  :description "[s]top-after")
     (stop-before  :key ?S  :major-mode llvm-mode :buffer-string "before-%s" :description "[S]top-before")))
 
-(defun ll/build-llc-command (file _action)
+(defun ll/build-llc-command (file action)
   (funcall lls/get-llc-command-fun file action))
 
 (defun ll/act-on-ll-file (file)

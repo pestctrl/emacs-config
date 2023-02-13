@@ -62,7 +62,7 @@
        (mapcar #'string-trim)
        (mapcar #'(lambda (x)
                    (let ((str (car (split-string x " "))))
-                     (if (string= str "%clang_cc1")
+                     (if (member str '("%clang" "%clang_cc1"))
                          "clang"
                        str))))
        (seq-uniq)))
@@ -75,7 +75,8 @@
     (lls/ninja-build-tools dir tools)))
 
 (defun ll/build-lit-command (file action)
-  (format "./bin/llvm-lit %s %s"
+  (format "%s %s %s"
+          (car (lls/get-tool "llvm-lit"))
           (pcase action
             ('verbose "-v")
             ('all "-a")

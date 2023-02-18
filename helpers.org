@@ -58,11 +58,13 @@
 
 * Sending reports to mom
 #+begin_src emacs-lisp
-  (defun my/run-report-get-file-name ()
+  (defun my/run-report-get-file-name (arg)
     (let* ((default-directory (expand-file-name "~/plaintext/ledger-finance"))
            (buf
             (save-window-excursion
-              (compilation-start "./mom_report.sh mid" nil (lambda (_) "*ledger-report*")))))
+              (compilation-start (format "./mom_report.sh %s"
+                                         (if arg "end" "mid"))
+                                 nil (lambda (_) "*ledger-report*")))))
       (save-window-excursion
         (display-buffer-same-window buf nil)
         (when (not (y-or-n-p "Looks good? "))
@@ -72,10 +74,10 @@
         (string-match (rx line-start "Filename: " (group (+ nonl))) str)
         (match-string 1 str))))
 
-  (defun my/run-ledger-report ()
-    (interactive)
-    (let ((fname (my/run-report-get-file-name)))
-      (notmuch-mua-mail "benedi.chu@hotmail.com" "Finance Report"
+  (defun my/run-ledger-report (arg)
+    (interactive "P")
+    (let ((fname (my/run-report-get-file-name arg)))
+      (notmuch-mua-mail "benedi.chu@hotmail.com" (if arg "Rent" "Finance Report")
                         '((From . "bensonchu457@fastmail.com")))
       (mml-attach-file fname)))
 #+end_src

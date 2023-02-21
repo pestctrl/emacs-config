@@ -125,9 +125,12 @@
                           ('compile "-c")
                           ('assemble "-S")
                           ('preprocess "-E")
-                          ('llvm-ir "-S -emit-llvm"))
+                          ('llvm-ir "-S -emit-llvm")
+                          ('executable ""))
                         (format "-o %s"
-                                (or output "-")))
+                                (or output
+                                    (and (eq action 'executable) "a.out")
+                                    "-")))
                   " "))))
 
 (defvar lls/get-llc-command-fun

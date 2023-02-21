@@ -29,13 +29,14 @@
 (require 'anaphora)
 
 (defvar ll/c-file-action-map
-  '((debug        :key ?d  :major-mode llvm-mode :buffer-string "debug"              :description "[d]ebug pass"             :compiler-action assemble)
-    (assembly     :key ?a  :major-mode asm-mode  :buffer-string "assembly"           :description "[a]ssembly"               :compiler-action assemble)
-    (output-dis   :key ?A  :major-mode asm-mode  :buffer-string "dissasembly"        :description "output-dis[A]ssemble"     :compiler-action nil)
-    (preprocess   :key ?e  :major-mode c-mode    :buffer-string "preprocess"         :description "pr[e]process"             :compiler-action preprocess)
-    (LLVMIR       :key ?l  :major-mode llvm-mode :buffer-string "llvm-ir"            :description "[l]lvm-ir"                :compiler-action llvm-ir)
-    (before-after :key ?p  :major-mode llvm-mode :buffer-string "print-before-after" :description "[p]rint before/after"     :compiler-action assemble)
-    (changed      :key ?P  :major-mode llvm-mode :buffer-string "print-changed"      :description "[P]rint before/after all" :compiler-action assemble)))
+  '((debug        :key ?d    :major-mode llvm-mode :buffer-string "debug"              :description "[d]ebug pass"             :compiler-action assemble)
+    (assembly     :key ?a    :major-mode asm-mode  :buffer-string "assembly"           :description "[a]ssembly"               :compiler-action assemble)
+    (output-dis   :key ?A    :major-mode asm-mode  :buffer-string "dissasembly"        :description "output-dis[A]ssemble"     :compiler-action nil)
+    (preprocess   :key ?e    :major-mode c-mode    :buffer-string "preprocess"         :description "pr[e]process"             :compiler-action preprocess)
+    (LLVMIR       :key ?l    :major-mode llvm-mode :buffer-string "llvm-ir"            :description "[l]lvm-ir"                :compiler-action llvm-ir)
+    (before-after :key ?p    :major-mode llvm-mode :buffer-string "print-before-after" :description "[p]rint before/after"     :compiler-action assemble)
+    (changed      :key ?P    :major-mode llvm-mode :buffer-string "print-changed"      :description "[P]rint before/after all" :compiler-action assemble)
+    (executable   :key ?\^M  :major-mode nil       :buffer-string "executable"         :description "Executable"               :compiler-action executable)))
 
 (defun ll/ensure-clang-binary-built (dir)
   ;; TODO: assumed build-dir constant, should take as argument and prompt
@@ -56,20 +57,15 @@
       (ll/clang-output-disassemble-command file)
     (let ((compiler-action (aml/get-map-prop ll/c-file-action-map action :compiler-action))
           (compiler (lls/prompt-tool "clang$")))
-      (concat ;; (ll/ensure-clang-binary-built
-              ;;  (file-name-directory
-              ;;   (directory-file-name
-              ;;    (file-name-directory compiler))))
-              ;; " && "
-              (string-join
-               (list (funcall lls/get-clang-command-fun compiler file compiler-action)
-                     (pcase action
-                       ('debug (format "-mllvm -debug-only=%s" (read-string "Which pass? ")))
-                       ('before-after (let ((pass (read-string "Which pass? ")))
-                                        (format "-mllvm -print-before=%s -mllvm -print-after=%s" pass pass)))
-                       ('changed "-mllvm -print-before-all"))
-                     " ")
-               " ")))))
+      (string-join
+       (list (funcall lls/get-clang-command-fun compiler file compiler-action)
+             (pcase action
+               ('debug (format "-mllvm -debug-only=%s" (read-string "Which pass? ")))
+               ('before-after (let ((pass (read-string "Which pass? ")))
+                                (format "-mllvm -print-before=%s -mllvm -print-after=%s" pass pass)))
+               ('changed "-mllvm -print-before-all"))
+             " ")
+       " "))))
 
 (defun ll/buffer-has-include-error (buffer)
   (with-current-buffer buffer

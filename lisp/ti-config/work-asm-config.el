@@ -61,7 +61,7 @@
 (defun my/asm-back-to-label (arg)
   (interactive "P")
   (if arg
-      (re-search-backward (rx "<" (not "$") (+ nonl) (not digit) ">:"))
+      (re-search-backward (rx "<" (not "$") (* nonl) ">:"))
     (re-search-backward (rx "<" (+ nonl) ">:")))
   (beginning-of-line))
 

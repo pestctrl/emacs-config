@@ -285,9 +285,9 @@
               ("Add to lists conveniently" :keys "l" :children
                (("Plan" :keys "p" :children
                  (("Plan week" :keys "w"
-                    :file ,(my/agenda-file "plan.org")
-                    :headline "The Plan"
-                    :template-file ,(my/org-file "templates/weekly-plan.org"))
+                   :file ,(my/agenda-file "plan.org")
+                   :headline "The Plan"
+                   :template-file ,(my/org-file "templates/weekly-plan.org"))
                   ("Plan your day" :keys "p"
                    :file ,(my/agenda-file "plan.org")
                    :function org-plan-goto

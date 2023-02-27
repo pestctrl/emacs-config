@@ -51,7 +51,7 @@
          ;; All todo children are done? Stuck!
          (not (olc/any-todo-children?
                 (not (member (cdr (opr/get-type-and-state))
-                             '(done wait))))))
+                             '(done wait invis))))))
         'stuck
       'active)))
 
@@ -123,7 +123,7 @@
                     (cond ((and (member "_invis_when_empty_" tags)
                                 (not (eq status 'active))
                                 (not (olc/any-todo-children?
-                                       (member (org-get-todo-state) org-not-done-keywords))))
+                                       (eq 'stuck (cdr (opr/get-type-and-state))))))
                            'invis)
                           ((and (member "invis_when_active" (org-get-tags))
                                 (eq status 'active))

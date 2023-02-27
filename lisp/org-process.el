@@ -45,6 +45,7 @@
     (org-refile nil nil (list headline file nil pos))))
 
 (defun op/refile-to-point (file point)
+  ;; Apparently, if you refile to the previous line, there's a bug
   (org-refile nil nil (list nil file nil point)))
 
 (defun op/lenient-y-or-n-p (prompt)

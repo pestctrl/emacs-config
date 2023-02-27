@@ -57,7 +57,7 @@
         (if (member state '("EMPTY"))
             (list element)
           (cons element
-                (let ((display '()))
+                (let (display nothing)
                   (olc/todo-children
                     (let ((type (opr/get-type)))
                       (pcase type
@@ -70,10 +70,14 @@
                                           (reverse))))
                              (setf display (append res display)))))
                         ('task
-                         (when (eq 'stuck (opr/type-of-task))
+                         (cond
+                          ((eq 'stuck (opr/type-of-task))
                            (push (org-ql--add-markers (org-element-headline-parser (point)))
-                                 display))))))
-                  (reverse display))))))))
+                                 display))
+                          ((member (org-get-todo-state) '("FUTURE" "BACKLOG"))
+                           (push (org-ql--add-markers (org-element-headline-parser (point)))
+                                 nothing)))))))
+                  (reverse (or display nothing)))))))))
 
 (defun my/org-ql-stuck-projects (tag)
   (let (narrow-p old-beg old-end)

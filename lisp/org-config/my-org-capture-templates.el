@@ -179,7 +179,7 @@
                 ("Working on this task now" :file ,(my/agenda-file "dev.org")
                  :keys "n" :clock-in t :clock-keep t
                  :template "* TASK %?\nSCHEDULED: %T")
-                ("Do it today" :file ,(my/agenda-file "dev.org")
+                ("Do it today" :file ,(my/agenda-file "prod.org") :olp ("Short")
                  :keys "T" :template "* TASK %?\nSCHEDULED: %T")))
               ("Reviews" :keys "r"
                :icon ,(all-the-icons-faicon "share" :face 'all-the-icons-lblue)

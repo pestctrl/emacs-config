@@ -28,14 +28,17 @@
   ;; Stop creating lock files
   (setq create-lockfiles nil)
 
-  ;; Undo tree is useful
-  (use-package undo-tree)
-  (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo"))
-        undo-tree-limit 8000000
-        undo-tree-auto-save-history nil)
-  (global-undo-tree-mode t)
-  (add-to-list 'undo-tree-incompatible-major-modes 'vterm-mode)
-  (add-to-list 'undo-tree-incompatible-major-modes 'compilation-mode)
+  ;; ;; Undo tree is useful
+  ;; (use-package undo-tree)
+  ;; (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo"))
+  ;;       undo-tree-limit 8000000
+  ;;       undo-tree-auto-save-history nil)
+  ;; (global-undo-tree-mode t)
+  ;; (add-to-list 'undo-tree-incompatible-major-modes 'vterm-mode)
+  ;; (add-to-list 'undo-tree-incompatible-major-modes 'compilation-mode)
+  ;; Try out vundo instead?
+  (use-package vundo
+    :commands (vundo))
 
   ;; Beacon-mode
   (use-package beacon)

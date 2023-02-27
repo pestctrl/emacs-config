@@ -133,10 +133,15 @@
     ;; Tidy shadowed file names
     :hook (rfn-eshadow-update-overlay . vertico-directory-tidy)
     :config
+    (defun my/should-backwards-tramp ()
+      (and (not (eq (char-before) ?:))
+           (not (eq (char-before) ?@))))
+
     (defun my/vertico-directory-up (&optional n)
       (interactive "p")
       (when (and (> (point) (minibuffer-prompt-end))
-                 (eq (char-before) ?/)
+                 (or (eq (char-before) ?/)
+                     (my/should-backwards-tramp))
                  (eq 'file (vertico--metadata-get 'category)))
         (let ((path (buffer-substring (minibuffer-prompt-end) (point))) found)
           (when (string-match-p "\\`~[^/]*/\\'" path)
@@ -146,7 +151,7 @@
             (save-excursion
               (let ((end (point)))
                 (goto-char (1- end))
-                (when (re-search-backward (rx (or "/" ":")) (minibuffer-prompt-end) t)
+                (when (re-search-backward (rx (or "/" "@" ":")) (minibuffer-prompt-end) t)
                   (delete-region (1+ (point)) end)
                   (setq found t))))))))
 

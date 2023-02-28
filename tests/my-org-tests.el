@@ -1,7 +1,9 @@
 (require 'org)
 (require 'org-project)
 
-(defvar org-tests-directory "~/.emacs.d/tests/files/")
+(defvar org-tests-directory
+  (expand-file-name "tests/files/"
+                    user-emacs-directory))
 (defvar org-disabled-tests '())
 
 (defmacro org-test/parents-should (file &rest body)

@@ -43,9 +43,16 @@
                  ec/my-variables-list))
      (add-to-list 'ec/my-variables-list
                   (list ',type ,@args))
-     (if (or override (not (boundp ,(car args))))
-         ,@body
-       (eval ,(car args)))))
+     (if (not noninteractive)
+         (if (or override (not (boundp ,(car args))))
+             ,@body
+           (eval ,(car args)))
+       (when (not (featurep 'default-prompts))
+         (load (expand-file-name "prompts/default.el"
+                                 user-emacs-directory))
+         (message (format "%s: %s"
+                          ,@(last args)
+                          ,(car args)))))))
 
 (defun-prompt ec/load-or-ask-pred predicate (sym prompt)
   (customize-save-variable sym (y-or-n-p prompt)))

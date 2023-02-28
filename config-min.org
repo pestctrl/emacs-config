@@ -557,7 +557,7 @@
   (define-key emacs-lisp-mode-map (kbd "C-c C-e") 'my/eval-and-replace)
 
   ;; Use cider's eval expression
-  (let ((fetcher (if my-ec/at-ti "github" "github-ssh"))
+  (let ((fetcher (if (or noninteractive my-ec/at-ti) "github" "github-ssh"))
         (quelpa-build-default-files-spec
          '("*.el" (:exclude ".dir-locals.el"))))
     (quelpa `(cider :repo "clojure-emacs/cider" :branch "master" :fetcher ,fetcher)))

@@ -32,7 +32,7 @@
   `(use-package exwm
      :ensure nil
      :defer t
-     :quelpa (exwm :fetcher ,(if my-ec/at-ti "github" "github-ssh") :repo "pestctrl/exwm")
+     :quelpa (exwm :fetcher ,(if (or noninteractive my-ec/at-ti) "github" "github-ssh") :repo "pestctrl/exwm")
      ,@body))
 
 (provide 'use-exwm)

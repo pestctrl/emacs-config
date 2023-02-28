@@ -40,7 +40,7 @@
 (use-package peg)
 (use-package ov)
 (use-package dash-functional)
-(let ((fetcher (if my-ec/at-ti "github" "github-ssh")))
+(let ((fetcher (if (or noninteractive my-ec/at-ti) "github" "github-ssh")))
   (quelpa `(org-ql :repo "pestctrl/org-ql" :branch "my-changes" :fetcher ,fetcher)))
 (require 'org-ql)
 (require 'org-ql-search)

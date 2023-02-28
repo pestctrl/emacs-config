@@ -25,12 +25,11 @@
 ;;; Code:
 
 (message "Loading Emacs config...")
+(setq user-emacs-directory (expand-file-name "./"))
 (let ((inhibit-message t))
-  (load (expand-file-name "init.el"
-                          user-emacs-directory)))
+  (load (expand-file-name "init.el")))
 (message "Running tests...")
-(load (expand-file-name "tests/my-org-tests.el"
-                        user-emacs-directory))
+(load (expand-file-name "tests/my-org-tests.el"))
 
 (provide 'run-tests)
 ;;; run-tests.el ends here

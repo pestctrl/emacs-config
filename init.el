@@ -35,13 +35,17 @@
 
 ;; Add my modules
 (progn
-  (add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
+  (let ((lisp-dir (expand-file-name "lisp/"
+                                    user-emacs-directory)))
+    (add-to-list 'load-path lisp-dir)
 
-  (let ((default-directory  "~/.emacs.d/lisp/"))
-    (normal-top-level-add-subdirs-to-load-path))
+    (let ((default-directory lisp-dir))
+      (normal-top-level-add-subdirs-to-load-path))
 
-  (let ((default-directory  "~/.emacs.d/submodule/"))
-    (normal-top-level-add-subdirs-to-load-path)))
+    (let ((default-directory
+           (expand-file-name "submodule/"
+                             user-emacs-directory)))
+      (normal-top-level-add-subdirs-to-load-path))))
 
 (require 'libs)
 (require 'emacs-custom-load-or-ask)

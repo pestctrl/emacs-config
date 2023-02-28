@@ -135,7 +135,17 @@
     :config
     (defun my/should-backwards-tramp ()
       (and (not (eq (char-before) ?:))
-           (not (eq (char-before) ?@))))
+           (not (eq (char-before) ?@))
+           (save-excursion
+             (re-search-backward "@" nil t))
+           (save-excursion
+             (re-search-backward "/" nil t))
+           (< (save-excursion
+                (re-search-backward "/" nil t)
+                (point))
+              (save-excursion
+                (re-search-backward "@" nil t)
+                (point)))))
 
     (defun my/vertico-directory-up (&optional n)
       (interactive "p")

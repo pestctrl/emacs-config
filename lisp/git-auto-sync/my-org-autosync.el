@@ -69,34 +69,11 @@
   ;; (defvar gac-auto-merge-branch-list nil)
 ;; (make-variable-buffer-local 'gac-auto-merge-branch-list)
 
-(when my/puppet-p
-  (add-to-list 'emacs-startup-hook
-               #'(lambda ()
-                   (run-at-time 30 300 #'gaff/trigger)))
-
-  (add-hook 'emacs-startup-hook
-            #'gac-run-ssh-add)
-
-  (add-hook 'emacs-startup-hook
-            #'keychain-refresh-environment))
-
 (defun-cached 60 gac-run-gaff ()
   (gaff/trigger))
 
 (defun-cached 15 gac-run-ssh-add ()
   (rb/ssh-add))
-
-(add-hook 'git-auto-commit-mode-hook
-          #'gac-run-gaff)
-
-(add-hook 'git-auto-commit-mode-hook
-          #'gac-after-save-func t t)
-
-(add-hook 'git-auto-commit-mode-hook
-          #'gac-run-ssh-add)
-
-(add-hook 'git-auto-commit-mode-hook
-          #'keychain-refresh-environment)
 
 (add-to-list 'safe-local-variable-values
              '(gac-automatically-push-p . t))
@@ -180,8 +157,33 @@
       (timer-event-handler timer))
     (remhash k gac--debounce-timers)))
 
-(add-hook 'kill-emacs-hook
-          'gac-activate-all-timers)
+
+(when (not noninteractive)
+  (when my/puppet-p
+    (add-to-list 'emacs-startup-hook
+                 #'(lambda ()
+                     (run-at-time 30 300 #'gaff/trigger)))
+
+    (add-hook 'emacs-startup-hook
+              #'gac-run-ssh-add)
+
+    (add-hook 'emacs-startup-hook
+              #'keychain-refresh-environment))
+
+  (add-hook 'git-auto-commit-mode-hook
+            #'gac-run-gaff)
+
+  (add-hook 'git-auto-commit-mode-hook
+            #'gac-after-save-func t t)
+
+  (add-hook 'git-auto-commit-mode-hook
+            #'gac-run-ssh-add)
+
+  (add-hook 'git-auto-commit-mode-hook
+            #'keychain-refresh-environment)
+
+  (add-hook 'kill-emacs-hook
+            'gac-activate-all-timers))
 
 ;; (add-hook 'gaff/after-merge-hook
 ;;           (lambda ()

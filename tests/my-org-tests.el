@@ -10,7 +10,8 @@
         (buffer-gensym (gensym "buffer")))
     `(progn
        ,@(save-window-excursion
-           (let ((buffer (find-file-noselect file)))
+           (let ((inhibit-message t)
+                 (buffer (find-file-noselect file)))
              (prog1 (with-current-buffer buffer
                       (beginning-of-buffer)
                       (when (not (org-at-heading-p))
@@ -36,7 +37,8 @@
         (buffer-gensym (gensym "buffer")))
     `(progn
        ,@(save-window-excursion
-           (let ((buffer (find-file-noselect file)))
+           (let ((buffer (find-file-noselect file))
+                 (inhibit-message t))
              (prog1 (with-current-buffer buffer
                       (beginning-of-buffer)
                       (when (not (org-at-heading-p))
@@ -107,4 +109,4 @@
 
 (ert-run-tests-interactively t)
 
-;; (progn (setq org-disabled-tests nil) (mapcar (lambda (sym) (put sym 'ert--test nil)) (apropos-internal "" #'ert-test-boundp)))
+;; (progn (setq org-disabled-tests nil) (mapcar (lambda (sym) (put sym 'ert--test nil)) (apropos-internal "" #'ert-test-boundp))))

@@ -36,7 +36,7 @@
     (LLVMIR       :key ?l    :major-mode llvm-mode :buffer-string "llvm-ir"            :description "[l]lvm-ir"                :compiler-action llvm-ir)
     (before-after :key ?p    :major-mode llvm-mode :buffer-string "print-before-after" :description "[p]rint before/after"     :compiler-action assemble)
     (changed      :key ?P    :major-mode llvm-mode :buffer-string "print-changed"      :description "[P]rint before/after all" :compiler-action assemble)
-    (executable   :key ?\^M  :major-mode nil       :buffer-string "executable"         :description "Executable"               :compiler-action executable)))
+    (executable   :key ?\^M  :major-mode nil       :buffer-string "executable"         :description "[RET]Executable"               :compiler-action executable)))
 
 (defun ll/ensure-clang-binary-built (dir)
   ;; TODO: assumed build-dir constant, should take as argument and prompt

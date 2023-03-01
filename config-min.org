@@ -390,7 +390,7 @@
   ;; side-window stuff
   (setq transient-display-buffer-action
         '(display-buffer-in-side-window
-          (side . right)
+          (side . left)
           (dedicated . t)))
   (global-set-key (kbd "C-x g") 'magit-status)
   (global-set-key (kbd "C-x M-g") 'magit-dispatch)

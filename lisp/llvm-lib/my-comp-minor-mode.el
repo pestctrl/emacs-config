@@ -53,12 +53,13 @@ commands of Compilation major mode are available.  See
 (defun my/enable-comp-keys-if-separate-mode (orig &rest args)
   (let ((ht compilation-finish-local-transient)
         (hs compilation-finish-local-sticky))
-    (aprog1 (apply orig args)
+    (aprog1 (save-window-excursion (apply orig args))
       (with-current-buffer it
         (when (cadr args)
-          (compilation-minor-mode)
+          (compilation-minor-mode t)
           (setq compilation-finish-local-sticky hs)
-          (setq compilation-finish-local-transient ht))))))
+          (setq compilation-finish-local-transient ht)))
+      (display-buffer it))))
 
 (advice-add #'compilation-start
             :around

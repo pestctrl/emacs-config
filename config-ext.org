@@ -272,7 +272,7 @@
 
   (setq epg-gpg-program "gpg2")
   ;; (setq auth-source-debug t)
-  (setq auth-sources '((:source "~/.emacs.d/secrets/.authinfo.gpg")))
+  (setq auth-sources `((:source ,(ef "secrets/.authinfo.gpg"))))
 #+end_src
 ** debbugs
 #+begin_src emacs-lisp
@@ -322,7 +322,7 @@
            )))
 
   (defun get-authinfo (host port)
-    (let* ((netrc (netrc-parse (expand-file-name "~/.emacs.d/secrets/.authinfo.gpg")))
+    (let* ((netrc (netrc-parse (ef "secrets/.authinfo.gpg")))
            (hostentry (netrc-machine netrc host port)))
       (when hostentry (netrc-get hostentry "password"))))
 
@@ -440,7 +440,7 @@
 #+end_src
 * auto-save files in same directory
 #+begin_src emacs-lisp
-  (setq backup-directory-alist `(("." . "~/.emacs.d/backups/")))
+  (setq backup-directory-alist `(("." . ,(ef "backups/"))))
 
   (setq make-backup-files t               ; backup of a file the first time it is saved.
         backup-by-copying t               ; don't clobber symlinks

@@ -18,4 +18,7 @@
 ;; Register my own rx forms
 (require 'my-rx-forms)
 
+(defmacro ef (path)
+  `(expand-file-name ,path user-emacs-directory))
+
 (provide 'libs)

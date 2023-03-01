@@ -47,7 +47,7 @@
   (setq beacon-color "#006400")
 
   ;; Use my fork of chinese-etzy
-  (load-file "~/.emacs.d/my-etzy.el")
+  (load-file (ef "my-etzy.el"))
 
   ;; If I ever decide to turn on display-lines-mode, use relative line
   ;; numbering
@@ -1049,7 +1049,7 @@
   (modus-themes-load-themes)
   (load-theme 'modus-operandi nil t)
 
-  (add-to-list 'custom-theme-load-path "~/.emacs.d/lisp/themes")
+  (add-to-list 'custom-theme-load-path (ef "lisp/themes"))
   (require 'light-default-theme)
   (load-theme 'light-default nil t)
   (require 'dark-default-theme)

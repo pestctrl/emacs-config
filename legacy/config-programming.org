@@ -201,9 +201,9 @@
   (use-package erlang)
 
   (add-to-list 'load-path
-               "~/.emacs.d/submodule/erlang_ls/")
+               (ef "submodule/erlang_ls/"))
 
-  (setq lsp-erlang-server-install-dir "~/.emacs.d/submodule/erlang_ls")
+  (setq lsp-erlang-server-install-dir (ef "submodule/erlang_ls"))
 
   (defun my/erlang-keymap-hook ()
     (local-set-key (kbd "C-c C-c") 'erlang-compile))

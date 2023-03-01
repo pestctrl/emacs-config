@@ -9,7 +9,7 @@
 ** fstree
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'load-path
-               "~/.emacs.d/submodule/org-fstree")
+               (ef "submodule/org-fstree"))
   (require 'org-fstree)
 #+END_SRC
 ** org-bullets
@@ -43,7 +43,7 @@
   (setq plstore-cache-passphrase-for-symmetric-encryption t)
 
   (save-excursion
-    (let ((filename "~/.emacs.d/google-calendar-secret.el"))
+    (let ((filename (ef "google-calendar-secret.el")))
       (when (file-exists-p filename)
         (set-buffer (find-file-noselect filename))
         (let ((var (eval (read (buffer-string)))))
@@ -88,7 +88,7 @@
 *** Old ox-reveal package
 #+BEGIN_SRC
   (add-to-list 'load-path
-               "~/.emacs.d/submodule/org-reveal")
+               (ef "submodule/org-reveal"))
   (require 'ox-reveal)
   (setq org-reveal-root "file:///home/benson/.reveal.js")
   (setq org-structure-template-alist (remove-if (lambda (c) (string= (car c) "n")) org-structure-template-alist))
@@ -192,7 +192,7 @@
       (evil-set-initial-state 'org-brain-visualize-mode 'emacs))
     :config
     (setq org-id-track-globally t)
-    (setq org-id-locations-file "~/.emacs.d/.org-id-locations")
+    (setq org-id-locations-file (ef ".org-id-locations"))
     (push '("b" "Brain" plain (function org-brain-goto-end)
             "* %i%?" :empty-lines 1)
           org-capture-templates)
@@ -218,7 +218,7 @@
 #+END_SRC
 ** org-now
 #+begin_src emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/submodule/org-now")
+  (add-to-list 'load-path (ef "submodule/org-now"))
   (require 'org-now)
   (setq org-now-location
         nil)
@@ -782,7 +782,7 @@
 #+end_src
 * elgantt
 #+begin_src emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/submodule/elgantt")
+  (add-to-list 'load-path (ef "submodule/elgantt"))
   (require 'elgantt)
 #+end_src
 * org-kanban

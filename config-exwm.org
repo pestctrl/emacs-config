@@ -129,7 +129,7 @@
 #+end_src
 * exwm-background
 #+begin_src emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/submodule/exwm-background/")
+  (add-to-list 'load-path (ef "submodule/exwm-background/"))
   (require 'exwm-background)
 
   (let ((wm (shell-command-to-string "wmctrl -m")))

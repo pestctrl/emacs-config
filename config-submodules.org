@@ -10,7 +10,7 @@
 * Youtube-dl
 #+BEGIN_SRC emacs-lisp
   (when (executable-find "youtube-dl")
-    (add-to-list 'load-path "~/.emacs.d/submodule/youtube-dl-emacs/")
+    (add-to-list 'load-path (ef "submodule/youtube-dl-emacs/"))
     (require 'youtube-dl)
 
     (defun youtube-dl-song (url)

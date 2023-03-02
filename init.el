@@ -51,6 +51,10 @@
 (require 'emacs-custom-load-or-ask)
 (require 'my-predicates)
 
+(when (and my-ec/at-ti
+           (string-match-p ".*NATIVE_COMP.*" system-configuration-features))
+  (setenv "PATH" (concat "/db/sds/packages2/emacs-master/bin:" (getenv "PATH"))))
+
 (require 'my-keymap)
 
 (when (boundp 'face--new-frame-defaults)

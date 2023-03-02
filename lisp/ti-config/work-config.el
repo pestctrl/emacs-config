@@ -148,5 +148,25 @@
 
 (define-key tablegen-mode-map (kbd "M-.") #'ll/jump-to-tablegen)
 
+;; (when (string-match-p ".*NATIVE_COMP.*" system-configuration-features)
+;;   (defun replace-path-for-async-native-comp (orig &rest args)
+;;     (let ((path (getenv "PATH")))
+;;       (setenv "PATH" (concat "/db/sds/packages2/emacs-master/bin:" path))
+;;       (apply orig args)))
+
+;;   (defun replace-path-for-native-comp (orig &rest args)
+;;     (let ((path (getenv "PATH")))
+;;       (setenv "PATH" (concat "/db/sds/packages2/emacs-master/bin:" path))
+;;       (apply orig args)
+;;       (setenv "PATH" path)))
+
+;;   (advice-add #'native-compile
+;;               :around
+;;               #'replace-path-for-native-comp)
+
+;;   (advice-add #'native-compile-async
+;;               :around
+;;               #'replace-path-for-async-native-comp))
+
 (provide 'work-config)
 ;;; work-config.el ends here

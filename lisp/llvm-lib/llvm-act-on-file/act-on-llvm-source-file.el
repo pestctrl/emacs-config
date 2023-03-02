@@ -25,8 +25,7 @@
 ;;; Code:
 
 (defun ll/is-llvm-source-file (file)
-  (and (string= "cpp" (file-name-extension file))
-       (string-match-p ".*llvm-project.*" file)))
+  (string-match-p ".*llvm-project.*" file))
 
 (defun ll/act-on-llvm-source-file (file)
   (let ((dir (lls/get-llvm-build-dir)))

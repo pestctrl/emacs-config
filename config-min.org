@@ -346,6 +346,10 @@
   (setq dired-dwim-target t)
   (setq dired-listing-switches "-al  --group-directories-first --sort=extension")
 
+  (when (string-match-p ".*NATIVE_COMP.*" system-configuration-features)
+    (require 'dired-native-compile)
+    (define-key dired-mode-map (kbd "B") #'dired-do-native-compile))
+
   ;; diredx lets me hide stuff I don't want to see
   (require 'dired-x)
   (add-hook 'dired-mode-hook (lambda () (dired-omit-mode)))

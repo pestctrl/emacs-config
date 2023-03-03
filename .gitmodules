@@ -1,49 +1,49 @@
-[submodule "custom/mu"]
+[submodule "submodule/mu"]
 	path = submodule/mu
 	url = https://github.com/djcb/mu
-[submodule "custom/youtube-dl-emacs"]
+[submodule "submodule/youtube-dl-emacs"]
 	path = submodule/youtube-dl-emacs
 	url = https://github.com/skeeto/youtube-dl-emacs
-[submodule "custom/bookmark-plus"]
+[submodule "submodule/bookmark-plus"]
 	path = submodule/bookmark-plus
 	url = https://github.com/emacsmirror/bookmark-plus
-[submodule "custom/emacs-memoize"]
+[submodule "submodule/emacs-memoize"]
 	path = submodule/emacs-memoize
 	url = https://github.com/skeeto/emacs-memoize
-[submodule "custom/xelb"]
+[submodule "submodule/xelb"]
 	path = submodule/xelb
 	url = https://github.com/ch11ng/xelb
-[submodule "custom/org-fstree"]
+[submodule "submodule/org-fstree"]
 	path = submodule/org-fstree
 	url = http://repo.or.cz/org-fstree.git
-[submodule "custom/ts.el"]
+[submodule "submodule/ts.el"]
 	path = submodule/ts.el
 	url = https://github.com/alphapapa/ts.el
-[submodule "custom/eosd"]
+[submodule "submodule/eosd"]
 	path = submodule/eosd
 	url = https://github.com/clarete/eosd
-[submodule "custom/org-now"]
+[submodule "submodule/org-now"]
 	path = submodule/org-now
 	url = https://github.com/alphapapa/org-now
-[submodule "custom/power-mode.el"]
+[submodule "submodule/power-mode.el"]
 	path = submodule/power-mode.el
 	url = https://github.com/ALSchwalm/power-mode.el
-[submodule "custom/leetcode-emacs"]
+[submodule "submodule/leetcode-emacs"]
 	path = submodule/leetcode-emacs
 	url = https://github.com/ginqi7/leetcode-emacs
-[submodule "custom/subed"]
+[submodule "submodule/subed"]
 	path = submodule/subed
 	url = https://github.com/rndusr/subed
-[submodule "custom/exwm-background"]
+[submodule "submodule/exwm-background"]
 	path = submodule/exwm-background
 	url = https://github.com/pestctrl/exwm-background
-[submodule "custom/erlang_ls"]
+[submodule "submodule/erlang_ls"]
 	path = submodule/erlang_ls
 	url = https://github.com/erlang-ls/erlang_ls
-[submodule "custom/sourcer"]
+[submodule "submodule/sourcer"]
 	path = submodule/sourcer
 	url = https://github.com/erlang/sourcer
-[submodule "custom/org-reveal"]
+[submodule "submodule/org-reveal"]
 	path = submodule/org-reveal
 	url = https://github.com/yjwen/org-reveal
 [submodule "submodule/emacs-piper"]

@@ -1,4 +1,4 @@
-#+PROPERTY: header-args :tangle "~/.emacs.d/my-redefs.el" :comments both
+#+PROPERTY: header-args :tangle (ef "my-redefs.el") :comments both
 
 * Filter by top heading, but only top todo heading
   #+begin_src emacs-lisp

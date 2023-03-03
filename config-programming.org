@@ -1,4 +1,4 @@
-#+PROPERTY: header-args:emacs-lisp :tangle "~/.emacs.d/config-programming.el" :comments both
+#+PROPERTY: header-args:emacs-lisp :tangle (ef "config-programming.el") :comments both
 
 * lsp
 #+begin_src emacs-lisp

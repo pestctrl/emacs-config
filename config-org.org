@@ -1,4 +1,4 @@
-#+PROPERTY: header-args:emacs-lisp :tangle "~/.emacs.d/config-org.el" :comments both
+#+PROPERTY: header-args:emacs-lisp :tangle (ef "config-org.el") :comments both
 
 * The all-mighty org configuration
 #+begin_src emacs-lisp

@@ -15,7 +15,7 @@
   (setq gnutls-algorithm-priority
 	    "NORMAL:-VERS-TLS1.3"))
 
-(setq gc-cons-threshold 200000000)
+(setq gc-cons-threshold (* 100 1024 1024))
 
 ;; fetch the list of packages available
 (unless package-archive-contents
@@ -124,6 +124,9 @@
   (org-babel-load-file
    (expand-file-name "config-submodules.org"
                      user-emacs-directory)))
+
+;; Set gc-cons-threshold lower, to decrease GC times.
+(setq gc-cons-threshold (* 20 1024 1024))
 
 (setq my/finished t)
 ;; Testing pull from windows

@@ -389,7 +389,13 @@
   ;; Magit
   (use-package magit)
   (use-package magit-popup)
-  (use-package magit-todos)
+  (use-package magit-todos
+    :config
+    (require 'hl-todo)
+    (add-to-list 'hl-todo-keyword-faces
+                 '("TODO(pestctrl)" . "#FFFFFF"))
+    (add-to-list 'magit-todos-keywords-list
+                 "TODO(pestctrl)"))
   ;; Todo: Figure out why transient side-window stuff wrecks my
   ;; side-window stuff
   (setq transient-display-buffer-action

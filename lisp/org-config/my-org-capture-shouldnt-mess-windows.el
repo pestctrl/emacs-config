@@ -65,5 +65,33 @@
             :around
             #'my/org-todo-side-window-hack)
 
+(defun my/balance-windows-after-delete-side (fun &optional window)
+  (let* ((win (or window (selected-window)))
+         (should-rebalance
+          (my/side-window-p win)))
+    (funcall fun win)
+    (when should-rebalance
+      (let* ((window
+	          (cond
+	           ((or (not win)
+		            (frame-live-p win))
+	            (frame-root-window win))
+	           ((or (window-live-p win)
+		            (window-child win))
+	            win)
+	           (t
+	            (error "Not a window or frame %s" win))))
+	         (frame (window-frame window)))
+        ;; Balance vertically.
+        (window--resize-reset (window-frame window))
+        (balance-windows-1 window)
+        (when (window--resize-apply-p frame)
+          (window-resize-apply frame)
+          (window--pixel-to-total frame))))))
+
+;; (advice-add #'delete-window
+;;             :around
+;;             #'my/balance-windows-after-delete-side)
+
 (provide 'my-org-capture-shouldnt-mess-windows)
 ;;; my-org-capture-shouldnt-mess-windows.el ends here

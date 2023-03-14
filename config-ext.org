@@ -86,7 +86,7 @@
                  (side . right)
                  (select . t)
                  (slot . 7)
-                 (window-width . 80)
+                 (window-width . 85)
                  (window-parameters
                   . ((no-delete-other-windows . t)
                      (dedicated . t)))))

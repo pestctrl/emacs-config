@@ -43,12 +43,13 @@
             :around
             #'my/org-capture-shouldnt-mess-windows)
 
-(defun my/org-capture-finalize-shouldnt-mess-windows (fun &rest args)
+(defun my/org-capture-finalize-shouldnt-mess-windows (&rest args)
   (save-window-excursion
-    (apply fun args)))
+    (delete-window)
+    (org-capture-put :return-to-wconf (current-window-configuration))))
 
 (advice-add #'org-capture-finalize
-            :around
+            :before
             #'my/org-capture-finalize-shouldnt-mess-windows)
 
 (defun my/org-todo-side-window-hack (fun &rest args)

@@ -98,12 +98,13 @@
           (my/side-window-p win)))
     (funcall fun win)
     (when should-rebalance
-      (-->
-       (window-list)
-       (remove-if-not #'my/side-window-p it)
-       (first it)
-       (with-selected-window it
-         (call-interactively #'my/rebalance-windows-vertical))))))
+      (when-let ((side-win
+                  (-->
+                   (window-list)
+                   (remove-if-not #'my/side-window-p it)
+                   (first it))))
+        (with-selected-window side-win
+          (call-interactively #'my/rebalance-windows-vertical))))))
 
 (advice-add #'delete-window
             :around

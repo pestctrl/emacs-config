@@ -157,7 +157,6 @@
       (timer-event-handler timer))
     (remhash k gac--debounce-timers)))
 
-
 (when (not noninteractive)
   (when my/puppet-p
     (add-to-list 'emacs-startup-hook

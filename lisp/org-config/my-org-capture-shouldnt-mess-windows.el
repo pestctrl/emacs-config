@@ -45,7 +45,14 @@
 
 (defun my/org-capture-finalize-shouldnt-mess-windows (&rest args)
   (save-window-excursion
-    (delete-window)
+    ;; This basically means that we don't change window configurations when
+    ;; there are previous buffers to be seen. IDK if this will have unintended
+    ;; consequences, because...
+    (when (zerop (length (window-prev-buffers)))
+      (delete-window))
+    ;; current-window-configuration will encode a buffer that's about to be
+    ;; deleted. I tested it, and it does what I want, so maybe there's no
+    ;; problem?
     (org-capture-put :return-to-wconf (current-window-configuration))))
 
 (advice-add #'org-capture-finalize
@@ -65,33 +72,42 @@
             :around
             #'my/org-todo-side-window-hack)
 
+(defun my/rebalance-windows-vertical (&optional window-or-frame)
+  (interactive)
+  (let* ((window
+	      (cond
+	       ((or (not window-or-frame)
+		        (frame-live-p window-or-frame))
+	        (frame-root-window window-or-frame))
+	       ((or (window-live-p window-or-frame)
+		        (window-child window-or-frame))
+	        window-or-frame)
+	       (t
+	        (error "Not a window or frame %s" window-or-frame))))
+	     (frame (window-frame window)))
+    ;; Balance vertically.
+    (window--resize-reset (window-frame window))
+    (balance-windows-1 window)
+    (when (window--resize-apply-p frame)
+      (window-resize-apply frame)
+      (window--pixel-to-total frame))))
+
 (defun my/balance-windows-after-delete-side (fun &optional window)
   (let* ((win (or window (selected-window)))
          (should-rebalance
           (my/side-window-p win)))
     (funcall fun win)
     (when should-rebalance
-      (let* ((window
-	          (cond
-	           ((or (not win)
-		            (frame-live-p win))
-	            (frame-root-window win))
-	           ((or (window-live-p win)
-		            (window-child win))
-	            win)
-	           (t
-	            (error "Not a window or frame %s" win))))
-	         (frame (window-frame window)))
-        ;; Balance vertically.
-        (window--resize-reset (window-frame window))
-        (balance-windows-1 window)
-        (when (window--resize-apply-p frame)
-          (window-resize-apply frame)
-          (window--pixel-to-total frame))))))
+      (-->
+       (window-list)
+       (remove-if-not #'my/side-window-p it)
+       (first it)
+       (with-selected-window it
+         (call-interactively #'my/rebalance-windows-vertical))))))
 
-;; (advice-add #'delete-window
-;;             :around
-;;             #'my/balance-windows-after-delete-side)
+(advice-add #'delete-window
+            :around
+            #'my/balance-windows-after-delete-side)
 
 (provide 'my-org-capture-shouldnt-mess-windows)
 ;;; my-org-capture-shouldnt-mess-windows.el ends here

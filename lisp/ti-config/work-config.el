@@ -41,6 +41,10 @@
 
 ;; (setq url-proxy-services '(("http" . "http://webproxy.ext.ti.com:80")
 ;;                            ("https" . "http://webproxy.ext.ti.com:80")))
+(use-package ein
+  :config
+  (setq request-curl-options '("--noproxy \"*\""))
+  (setq ein:jupyter-server-command "~/.local/bin/jupyter"))
 
 (global-display-fill-column-indicator-mode t)
 

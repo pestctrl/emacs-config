@@ -189,7 +189,8 @@
   ;; For some reason, rustic is causing weird dialogue issues on
   ;; puppet's computer.
   (when (not my/puppet-p)
-    (use-package rustic))
+    (use-package rustic)
+    (setq rustic-use-rust-save-some-buffers nil))
 #+end_src
 * golang
 #+begin_src emacs-lisp

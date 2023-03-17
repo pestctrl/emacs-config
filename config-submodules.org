@@ -6,6 +6,7 @@
   (use-package simple-httpd)
   (require 'code-compass)
   (setq c/preferred-browser "firefox")
+  (remove-hook 'prog-mode-hook 'c/display-contributors-delayed)
 #+end_src
 * Youtube-dl
 #+BEGIN_SRC emacs-lisp

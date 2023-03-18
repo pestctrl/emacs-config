@@ -29,6 +29,9 @@
                "/usr/share/emacs/site-lisp/mu4e/")
   (require 'mu4e)
 
+  ;; For mbsync, this must be set
+  (setq mu4e-change-filenames-when-moving t)
+
   (add-to-list 'mu4e-view-actions
                '("ViewInBrowser" . mu4e-action-view-in-browser) t)
 

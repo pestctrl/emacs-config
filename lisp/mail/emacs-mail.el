@@ -25,6 +25,7 @@
 ;;; Code
 
 (require 'notmuch-config)
+(require 'mu4e-configuration)
 
 (provide 'emacs-mail)
 ;;; emacs-mail.el ends here

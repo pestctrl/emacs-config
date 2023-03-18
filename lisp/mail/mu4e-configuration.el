@@ -23,11 +23,16 @@
 ;;; Commentary:
 
 ;;; Code:
+(require 'mbsync)
 
 (unless (eq system-type 'windows-nt)
   (add-to-list 'load-path
                "/usr/share/emacs/site-lisp/mu4e/")
   (require 'mu4e)
+
+  (add-hook 'mbsync-hooks
+            '(lambda (&rest _ignore)
+               (mu4e-update-mail-and-index t)))
 
   ;; For mbsync, this must be set
   (setq mu4e-change-filenames-when-moving t)

@@ -83,9 +83,8 @@
   (add-to-list 'display-buffer-alist
                `(my/is-org-capture-buffer
                  display-buffer-in-side-window
-                 (side . right)
+                 (side . left)
                  (select . t)
-                 (slot . 7)
                  (window-width . 85)
                  (window-parameters
                   . ((no-delete-other-windows . t)

@@ -54,6 +54,30 @@
           ("/INBOX/unsorted" . ?u)
           ("/Archive" . ?a)))
 
+  (setq mu4e-bookmarks
+        '(( :name  "Unread messages"
+            :query "flag:unread AND NOT flag:trashed"
+            :key ?u)
+          ( :name "Today's messages"
+            :query "date:today..now"
+            :key ?t)
+          ( :name "Last 7 days"
+            :query "date:7d..now"
+            :hide-unread t
+            :key ?w)
+          ( :name "Messages with images"
+            :query "mime:image/*"
+            :key ?p)))
+
+  (setq mu4e-bookmarks
+        (mapcar (lambda (x)
+                  (let ((str (plist-get x :query)))
+                    (when (not (string-match-p "Unnecessary/mailing_lists" str))
+                      (setf (plist-get x :query)
+                            (concat str " AND NOT maildir:/Unnecessary/mailing_lists*"))))
+                  x)
+                mu4e-bookmarks))
+
   (defun my/mu-init ()
     (interactive)
     (let ((addresses

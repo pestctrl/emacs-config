@@ -30,7 +30,7 @@
                "/usr/share/emacs/site-lisp/mu4e/")
   (require 'mu4e)
 
-  (add-hook 'mbsync-hooks
+  (add-hook 'mbsync-postsync-hooks
             '(lambda (&rest _ignore)
                (mu4e-update-mail-and-index t)))
 

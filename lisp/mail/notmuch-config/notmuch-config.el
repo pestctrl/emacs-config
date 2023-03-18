@@ -224,45 +224,15 @@
 
 (use-exwm
  :config
- ;; (defvar offlineimap-timer nil)
- ;; (defvar offlineimap-process nil)
+ (require 'mbsync)
+ ;; (add-hook 'mbsync-presync-hooks
+ ;;           (lambda (&rest _)
+ ;;             (shell-command "~/bin/notmuch-presync.sh")))
 
- ;; (defun run-offlineimap ()
- ;;   (interactive)
- ;;   (if (and (processp offlineimap-process)
- ;;            (process-live-p offlineimap-process))
- ;;       (message "offlineimap already running...")
- ;;     (message "offlineimap starting...")
- ;;     (when (and (timerp offlineimap-timer)
- ;;                (not (timer--triggered offlineimap-timer)))
- ;;       (cancel-timer offlineimap-timer))
- ;;     (call-process-shell-command "timedatectl" nil "*offlineimap-output*")
- ;;     (set-process-sentinel
- ;;      (setq offlineimap-process
- ;;            (start-process-shell-command "offlineimap" "*offlineimap-output*" "offlineimap"))
- ;;      #'(lambda (process event)
- ;;          (when (string-match-p "exited abnormally with code 1" event)
- ;;            (with-current-buffer (process-buffer offlineimap-process)
- ;;              (when (string-match-p "get_password_emacs"(buffer-string))
- ;;                (erase-buffer)
- ;;                (message "Oops, didn't grab a password. ")
- ;;                (setq offlineimap-timer (run-with-timer 300 nil #'run-offlineimap)))))
- ;;          (when (string-match-p "^finished" event)
- ;;            (message "Offlineimap finished")
- ;;            (setq offlineimap-timer (run-with-timer 300 nil #'run-offlineimap)))))))
-
- ;; (defun stop-offlineimap ()
- ;;   (interactive)
- ;;   (when (timerp offlineimap-timer)
- ;;     (cancel-timer offlineimap-timer))
- ;;   (when (processp offlineimap-process)
- ;;     (set-process-sentinel offlineimap-process
- ;;                           nil)))
-
- ;; (add-to-list 'exwm-init-hook
- ;;              #'run-offlineimap
- ;;              t)
- (require 'mbsync))
+ ;; (add-hook 'mbsync-postsync-hooks
+ ;;           (lambda (&rest _)
+ ;;             (shell-command "~/bin/notmuch-postsync.sh")))
+ )
 
 (provide 'notmuch-config)
 ;;; notmuch-config.el ends here

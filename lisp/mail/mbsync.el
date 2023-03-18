@@ -27,11 +27,8 @@
 (defvar mbsync-timer nil)
 (defvar mbsync-process nil)
 
-(defvar mbsync-hooks '())
-
-(add-hook 'mbsync-hooks
-          '(lambda (&rest _args)
-             (message "Hello!")))
+(defvar mbsync-presync-hooks '())
+(defvar mbsync-postsync-hooks '())
 
 (defun mbsync-process-sentinel (process event)
   (when (string-match-p "exited abnormally with code 1" event)
@@ -42,7 +39,7 @@
         (setq mbsync-timer (run-with-timer 300 nil #'run-mbsync)))))
   (when (string-match-p "^finished" event)
     (message "mbsync finished")
-    (run-hooks 'mbsync-hooks)
+    (run-hooks 'mbsync-postsync-hooks)
     (setq mbsync-timer (run-with-timer 300 nil #'run-mbsync))))
 
 (defun run-mbsync ()
@@ -50,6 +47,7 @@
   (if (and (processp mbsync-process)
            (process-live-p mbsync-process))
       (message "mbsync already running...")
+    (run-hooks 'mbsync-presync-hooks)
     (message "mbsync starting...")
     (when (and (timerp mbsync-timer)
                (not (timer--triggered mbsync-timer)))

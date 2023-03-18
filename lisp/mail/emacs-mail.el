@@ -24,6 +24,7 @@
 
 ;;; Code
 
+(require 'mbsync)
 (require 'notmuch-config)
 (require 'mu4e-configuration)
 

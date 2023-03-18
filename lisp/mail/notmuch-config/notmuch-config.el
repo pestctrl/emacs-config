@@ -262,42 +262,7 @@
  ;; (add-to-list 'exwm-init-hook
  ;;              #'run-offlineimap
  ;;              t)
-
- (defvar mbsync-timer nil)
- (defvar mbsync-process nil)
-
- (defvar mbsync-hooks '())
-
- (add-hook 'mbsync-hooks
-           '(lambda (&rest _args)
-              (message "Hello!")))
-
- (defun mbsync-process-sentinel (process event)
-   (when (string-match-p "exited abnormally with code 1" event)
-     (with-current-buffer (process-buffer mbsync-process)
-       (when (string-match-p "get_password_emacs"(buffer-string))
-         (erase-buffer)
-         (message "Oops, didn't grab a password. ")
-         (setq mbsync-timer (run-with-timer 300 nil #'run-mbsync)))))
-   (when (string-match-p "^finished" event)
-     (message "mbsync finished")
-     (run-hooks 'mbsync-hooks)
-     (setq mbsync-timer (run-with-timer 300 nil #'run-mbsync))))
-
- (defun run-mbsync ()
-   (interactive)
-   (if (and (processp mbsync-process)
-            (process-live-p mbsync-process))
-       (message "mbsync already running...")
-     (message "mbsync starting...")
-     (when (and (timerp mbsync-timer)
-                (not (timer--triggered mbsync-timer)))
-       (cancel-timer mbsync-timer))
-     (call-process-shell-command "timedatectl" nil "*mbsync-output*")
-     (set-process-sentinel
-      (setq mbsync-process
-            (start-process-shell-command "mbsync" "*mbsync-output*" "mbsync fm"))
-      #'mbsync-process-sentinel))))
+ (require 'mbsync))
 
 (provide 'notmuch-config)
 ;;; notmuch-config.el ends here

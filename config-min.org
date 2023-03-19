@@ -395,7 +395,8 @@
     (add-to-list 'hl-todo-keyword-faces
                  '("TODO(pestctrl)" . "#FFFFFF"))
     (add-to-list 'magit-todos-keywords-list
-                 "TODO(pestctrl)"))
+                 "TODO(pestctrl)")
+    (magit-todos-mode 1))
   ;; Todo: Figure out why transient side-window stuff wrecks my
   ;; side-window stuff
   (setq transient-display-buffer-action

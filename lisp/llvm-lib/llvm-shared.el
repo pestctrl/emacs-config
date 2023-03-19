@@ -25,6 +25,7 @@
 ;;; Code:
 
 (require 'magit)
+(require 'eieio)
 
 ;; =========================== LLVM Rebuild ==========================
 
@@ -38,49 +39,75 @@
 
 ;; =============================== Init ==============================
 
-(defvar lls/llvm-root-dir nil)
-(defvar lls/llvm-build-dirs nil)
-(defvar lls/llvm-bin-dirs nil)
+(defclass llvm-config ()
+  ((root-dir :initarg :root-dir :type string)
+   (build-dirs :initarg :build-dirs :type list)
+   (target :initarg :target :type string)
+   (bin-dirs :initarg :bin-dirs :type list :initform nil)
+   (compile-command-fun :initarg :cc :type function :initform (lambda ()))
+   (dis-command-fun :initarg :dc :type function :initform (lambda ()))
+   (llc-command-fun :initarg :llc :type function :initform (lambda ()))))
+
+(defvar lls/llvm-config nil)
+;; (defvar lls/llvm-root-dir nil)
+;; (defvar lls/llvm-build-dirs nil)
+;; (defvar lls/llvm-bin-dirs nil)
 
 (defvar lls/target-init-fun
   nil)
 
-(defun lls/init-llvm-shared (root-dir build-dirs &optional bindirs)
-  ;; TODO: make interactive
-  (let ((r (rx (or "RelWithAsserts" "Release"))))
-    (setq lls/llvm-root-dir (or root-dir
-                                (read-file-name "llvm-project directory? "))
-          lls/llvm-build-dirs
-          (sort build-dirs
+;; (defun lls/init-llvm-shared (root-dir build-dirs &optional bindirs)
+;;   ;; TODO: make interactive
+;;   (let ((r (rx (or "RelWithAsserts" "Release"))))
+;;     (setq lls/llvm-root-dir (or root-dir
+;;                                 (read-file-name "llvm-project directory? "))
+;;           lls/llvm-build-dirs
+;;           (sort build-dirs
+;;                 #'(lambda (x y)
+;;                     (cond ((string-match-p r y) nil)
+;;                           ((string-match-p r x) t)
+;;                           (t (string< x y)))))
+;;           lls/llvm-bin-dirs bindirs)))
+
+(defun lls/conf-get (sym)
+  (slot-value lls/llvm-config sym))
+
+(defun lls/initialize ()
+  (interactive)
+  (setq lls/llvm-config
+        (funcall lls/target-init-fun))
+  (setf (slot-value lls/llvm-config
+                    'build-dirs)
+        (let ((r (rx (or "RelWithAsserts" "Release"))))
+          (sort (lls/conf-get 'build-dirs)
                 #'(lambda (x y)
                     (cond ((string-match-p r y) nil)
                           ((string-match-p r x) t)
-                          (t (string< x y)))))
-          lls/llvm-bin-dirs bindirs)))
+                          (t (string< x y))))))))
 
-(defun lls/uninitialized? ()
-  (not (and lls/llvm-root-dir
-            lls/llvm-build-dirs)))
+(defun lls/ensure-initialized ()
+  (when (or (not lls/llvm-config)
+            (not (llvm-config-p lls/llvm-config)))
+    (if (not (functionp lls/target-init-fun))
+        (error "Please register an init function for llvm")
+      (lls/initialize))))
 
 (defun lls/get-llvm-root-dir ()
-  (when (lls/uninitialized?)
-    (funcall lls/target-init-fun #'lls/init-llvm-shared))
-  lls/llvm-root-dir)
+  (lls/ensure-initialized)
+  (lls/conf-get 'root-dir))
 
 (defun lls/get-llvm-build-dirs ()
-  (when (lls/uninitialized?)
-    (funcall lls/target-init-fun #'lls/init-llvm-shared))
-  lls/llvm-build-dirs)
+  (lls/ensure-initialized)
+  (lls/conf-get 'build-dirs))
 
 (defun lls/get-llvm-bin-dir ()
   (car (lls/get-llvm-bin-dirs)))
 
 (defun lls/get-llvm-bin-dirs ()
-  (when (lls/uninitialized?)
-    (funcall lls/target-init-fun #'lls/init-llvm-shared))
+  (lls/ensure-initialized)
   (append (mapcar #'(lambda (x) (expand-file-name "bin" x))
                   (lls/get-llvm-build-dirs))
-          lls/llvm-bin-dirs))
+          (lls/conf-get 'bin-dirs)))
 
 (defun lls/get-llvm-build-dir ()
   (car (lls/get-llvm-build-dirs)))
@@ -88,8 +115,10 @@
 (defun lls/add-llvm-build-dir (dir)
   (interactive
    (list (read-file-name "Where? ")))
-  (add-to-list 'lls/llvm-build-dirs
-               dir))
+  (lls/ensure-initialized)
+  (setf (slot-value lls/llvm-config 'build-dirs)
+        (cons dir
+              (lls/conf-get 'build-dirs))))
 
 ;; =============================== Misc ==============================
 
@@ -115,42 +144,54 @@
              (or directories
                  (lls/get-llvm-bin-dirs))))
 
-(defvar lls/get-clang-command-fun
-  (cl-function
-   (lambda (compiler file action &key output rest)
-     (string-join (list compiler
-                        (string-join rest " ")
-                        file
-                        (pcase action
-                          ('compile "-c")
-                          ('assemble "-S")
-                          ('preprocess "-E")
-                          ('llvm-ir "-S -emit-llvm")
-                          ('executable ""))
-                        (format "-o %s"
-                                (or output
-                                    (and (eq action 'executable) "a.out")
-                                    "-")))
-                  " "))))
+(defun lls/get-clang-command-fun (&rest args)
+  (apply (lls/conf-get 'compile-command-fun)
+         args))
 
-(defvar lls/get-llc-command-fun
-  (lambda (file _action)
-    (concat "llc -o - "
-            file " ")))
+(defun lls/get-llc-command-fun (&rest args)
+  (apply (lls/conf-get 'llc-command-fun) args))
 
-(defvar lls/get-dis-command-fun
-  (lambda (file _action)
-    (concat "llvm-objdump --disassemble "
-            file " ")))
+(defun lls/get-dis-command-fun (&rest args)
+  (apply (lls/conf-get 'dis-command-fun) args))
 
 ;; ========================= LLVM Build Dirs =========================
+(cl-defun lls/default-comp-fun (compiler file action &key output rest)
+  (string-join
+   (list compiler
+         (string-join rest " ")
+         file
+         (pcase action
+           ('compile "-c")
+           ('assemble "-S")
+           ('preprocess "-E")
+           ('llvm-ir "-S -emit-llvm")
+           ('executable ""))
+         (format "-o %s"
+                 (or output
+                     (and (eq action 'executable) "a.out")
+                     "-")))
+   " "))
+
+(defun lls/default-llc-comm (file _action)
+  (concat "llc -o - "
+          file " "))
+
+(defun lls/default-dis-comm (file _action)
+  (concat "llvm-objdump --disassemble "
+          file " "))
 
 (setq lls/target-init-fun
       ;; TODO: load llvm-mode
-      (lambda (callback)
-        (funcall callback
-                 (lls/guess-root-dir-fun)
-                 (lls/guess-build-dirs-fun))))
+      (lambda ()
+        (make-instance
+         'llvm-config
+         :root-dir (lls/guess-root-dir-fun)
+         :build-dirs (lls/guess-build-dirs-fun)
+         :bin-dirs '("/usr/bin/")
+         :target "X86"
+         :cc #'lls/default-comp-fun
+         :dc #'lls/default-dis-comm
+         :llc #'lls/default-llc-comm)))
 
 (defun lls/guess-root-dir-fun ()
   ;; TODO: constant

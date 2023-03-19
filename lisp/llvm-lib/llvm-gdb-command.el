@@ -45,8 +45,7 @@
 
 (defun ll/get-clang-command-for-file (clang file)
   (string-join
-   (list (funcall
-          lls/get-clang-command-fun
+   (list (lls/get-clang-command-fun
           clang file 'compile
           :output (make-temp-file nil nil ".o"))
          "-v")

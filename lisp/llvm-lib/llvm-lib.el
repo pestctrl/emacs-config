@@ -30,7 +30,7 @@
 (require 'llvm-jump-to-tablegen)
 
 (define-prefix-command '*llvm-map*)
-;; (define-key *root-map* (kbd "C-w") '*llvm-map*)
+(define-key *root-map* (kbd "C-w") '*llvm-map*)
 
 (define-key *llvm-map* (kbd "a") #'ll/act-on-file)
 (define-key *llvm-map* (kbd "c") #'ll/llvm-build-tool)

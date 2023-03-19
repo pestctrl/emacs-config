@@ -47,9 +47,9 @@
   (let ((compiler (lls/prompt-tool "clang$" (lls/get-llvm-bin-dir)))
         (tmp-file (make-temp-file (file-name-sans-extension (file-name-nondirectory file)))))
     (string-join
-     (list (funcall lls/get-clang-command-fun compiler file 'compile
-                    :output tmp-file)
-           (funcall lls/get-dis-command-fun tmp-file nil))
+     (list (lls/get-clang-command-fun compiler file 'compile
+                                      :output tmp-file)
+           (lls/get-dis-command-fun tmp-file nil))
      " && ")))
 
 (defun ll/build-clang-command (file action)
@@ -58,7 +58,7 @@
     (let ((compiler-action (aml/get-map-prop ll/c-file-action-map action :compiler-action))
           (compiler (lls/prompt-tool "clang$")))
       (string-join
-       (list (funcall lls/get-clang-command-fun compiler file compiler-action)
+       (list (lls/get-clang-command-fun compiler file compiler-action)
              (pcase action
                ('debug (format "-mllvm -debug-only=%s" (read-string "Which pass? ")))
                ('before-after (let ((pass (read-string "Which pass? ")))

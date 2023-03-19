@@ -77,7 +77,9 @@
         found)
     (while (and win (not found))
       ;; not a vertical combination
-      (if (not (window-combination-p win nil))
+      (when (not (window-valid-p win))
+        (throw 'invalid-window 'invalid-window))
+      (if (or (not (window-combination-p win nil)))
           (setq win (window-parent win))
         (setq found win)))
     found))
@@ -107,9 +109,12 @@
           (my/side-window-p win)))
     (funcall fun win)
     (when should-rebalance
-      (my/rebalance-windows-vertical
-       (my/get-first-parent-vertical-window-combination
-        parent-win)))))
+      (when (eq 'invalid-window
+                (catch 'invalid-window
+                  (my/rebalance-windows-vertical
+                   (my/get-first-parent-vertical-window-combination
+                    parent-win))))
+        (message "Ohhh, some kind of window-error happened")))))
 
 (advice-add #'delete-window
             :around

@@ -32,7 +32,11 @@
 (defun my/window-tree-to-dot (window)
   (when window
     (let ((window-id (my/get-window-id window))
+          (buffer (window-buffer window))
           (child (window-child window)))
+      (insert
+       (format "%d [label=\"%d\n%s\"]\n"
+               window-id window-id (if buffer (buffer-name buffer) "")))
       (while child
         (insert
          (format "%s -> %s\n"
@@ -42,9 +46,9 @@
 
 (defun my/dump-window-tree ()
   (interactive)
-  (let ((win (frame-root-window nil))
-        (dot-file (make-temp-file "emacs-window-tree-" nil ".dot"))
-        (png-file (make-temp-file "emacs-window-tree-" nil ".png")))
+  (let* ((win (frame-root-window nil))
+         (dot-file (make-temp-file "emacs-window-tree-" nil ".dot"))
+         (png-file (concat (file-name-sans-extension dot-file) ".png")))
     (with-current-buffer (find-file-noselect dot-file)
       (insert "digraph g {\n")
       (my/window-tree-to-dot win)

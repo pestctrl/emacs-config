@@ -734,7 +734,7 @@
     (bind-key "C-c C-r" 'dired-rsync dired-mode-map)
     (add-to-list 'global-mode-string 'dired-rsync-modeline-status t))
 #+end_src
-* keyfreq
+** keyfreq
 #+begin_src emacs-lisp
   (use-package keyfreq
     :init
@@ -751,7 +751,7 @@
     (keyfreq-mode 1)
     (keyfreq-autosave-mode 1))
 #+end_src
-* Hammy?
+** Hammy?
 #+begin_src emacs-lisp#
   (use-package hammy
     :quelpa (hammy :fetcher github :repo "alphapapa/hammy.el"))
@@ -806,13 +806,13 @@
                                  (notify "Time for a sit-down...")
                                  (play-sound-file "~/Misc/Sounds/relax.wav")))))
 #+end_src
-* Auto dim buffers
+** Auto dim buffers
 #+begin_src emacs-lisp
   (use-package auto-dim-other-buffers)
 
   (set-face-attribute 'auto-dim-other-buffers-face nil :background "#700CB3")
 #+end_src
-* Splitting functions
+** Splitting functions
 #+begin_src emacs-lisp
   (defun mp-split-below (arg)
     "Split window below from the parent or from root with ARG."
@@ -828,7 +828,7 @@
                     (window-parent (selected-window)))
                   nil 'left nil))
 #+end_src
-* Tramp configuration
+** Tramp configuration
 This is sort of implicit in the code, but I
 #+begin_src emacs-lisp
   ;; This is sort the default in tramp, but I wanted to keep this here

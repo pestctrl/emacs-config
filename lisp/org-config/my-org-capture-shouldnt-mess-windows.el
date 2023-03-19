@@ -72,21 +72,29 @@
             :around
             #'my/org-todo-side-window-hack)
 
-(defun my/rebalance-windows-vertical (&optional window-or-frame)
-  (interactive)
-  (let* ((window
-	      (cond
-	       ((or (not window-or-frame)
-		        (frame-live-p window-or-frame))
-	        (frame-root-window window-or-frame))
-	       ((or (window-live-p window-or-frame)
-		        (window-child window-or-frame))
-	        window-or-frame)
-	       (t
-	        (error "Not a window or frame %s" window-or-frame))))
-	     (frame (window-frame window)))
-    ;; Balance vertically.
-    (window--resize-reset (window-frame window))
+(defun my/get-first-parent-vertical-window-combination (window)
+  (let ((win window)
+        found)
+    (while (and win (not found))
+      ;; not a vertical combination
+      (if (not (window-combination-p win nil))
+          (setq win (window-parent win))
+        (setq found win)))
+    found))
+
+;; TODO(pestctrl): This function will rebalanace a whole
+;; subtree. Would be nice if the routine only balanced the first
+;; window-combination child encountered, instead of recursively
+;; walking the whole tree, balancing everything.
+(defun my/rebalance-windows-vertical (window)
+  (interactive
+   (list
+    (or (my/get-first-parent-vertical-window-combination
+         (selected-window))
+	    (error "Not a window or frame %s" window-or-frame))))
+  ;; Balance vertically.
+  (let ((frame (window-frame window)))
+    (window--resize-reset frame)
     (balance-windows-1 window)
     (when (window--resize-apply-p frame)
       (window-resize-apply frame)
@@ -94,17 +102,14 @@
 
 (defun my/balance-windows-after-delete-side (fun &optional window)
   (let* ((win (or window (selected-window)))
+         (parent-win (window-parent win))
          (should-rebalance
           (my/side-window-p win)))
     (funcall fun win)
     (when should-rebalance
-      (when-let ((side-win
-                  (-->
-                   (window-list)
-                   (remove-if-not #'my/side-window-p it)
-                   (first it))))
-        (with-selected-window side-win
-          (call-interactively #'my/rebalance-windows-vertical))))))
+      (my/rebalance-windows-vertical
+       (my/get-first-parent-vertical-window-combination
+        parent-win)))))
 
 (advice-add #'delete-window
             :around

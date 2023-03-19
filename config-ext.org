@@ -849,3 +849,10 @@ This is sort of implicit in the code, but I
   ;; (setq tramp-verbose 3)
   ;; (setq tramp-verbose 9)
 #+end_src
+** Visualization tools
+#+begin_src emacs-lisp
+  (use-package graphviz-dot-mode)
+  ;; TODO: There seems to be an issue with my face setup and svg
+  ;; rendering.
+  (use-package pair-tree)
+#+end_src

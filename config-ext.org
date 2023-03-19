@@ -839,6 +839,9 @@ This is sort of implicit in the code, but I
   ;; if [[ "$TERM" != "dumb" ]]; then
   ;;    # vterm configuration, etc.
   ;; fi
+
+  ;; OR, the new way I've been doing this:
+  ;; [[ "$TERM" = "dumb" ]] && return
   (setq tramp-terminal-type "dumb")
 
   ;; To debug tramp, set the following variable (max value 11).

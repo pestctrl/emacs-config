@@ -1,4 +1,4 @@
-#+PROPERTY: header-args:emacs-lisp :tangle (ef "config-ext.el") :comments both
+#+PROPERTY: header-args:emacs-lisp :tangle "~/.emacs.d/config-ext.el" :comments both
 
 * buffer-window management
 #+begin_src emacs-lisp

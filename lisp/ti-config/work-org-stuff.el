@@ -510,7 +510,8 @@
 
   (require 'my-org-roam-logger)
 
-  (setq my/org-roam-logger-filter-fun (my/org-roam-filter-by-tag "Project")))
+  ;; (setq my/org-roam-logger-filter-fun (my/org-roam-filter-by-tag "Project"))
+  )
 
 (advice-add #'org-agenda-redo
             :around

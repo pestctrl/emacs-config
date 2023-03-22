@@ -402,7 +402,10 @@
   (setq transient-display-buffer-action
         '(display-buffer-in-side-window
           (side . left)
-          (dedicated . t)))
+          (dedicated . t)
+          (inhibit-same-window . t)
+          (window-parameters
+           (no-other-window . t))))
   (global-set-key (kbd "C-x g") 'magit-status)
   (global-set-key (kbd "C-x M-g") 'magit-dispatch)
 

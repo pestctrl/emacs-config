@@ -106,7 +106,8 @@
   (let* ((win (or window (selected-window)))
          (parent-win (window-parent win))
          (should-rebalance
-          (my/side-window-p win)))
+          (and (my/side-window-p win)
+               (< 2 (window-child-count parent-win)))))
     (funcall fun win)
     (when should-rebalance
       (when (eq 'invalid-window

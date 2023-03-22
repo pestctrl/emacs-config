@@ -186,5 +186,10 @@
 (define-key vertico-flat-map (kbd "C-l") #'vertico--jump-to-home)
 (define-key vertico-flat-map (kbd "M-s") #'vertico--jump-to-scratch)
 
+(use-package plantuml-mode
+  :init
+  (setq plantuml-jar-path "~/bin/plantuml"
+        plantuml-default-exec-mode 'jar))
+
 (provide 'work-config)
 ;;; work-config.el ends here

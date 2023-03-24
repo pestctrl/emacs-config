@@ -420,6 +420,31 @@
   (transient-append-suffix 'magit-push "m"
     '("a" "all remotes" my/magit-push-all))
 
+  (defun my/magit-worktree-checkout (path branch)
+    "Checkout BRANCH in a new worktree at PATH."
+    (interactive
+     (let ((branch (magit-read-branch-or-commit "Checkout")))
+       (list (funcall magit-worktree-read-directory-name-function
+                      (format "Checkout %s in new worktree: " branch))
+             branch)))
+    (magit-run-git-async "worktree" "add" (magit--expand-worktree path) branch))
+
+  (defun my/magit-worktree-branch (path branch start-point &optional force)
+    "Create a new BRANCH and check it out in a new worktree at PATH."
+    (interactive
+     `(,(funcall magit-worktree-read-directory-name-function
+                 "Create worktree: ")
+       ,@(magit-branch-read-args "Create and checkout branch")
+       ,current-prefix-arg))
+    (magit-run-git-async "worktree" "add" (if force "-B" "-b")
+                         branch (magit--expand-worktree path) start-point))
+
+  (transient-append-suffix 'magit-worktree "b"
+    '("B" "[async] worktree" my/magit-worktree-checkout))
+
+  (transient-append-suffix 'magit-worktree "c"
+    '("C" "[async] branch and worktree" my/magit-worktree-branch))
+
   ;; Update all submodules
   (defun magit-submodule-update-recursive ()
     (interactive)

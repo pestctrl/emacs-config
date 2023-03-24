@@ -32,11 +32,15 @@
 (defun my/window-tree-to-dot (window)
   (when window
     (let ((window-id (my/get-window-id window))
+          (side (window-parameter window 'window-side))
           (buffer (window-buffer window))
           (child (window-child window)))
       (insert
-       (format "%d [label=\"%d\n%s\"]\n"
-               window-id window-id (if buffer (buffer-name buffer) "")))
+       (format "%d [label=\"%d\n%s%s\"]\n"
+               window-id window-id
+               (or (and side (format "[%s]\n" side))
+                   "")
+               (if buffer (buffer-name buffer) "")))
       (while child
         (insert
          (format "%s -> %s\n"

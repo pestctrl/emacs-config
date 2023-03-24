@@ -24,6 +24,10 @@
 
 ;;; Code:
 (require 'cl-lib)
+(if (and (<= 30 emacs-major-version)
+         (< 0 emacs-minor-version))
+    (message "No longer need this patch, hopefully!")
+  (require 'tab-bar-patch))
 
 (setq tab-bar-show nil
       tab-bar-close-tab-select 'recent

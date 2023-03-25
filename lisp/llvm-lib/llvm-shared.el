@@ -110,7 +110,13 @@
 
 (defun lls/get-clang-options ()
   (or (lls/conf-get 'target-clang-opts)
-      (funcall (lls/conf-get 'target-clang-opts-fun))))
+      (setf (slot-value lls/llvm-config 'target-clang-opts)
+            (funcall (lls/conf-get 'target-clang-opts-fun)))))
+
+(defun lls/swap-clang-options ()
+  (interactive)
+  (setf (slot-value lls/llvm-config 'target-clang-opts)
+        (funcall (lls/conf-get 'target-clang-opts-fun))))
 
 ;; =============================== Misc ==============================
 

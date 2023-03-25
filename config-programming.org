@@ -317,3 +317,9 @@
   ;; Run copilot-login
   (add-hook 'prog-mode-mook 'copilot-mode)
 #+end_src
+* llvm-lib
+#+begin_src emacs-lisp
+  (require 'llvm-lib)
+
+  (define-key *root-map* (kbd "C-w") '*llvm-map*)
+#+end_src

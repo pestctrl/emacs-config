@@ -172,19 +172,22 @@
 ;;               :around
 ;;               #'replace-path-for-async-native-comp))
 
-(defun nothing () (interactive))
+(use-package vertico
+  :config
+  (with-eval-after-load 'vertico-flat
+    (defun nothing () (interactive))
 
-(defun vertico--jump-to-home ()
-  (interactive)
-  (insert "/home/a0487752/"))
+    (defun vertico--jump-to-home ()
+      (interactive)
+      (insert "/home/a0487752/"))
 
-(defun vertico--jump-to-scratch ()
-  (interactive)
-  (insert "/scratch/benson/"))
+    (defun vertico--jump-to-scratch ()
+      (interactive)
+      (insert "/scratch/benson/"))
 
-(define-key vertico-flat-map (kbd "~") #'nothing)
-(define-key vertico-flat-map (kbd "C-l") #'vertico--jump-to-home)
-(define-key vertico-flat-map (kbd "M-s") #'vertico--jump-to-scratch)
+    (define-key vertico-flat-map (kbd "~") #'nothing)
+    (define-key vertico-flat-map (kbd "C-l") #'vertico--jump-to-home)
+    (define-key vertico-flat-map (kbd "M-s") #'vertico--jump-to-scratch)))
 
 (use-package plantuml-mode
   :init

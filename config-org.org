@@ -109,7 +109,10 @@
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((clojure . t)
-     (plantuml . t)))
+     (plantuml . t)
+     (emacs-lisp . t)
+     (shell . t)
+     (dot . t)))
 
   (defun my-org-confirm-babel-evaluate (lang body)
     (not (member lang '("plantuml"))))

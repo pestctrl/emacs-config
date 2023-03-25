@@ -215,5 +215,11 @@
 
 (define-key *root-map* (kbd "F") #'org-ql-embark)
 
+(require 'ob-shell)
+(require 'ob-dot)
+(require 'org-babel)
+
+(setq org-confirm-babel-evaluate nil)
+
 (provide 'my-org-misc)
 ;;; my-org-misc.el ends here

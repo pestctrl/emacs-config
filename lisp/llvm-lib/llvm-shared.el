@@ -46,28 +46,15 @@
    (bin-dirs :initarg :bin-dirs :type list :initform nil)
    (compile-command-fun :initarg :cc :type function :initform (lambda ()))
    (dis-command-fun :initarg :dc :type function :initform (lambda ()))
-   (llc-command-fun :initarg :llc :type function :initform (lambda ()))))
+   (llc-command-fun :initarg :llc :type function :initform (lambda ()))
+   ;; Cached compilation command options
+   (target-clang-opts :initarg :clang-opts :initform nil)
+   ;; Target + CPU -> compilation command options
+   (target-clang-opts-fun :initarg :clang-opts-fun :type function :initform (lambda ()))))
 
 (defvar lls/llvm-config nil)
-;; (defvar lls/llvm-root-dir nil)
-;; (defvar lls/llvm-build-dirs nil)
-;; (defvar lls/llvm-bin-dirs nil)
 
-(defvar lls/target-init-fun
-  nil)
-
-;; (defun lls/init-llvm-shared (root-dir build-dirs &optional bindirs)
-;;   ;; TODO: make interactive
-;;   (let ((r (rx (or "RelWithAsserts" "Release"))))
-;;     (setq lls/llvm-root-dir (or root-dir
-;;                                 (read-file-name "llvm-project directory? "))
-;;           lls/llvm-build-dirs
-;;           (sort build-dirs
-;;                 #'(lambda (x y)
-;;                     (cond ((string-match-p r y) nil)
-;;                           ((string-match-p r x) t)
-;;                           (t (string< x y)))))
-;;           lls/llvm-bin-dirs bindirs)))
+(defvar lls/target-init-fun nil)
 
 (defun lls/conf-get (sym)
   (slot-value lls/llvm-config sym))
@@ -83,7 +70,8 @@
                 #'(lambda (x y)
                     (cond ((string-match-p r y) nil)
                           ((string-match-p r x) t)
-                          (t (string< x y))))))))
+                          (t (string< x y)))))))
+  (message "llvm-lib initialize!"))
 
 (defun lls/ensure-initialized ()
   (when (or (not lls/llvm-config)
@@ -120,6 +108,10 @@
         (cons dir
               (lls/conf-get 'build-dirs))))
 
+(defun lls/get-clang-options ()
+  (or (lls/conf-get 'target-clang-opts)
+      (funcall (lls/conf-get 'target-clang-opts-fun))))
+
 ;; =============================== Misc ==============================
 
 (defun my/completing-read (prompt collection)
@@ -155,9 +147,17 @@
   (apply (lls/conf-get 'dis-command-fun) args))
 
 ;; ========================= LLVM Build Dirs =========================
+(defun lls/default-clang-opts ()
+  (let ((target (lls/conf-get 'target)))
+    (concat "--target="
+            (pcase target
+              ("X86" "x86_64")
+              ("ARM" "arm")))))
+
 (cl-defun lls/default-comp-fun (compiler file action &key output rest)
   (string-join
    (list compiler
+         (lls/get-clang-options)
          (string-join rest " ")
          file
          (pcase action
@@ -187,11 +187,12 @@
          'llvm-config
          :root-dir (lls/guess-root-dir-fun)
          :build-dirs (lls/guess-build-dirs-fun)
+         :target (completing-read "Which target? " '("X86" "ARM"))
          :bin-dirs '("/usr/bin/")
-         :target "X86"
          :cc #'lls/default-comp-fun
          :dc #'lls/default-dis-comm
-         :llc #'lls/default-llc-comm)))
+         :llc #'lls/default-llc-comm
+         :clang-opts-fun #'lls/default-clang-opts)))
 
 (defun lls/guess-root-dir-fun ()
   ;; TODO: constant

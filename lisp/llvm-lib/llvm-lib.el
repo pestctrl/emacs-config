@@ -28,6 +28,7 @@
 (require 'llvm-gdb-command)
 (require 'llvm-show-instr-info)
 (require 'llvm-jump-to-tablegen)
+(require 'llvm-shared)
 
 (define-prefix-command '*llvm-map*)
 (define-key *root-map* (kbd "C-w") '*llvm-map*)
@@ -36,6 +37,7 @@
 (define-key *llvm-map* (kbd "c") #'ll/llvm-build-tool)
 (define-key *llvm-map* (kbd "M-w") #'ll/kill-gdb-command)
 (define-key *llvm-map* (kbd "i") #'ll/prompt-for-instr-info)
+(define-key *llvm-map* (kbd "I") #'lls/initialize)
 (define-key *llvm-map* (kbd "t") #'ll/jump-to-tablegen)
 
 (provide 'llvm-lib)

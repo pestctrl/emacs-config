@@ -74,37 +74,37 @@
   (let ((buffer (find-file-noselect filename)))
     (my/display-buffer-in-side-window side buffer slot-override)))
 
-(defun side-left-window ()
-  (interactive)
-  (my/display-buffer-in-side-window
-   'left
-   (read-buffer "Switch to buffer in side window: "
-                (current-buffer)
-                (confirm-nonexistent-file-or-buffer))))
+(defun side-left-window (buffer)
+  (interactive
+   (list
+    (read-buffer "Switch to buffer in side window: "
+                 (current-buffer)
+                 (confirm-nonexistent-file-or-buffer))))
+  (my/display-buffer-in-side-window 'left buffer))
 
-(defun side-right-window ()
-  (interactive)
-  (my/display-buffer-in-side-window
-   'right
-   (read-buffer "Switch to buffer in side window: "
-                (current-buffer)
-                (confirm-nonexistent-file-or-buffer))))
+(defun side-right-window (buffer)
+  (interactive
+   (list
+    (read-buffer "Switch to buffer in side window: "
+                 (current-buffer)
+                 (confirm-nonexistent-file-or-buffer))))
+  (my/display-buffer-in-side-window 'right buffer))
 
-(defun side-bottom-window ()
-  (interactive)
-  (my/display-buffer-in-side-window
-   'bottom
-   (read-buffer "Switch to buffer in side window: "
-                (current-buffer)
-                (confirm-nonexistent-file-or-buffer))))
+(defun side-bottom-window (buffer)
+  (interactive
+   (list
+    (read-buffer "Switch to buffer in side window: "
+                 (current-buffer)
+                 (confirm-nonexistent-file-or-buffer))))
+  (my/display-buffer-in-side-window 'bottom buffer))
 
-(defun side-top-window ()
-  (interactive)
-  (my/display-buffer-in-side-window
-   'top
-   (read-buffer "Switch to buffer in side window: "
-                (current-buffer)
-                (confirm-nonexistent-file-or-buffer))))
+(defun side-top-window (buffer)
+  (interactive
+   (list
+    (read-buffer "Switch to buffer in side window: "
+                 (current-buffer)
+                 (confirm-nonexistent-file-or-buffer))))
+  (my/display-buffer-in-side-window 'top buffer))
 
 (provide 'side-window-split)
 ;;; side-window-split.el ends here

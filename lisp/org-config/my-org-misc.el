@@ -215,9 +215,9 @@
 
 (define-key *root-map* (kbd "F") #'org-ql-embark)
 
+(require 'ob)
 (require 'ob-shell)
 (require 'ob-dot)
-(require 'org-babel)
 
 (setq org-confirm-babel-evaluate nil)
 

@@ -94,10 +94,12 @@
     (or (my/get-first-parent-vertical-window-combination
          (selected-window))
 	    (error "Not a window or frame %s" window-or-frame))))
+  (unless (window-combination-p window nil)
+    (error "Not a vertical window combination"))
   ;; Balance vertically.
   (let ((frame (window-frame window)))
     (window--resize-reset frame)
-    (balance-windows-1 window)
+    (balance-windows-1 window nil)
     (when (window--resize-apply-p frame)
       (window-resize-apply frame)
       (window--pixel-to-total frame))))

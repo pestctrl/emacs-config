@@ -109,6 +109,7 @@
          (parent-win (window-parent win))
          (should-rebalance
           (and (my/side-window-p win)
+               (my/side-window-p parent-win)
                (< 2 (window-child-count parent-win)))))
     (funcall fun win)
     (when should-rebalance

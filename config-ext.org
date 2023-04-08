@@ -318,6 +318,12 @@
            ;; "##linux" "#compilers" "#pltclub"
            ;; "##cs" "##computerscience" "##programming" "#lisp" "##lisp"
            ;; "#sbcl" "#ecl"
+           )
+          ("libera.chat" "#emacs" "#org-mode" "#archlinux"
+           "#commonlisp" "#sbcl" "#compilers"
+           ;; "##linux" "#pltclub"
+           ;; "##cs" "##computerscience" "##programming" "#lisp" "##lisp"
+           ;; "#ecl"
            )))
 
   (defun get-authinfo (host port)
@@ -329,10 +335,14 @@
     (erc :server "irc.freenode.net" :port 6667
          :password password :nick nick))
 
+  (defun libera-connect (nick password)
+    (erc-tls :server "irc.libera.chat" :port 6697
+             :password password :nick nick))
+
   (defun irc-connect ()
     (interactive)
     (when (y-or-n-p "Connect to IRC? ")
-      (freenode-connect "pest-ctrl" (get-authinfo "irc.freenode.net" "6667"))))
+      (libera-connect "pestctrl" (get-authinfo "irc.libera.chat" "6697"))))
 #+end_src
 ** font-lock-studio
 #+begin_src emacs-lisp

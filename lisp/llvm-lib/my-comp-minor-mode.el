@@ -59,6 +59,14 @@ commands of Compilation major mode are available.  See
           (compilation-minor-mode t)
           (setq compilation-finish-local-sticky hs)
           (setq compilation-finish-local-transient ht)))
+      ;; For some reason, when calling display-buffer, window doesn't get sent
+      ;; to the side. This is because in my/is-compilation-buffer,
+      ;; compilation-minor-mode is nil. No idea why, just manually call
+      ;; display-buffer-in-side-window.
+
+      ;; For some reason, calling display-window-in-side-window directly
+      ;; doesn't work EITHER. The window doesn't pop up UNLESS there already
+      ;; exists a side-window.
       (display-buffer it))))
 
 (advice-add #'compilation-start

@@ -403,6 +403,7 @@
         '(display-buffer-in-side-window
           (side . left)
           (dedicated . t)
+          (select . t)
           (inhibit-same-window . t)
           (window-parameters
            (no-other-window . t))))

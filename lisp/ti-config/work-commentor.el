@@ -23,17 +23,7 @@
 ;;; Commentary:
 
 ;;; Code:
-(global-set-key (kbd "C-c h") #'my/banner-comment)
-
-(defun work-banner-switch-char ()
-  (interactive)
-  (setq work-banner-comment-char
-        (if (= banner-comment-char ?-)
-            ?*
-          ?-)))
-
 (defvar banner/styles nil)
-
 (defvar banner/current-style nil)
 
 (defclass banner-comment-style ()
@@ -52,34 +42,41 @@
                       :align align :fill fill :padding padding
                       :start start :end end :empty-fill (or empty fill)))))
 
-(banner/new-style 'llvm-start :padding "===" :fill ?- :end 'comment-start)
+(banner/new-style 'llvm-start :padding "===" :fill ?- :end '(string-reverse comment-start))
 (banner/new-style 'ti-box
                   :fill (string-to-char " ")
-                  :empty ?- :end 'comment-start)
+                  :empty ?- :end '(string-reverse comment-start))
 
 (defun banner/change-alignment (align)
   (interactive (list (intern (completing-read "Alignment? " '(left right center)))))
   (setf (slot-value banner/current-style 'align)
         align))
 
-;; (setq banner/current-style (cdr (car banner/styles)))            ;;
+;; (setq banner/current-style (cdr (car banner/styles)))
 
-(defun banner/extract-comment-string (expr)
-  (cond ((null expr) (banner/extract-comment-string comment-start))
-        ((eq 'symbol (type-of expr))
-         (banner/extract-comment-string (eval expr)))
-        ((eq 'string (type-of expr))
-         (string-trim expr))))
+(defun banner/extract-comment-string (expr other)
+  (when (or (not (null expr))
+            (not (null other)))
+    (cond ((null expr) (banner/extract-comment-string other nil))
+          ((member (type-of expr) '(symbol cons))
+           (banner/extract-comment-string (eval expr) other))
+          ((eq 'string (type-of expr))
+           (string-trim expr)))))
+
+(defun my/banner-select-style (style)
+  (interactive
+   (list (intern (completing-read "Style? " (mapcar #'car banner/styles)))))
+  (setq banner/current-style (alist-get style banner/styles)))
 
 (defun my/banner-comment (arg style)
   (interactive
    (list
     current-prefix-arg
     (or banner/current-style
-        (cdr (car banner/styles)))))
+        (call-interactively #'my/banner-select-style))))
   (with-slots (align fill empty-fill padding start end) style
-    (let* ((comm-start (banner/extract-comment-string start))
-           (comm-end (banner/extract-comment-string end))
+    (let* ((comm-start (banner/extract-comment-string start comment-start))
+           (comm-end (banner/extract-comment-string end comment-end))
            (regexp
             (rx-to-string
              `(and
@@ -92,7 +89,9 @@
                  (or (+ ,(string empty-fill)) (+ ,(string fill)))
                  (* " ")))
                (group
-                (*? (not ,fill)))
+                (*? (not (any ,fill
+                              ,(string-to-char comm-start)
+                              ,(string-to-char comm-end)))))
                (group
                 (optional
                  (* " ")
@@ -148,6 +147,7 @@
                                                             fill))
                                      (string-reverse padding) comm-end)
                              nil nil nil 4))))))))
+
 ;;------------------------------------------------------------------;;
 ;; Hello                                                            ;;
 

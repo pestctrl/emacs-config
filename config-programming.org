@@ -249,6 +249,10 @@
 #+begin_src emacs-lisp
   (define-prefix-command '*comment-map*)
 
+  (require 'work-commentor)
+
+  (define-key *comment-map* (kbd "b") #'my/banner-comment)
+  (define-key *comment-map* (kbd "B") #'my/banner-select-style)
   (define-key *comment-map* (kbd "/") #'comment-region)
   (define-key *comment-map* (kbd "\\") #'uncomment-region)
 

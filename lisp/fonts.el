@@ -57,6 +57,35 @@
 
 ;;(set-face-attribute 'variable-pitch nil :font '(:family "ETBookOT"))
 
+
+(defvar frame-font-size-cache
+  (make-hash-table))
+
+;; Font size adjustment
+(defun hoagie-adjust-font-size (&optional frame)
+  "Inspired by https://emacs.stackexchange.com/a/44930/17066. FRAME is ignored.
+  If I let Windows handle DPI everything looks blurry."
+  (interactive)
+  ;; Using display names is unreliable...switched to checking the resolution
+  (let* ((attrs (frame-monitor-attributes)) ;; gets attribs for current frame
+         (monitor-name (cdr (assoc 'name attrs)))
+         (width-mm (second (assoc 'mm-size attrs)))
+         (width-px (fourth (assoc 'geometry attrs)))
+         (height-px (fifth (assoc 'geometry attrs)))
+         (size 10)) ;; default for first screen at work
+    (when (eq height-px 2880)
+      (let ((f (selected-frame)))
+        (set-face-attribute 'default f :height 130)
+        (set-face-attribute 'mode-line f :height 130)
+        (set-face-attribute 'mode-line-inactive f :height 130)
+        (setq doom-modeline-height 30))
+      (exwm-randr-refresh))
+    ;; (unless (and (gethash frame frame-font-size-cache)
+    ;;              (= size (gethash frame frame-font-size-cache)))
+    ;;   (puthash frame size frame-font-size-cache))
+    ))
+;; (remove-hook 'window-size-change-functions #'hoagie-adjust-font-size)
+
 (when my/at-ti
   (set-fontset-font "fontset-default"
                     (cons

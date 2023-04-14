@@ -31,9 +31,17 @@
 (define-key vertico-flat-map (kbd "M-j") '*vertico-jump-map*)
 
 (define-key *vertico-jump-map* (kbd "h") #'vertico--jump-to-home)
+(define-key *vertico-jump-map* (kbd "H") #'vertico--force-jump-to-home)
 
 (defun vertico--jump-to-home ()
   (interactive)
+  (insert "~/")
+  (vertico--exhibit))
+
+(defun vertico--force-jump-to-home ()
+  (interactive)
+  (call-interactively #'move-beginning-of-line)
+  (kill-line)
   (insert "~/"))
 
 (provide 'vertico-jumper)

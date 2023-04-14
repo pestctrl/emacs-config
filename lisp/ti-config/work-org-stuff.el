@@ -519,5 +519,9 @@
               (save-window-excursion
                 (apply orig-fun args))))
 
+(setq org-agenda-hide-tags-regexp
+      (rx (or "prod"
+              (and symbol-start "_" (+ nonl) "_" symbol-end))))
+
 (provide 'work-org-stuff)
 ;;; work-org-stuff.el ends here

@@ -57,5 +57,17 @@
 
 ;;(set-face-attribute 'variable-pitch nil :font '(:family "ETBookOT"))
 
+(when my/at-ti
+  (set-fontset-font "fontset-default"
+                    (cons
+                     (decode-char 'ucs #x2500)
+                     (decode-char 'ucs #x257F))
+                    (font-spec :name "Latin Modern Math" :size 12))
+  (set-fontset-font "fontset-default"
+                    (cons
+                     (decode-char 'ucs #x2997)
+                     (decode-char 'ucs #x2997))
+                    (font-spec :size 8 :avgwidth 8 :name "STIXGeneral" :weight 'normal)))
+
 (provide 'fonts)
 ;;; fonts.el ends here

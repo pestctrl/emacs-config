@@ -27,11 +27,6 @@
 (create-fontset-from-fontset-spec
  "-*-Roboto Mono-regular-normal-normal-*-13-*-*-*-m-0-fontset-mine")
 
-(set-face-font 'default "fontset-default")
-
-(set-fontset-font "fontset-default" 'ascii (font-spec :size 13 :name "RobotoMono"))
-(set-fontset-font "fontset-default" 'latin (font-spec :size 13 :name "RobotoMono"))
-
 ;; HanWangKaiMediumChuIn
 ;; (set-fontset-font "fontset-default" 'han (font-spec :size 16 :name "HanWangMingMediumChuIn"))
 ;; (set-fontset-font "fontset-default" 'han (font-spec :size 16 :name "HanWangKaiMediumChuIn-20"))
@@ -49,6 +44,11 @@
 
 ;; adobe-source-han-sans-otc-fonts
 (set-fontset-font "fontset-default" 'han (font-spec :size 16 :name "SourceHanSans"))
+
+(set-fontset-font "fontset-default" 'ascii (font-spec :size 13 :name "RobotoMono"))
+(set-fontset-font "fontset-default" 'latin (font-spec :size 13 :name "RobotoMono"))
+
+(set-face-font 'default "fontset-default")
 
 ;; (custom-set-faces
 ;;  '(default ((t (:family "ETBookOT" :foundry "QUQA"

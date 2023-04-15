@@ -389,14 +389,14 @@
   ;; Magit
   (use-package magit)
   (use-package magit-popup)
-  (use-package magit-todos
-    :config
-    (require 'hl-todo)
-    (add-to-list 'hl-todo-keyword-faces
-                 '("TODO(pestctrl)" . "#FFFFFF"))
-    (add-to-list 'magit-todos-keywords-list
-                 "TODO(pestctrl)")
-    (magit-todos-mode 1))
+  ;; (use-package magit-todos
+  ;;   :config
+  ;;   (require 'hl-todo)
+  ;;   (add-to-list 'hl-todo-keyword-faces
+  ;; 	       '("TODO(pestctrl)" . "#FFFFFF"))
+  ;;   (add-to-list 'magit-todos-keywords-list
+  ;; 	       "TODO(pestctrl)")
+  ;;   (magit-todos-mode 1))
   ;; Todo: Figure out why transient side-window stuff wrecks my
   ;; side-window stuff
   (setq transient-display-buffer-action
@@ -1034,7 +1034,7 @@
   (load-theme 'calm-forest nil t)
 
   (use-package modus-themes)
-  (modus-themes-load-themes)
+  ;; (modus-themes-load-theme )
   (load-theme 'modus-operandi nil t)
 
   (add-to-list 'custom-theme-load-path (ef "lisp/themes"))

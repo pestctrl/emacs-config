@@ -191,12 +191,12 @@
   (switch-to-buffer (marker-buffer target))
   (goto-char target))
 
-(embark-define-keymap embark-org-map
-  nil
-  ("c" org-embark-clock-in)
-  ("RET" org-embark-goto))
+;; (embark-define-keymap embark-org-map
+;;   nil
+;;   ("c" org-embark-clock-in)
+;;   ("RET" org-embark-goto))
 
-(add-to-list 'embark-keymap-alist '(org . embark-org-map))
+;; (add-to-list 'embark-keymap-alist '(org . embark-org-map))
 
 (defun org-ql-embark ()
   (interactive)

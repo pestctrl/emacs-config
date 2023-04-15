@@ -76,3 +76,6 @@
 [submodule "submodule/code-compass"]
 	path = submodule/code-compass
 	url = https://github.com/ag91/code-compass
+[submodule "tree-sitter"]
+	path = tree-sitter
+	url = git@github.com:pestctrl/my-emacs-ts.git

@@ -86,7 +86,7 @@
     ))
 ;; (remove-hook 'window-size-change-functions #'hoagie-adjust-font-size)
 
-(when my/at-ti
+(when my-ec/at-ti
   (set-fontset-font "fontset-default"
                     (cons
                      (decode-char 'ucs #x2500)

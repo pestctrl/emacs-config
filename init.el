@@ -17,6 +17,10 @@
 
 (setq gc-cons-threshold (* 100 1024 1024))
 
+(when my-ec/at-ti
+  (require 'work-proxy-config)
+  (ti-proxy-mode 1))
+
 ;; fetch the list of packages available
 (unless package-archive-contents
   (package-refresh-contents))

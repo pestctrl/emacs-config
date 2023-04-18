@@ -58,7 +58,7 @@
                     (cons
                      (decode-char 'ucs #x2997)
                      (decode-char 'ucs #x2997))
-                    (font-spec :size 8 :avgwidth 8 :name "STIXGeneral" :weight 'normal)))))
+                    (font-spec :size 8 :avgwidth 8 :name "STIXGeneral" :weight 'normal)))
 
 (set-face-font 'default "fontset-default")
 

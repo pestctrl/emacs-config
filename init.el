@@ -17,6 +17,23 @@
 
 (setq gc-cons-threshold (* 100 1024 1024))
 
+;; Add my modules
+(progn
+  (let ((lisp-dir (expand-file-name "lisp/"
+                                    user-emacs-directory)))
+    (add-to-list 'load-path lisp-dir)
+
+    (let ((default-directory lisp-dir))
+      (normal-top-level-add-subdirs-to-load-path))
+
+    (let ((default-directory
+           (expand-file-name "submodule/"
+                             user-emacs-directory)))
+      (normal-top-level-add-subdirs-to-load-path))))
+
+(require 'emacs-custom-load-or-ask)
+(require 'my-predicates)
+
 (when my-ec/at-ti
   (require 'work-proxy-config)
   (ti-proxy-mode 1))
@@ -37,23 +54,7 @@
 
 (setq use-package-always-ensure t)
 
-;; Add my modules
-(progn
-  (let ((lisp-dir (expand-file-name "lisp/"
-                                    user-emacs-directory)))
-    (add-to-list 'load-path lisp-dir)
-
-    (let ((default-directory lisp-dir))
-      (normal-top-level-add-subdirs-to-load-path))
-
-    (let ((default-directory
-           (expand-file-name "submodule/"
-                             user-emacs-directory)))
-      (normal-top-level-add-subdirs-to-load-path))))
-
 (require 'libs)
-(require 'emacs-custom-load-or-ask)
-(require 'my-predicates)
 
 (when (and my-ec/at-ti
            (string-match-p ".*NATIVE_COMP.*" system-configuration-features))

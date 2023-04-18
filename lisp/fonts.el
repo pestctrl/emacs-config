@@ -25,7 +25,7 @@
 ;;; Code:
 
 (create-fontset-from-fontset-spec
- "-*-Roboto Mono-regular-normal-normal-*-13-*-*-*-m-0-fontset-mine")
+ "-*-Roboto Mono-regular-normal-normal-*-*-*-*-*-m-0-fontset-default")
 
 ;; HanWangKaiMediumChuIn
 ;; (set-fontset-font "fontset-default" 'han (font-spec :size 16 :name "HanWangMingMediumChuIn"))

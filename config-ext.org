@@ -201,17 +201,18 @@
                     (beginning-of-line)
                     (point))))
         (save-window-excursion
-          (narrow-to-region start end)
-          (beginning-of-buffer)
-          (replace-regexp (rx "    "
-                              (or "*" "!")
-                              " ")
-                          "    ")
-          (replace-regexp (rx (and " " (+ " ")
-                                   ";; [" (+ (any digit "-" "=" "/")) "]"
-                                   line-end))
-                          "")
-          (widen))))
+          (save-restriction
+            (narrow-to-region start end)
+            (beginning-of-buffer)
+            (replace-regexp (rx "    "
+                                (or "*" "!")
+                                " "
+                                (group (+ (not " "))))
+                            "    \\1  ")
+            (replace-regexp (rx (and " " (+ " ")
+                                     ";; [" (+ (any digit "-" "=" "/")) "]"
+                                     line-end))
+                            "")))))
 
     (advice-add #'ledger-fully-complete-xact
                 :after

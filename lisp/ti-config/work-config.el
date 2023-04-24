@@ -45,6 +45,19 @@
   (setq request-curl-options '("--noproxy \"*\""))
   (setq ein:jupyter-server-command "~/.local/bin/jupyter"))
 
+(use-package deadgrep)
+
+(use-package cmake-mode
+  :config
+  (defun my/cmake-jump-to-definiton (sym)
+    (interactive
+     (list (symbol-name (symbol-at-point))))
+    (rgrep (concat "function(" sym)
+           "*.cmake CMakeLists.txt"
+           (projectile-acquire-root)))
+
+  (define-key cmake-mode-map (kbd "M-.") #'my/cmake-jump-to-definiton))
+
 (global-display-fill-column-indicator-mode t)
 
 (setq-default fill-column 79)
@@ -177,6 +190,12 @@
   :init
   (setq plantuml-jar-path "~/bin/plantuml"
         plantuml-default-exec-mode 'jar))
+
+(use-package realgud
+  :config
+  (setq realgud-window-split-orientation 'horizontal))
+
+(use-package realgud-lldb)
 
 (provide 'work-config)
 ;;; work-config.el ends here

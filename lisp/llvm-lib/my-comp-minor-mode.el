@@ -60,7 +60,9 @@ commands of Compilation major mode are available.  See
         (when (cadr args)
           (compilation-minor-mode t)
           (setq compilation-finish-local-sticky hs)
-          (setq compilation-finish-local-transient ht)))
+          (setq compilation-finish-local-transient ht))
+        (when (eq major-mode 'compilation-mode)
+          (goto-char (point-max))))
       ;; For some reason, when calling display-buffer, window doesn't get sent
       ;; to the side. This is because in my/is-compilation-buffer,
       ;; compilation-minor-mode is nil. No idea why, just manually call
@@ -77,14 +79,6 @@ commands of Compilation major mode are available.  See
 (advice-add #'compilation-start
             :around
             #'my/enable-comp-keys-if-separate-mode)
-
-(defun my/compilation-start-should-goto-end-of-buffer (_command &optional mode &rest _)
-  (unless mode
-    (goto-char (point-max))))
-
-(advice-add #'compilation-start
-            :after
-            #'my/compilation-start-should-goto-end-of-buffer)
 
 (defun my/recompile-save-windows (fun &rest args)
   (display-buffer-same-window

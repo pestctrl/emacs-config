@@ -53,7 +53,9 @@ commands of Compilation major mode are available.  See
 (defun my/enable-comp-keys-if-separate-mode (orig &rest args)
   (let ((ht compilation-finish-local-transient)
         (hs compilation-finish-local-sticky))
-    (aprog1 (save-window-excursion (apply orig args))
+    (aprog1 (apply orig args)
+      (awhen (get-buffer-window it)
+        (delete-window it))
       (with-current-buffer it
         (when (cadr args)
           (compilation-minor-mode t)
@@ -67,6 +69,9 @@ commands of Compilation major mode are available.  See
       ;; For some reason, calling display-window-in-side-window directly
       ;; doesn't work EITHER. The window doesn't pop up UNLESS there already
       ;; exists a side-window.
+
+      ;; This only happens if we have (save-window-excursion (apply orig args))
+      ;; instead of delete-window.
       (display-buffer it))))
 
 (advice-add #'compilation-start

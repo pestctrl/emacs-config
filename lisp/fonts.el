@@ -60,6 +60,11 @@
                      (decode-char 'ucs #x2997))
                     (font-spec :size 8 :avgwidth 8 :name "STIXGeneral" :weight 'normal)))
 
+(when my-ec/at-ti
+  (set-fontset-font "fontset-default" 'ascii (font-spec :size 11 :name "RobotoMono"))
+  (set-fontset-font "fontset-default" 'latin (font-spec :size 11 :name "RobotoMono"))
+  (set-face-attribute 'mode-line nil :font "RobotoMono-8"))
+
 (set-face-font 'default "fontset-default")
 
 ;; (custom-set-faces

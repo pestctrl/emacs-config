@@ -94,7 +94,7 @@
       (let ((f (selected-frame)))
         (set-face-attribute 'default f :height 130)
         (set-face-attribute 'mode-line f :height 130)
-        (set-face-attribute 'mode-line-inactive f :height 130)
+        ;; (set-face-attribute 'mode-line-inactive f :height 130)
         (setq doom-modeline-height 30))
       (exwm-randr-refresh))
     ;; (unless (and (gethash frame frame-font-size-cache)

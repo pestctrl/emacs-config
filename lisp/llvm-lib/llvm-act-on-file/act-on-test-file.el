@@ -111,15 +111,58 @@
                   (ll/build-lit-command file action)))
              " && "))
 
+(defun ll/test-get-missing (buffer)
+  (interactive
+   (list (current-buffer)))
+  (let ((r
+         (rx "Did not find "
+             (group (+ (any alphanumeric "-")))))
+        tools)
+    (with-current-buffer buffer
+      (save-excursion
+        (goto-char (point-min))
+        (while (re-search-forward r nil t)
+          (let ((str (match-string 1) ))
+            (set-text-properties 0 (length str) nil str)
+            (push str tools)))))
+    (when (called-interactively-p)
+      (message (string-join tools ", ")))
+    tools))
+
+(defun ll/test-ensure-missing (buffer msg)
+  (let ((tools (ll/test-get-missing buffer)))
+    (when tools
+      (-->
+       ;; TODO: Assuming debug folder, (lls/get-llvm-build-dir) doesn't work
+       (lls/ninja-build-tools "/scratch/benson/tools3/llvm_cgt/build/Debug/llvm" (seq-uniq tools))
+       (compilation-start
+        it
+        nil
+        (lambda (_)
+          (format "*ensure-tools-%s*" (buffer-name buffer))))
+       (aprog1 it
+         (with-current-buffer it
+           (add-hook 'compilation-finish-local-transient
+                     (lambda (buf msg)
+                       (delete-window (get-buffer-window buf))
+                       (display-buffer buffer)
+                       (with-current-buffer buffer
+                         (call-interactively #'recompile))))))))))
+
 (defun ll/act-on-test-file (file)
   (let* ((action (aml/read-action-map ll/test-file-action-map " | ")))
-    (compilation-start
-     (ll/build-test-command file action)
-     nil
-     (lambda (_)
-       (format "*test-%s-%s*"
-               (file-name-nondirectory file)
-               (aml/get-map-prop ll/test-file-action-map action :buffer-string))))))
+    (--> (ll/build-test-command file action)
+         (compilation-start
+          it
+          nil
+          (lambda (_)
+            (format "*test-%s-%s*"
+                    (file-name-nondirectory file)
+                    (aml/get-map-prop ll/test-file-action-map action :buffer-string))))
+         (aprog1 it
+           (with-current-buffer it
+             (add-hook 'compilation-finish-local-sticky
+                       #'ll/test-ensure-missing))))))
 
 (provide 'act-on-test-file)
 ;;; act-on-test-file.el ends here

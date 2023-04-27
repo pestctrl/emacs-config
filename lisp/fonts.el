@@ -63,7 +63,9 @@
 (when my-ec/at-ti
   (set-fontset-font "fontset-default" 'ascii (font-spec :size 11 :name "RobotoMono"))
   (set-fontset-font "fontset-default" 'latin (font-spec :size 11 :name "RobotoMono"))
-  (set-face-attribute 'mode-line nil :font "RobotoMono-8"))
+  (set-face-attribute 'mode-line nil :font "RobotoMono-8")
+  (set-face-attribute 'mode-line-inactive nil :font "RobotoMono-8")
+  (setq doom-modeline-height 20))
 
 (set-face-font 'default "fontset-default")
 

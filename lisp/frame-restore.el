@@ -33,10 +33,10 @@
          (remove-if-not #'(lambda (frame)
                             (with-selected-frame frame
                               window-system))
-                        (frame-list))))
+                        (visible-frame-list))))
     (when (not (zerop (length non-tty-frames)))
       (setq my/framelist
-            (frameset-save non-tty-frames)))))
+            (frameset-save (visible-frame-list))))))
 
 (run-at-time nil 60 #'fr/save-if-appropriate)
 
@@ -46,7 +46,10 @@
     (frameset-restore
      my/framelist
      :force-display nil
-     :reuse-frames nil)))
+     :reuse-frames t)
+    (dolist (f (frame-list))
+      (unless (frame-visible-p f)
+        (delete-frame f)))))
 
 (provide 'frame-restore)
 ;;; frame-restore.el ends here

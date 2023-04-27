@@ -52,7 +52,7 @@
    ;; Target + CPU -> compilation command options
    (target-clang-opts-fun :initarg :clang-opts-fun :type function :initform (lambda ()))))
 
-(defvar lls/llvm-config nil)
+;; (defvar lls/llvm-config nil)
 
 (defvar lls/llvm-configs (make-hash-table :test #'equal))
 
@@ -87,24 +87,25 @@
 (defun lls/initialize ()
   (interactive)
   (lls/set-llvm-config
-   (let ((active-conf (lls/get-active-configs)))
-     (or (and (not (zerop (length active-conf)))
-              (y-or-n-p "Would you like to reuse a configuration? ")
-              (let ((tab-name
-                     (completing-read "Which tab's configuration would you like to reuse? "
-                                      (->>
-                                       (tab-bar-tabs)
-                                       (mapcar #'(lambda (x) (alist-get 'name x)))
-                                       (remove-if-not #'(lambda (x) (lls/get-llvm-config x)))))))
-                (lls/initialize (lls/get-llvm-config tab-name))))))
-   (aprog1 (funcall lls/target-init-fun)
-     (setf (slot-value it 'build-dirs)
-           (let ((r (rx (or "RelWithAsserts" "Release"))))
-             (sort (slot-value it 'build-dirs)
-                   #'(lambda (x y)
-                       (cond ((string-match-p r y) nil)
-                             ((string-match-p r x) t)
-                             (t (string< x y)))))))))
+   (or
+    (let ((active-conf (lls/get-active-configs)))
+      (and (not (zerop (length active-conf)))
+           (y-or-n-p "Would you like to reuse a configuration? ")
+           (let ((tab-name
+                  (completing-read "Which tab's configuration would you like to reuse? "
+                                   (->>
+                                    (tab-bar-tabs)
+                                    (mapcar #'(lambda (x) (alist-get 'name x)))
+                                    (remove-if-not #'(lambda (x) (lls/get-llvm-config x)))))))
+             (lls/get-llvm-config tab-name))))
+    (aprog1 (funcall lls/target-init-fun)
+      (setf (slot-value it 'build-dirs)
+            (let ((r (rx (or "RelWithAsserts" "Release"))))
+              (sort (slot-value it 'build-dirs)
+                    #'(lambda (x y)
+                        (cond ((string-match-p r y) nil)
+                              ((string-match-p r x) t)
+                              (t (string< x y))))))))))
   (message "llvm-lib initialize!"))
 
 (defun lls/ensure-initialized ()

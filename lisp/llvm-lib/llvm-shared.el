@@ -54,31 +54,93 @@
 
 (defvar lls/llvm-config nil)
 
+(defvar lls/llvm-configs (make-hash-table :test #'equal))
+
 (defvar lls/target-init-fun nil)
 
+(defun lls/get-active-configs ()
+  (hash-table-values lls/llvm-configs))
+
+(defun lls/get-llvm-config (&optional tab-name)
+  (gethash (or tab-name (alist-get 'name (tab-bar--current-tab)))
+           lls/llvm-configs))
+
+(defun lls/set-llvm-config (conf &optional tab-name)
+  (puthash (or tab-name (alist-get 'name (tab-bar--current-tab)))
+           conf
+           lls/llvm-configs))
+
 (defun lls/conf-get (sym)
-  (slot-value lls/llvm-config sym))
+  (lls/ensure-initialized)
+  (slot-value (lls/get-llvm-config) sym))
+
+(defun lls/conf-get-safe (sym)
+  (if-let ((conf (lls/get-llvm-config)))
+      (slot-value conf sym)
+    nil))
+
+(defun lls/conf-set (key val)
+  (lls/ensure-initialized)
+  (setf (slot-value (lls/get-llvm-config) key)
+        val))
 
 (defun lls/initialize ()
   (interactive)
-  (setq lls/llvm-config
-        (funcall lls/target-init-fun))
-  (setf (slot-value lls/llvm-config
-                    'build-dirs)
-        (let ((r (rx (or "RelWithAsserts" "Release"))))
-          (sort (lls/conf-get 'build-dirs)
-                #'(lambda (x y)
-                    (cond ((string-match-p r y) nil)
-                          ((string-match-p r x) t)
-                          (t (string< x y)))))))
+  (lls/set-llvm-config
+   (let ((active-conf (lls/get-active-configs)))
+     (or (and (not (zerop (length active-conf)))
+              (y-or-n-p "Would you like to reuse a configuration? ")
+              (let ((tab-name
+                     (completing-read "Which tab's configuration would you like to reuse? "
+                                      (->>
+                                       (tab-bar-tabs)
+                                       (mapcar #'(lambda (x) (alist-get 'name x)))
+                                       (remove-if-not #'(lambda (x) (lls/get-llvm-config x)))))))
+                (lls/initialize (lls/get-llvm-config tab-name))))))
+   (aprog1 (funcall lls/target-init-fun)
+     (setf (slot-value it 'build-dirs)
+           (let ((r (rx (or "RelWithAsserts" "Release"))))
+             (sort (slot-value it 'build-dirs)
+                   #'(lambda (x y)
+                       (cond ((string-match-p r y) nil)
+                             ((string-match-p r x) t)
+                             (t (string< x y)))))))))
   (message "llvm-lib initialize!"))
 
 (defun lls/ensure-initialized ()
-  (when (or (not lls/llvm-config)
-            (not (llvm-config-p lls/llvm-config)))
+  (when (or (not (lls/get-llvm-config))
+            (not (llvm-config-p (lls/get-llvm-config))))
     (if (not (functionp lls/target-init-fun))
         (error "Please register an init function for llvm")
       (lls/initialize))))
+
+(defun lls/get-cached-value (key fun)
+  (or (lls/conf-get key)
+      (lls/conf-set key (funcall fun))))
+
+(require 'projectile)
+
+(defun projectile-dont-switch-when-conf-available (x)
+  (when-let ((dir (lls/conf-get-safe 'root-dir))
+             (tools-dir
+              (progn
+                (string-match (rx line-start
+                                  "/scratch"
+                                  (group "/benson/tools" (+ (not "/")) "/"))
+                              dir)
+                (match-string 1 dir))))
+    (remove-if #'(lambda (path)
+                   (and (string-match-p (rx "/benson/tools")
+                                        path)
+                        (not (string-match-p tools-dir path))))
+               x)))
+
+(advice-add 'projectile-relevant-known-projects
+            :filter-return
+            #'projectile-dont-switch-when-conf-available)
+
+
+;;===---------------------------------------------------------------------===;;
 
 (defun lls/get-llvm-root-dir ()
   (lls/ensure-initialized)
@@ -104,19 +166,17 @@
   (interactive
    (list (read-file-name "Where? ")))
   (lls/ensure-initialized)
-  (setf (slot-value lls/llvm-config 'build-dirs)
-        (cons dir
-              (lls/conf-get 'build-dirs))))
+  (lls/conf-set 'build-dirs
+                (cons dir
+                      (lls/conf-get 'build-dirs))))
 
 (defun lls/get-clang-options ()
-  (or (lls/conf-get 'target-clang-opts)
-      (setf (slot-value lls/llvm-config 'target-clang-opts)
-            (funcall (lls/conf-get 'target-clang-opts-fun)))))
+  (lls/get-cached-value 'target-clang-opts (lls/conf-get 'target-clang-opts-fun)))
 
 (defun lls/swap-clang-options ()
   (interactive)
-  (setf (slot-value lls/llvm-config 'target-clang-opts)
-        (funcall (lls/conf-get 'target-clang-opts-fun))))
+  (lls/conf-set 'target-clang-opts
+                (funcall (lls/conf-get 'target-clang-opts-fun))))
 
 ;; =============================== Misc ==============================
 

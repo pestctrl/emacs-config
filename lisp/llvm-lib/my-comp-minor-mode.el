@@ -53,7 +53,13 @@ commands of Compilation major mode are available.  See
 (defun my/enable-comp-keys-if-separate-mode (orig &rest args)
   (let ((ht compilation-finish-local-transient)
         (hs compilation-finish-local-sticky))
-    (write-region (car args) nil "~/.bash_history" 'append)
+    (-->
+     (car args)
+     (replace-regexp-in-string
+      (rx (+ space) "\\" (* space) "\n" (* space)) " "
+      it)
+     (concat it "\n")
+     (write-region it nil "~/.bash_history" 'append))
     (aprog1 (apply orig args)
       (awhen (get-buffer-window it)
         (delete-window it))

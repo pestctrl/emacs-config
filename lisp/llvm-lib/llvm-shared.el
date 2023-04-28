@@ -129,19 +129,20 @@
 (require 'projectile)
 
 (defun projectile-dont-switch-when-conf-available (x)
-  (when-let ((dir (lls/conf-get-safe 'root-dir))
-             (tools-dir
-              (progn
-                (string-match (rx line-start
-                                  "/scratch"
-                                  (group "/benson/tools" (+ (not "/")) "/"))
-                              dir)
-                (match-string 1 dir))))
-    (remove-if #'(lambda (path)
-                   (and (string-match-p (rx "/benson/tools")
-                                        path)
-                        (not (string-match-p tools-dir path))))
-               x)))
+  (if-let ((dir (lls/conf-get-safe 'root-dir))
+           (tools-dir
+            (progn
+              (string-match (rx line-start
+                                "/scratch"
+                                (group "/benson/tools" (+ (not "/")) "/"))
+                            dir)
+              (match-string 1 dir))))
+      (remove-if #'(lambda (path)
+                     (and (string-match-p (rx "/benson/tools")
+                                          path)
+                          (not (string-match-p tools-dir path))))
+                 x)
+    x))
 
 (advice-add 'projectile-relevant-known-projects
             :filter-return

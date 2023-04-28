@@ -27,7 +27,7 @@
 
 (defvar my/framelist nil)
 
-(defun fr/save-if-appropriate ()
+(defun fr/save-if-appropriate (&rest _)
   (interactive)
   (let ((non-tty-frames
          (remove-if-not #'(lambda (frame)
@@ -36,9 +36,10 @@
                         (visible-frame-list))))
     (when (not (zerop (length non-tty-frames)))
       (setq my/framelist
-            (frameset-save (visible-frame-list))))))
+            (frameset-save (visible-frame-list)))))
+  (message "Framelist saved!"))
 
-(run-at-time nil 60 #'fr/save-if-appropriate)
+(run-at-time nil (* 60 2) #'fr/save-if-appropriate)
 
 (defun fr/restore ()
   (interactive)

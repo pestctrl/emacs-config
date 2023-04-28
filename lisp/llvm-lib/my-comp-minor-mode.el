@@ -67,9 +67,7 @@ commands of Compilation major mode are available.  See
         (when (cadr args)
           (compilation-minor-mode t)
           (setq compilation-finish-local-sticky hs)
-          (setq compilation-finish-local-transient ht))
-        (when (eq major-mode 'compilation-mode)
-          (goto-char (point-max))))
+          (setq compilation-finish-local-transient ht)))
       ;; For some reason, when calling display-buffer, window doesn't get sent
       ;; to the side. This is because in my/is-compilation-buffer,
       ;; compilation-minor-mode is nil. No idea why, just manually call
@@ -81,7 +79,9 @@ commands of Compilation major mode are available.  See
 
       ;; This only happens if we have (save-window-excursion (apply orig args))
       ;; instead of delete-window.
-      (display-buffer it))))
+      (with-selected-window (display-buffer it)
+        (when (eq major-mode 'compilation-mode)
+          (goto-char (point-max)))))))
 
 (advice-add #'compilation-start
             :around

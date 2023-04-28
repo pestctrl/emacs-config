@@ -74,7 +74,8 @@
       (let ((r
              (rx (and "fatal error: '" (group (+ (not space))) "' file not found"))))
         (aprog1 (re-search-forward r nil t)
-          (message "Couldn't find '%s' header file" (match-string 1)))))))
+          (when it
+            (message "Couldn't find '%s' header file" (match-string 1))))))))
 
 (defun ll/add-include-folder-to-command (command)
   (let ((directory (read-directory-name "directory? ")))

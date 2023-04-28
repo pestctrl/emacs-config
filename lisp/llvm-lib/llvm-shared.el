@@ -50,7 +50,8 @@
    ;; Cached compilation command options
    (target-clang-opts :initarg :clang-opts :initform nil)
    ;; Target + CPU -> compilation command options
-   (target-clang-opts-fun :initarg :clang-opts-fun :type function :initform (lambda ()))))
+   (target-clang-opts-fun :initarg :clang-opts-fun :type function :initform (lambda ()))
+   (aux-props :initarg :aux-props :type list :initform nil)))
 
 ;; (defvar lls/llvm-config nil)
 
@@ -78,6 +79,12 @@
   (if-let ((conf (lls/get-llvm-config)))
       (slot-value conf sym)
     nil))
+
+(defun lls/conf-aux-get (sym)
+  (lls/ensure-initialized)
+  (-->
+   (lls/conf-get 'aux-props)
+   (alist-get sym it)))
 
 (defun lls/conf-set (key val)
   (lls/ensure-initialized)

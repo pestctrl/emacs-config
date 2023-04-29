@@ -27,7 +27,7 @@
     (global-set-key (kbd "<f3>")
                     #'(lambda ()
                         (interactive)
-                        (find-file "~/plaintext/org/random/things_puppet_should_remember.org"))))
+                        (find-file (my/plaintext-file "org/random/things_puppet_should_remember.org")))))
 #+end_src
 
 * Add Ledger
@@ -59,7 +59,7 @@
 * Sending reports to mom
 #+begin_src emacs-lisp
   (defun my/run-report-get-file-name (arg)
-    (let* ((default-directory (expand-file-name "~/plaintext/ledger-finance"))
+    (let* ((default-directory (my/plaintext-file "ledger-finance"))
            (buf
             (save-window-excursion
               (compilation-start (format "./mom_report.sh %s"

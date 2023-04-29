@@ -30,6 +30,9 @@
 (require 'my-org-board)
 (require 'org-capture)
 
+(require 'org-capture-roam-refile)
+(define-key org-capture-mode-map (kbd "C-c M-w") #'org-capture-roam-refile)
+
 ;; Defines 3 things:
 ;; - #'setup-automatic-review
 ;; - #'finalize-review

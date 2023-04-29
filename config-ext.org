@@ -207,7 +207,7 @@
             (replace-regexp (rx "    "
                                 (or "*" "!")
                                 " "
-                                (group (+ (not " "))))
+                                (group (+ (not (any " " "\n")))))
                             "    \\1  ")
             (replace-regexp (rx (and " " (+ " ")
                                      ";; [" (+ (any digit "-" "=" "/")) "]"

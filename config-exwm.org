@@ -125,7 +125,8 @@
           ([?\C-s] . ?\C-f)
           ([?\C-.] . ?\C-w)
           ([?\C-/] . ?\C-z)
-          ([?\M-s] . ?\C-s)))
+          ([?\M-s] . ?\C-s)
+          ([?\M-E] . ?\C-a)))
 #+end_src
 * exwm-background
 #+begin_src emacs-lisp

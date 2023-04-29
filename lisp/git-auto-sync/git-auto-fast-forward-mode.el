@@ -125,7 +125,9 @@
                 (read-only-mode -1)
                 (when (not (verify-visited-file-modtime (current-buffer)))
                   (revert-buffer-quick)))))))))
-  (run-hooks 'gaff/after-merge-hook))
+  (message "git-auto-fast-forward finished")
+  (run-hooks 'gaff/after-merge-hook)
+  (message "gaff hooks finished"))
 
 (defvar gaff/after-merge-hook nil)
 

@@ -37,6 +37,7 @@
     (pcase arg
       ('(4)
        (org-entry-delete (point) "DELAYED")
+       (org-entry-delete (point) "NOT_TODAY")
        "Removed delay on entry")
       (_
        (let* ((new-time

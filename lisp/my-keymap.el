@@ -35,6 +35,8 @@
 (exwm-global-set-key (kbd "M-o") #'other-window)
 (exwm-global-set-key (kbd "s-o") #'org-agenda)
 (exwm-global-set-key (kbd "s-u") #'org-capture)
+;; (add-to-list 'exwm-input-global-keys
+;;              (cons (kbd "C-g") #'keyboard-quit))
 
 (ec/load-or-ask-key 'my/keymap-key
                     'my/keymap-key-key

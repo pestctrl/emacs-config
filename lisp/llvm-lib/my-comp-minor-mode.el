@@ -50,6 +50,11 @@ commands of Compilation major mode are available.  See
     (setq compilation-finish-local-transient nil)
     (run-hook-with-args 'compilation-finish-local-sticky buf msg)))
 
+(setq shell-file-name "bash")
+(let ((aliases-file "~/.config/bash/bash-env.sh"))
+  (when (file-exists-p aliases-file)
+    (setenv "BASH_ENV" aliases-file)))
+
 (defun my/enable-comp-keys-if-separate-mode (orig &rest args)
   (let ((ht compilation-finish-local-transient)
         (hs compilation-finish-local-sticky))

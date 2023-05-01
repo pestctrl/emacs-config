@@ -93,6 +93,11 @@
     ;; (setq vertico-multiform-commands
     ;;       '((completion-at-point vertical)))
 
+    (use-package affe
+      :config
+      (setq vertico-multiform-categories
+            '((affe-find vertical))))
+
     (setq vertico-multiform-categories
           '((file flat (vertico-cycle . t))))
 

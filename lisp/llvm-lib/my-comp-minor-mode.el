@@ -133,6 +133,12 @@ commands of Compilation major mode are available.  See
         (compilation-minor-mode t))
       (setq compilation-arguments args))))
 
+(defvar compile-command-joiner-fun
+  #'default-compile-command-joiner)
+
+(defun default-compile-command-joiner (l)
+  (string-join l " && \\\n"))
+
 (defmacro def-compile-command (sym args extra-args &rest body)
   (declare (indent defun))
   (mmt-with-gensyms (result)
@@ -140,10 +146,9 @@ commands of Compilation major mode are available.  See
        ,(when-let (int (plist-get extra-args :interactive))
           `(interactive ,@int))
        (let ((,result
-              (string-join
-               (progn
-                 ,@body)
-               " && \\\n")))
+              (funcall compile-command-joiner-fun
+                       (progn
+                         ,@body))))
          (if (not (called-interactively-p))
              ,result
            (compilation-start

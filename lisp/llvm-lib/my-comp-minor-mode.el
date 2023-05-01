@@ -133,5 +133,22 @@ commands of Compilation major mode are available.  See
         (compilation-minor-mode t))
       (setq compilation-arguments args))))
 
+(defmacro def-compile-command (sym args extra-args &rest body)
+  (declare (indent defun))
+  (mmt-with-gensyms (result)
+    `(defun ,sym ,args
+       ,(when-let (int (plist-get extra-args :interactive))
+          `(interactive ,@int))
+       (let ((,result
+              (string-join
+               (progn
+                 ,@body)
+               " && \\\n")))
+         (if (not (called-interactively-p))
+             ,result
+           (compilation-start
+            ,result
+            ,@(plist-get extra-args :compilation-args)))))))
+
 (provide 'my-comp-minor-mode)
 ;;; my-comp-minor-mode.el ends here

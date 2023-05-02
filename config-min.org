@@ -96,10 +96,14 @@
     (use-package affe
       :config
       (setq vertico-multiform-categories
-            '((affe-find vertical))))
+            '((affe-find vertical)
+              (find-file flat (vertico-cycle . t))))
 
-    (setq vertico-multiform-categories
-          '((file flat (vertico-cycle . t))))
+      (with-eval-after-load 'projectile
+        (define-key projectile-command-map (kbd "f") #'affe-find)))
+
+    ;; (setq vertico-multiform-categories
+    ;;       '((file flat (vertico-cycle . t))))
 
     (use-package embark)
     (define-key *root-map* (kbd "C-o") #'embark-act)

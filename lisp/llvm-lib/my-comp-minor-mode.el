@@ -66,6 +66,7 @@ commands of Compilation major mode are available.  See
      (concat it "\n")
      (write-region it nil "~/.bash_history" 'append))
     (aprog1 (apply orig args)
+      (set-process-filter (get-buffer-process it) nil)
       (awhen (get-buffer-window it)
         (delete-window it))
       (with-current-buffer it

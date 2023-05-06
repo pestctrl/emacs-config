@@ -21,6 +21,13 @@
                  (window-width . 80)))
 
   (add-to-list 'display-buffer-alist
+               `("*Async Shell Command*"
+                 display-buffer-in-side-window
+                 (side . left)
+                 (window-parameters . ((no-delete-other-windows . t)))
+                 (window-width . 80)))
+
+  (add-to-list 'display-buffer-alist
                `((major-mode . magit-status-mode)
                  display-buffer-in-side-window
                  (side . right)

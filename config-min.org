@@ -259,14 +259,16 @@
   (use-package resize-window)
   (require 'side-window-split)
 
+  (defun side-window-exwm-hide-window (buffer alist)
+    (when-let (window (and (with-current-buffer buffer
+                             (eq major-mode 'exwm-mode))
+                           (get-buffer-window buffer)))
+      (with-selected-window window
+        (previous-buffer))))
+
   (advice-add #'display-buffer-in-side-window
               :before
-              #'(lambda (buffer alist)
-                  (when-let (window (and (with-current-buffer buffer
-                                           (eq major-mode 'exwm-mode))
-                                         (get-buffer-window buffer)))
-                    (with-selected-window window
-                      (previous-buffer)))))
+              #'side-window-exwm-hide-window)
 
   (setq window-sides-vertical t)
   (define-key *window-map* (kbd "j") 'side-bottom-window)

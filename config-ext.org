@@ -647,9 +647,9 @@
 
   (exwm-global-set-key (kbd "s-s") #'toggle-audio-output)
 
-  (use-exwm
-    :config
-    (add-hook 'exwm-init-hook #'setup-headphone-stuff))
+  ;; (use-exwm
+  ;;   :config
+  ;;   (add-hook 'exwm-init-hook #'setup-headphone-stuff))
 #+end_src
 ** shell-command+
 #+begin_src emacs-lisp

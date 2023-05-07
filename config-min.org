@@ -92,11 +92,12 @@
 
     (use-package affe
       :config
-      (setq vertico-multiform-commands
-            '((find-file flat (vertico-cycle . t))))
-
       (with-eval-after-load 'projectile
-        (define-key projectile-command-map (kbd "f") #'affe-find)))
+        (define-key projectile-command-map (kbd "F") #'affe-find)
+        (define-key projectile-command-map (kbd "s G") #'affe-grep)))
+
+    (setq vertico-multiform-commands
+          '((find-file flat (vertico-cycle . t))))
 
     ;; (setq vertico-multiform-categories
     ;;       '((file flat (vertico-cycle . t))))

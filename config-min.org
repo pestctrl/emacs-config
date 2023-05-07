@@ -941,6 +941,10 @@
     (add-to-list 'window-persistent-parameters
                  '(spilt-window . t))
 
+    (advice-add 'window-toggle-side-windows
+                :before
+                'olivetti-reset-all-windows)
+
     (add-hook 'prog-mode-hook   'olivetti-mode)
     (add-hook 'org-mode-hook    'olivetti-mode)
     (add-hook 'dired-mode-hook  'olivetti-mode)

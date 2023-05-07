@@ -95,7 +95,7 @@
 
     (use-package affe
       :config
-      (setq vertico-multiform-categories
+      (setq vertico-multiform-commands
             '((affe-find vertical)
               (find-file flat (vertico-cycle . t))))
 

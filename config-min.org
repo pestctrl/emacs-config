@@ -524,6 +524,7 @@
   (define-key macrostep-keymap (kbd "c") nil)
   (define-key macrostep-keymap (kbd "u") nil)
   (define-key macrostep-keymap (kbd "C-c q") #'macrostep-collapse)
+  ;; (define-key macrostep-keymap (kbd "q") #'macrostep-collapse)
 
   (define-key macrostep-keymap (kbd "RET") nil)
   (define-key macrostep-keymap (kbd "e") nil)

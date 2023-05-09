@@ -37,7 +37,8 @@
     (when (not (zerop (length non-tty-frames)))
       (setq my/framelist
             (frameset-save (visible-frame-list)))))
-  (message "Framelist saved!"))
+  (message "%s Framelist saved!"
+           (format-time-string "%Y-%m-%d %H:%M:%S")))
 
 (run-at-time nil (* 60 2) #'fr/save-if-appropriate)
 

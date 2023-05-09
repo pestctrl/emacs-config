@@ -31,6 +31,7 @@
 (require 'act-on-obj-file)
 (require 'act-on-llvm-source-file)
 (require 'act-on-llvm-dump-file)
+(require 'act-on-tablegen-file)
 
 (defun ll/act-on-file (file)
   (interactive (list (or (and (eq major-mode 'dired-mode)
@@ -43,6 +44,8 @@
   (pcase (file-name-extension file)
     ((and _ (guard (ll/is-test-file file)))
      (ll/act-on-test-file file))
+    ((and "td" (guard (and (ll/is-llvm-source-file file))))
+     (ll-tblgen))
     ((and _ (guard (ll/is-llvm-source-file file)))
      (ll/act-on-llvm-source-file file))
     ((and _ (guard (ll/is-dump-file file)))

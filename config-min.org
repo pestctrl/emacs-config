@@ -1011,6 +1011,7 @@
     )
 
   (fringe-mode '(10 . 10))
+  (set-face-attribute 'fringe nil :background "#222222")
   ;; Need to configure all-the-icons so that mode-line doesn't look fat
   ;; and ugly
   (use-package all-the-icons

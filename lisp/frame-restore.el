@@ -42,12 +42,22 @@
 
 (run-at-time nil (* 60 2) #'fr/save-if-appropriate)
 
+(defun keep-display-ignore-daemon (ret)
+  (if (and ret
+           (daemonp))
+      nil
+    ret))
+
+(advice-add #'frameset-keep-original-display-p
+            :filter-return
+            #'keep-display-ignore-daemon)
+
 (defun fr/restore ()
   (interactive)
   (let ((frameset--target-display `(display . ,(getenv "DISPLAY"))))
     (frameset-restore
      my/framelist
-     :force-display nil
+     :force-display t
      :reuse-frames t)
     (dolist (f (frame-list))
       (unless (frame-visible-p f)

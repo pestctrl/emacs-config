@@ -80,6 +80,7 @@
 
   (use-package vertico
     :init
+    (require 'vertico-jumper)
     (vertico-mode)
     (vertico-multiform-mode)
     (setq vertico-count 8)

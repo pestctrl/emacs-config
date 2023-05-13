@@ -956,6 +956,10 @@
 #+begin_src emacs-lisp
   (use-package olivetti
     :commands (olivetti-mode)
+    :hook ((prog-mode-hook . olivetti-mode)
+           (org-mode-hook . olivetti-mode)
+           (dired-mode-hook . olivetti-mode)
+           (org-agenda-hook . olivetti-mode))
     :config
     (add-to-list 'window-persistent-parameters
                  '(spilt-window . t))
@@ -963,11 +967,6 @@
     (advice-add 'window-toggle-side-windows
                 :before
                 'olivetti-reset-all-windows)
-
-    (add-hook 'prog-mode-hook   'olivetti-mode)
-    (add-hook 'org-mode-hook    'olivetti-mode)
-    (add-hook 'dired-mode-hook  'olivetti-mode)
-    (add-hook 'org-agenda-hook  'olivetti-mode)
 
     (setq-default olivetti-body-width 140))
 #+end_src

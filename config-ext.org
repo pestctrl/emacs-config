@@ -317,7 +317,7 @@
   (use-package erc-hl-nicks)
   (use-package erc-colorize)
   (require 'netrc)
-  (erc-hl-nicks-mode)
+  (erc-hl-nicks)
   (erc-colorize-mode)
   (setq erc-user-full-name "Benson Chu")
   (setq erc-kill-buffer-on-part t)

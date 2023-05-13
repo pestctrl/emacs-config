@@ -26,6 +26,7 @@
 
 (require 'magit)
 (require 'eieio)
+(require 'my-llvm-mode)
 
 ;; =========================== LLVM Rebuild ==========================
 
@@ -113,6 +114,7 @@
                         (cond ((string-match-p r y) nil)
                               ((string-match-p r x) t)
                               (t (string< x y))))))))))
+  (load-llvm-mode (lls/conf-get 'root-dir))
   (message "llvm-lib initialize!"))
 
 (defun lls/ensure-initialized ()
@@ -271,7 +273,7 @@
 
 (defun lls/guess-root-dir-fun ()
   ;; TODO: constant
-  "~/workspace/llvm-project")
+  "~/workspace/llvm-project.git/machine-outliner")
 
 (defun lls/guess-build-dirs-fun ()
   (when-let ((toplevel ;;(magit-toplevel (buffer-file-name (current-buffer)))

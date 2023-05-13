@@ -86,52 +86,6 @@
   `(when (file-exists-p ,fname)
      (load-file ,fname)))
 
-(load-file? (expand-file-name
-             "lisp/work-config/secrets/tools-manipulation.el"
-             user-emacs-directory))
-(load-file? (expand-file-name
-             "lisp/work-config/secrets/update_environment.el"
-             user-emacs-directory))
-
-(load-file? "/scratch/benson/tools2/llvm_cgt/llvm-project/llvm/utils/emacs/llvm-mode.el")
-(load-file? "/scratch/benson/tools2/llvm_cgt/llvm-project/llvm/utils/emacs/emacs.el")
-
-(defface llvm-separator-face `((t (:background "gray25" :extend t :inherit font-lock-warning-face)))
-  nil)
-
-(progn
-  (-->
-   llvm-font-lock-keywords
-   (remove '("%[-a-zA-Z$._][-a-zA-Z$._0-9]*" . font-lock-variable-name-face) llvm-font-lock-keywords)
-   (setq llvm-font-lock-keywords it))
-
-  (add-to-list 'llvm-font-lock-keywords
-               `(,(rx "%" (+ (or "." "_" alphanumeric)) (optional (+ ":" (+ (or "." "_" alphanumeric)))))
-                 . font-lock-variable-name-face)))
-
-(add-to-list 'llvm-font-lock-keywords
-             `(,(rx line-start (optional "# ") "***" (+ nonl) "***" (optional ":") "\n") . 'llvm-separator-face))
-
-(add-to-list 'llvm-font-lock-keywords
-             `(,(rx " = " (optional "nsw ") (group (+ (or "_" alphanumeric)))) (1 font-lock-keyword-face)))
-
-(add-to-list 'llvm-font-lock-keywords
-             `(,(rx "$" (+ alphanumeric)) . font-lock-variable-name-face))
-
-(add-to-list 'llvm-font-lock-keywords
-             `(,(rx (or "renamable" "implicit-def" "implicit" "debug-location" "nsw" "align")) . 'shadow))
-
-(add-to-list 'llvm-font-lock-keywords
-             `(,(rx "!" (+ alphanumeric)) . 'font-lock-variable-name-face))
-
-(-->
- "\\b[-]?[0-9]+\\b"
- (assoc it llvm-font-lock-keywords)
- (cl-position it llvm-font-lock-keywords)
- (nth it llvm-font-lock-keywords)
- (setf it
-       `(,(rx word-boundary (optional "-") ))))
-
 ;; (pop llvm-font-lock-keywords)
 
 (add-to-list 'auto-mode-alist

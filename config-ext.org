@@ -868,3 +868,7 @@ This is sort of implicit in the code, but I
   ;; rendering.
   (use-package pair-tree)
 #+end_src
+* Gimme that process
+#+begin_src emacs-lisp
+  (require 'rgrep-patch)
+#+end_src

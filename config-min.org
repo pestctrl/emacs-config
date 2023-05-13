@@ -466,7 +466,8 @@
 
   ;; Magit uses ediff
   (with-eval-after-load 'ediff
-    (setq ediff-window-setup-function 'ediff-setup-windows-plain)
+    (setq ediff-window-setup-function 'ediff-setup-windows-plain
+          ediff-split-window-function 'split-window-horizontally)
 
     (defun ediff-copy-both-to-C ()
       (interactive)

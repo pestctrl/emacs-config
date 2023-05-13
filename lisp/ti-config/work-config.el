@@ -138,8 +138,6 @@
 ;;               :around
 ;;               #'replace-path-for-async-native-comp))
 
-(require 'vertico-jumper)
-
 (use-package plantuml-mode
   :init
   (setq plantuml-jar-path "~/bin/plantuml"

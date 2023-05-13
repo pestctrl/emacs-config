@@ -78,20 +78,18 @@
 (defun ediff-transition-llvm-print-after-all (buffer)
   (interactive
    (list (current-buffer)))
-  (let ((window--sides-inhibit-check t))
-    (set-window-parameter (selected-window) 'window-side nil)
-    (save-excursion
-      (goto-char (point-min))
-      (let ((r (rx line-start (optional "# ") "*** "))
-            flist)
-        (re-search-forward r)
-        (let ((previous-index (match-beginning 0)))
-          (while (re-search-forward r nil t)
-            (let ((file (make-temp-file "llvm-print-after-all-" nil ".ll")))
-              (write-region previous-index (match-beginning 0) file)
-              (push file flist))
-            (setq previous-index (match-beginning 0))))
-        (ediff-transition (reverse flist))))))
+  (save-excursion
+    (goto-char (point-min))
+    (let ((r (rx line-start (optional "# ") "*** "))
+          flist)
+      (re-search-forward r)
+      (let ((previous-index (match-beginning 0)))
+        (while (re-search-forward r nil t)
+          (let ((file (make-temp-file "llvm-print-after-all-" nil ".ll")))
+            (write-region previous-index (match-beginning 0) file)
+            (push file flist))
+          (setq previous-index (match-beginning 0))))
+      (ediff-transition (reverse flist)))))
 
 ;; (ediff-transition
 ;;  (mapcar #'(lambda (x)

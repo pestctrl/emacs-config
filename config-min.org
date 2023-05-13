@@ -469,6 +469,19 @@
     (setq ediff-window-setup-function 'ediff-setup-windows-plain
           ediff-split-window-function 'split-window-horizontally)
 
+    (defun ediff-clear-up-windows (&rest optional)
+      (let ((tab-name (alist-get 'name (tab-bar--current-tab))))
+        (unless (string-match-p "-ediff$" tab-name)
+          (switch-or-create-tab (concat tab-name "-ediff"))))
+      (when (window-parameter (selected-window) 'window-side)
+        (window-toggle-side-windows))
+      (let ((ignore-window-parameters t))
+        (delete-other-windows)))
+
+    (advice-add #'ediff-setup
+                :before
+                #'ediff-clear-up-windows)
+
     (require 'ediff-transition)
 
     (defun ediff-copy-both-to-C ()

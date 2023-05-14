@@ -65,26 +65,13 @@ commands of Compilation major mode are available.  See
       it)
      (concat it "\n")
      (write-region it nil "~/.bash_history" 'append))
-    (aprog1 (apply orig args)
+    (aprog1 (save-window-excursion (apply orig args))
       (set-process-filter (get-buffer-process it) nil)
-      (awhen (get-buffer-window it)
-        (delete-window it))
       (with-current-buffer it
         (when (cadr args)
           (compilation-minor-mode t)
           (setq compilation-finish-local-sticky hs)
           (setq compilation-finish-local-transient ht)))
-      ;; For some reason, when calling display-buffer, window doesn't get sent
-      ;; to the side. This is because in my/is-compilation-buffer,
-      ;; compilation-minor-mode is nil. No idea why, just manually call
-      ;; display-buffer-in-side-window.
-
-      ;; For some reason, calling display-window-in-side-window directly
-      ;; doesn't work EITHER. The window doesn't pop up UNLESS there already
-      ;; exists a side-window.
-
-      ;; This only happens if we have (save-window-excursion (apply orig args))
-      ;; instead of delete-window.
       (with-selected-window (display-buffer it)
         (when (eq major-mode 'compilation-mode)
           (goto-char (point-max)))))))

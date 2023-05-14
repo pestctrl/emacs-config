@@ -79,7 +79,8 @@
   ;; (ido-mode 'file)
 
   (use-package vertico
-    :init
+    :demand t
+    :config
     (require 'vertico-jumper)
     (vertico-mode)
     (vertico-multiform-mode)

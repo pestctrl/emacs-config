@@ -32,7 +32,8 @@
   (let ((non-tty-frames
          (remove-if-not #'(lambda (frame)
                             (with-selected-frame frame
-                              window-system))
+                              (and window-system
+                                   (not (string= "F1" (frame-parameter frame 'name))))))
                         (visible-frame-list))))
     (when (not (zerop (length non-tty-frames)))
       (setq my/framelist

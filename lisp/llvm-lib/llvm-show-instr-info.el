@@ -43,7 +43,7 @@
        (find-file-noselect file))))
 
 (defconst ll/ibase-regexp
-  (rx (seq "IBase<"
+  (rx (seq "<"
            (+? (not ",")) "," (*? (or white "\n"))
            "(outs" (optional " " (group (+ (not ")")))) ")," (*? (or white "\n"))
            "(ins" (optional " " (group (+ (not ")")))) ")," (*? (or white "\n"))
@@ -174,7 +174,7 @@
             (re-search-forward (rx (group (+ "defvar _" (+ alphanumeric) " = " (+ digit) ";" (+ "\n")))))
             (--> (match-string 1)
                  (replace-regexp-in-string "\n+" "\n" it)
-                 (compat-string-trim it)
+                 (string-trim it)
                  (push (cons "Schedule Timing Definitions" it) l)))
           (re-search-forward (rx (group "class " (literal itin) "Data" symbol-end (+? (not ";")) ";")))
           (push (cons "Itinerary class" (match-string 1)) l)))

@@ -36,9 +36,7 @@
    (string-join it " ")))
 
 (defun ll-tblgen/gen-command (file flags output-file)
-  (let ((bin (car (lls/get-tool "llvm-tblgen$")))
-
-        )
+  (let ((bin (car (lls/get-tool "llvm-tblgen$"))))
     (format "%s %s %s %s"
             bin
             file
@@ -142,7 +140,10 @@
        ((eq action ?p)
         (setq comm (concat comm " --print-records")))
        ((eq action ?c)
-        (setq comm (concat comm
+        (setq comm (concat (format "mkdir -p %s"
+                                   (diredp-parent-dir out))
+                           " && "
+                           comm
                            (format " -o %s"
                                    out)))))
 

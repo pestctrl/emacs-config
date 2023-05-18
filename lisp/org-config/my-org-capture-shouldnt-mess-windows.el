@@ -30,13 +30,10 @@
 (defun my/org-capture-shouldnt-mess-windows (fun &rest args)
   (let ((buffer
          (save-window-excursion
-           (when (my/side-window-p (selected-window))
-             (select-window
-              (display-buffer-pop-up-window
-               (current-buffer)
-               '((window-side . nil)))))
-           (apply fun args)
-           (current-buffer))))
+           (set-window-parameter (selected-window) 'window-side nil)
+           (let ((window--sides-inhibit-check t))
+             (apply fun args)
+             (current-buffer)))))
     (pop-to-buffer buffer)))
 
 (advice-add #'org-capture
@@ -61,12 +58,9 @@
 
 (defun my/org-todo-side-window-hack (fun &rest args)
   (save-window-excursion
-    (when (my/side-window-p (selected-window))
-      (select-window
-       (display-buffer-pop-up-window
-        (current-buffer)
-        '((window-side . nil)))))
-    (apply fun args)))
+    (set-window-parameter (selected-window) 'window-side nil)
+    (let ((window--sides-inhibit-check t))
+      (apply fun args))))
 
 (advice-add #'org-todo
             :around

@@ -66,9 +66,10 @@ commands of Compilation major mode are available.  See
      (concat it "\n")
      (write-region it nil "~/.bash_history" 'append))
     (aprog1 (save-window-excursion (apply orig args))
-      (set-process-filter (get-buffer-process it) nil)
       (with-current-buffer it
-        (when (cadr args)
+        (when-let (mode (cadr args))
+          (unless (member mode '(grep-mode))
+            (set-process-filter (get-buffer-process it) nil))
           (compilation-minor-mode t)
           (setq compilation-finish-local-sticky hs)
           (setq compilation-finish-local-transient ht)))

@@ -393,10 +393,15 @@
                  (window-height   . 0.10)))
 
   ;; Autocompletion
-  (use-package company)
-  (setq company-idle-delay 0.2)
-  (add-hook 'emacs-lisp-mode-hook 'company-mode)
-  (add-hook 'lisp-mode-hook 'company-mode)
+  (use-package corfu
+    :after orderless
+    :custom
+    (corfu-quit-at-boundary nil)
+    (corfu-quit-no-match t)
+    (corfu-cycle t)
+    (corfu-auto t)
+    :init
+    (global-corfu-mode))
 
   ;; Magit
   (use-package magit)

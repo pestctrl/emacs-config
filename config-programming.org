@@ -3,10 +3,17 @@
 * lsp
 #+begin_src emacs-lisp
   (use-package lsp-mode
+    :after corfu
     :commands lsp
     :config
     (setq lsp-lens-enable nil)
-    (setq read-process-output-max (* 1024 1024)))
+    (setq read-process-output-max (* 1024 1024))
+    (setq lsp-completion-provider :none)
+    ;; (defun corfu-lsp-setup ()
+    ;;   (setq-local completion-styles '(orderless)
+    ;;               completion-category-defaults nil))
+    ;; (add-hook 'lsp-mode-hook #'corfu-lsp-setup)
+    )
 
   (use-package lsp-ui
     :after lsp-mode
@@ -35,6 +42,7 @@
   (let ((fetcher (if (or noninteractive my-ec/at-ti) "github" "github-ssh")))
     (quelpa `(yasnippet :repo "pestctrl/yasnippet" :branch "quit-undo-tree" :fetcher ,fetcher)))
   (use-package java-snippets)
+  (add-hook 'lsp-mode-hook 'yas-minor-mode)
 #+END_SRC
 
 * c++

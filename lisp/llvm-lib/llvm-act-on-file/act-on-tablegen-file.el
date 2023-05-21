@@ -24,7 +24,7 @@
 
 ;;; Code:
 
-(defun ll-tblgen/get-includes ()
+(defun ll-tblgen/get-includes (file)
   (-->
    (list "llvm/include"
          "llvm/include/llvm/IR")
@@ -32,6 +32,7 @@
    ;; TODO Hard coding this value
    (cons (lls/get-llvm-build-dir) it)
    (reverse it)
+   (cons (file-name-directory file) it)
    (mapcar #'(lambda (x) (concat "-I" x)) it)
    (string-join it " ")))
 
@@ -40,7 +41,7 @@
     (format "%s %s %s %s"
             bin
             file
-            (ll-tblgen/get-includes)
+            (ll-tblgen/get-includes file)
             (string-join
              (list
               "--write-if-changed"

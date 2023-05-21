@@ -127,31 +127,30 @@
   (interactive)
   (when-let ((f (find-file-noselect (expand-file-name "CMakeLists.txt"
                                                       default-directory))))
-    (let* ((action (read-key "[c]ompile [p]rint-records"))
-           (commands (ll-tblgen/cmake-extract-tblgen-commands f))
-           (key (completing-read "Which tablegen command? " (mapcar #'car commands)))
-           (build-dir (lls/get-llvm-build-dir))
-           (out-comm (alist-get key commands nil nil #'equal))
-           (comm (car out-comm))
-           (out (cadr out-comm)))
+    (let* ((action (read-key "[c]ompile [p]rint-records")))
       (when (not (member action '(?c ?p)))
         (error "Unknown action"))
+      (let* ((commands (ll-tblgen/cmake-extract-tblgen-commands f))
+             (key (completing-read "Which tablegen command? " (mapcar #'car commands)))
+             (build-dir (lls/get-llvm-build-dir))
+             (out-comm (alist-get key commands nil nil #'equal))
+             (comm (car out-comm))
+             (out (cadr out-comm)))
+        (cond
+         ((eq action ?p)
+          (setq comm (concat comm " --print-records")))
+         ((eq action ?c)
+          (setq comm (concat (format "mkdir -p %s"
+                                     (diredp-parent-dir out))
+                             " && "
+                             comm
+                             (format " -o %s"
+                                     out)))))
 
-      (cond
-       ((eq action ?p)
-        (setq comm (concat comm " --print-records")))
-       ((eq action ?c)
-        (setq comm (concat (format "mkdir -p %s"
-                                   (diredp-parent-dir out))
-                           " && "
-                           comm
-                           (format " -o %s"
-                                   out)))))
-
-      (compilation-start
-       comm
-       nil
-       (lambda (_) "*tblgen*")))))
+        (compilation-start
+         comm
+         nil
+         (lambda (_) "*tblgen*"))))))
 
 (provide 'act-on-tablegen-file)
 ;;; act-on-tablegen-file.el ends here

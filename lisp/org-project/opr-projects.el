@@ -103,7 +103,7 @@
            (cond ((member "_invis_" tags)
                   'invis)
                  ((when-let (d (org-entry-get (point) "DELAYED"))
-                    (org-time> d (org-matcher-time "<yesterday>")))
+                    (org-time> d (org-matcher-time "<now>")))
                   'invis)
                  ((when-let (d (org-entry-get (point) "NOT_TODAY"))
                     (org-time> d (org-matcher-time "<yesterday>")))

@@ -32,7 +32,8 @@
         (expand-file-name "org/org-board-data"
                           my/plaintext-mega-folder)))
 
-(use-package org-board)
+(use-package org-board :demand t)
+(require 'org-board-custom-dispatcher)
 (add-to-list 'org-board-agent-header-alist
              '("Linux" . "--user-agent=\"Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.6) Gecko/20070802 SeaMonkey/1.1.4\""))
 (setq org-board-wget-show-buffer nil)

@@ -962,10 +962,10 @@
 #+begin_src emacs-lisp
   (use-package olivetti
     :commands (olivetti-mode)
-    :hook ((prog-mode-hook . olivetti-mode)
-           (org-mode-hook . olivetti-mode)
-           (dired-mode-hook . olivetti-mode)
-           (org-agenda-hook . olivetti-mode))
+    :hook ((prog-mode . olivetti-mode)
+           (org-mode . olivetti-mode)
+           (dired-mode . olivetti-mode)
+           (org-agenda . olivetti-mode))
     :config
     (add-to-list 'window-persistent-parameters
                  '(spilt-window . t))

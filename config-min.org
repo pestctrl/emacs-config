@@ -692,7 +692,7 @@
   (add-hook 'ibuffer-mode-hook
             #'(lambda ()
                (ibuffer-switch-to-saved-filter-groups "default")
-               (ibuffer-do-sort-by-alphabetic)
+               (ibuffer-do-sort-by-custom)
                ;; (ibuffer-auto-mode)
                ))
 
@@ -700,13 +700,25 @@
 
   (define-key ibuffer-mode-map my/keymap-key nil)
 
-  (eval-after-load "ibuf-ext"
-    '(define-ibuffer-filter directory-name
-         "Filter files in the agenda folder"
-       (:description "agenda")
-       (and (buffer-file-name buf)
-            (string-match qualifier
-                          (buffer-file-name buf)))))
+  (with-eval-after-load "ibuf-ext"
+    (define-ibuffer-filter directory-name
+        "Filter files in the agenda folder"
+      (:description "agenda")
+      (and (buffer-file-name buf)
+           (string-match qualifier
+                         (buffer-file-name buf))))
+
+    (define-ibuffer-sorter custom
+      "My custom ibuffer sorter."
+      (:description "custom")
+      (cl-labels ((exwm-name-or-directory (buffer)
+                    (with-current-buffer buffer
+                      (if (eq major-mode 'exwm-mode)
+                          (downcase (buffer-name))
+                        (ibuffer-buffer-file-name)))))
+        (not
+         (string-lessp (exwm-name-or-directory (car a))
+                       (exwm-name-or-directory (car b)))))))
 
   (add-to-list 'ibuffer-never-show-predicates
                #'(lambda (buf)
@@ -720,10 +732,17 @@
                                   (mode . term-mode)))
            ("emacs-config"    (and (or (filename . ".emacs.d")
                                        (filename . "emacs-config"))
-                                   (not (mode . magit-status-mode))))
+                                   (not (mode . magit-status-mode))
+                                   (not (mode . magit-log-mode))
+                                   (not (mode . magit-diff-mode))
+                                   (not (mode . magit-process-mode))))
            ("code-aux"        (or (mode . slime-repl-mode)
                                   (mode . slime-mode)
                                   (mode . magit-status-mode)
+                                  (mode . magit-status-mode)
+                                  (mode . magit-log-mode)
+                                  (mode . magit-diff-mode)
+                                  (mode . magit-process-mode)
                                   (mode . ein:notebooklist-mode)
                                   (mode . cider-repl-mode)
                                   (mode . comint-mode)

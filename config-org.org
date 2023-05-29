@@ -660,6 +660,7 @@
                 ("h" . org-roam-buffer-toggle)
                 ("f" . org-roam-node-find)
                 ("F" . my/org-roam-find-daily)
+                ("p" . my/org-roam-find-project)
                 ("T" . org-roam-dailies-goto-today)
                 ("t" . org-roam-dailies-capture-today)
                 ("i" . org-roam-node-insert)
@@ -676,7 +677,7 @@
           '(("d" "Journal" entry "* %<%H:%M> %?"
              :unnarrowed t
              :target (file+head+olp "%<%Y-%m-%d>.org"
-                                    "#+title: %<%Y-%m-%d>\n#+filetags: %<:%Y:%B:>\n"
+                                    "#+title: %<%Y-%m-%d>\n#+filetags: %<:%Y:%B:dailies>\n"
                                     ("Journal")))
             ;; ("m" "Most Important Thing" entry "* TODO %? :mit:"
             ;;  :target (file+head+olp "%<%Y-%m-%d>.org"
@@ -691,12 +692,32 @@
              :unnarrowed t)
             ("t" "tech tips" plain "%?" :target
              (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: techtips\n")
-             :unnarrowed t))))
+             :unnarrowed t)))
+
+    (require 'org-roam-util)
+
+    (defun my/org-roam-find-project ()
+      (interactive)
+      ;; Select a project file to open, creating it if necessary
+      (org-roam-node-find
+       nil nil
+       (lambda (node)
+         (let ((tags (org-roam-node-tags node)))
+           (and (eq (org-roam-node-level node) 0)
+                (member "project" tags)
+                (not (member "done" tags)))))
+       nil
+       :templates
+       '(("p" "project" plain ""
+          :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}: %^{Description}\n#+category: ${title}\n#+filetags: project")
+          :unnarrowed t)))))
 
   (use-package consult-org-roam
     :after org-roam consult
     :commands (my/org-roam-find-daily)
     :config
+
+    (require 'org-roam-util)
 
     (defun consult-org-roam-file-find (arg)
       "Find org-roam node with preview, if ARG open in other window."

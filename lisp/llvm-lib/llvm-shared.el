@@ -146,9 +146,10 @@
                  x)
     x))
 
-(advice-add 'projectile-relevant-known-projects
-            :filter-return
-            #'projectile-dont-switch-when-conf-available)
+(when my-ec/at-ti
+  (advice-add 'projectile-relevant-known-projects
+              :filter-return
+              #'projectile-dont-switch-when-conf-available))
 
 
 ;;===---------------------------------------------------------------------===;;

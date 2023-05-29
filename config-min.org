@@ -397,7 +397,7 @@
   (use-package corfu
     :after orderless
     :custom
-    (corfu-quit-at-boundary nil)
+    (corfu-quit-at-boundary t)
     (corfu-quit-no-match t)
     (corfu-cycle t)
     (corfu-auto t)

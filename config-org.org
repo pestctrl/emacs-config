@@ -691,20 +691,30 @@
              :unnarrowed t)
             ("t" "tech tips" plain "%?" :target
              (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: techtips\n")
-             :unnarrowed t)))
+             :unnarrowed t))))
+
+  (use-package consult-org-roam
+    :after org-roam consult
+    :commands (my/org-roam-find-daily)
+    :config
+
+    (defun consult-org-roam-file-find (arg)
+      "Find org-roam node with preview, if ARG open in other window."
+      (interactive "P")
+      (cl-letf (((symbol-function 'org-roam-node-read)
+                 (symbol-function 'consult-org-roam-node-read)))
+        (let ((other-window (if arg t nil)))
+          (org-roam-node-find other-window nil #'consult-org-roam--node-file-p))))
 
     (defun my/org-roam-find-daily ()
       (interactive)
-      (org-roam-node-find nil nil
-                          (my/org-roam-filter-by-tag "dailies")
-                          (lambda (x y)
-                            (string-lessp (org-roam-node-file (cdr y))
-                                          (org-roam-node-file (cdr x)))))))
-
-  (use-package consult-org-roam
-    :after org-roam
-    :config
-    (consult-org-roam-mode))
+      (cl-letf (((symbol-function 'org-roam-node-read)
+                 (symbol-function 'consult-org-roam-node-read)))
+        (org-roam-node-find nil nil
+                            (my/org-roam-filter-by-tag "dailies")
+                            (lambda (x y)
+                              (string-lessp (org-roam-node-file (cdr y))
+                                            (org-roam-node-file (cdr x))))))))
 
   ;; (require 'org-roam-protocol)
 #+end_src

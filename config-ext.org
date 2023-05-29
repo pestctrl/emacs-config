@@ -110,6 +110,13 @@
 
   ;; (pop display-buffer-alist)
 #+end_src
+* Ace jump
+#+BEGIN_SRC emacs-lisp
+  (use-package ace-jump-mode
+    :bind (("C-c j" . 'ace-jump-line-mode)
+           :map *root-map*
+           ("SPC" . 'ace-jump-mode)))
+#+END_SRC
 * delete-other-side-windows
 #+begin_src emacs-lisp
   (defun my/delete-other-windows (arg)

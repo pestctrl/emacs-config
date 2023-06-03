@@ -724,32 +724,31 @@
        :templates
        '(("p" "project" plain ""
           :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}: %^{Description}\n#+category: ${title}\n#+filetags: project")
-          :unnarrowed t)))))
+          :unnarrowed t))))
 
-  (use-package consult-org-roam
-    :after org-roam consult
-    :commands (my/org-roam-find-daily)
-    :config
+    (use-package consult-org-roam
+      :demand t
+      :commands (my/org-roam-find-daily)
+      :config
+      (require 'org-roam-util)
 
-    (require 'org-roam-util)
+      (defun consult-org-roam-file-find (arg)
+        "Find org-roam node with preview, if ARG open in other window."
+        (interactive "P")
+        (cl-letf (((symbol-function 'org-roam-node-read)
+                   (symbol-function 'consult-org-roam-node-read)))
+          (let ((other-window (if arg t nil)))
+            (org-roam-node-find other-window nil #'consult-org-roam--node-file-p))))
 
-    (defun consult-org-roam-file-find (arg)
-      "Find org-roam node with preview, if ARG open in other window."
-      (interactive "P")
-      (cl-letf (((symbol-function 'org-roam-node-read)
-                 (symbol-function 'consult-org-roam-node-read)))
-        (let ((other-window (if arg t nil)))
-          (org-roam-node-find other-window nil #'consult-org-roam--node-file-p))))
-
-    (defun my/org-roam-find-daily ()
-      (interactive)
-      (cl-letf (((symbol-function 'org-roam-node-read)
-                 (symbol-function 'consult-org-roam-node-read)))
-        (org-roam-node-find nil nil
-                            (my/org-roam-filter-by-tag "dailies")
-                            (lambda (x y)
-                              (string-lessp (org-roam-node-file (cdr y))
-                                            (org-roam-node-file (cdr x))))))))
+      (defun my/org-roam-find-daily ()
+        (interactive)
+        (cl-letf (((symbol-function 'org-roam-node-read)
+                   (symbol-function 'consult-org-roam-node-read)))
+          (org-roam-node-find nil nil
+                              (my/org-roam-filter-by-tag "dailies")
+                              (lambda (x y)
+                                (string-lessp (org-roam-node-file (cdr y))
+                                              (org-roam-node-file (cdr x)))))))))
 
   ;; (require 'org-roam-protocol)
 #+end_src

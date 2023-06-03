@@ -658,7 +658,7 @@
     (org-roam-use-completion-everywhere t)
     :bind (:map *org-roam-map*
                 ("h" . org-roam-buffer-toggle)
-                ("f" . org-roam-node-find)
+                ("f" . my/org-roam-find-file)
                 ("F" . my/org-roam-find-daily)
                 ("p" . my/org-roam-find-project)
                 ("T" . org-roam-dailies-goto-today)
@@ -695,6 +695,20 @@
              :unnarrowed t)))
 
     (require 'org-roam-util)
+
+    (defun my/org-roam-find-file ()
+      (interactive)
+      ;; Select a project file to open, creating it if necessary
+      (org-roam-node-find
+       nil nil
+       (lambda (node)
+         (let ((tags (org-roam-node-tags node)))
+           (not (member "project" tags))))
+       nil
+       :templates
+       '(("p" "project" plain ""
+          :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}: %^{Description}\n#+category: ${title}\n#+filetags: project")
+          :unnarrowed t))))
 
     (defun my/org-roam-find-project ()
       (interactive)

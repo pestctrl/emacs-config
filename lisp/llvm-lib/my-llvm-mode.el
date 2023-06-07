@@ -25,6 +25,7 @@
 ;;; Code:
 
 (defun load-llvm-mode (root-dir)
+  (interactive (list (lls/conf-get 'root-dir)))
   (load-file (expand-file-name "llvm/utils/emacs/llvm-mode.el" root-dir))
   (load-file (expand-file-name "llvm/utils/emacs/tablegen-mode.el" root-dir))
   (load-file (expand-file-name "llvm/utils/emacs/emacs.el" root-dir))
@@ -46,7 +47,10 @@
                `(,(rx line-start (optional "# ") "***" (+ nonl) "***" (optional ":") "\n") . 'llvm-separator-face))
 
   (add-to-list 'llvm-font-lock-keywords
-               `(,(rx " = " (optional "nsw ") (group (+ (or "_" alphanumeric)))) (1 font-lock-keyword-face)))
+               `(,(rx line-start (+ space)
+                      (optional "renamable") (separated-list ", " (and (or "$" "%") (+ alphanumeric))) " = "
+                      (optional "nsw ") (group (+ (or "_" alphanumeric))))
+                 (1 font-lock-keyword-face)))
 
   (add-to-list 'llvm-font-lock-keywords
                `(,(rx "$" (+ alphanumeric)) . font-lock-variable-name-face))

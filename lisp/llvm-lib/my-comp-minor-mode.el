@@ -64,7 +64,9 @@ commands of Compilation major mode are available.  See
       (rx (+ space) "\\" (* space) "\n" (* space)) " "
       it)
      (concat it "\n")
-     (write-region it nil "~/.bash_history" 'append))
+     (when (not (zerop (shell-command (format "grep -Fxq '%s' ~/.bash_history"
+                                              it))))
+       (write-region it nil "~/.bash_history" 'append)))
     (aprog1 (save-window-excursion (apply orig args))
       (with-current-buffer it
         (when-let (mode (cadr args))

@@ -34,13 +34,25 @@
                             (not (string= "F1" (frame-parameter frame 'name))))))
                  (visible-frame-list)))
 
+(defvar fr/working-state nil)
+
+(defun fr/give-up-working-state ()
+  (interactive)
+  (setq fr/working-state t))
+
+(add-to-list 'server-after-make-frame-hook
+             (lambda (&rest _)
+               (when (<= (length (fr/non-tty-frames)) 1)
+                 (setq fr/working-state nil))))
+
 (defun fr/save-if-appropriate (&rest _)
   (interactive)
   (let ((non-tty-frames
          (fr/non-tty-frames)))
-    (when (not (zerop (length non-tty-frames)))
+    (when (and fr/working-state
+               (not (zerop (length (fr/non-tty-frames)))))
       (setq my/framelist
-            (frameset-save (visible-frame-list)))
+            (frameset-save (fr/non-tty-frames)))
       (message "%s Framelist saved!"
                (format-time-string "%Y-%m-%d %H:%M:%S")))))
 
@@ -58,14 +70,14 @@
 
 (defun fr/restore ()
   (interactive)
-  (let ((frameset--target-display `(display . ,(getenv "DISPLAY"))))
-    (frameset-restore
-     my/framelist
-     :force-display t
-     :reuse-frames t)
-    (dolist (f (frame-list))
-      (unless (frame-visible-p f)
-        (delete-frame f)))))
+  (setq fr/working-state t)
+  (frameset-restore
+   my/framelist
+   :force-display t
+   :reuse-frames t)
+  (dolist (f (frame-list))
+    (unless (frame-visible-p f)
+      (delete-frame f))))
 
 (provide 'frame-restore)
 ;;; frame-restore.el ends here

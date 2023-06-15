@@ -94,9 +94,27 @@
                (mapcar #'(lambda (x) (string-trim x)) it)
                ;; TODO: assuming all commands will be llc
                (mapcar #'(lambda (x)
-                           (string-replace "llc"
-                                           (expand-file-name "bin/llc" dir)
-                                           x))
+                           (let (res)
+                             (string-match (rx line-start
+                                               (group
+                                                (or "llc" "%clang" "%clang_cc1"))
+                                               " ")
+                                           x)
+                             (setq res
+                                   (pcase (match-string 1 x)
+                                     ("%clang_cc1"
+                                      (replace-match "clang -cc1" nil nil x 1))
+                                     ("%clang"
+                                      (replace-match "clang" nil nil x 1))))
+                             (string-match (rx line-start
+                                               (group (or "clang" "llc"))
+                                               " ")
+                                           res)
+                             (replace-match
+                              (expand-file-name (match-string 1 res)
+                                                (expand-file-name "bin"
+                                                                  dir))
+                              nil nil res 1)))
                        it)
                (mapcar #'(lambda (x)
                            (string-replace "%s" file x))
@@ -104,12 +122,15 @@
     (my/completing-read "Which command? " commands)))
 
 (defun ll/build-test-command (file action)
-  (mapconcat #'identity
-             `(,(ll/test-ensure-binary-built file)
-               ,(if (eq action 'test-action)
-                    (ll/prompt-test-action file action)
-                  (ll/build-lit-command file action)))
-             " && "))
+  (let (actions)
+    (if (eq action 'test-action)
+        (push (ll/prompt-test-action file action) actions)
+      (push (ll/build-lit-command file action) actions))
+    (when (y-or-n-p "Rebuild before running test? ")
+      (push (ll/test-ensure-binary-built file) actions))
+    (mapconcat #'identity
+               actions
+               " && ")))
 
 (defun ll/test-get-missing (buffer)
   (interactive

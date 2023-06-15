@@ -1102,14 +1102,14 @@
   (defvar dark-theme 'calm-forest)
   (defvar light-theme 'modus-operandi)
 
-  (defun switch-themes ()
+  (defun my/switch-themes ()
     (interactive)
     (disable-current-theme)
     (setq current-theme (if (eq current-theme 'dark) 'light 'dark))
     (enable-current-theme)
     (set-background-mode current-theme))
 
-  (defun reload-theme ()
+  (defun my/reload-theme ()
     (interactive)
     (disable-current-theme)
     (enable-current-theme)

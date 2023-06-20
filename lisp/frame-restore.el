@@ -40,6 +40,8 @@
   (interactive)
   (setq fr/working-state t))
 
+(fr/give-up-working-state)
+
 (add-to-list 'server-after-make-frame-hook
              (lambda (&rest _)
                (when (<= (length (fr/non-tty-frames)) 1)

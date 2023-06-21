@@ -133,7 +133,37 @@
      ,(org-agenda-compound-view tag))
     (,(concat key "h") ,(concat "\t" name " Hold and Delay")
      ,(org-agenda-hold-view tag))
+    (,(concat key "w") ,(concat "\t" name " Weekly Report")
+     ,(org-agenda-weekly-view tag))
     ,@additional))
+
+
+(defun org-agenda-weekly-view (tag)
+  `((my/org-ql-stuck-projects ,tag
+                              ((org-ql-block-header "Stuck Projects")
+                               (org-ql-indent-levels t)))
+    (my/org-ql-active-projects-plus-tasks ,tag
+                                          ((org-ql-block-header "Active Projects")
+                                           (org-ql-indent-levels t)))
+    (agenda ""
+            ((org-agenda-span (car (work/last-week-wednesday)))
+             (org-agenda-start-day (cdr (work/last-week-wednesday)))
+             (org-agenda-start-on-weekday 3)
+             (org-agenda-show-log '(closed))
+             (org-agenda-skip-function (lambda ()
+                                         (let ((tags (org-get-tags)))
+                                           (unless (and (or (member ,tag tags)
+                                                            (member "PLAN" tags))
+                                                        (let ((delayed (org-entry-get (point) "DELAYED")))
+                                                          (or (null delayed)
+                                                              (org-time< delayed (org-matcher-time "<now>"))))
+                                                        (not (member (org-get-todo-state) '("HOLD" "TICKLER"))))
+                                             (outline-next-heading)))))))))
+
+(defun work/last-week-wednesday ()
+  (let ((num (+ 4 (string-to-number (format-time-string "%u")))))
+    (cons (1+ num)
+          (format "-%dd" num))))
 
 (defun org-agenda-hold-view (tag)
   `((org-ql-block '(and (tags ,tag)

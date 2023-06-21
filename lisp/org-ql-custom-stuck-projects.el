@@ -151,7 +151,7 @@
 ;;            insert))
 ;;     (insert "\n")))
 
-(defun my/get-project-active-displayables (element)
+(defun my/get-project-active-displayables (element &optional plus-task)
   (let ((marker (org-element-property :org-marker element)))
     (with-current-buffer (marker-buffer marker)
       (goto-char marker)
@@ -162,20 +162,24 @@
                 (olc/todo-children
                   (let ((type (opr/get-type)))
                     (when (or (and (eq 'task (opr/get-type))
-                                   (string= "WAIT" (org-get-todo-state)))
-                           (and (eq 'project (opr/get-type))
+                                   (or (and plus-task (eq 'active (opr/type-of-task)))
+                                       (string= "WAIT" (org-get-todo-state))))
+                              (and (eq 'project (opr/get-type))
                                    (eq 'active (opr/type-of-project 'active))))
-                      (let ((res (-> (point)
-                                     (org-element-headline-parser)
-                                     (org-ql--add-markers)
-                                     (my/get-project-active-displayables)
-                                     (reverse))))
+                      (let ((res (--> (point)
+                                      (org-element-headline-parser it)
+                                      (org-ql--add-markers it)
+                                      (my/get-project-active-displayables it plus-task)
+                                      (reverse it))))
                         (setf display (append res display))))))
                 (reverse display)))))))
 
+(defun my/get-project-active-displayables-plus-tasks (element)
+  (my/get-project-active-displayables element t))
+
 (require 'org-dev-level)
 
-(defun my/org-ql-active-projects (tag)
+(defun my/org-ql-active-projects-plus-tasks (tag)
   (let (narrow-p old-beg old-end)
     (let* ((from (or (pcase org-agenda-overriding-restriction
                         ('nil (org-agenda-files nil 'ifmode))
@@ -187,6 +191,53 @@
                                             narrow-p t)
                                       (narrow-to-region org-agenda-restrict-begin org-agenda-restrict-end)))))
                      (org-agenda-files nil 'ifmode)))
+           (org-todo-keywords-1 '("EMPTY" "META" "META1" "ONE" "TODO"))
+           (items (mapcan #'my/get-project-active-displayables-plus-tasks
+                          (org-ql-select from
+                            `(and ,@(when (and tag
+                                               (not (zerop (length tag))))
+                                      `((tags ,tag)))
+                                  (not (done))
+                                  (odl/part-of-current-level-p)
+                                  ,@my/is-project-short-circuit
+                                  (or (eq 'active (opr/type-of-task))
+                                      (eq 'active (opr/type-of-project 'active))))
+                            :action 'element-with-markers
+                            :narrow narrow-p
+                            :sort 'todo))))
+
+      (when narrow-p
+        ;; Restore buffer's previous restrictions.
+        (with-current-buffer from
+          (narrow-to-region old-beg old-end)))
+      (org-agenda-prepare)
+      ;; FIXME: `org-agenda--insert-overriding-header' is from an Org version newer than
+      ;; I'm using.  Should probably declare it as a minimum Org version after upgrading.
+      ;;  (org-agenda--insert-overriding-header (or org-ql-block-header (org-ql-agenda--header-line-format from query)))
+      (insert (org-add-props org-ql-block-header
+                  nil 'face 'org-agenda-structure 'org-agenda-type 'search) "\n")
+      ;; Calling `org-agenda-finalize' should be unnecessary, because in a "series" agenda,
+      ;; `org-agenda-multi' is bound non-nil, in which case `org-agenda-finalize' does nothing.
+      ;; But we do call `org-agenda-finalize-entries', which allows `org-super-agenda' to work.
+      (let ((org-agenda-sorting-strategy-selected '(category-keep) ))
+        (->> items
+             (-map #'org-ql-view--format-element)
+             org-agenda-finalize-entries
+             insert))
+      (insert "\n"))))
+
+(defun my/org-ql-active-projects (tag)
+  (let (narrow-p old-beg old-end)
+    (let* ((from (or (pcase org-agenda-overriding-restriction
+                       ('nil (org-agenda-files nil 'ifmode))
+                       ('file (get 'org-agenda-files 'org-restrict))
+                       ('subtree (prog1 org-agenda-restrict
+                                   (with-current-buffer org-agenda-restrict
+                                     ;; Narrow the buffer; remember to widen it later.
+                                     (setf old-beg (point-min) old-end (point-max)
+                                           narrow-p t)
+                                     (narrow-to-region org-agenda-restrict-begin org-agenda-restrict-end)))))
+                     (org-agenda-files nil 'ifmode)))
            (org-todo-keywords-1 '("EMPTY" "META" "META1" "ONE" "TODO" ))
            (items (mapcan #'my/get-project-active-displayables
                           (org-ql-select from
@@ -194,7 +245,7 @@
                                                (not (zerop (length tag))))
                                       `((tags ,tag)))
                                   (odl/part-of-current-level-p)
-                                    ,@my/is-project-short-circuit
+                                  ,@my/is-project-short-circuit
                                   (or (eq 'active (opr/type-of-task))
                                       (eq 'active (opr/type-of-project 'active))))
                             :action 'element-with-markers

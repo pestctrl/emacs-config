@@ -200,8 +200,7 @@
                                   (not (done))
                                   (odl/part-of-current-level-p)
                                   ,@my/is-project-short-circuit
-                                  (or (eq 'active (opr/type-of-task))
-                                      (eq 'active (opr/type-of-project 'active))))
+                                  (eq 'active (opr/type-of-project 'active)))
                             :action 'element-with-markers
                             :narrow narrow-p
                             :sort 'todo))))
@@ -246,8 +245,7 @@
                                       `((tags ,tag)))
                                   (odl/part-of-current-level-p)
                                   ,@my/is-project-short-circuit
-                                  (or (eq 'active (opr/type-of-task))
-                                      (eq 'active (opr/type-of-project 'active))))
+                                  (eq 'active (opr/type-of-project 'active)))
                             :action 'element-with-markers
                             :narrow narrow-p
                             :sort 'todo))))

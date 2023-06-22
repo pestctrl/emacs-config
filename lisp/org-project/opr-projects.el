@@ -36,7 +36,7 @@
       (if (or (olc/any-todo-children? 
                 (eq 'active (opr/type-of-task)))
               (olc/any-todo-children?
-                (eq 'active (opr/type-of-project))))
+                (eq 'active (opr/type-of-project active-if-one-active))))
           'active
         'stuck)
     (if (or
@@ -45,7 +45,7 @@
             ;; Any stuck task? Stuck!
             (eq 'stuck (opr/type-of-task))
             ;; Have a stuck project? Stuck! 
-            (eq 'stuck (opr/type-of-project))))
+            (eq 'stuck (opr/type-of-project active-if-one-active))))
          ;; No todo children? Stuck!
          (not (olc/any-todo-children? t))
          ;; All todo children are done? Stuck!

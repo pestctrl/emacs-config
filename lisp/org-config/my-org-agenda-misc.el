@@ -25,9 +25,10 @@
 ;;; Code:
 (require 'org)
 
-(setq org-agenda-skip-deadline-if-done t
-      org-agenda-skip-scheduled-if-done t
-      org-agenda-skip-deadline-prewarning-if-scheduled 7)
+(setq org-agenda-skip-scheduled-if-done t
+      org-agenda-skip-scheduled-if-deadline-is-shown t
+      org-agenda-skip-deadline-if-done t
+      org-agenda-skip-deadline-prewarning-if-scheduled 6)
 (setq org-agenda-start-on-weekday 6)
 
 (setq org-tags-match-list-sublevels 'indented)

@@ -31,8 +31,6 @@
 (global-set-key (kbd "C-c c") 'org-capture)
 (global-set-key (kbd "C-c l") 'org-store-link)
 
-(setq org-agenda-skip-scheduled-if-deadline-is-shown t)
-
 (setq org-src-window-setup 'current-window)
 (setq org-agenda-window-setup 'other-window)
 

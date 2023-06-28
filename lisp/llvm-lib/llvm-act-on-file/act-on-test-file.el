@@ -35,7 +35,7 @@
 
 (defun ll/is-test-file (file)
   (and (member (file-name-extension file)
-               '("ll" "c" "mir"))
+               '("ll" "c" "mir" "s"))
        (string-match-p ".*llvm-project.*test.*" file)))
 
 (defun ll/get-test-run-commands (file)
@@ -95,6 +95,7 @@
                ;; TODO: assuming all commands will be llc
                (mapcar #'(lambda (x)
                            (let (res)
+                             (setq res (string-replace "RUN: not " "RUN: " res))
                              (string-match (rx line-start
                                                (group
                                                 (or "llc" "%clang" "%clang_cc1"))

@@ -9,6 +9,8 @@
 #+end_src
 * misc emacs settings
 #+begin_src emacs-lisp
+  (setq garbage-collection-messages t)
+
   (setq backup-directory-alist `(("." . ,(concat user-emacs-directory "backups"))))
 
   (setq use-dialog-box nil)

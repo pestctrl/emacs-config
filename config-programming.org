@@ -66,7 +66,7 @@
     ((c-mode c++-mode objc-mode) .
      #'my/cpp-auto-lsp)
     :init
-    (setq lsp-enable-file-watchers)
+    (setq lsp-enable-file-watchers nil)
     (defun my/cpp-auto-lsp ()
       (let ((project-root (projectile-project-p)))
         (when (and project-root

@@ -87,6 +87,9 @@
 ;; Load additional exwm stuff that changes constantly
 (when (and (not my-switch-found)
            my-ec/load-full-config)
+  (org-babel-load-file
+   (expand-file-name "config-emacs.org"
+                     user-emacs-directory))
 
   (org-babel-load-file
    (expand-file-name "config-programming.org"

@@ -117,26 +117,6 @@
            :map *root-map*
            ("SPC" . 'ace-jump-mode)))
 #+END_SRC
-* delete-other-side-windows
-#+begin_src emacs-lisp
-  (defun my/delete-other-windows (arg)
-    (interactive "p")
-    (let ((win (selected-window)))
-      (if (not (window-parameter win 'window-side))
-          (if (= arg 1)
-              (delete-other-windows)
-            (let ((ignore-window-parameters t))
-              (delete-other-windows)))
-        (if (= arg 1)
-            (delete-other-windows-vertically)
-          (let ((ignore-window-parameters t)
-                (window--sides-inhibit-check t))
-            (set-window-parameter win 'window-side nil)
-            (set-window-parameter win 'no-delete-other-windows nil)
-            (delete-other-windows))))))
-
-  (define-key pestctrl-minor-mode-map (kbd "C-x 1") #'my/delete-other-windows)
-#+end_src
 * Various tools
 ** ledger
 #+begin_src emacs-lisp
@@ -281,18 +261,6 @@
   (fset 'credit_card_statement
      [?\M-x ?o ?r ?g ?- ?m ?o ?d ?e return ?\M-x ?q backspace ?r ?e ?p ?l ?a ?c ?e ?- ?r ?e ?g ?e ?x ?p return ?^ ?\C-q tab return ?  ?  ?  ?  return ?\M-< ?\C-  ?\C-f ?\C-f ?\C-f ?\C-f ?\C-c ?m ?a ?\C-w ?- ?  ?\[ ?  ?\] ?  ?\C-e ?\C-k ?\C-c ?m ?  ?\C-q tab ?\C-q tab ?\C-e ?\C-j ?y ?\C-a ?_ ?_ ?_ ?_ backspace backspace backspace backspace ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?= ?\C-p ?\C-p ?\C-k ?\C-c ?m ?  ?\C-q tab ?\C-q tab ?\C-d ?\C-d return ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n ?\C-n])
 #+end_src
-** encryption
-#+begin_src emacs-lisp
-  (require 'epa-file)
-  (epa-file-enable)
-  (setq epa-pinentry-mode 'loopback)
-  (setq epa-file-cache-passphrase-for-symmetric-encryption t)
-  (setenv "GPG_AGENT_INFO" nil)
-
-  (setq epg-gpg-program "gpg2")
-  ;; (setq auth-source-debug t)
-  (setq auth-sources `((:source ,(ef "secrets/.authinfo.gpg"))))
-#+end_src
 ** debbugs
 #+begin_src emacs-lisp
   (use-package debbugs)
@@ -380,134 +348,16 @@
     (define-key pdf-view-mode-map (kbd "d") (lambda () (interactive) (pdf-view-next-line-or-next-page 8)))
     (define-key pdf-view-mode-map (kbd "u") (lambda () (interactive) (pdf-view-previous-line-or-previous-page 8))))
   #+END_SRC
-* freezing time
-#+begin_src emacs-lisp
-  (defvar my/frozen-time nil)
-
-  (defvar my/format-time-string-function nil)
-
-  (defun my/org-today ()
-    (time-to-days my/frozen-time))
-
-  (defun my/current-time ()
-    my/frozen-time)
-
-  (defun my/format-time-string (original format-string &optional time zone)
-    (apply original
-           format-string
-           (if time
-               time
-             my/frozen-time)
-           zone))
-
-  (defun my/decode-time (original &optional time zone)
-    (apply original
-           (if time
-               time
-             my/frozen-time)
-           zone))
-
-  ;; Change and freeze time
-  (defun za-warudo ()
-    "Freeze `current-time' at the current active or inactive timestamp. If point
-  is not on a timestamp, the function prompts for one. If time is not specified,
-  either by the timstamp under point or prompt, the time defaults to the
-  current HH:MM of today at the selected date."
-    (interactive)
-    (let* ((org-read-date-prefer-future nil)
-           (time (org-read-date t 'totime nil "Input freeze time: ")))
-      (setq my/frozen-time (append time '(0 0)))
-      (advice-add #'current-time :override #'my/current-time)
-      (advice-add #'format-time-string :around #'my/format-time-string)
-      (advice-add #'decode-time :around #'my/decode-time)
-      (advice-add #'org-today :override #'my/org-today)
-      (set-face-background 'fringe "firebrick2")
-      (message "Toki yo tomare")))
-
-  (define-key *root-map* (kbd "C-z") 'za-warudo)
-
-  ;; Release changed / frozen time
-  (defun un-za-warudo ()
-    "Release the time frozen by `freeze-time'."
-    (interactive)
-    (advice-remove #'current-time #'my/current-time)
-    (advice-remove #'format-time-string #'my/format-time-string)
-    (advice-remove #'decode-time #'my/decode-time)
-    (advice-remove #'org-today #'my/org-today)
-    (setq my/frozen-time nil)
-    (set-face-background 'fringe nil)
-    (message "Soshite, toki wa ugoki dasu"))
-
-  (define-key *root-map* (kbd "C-r") 'un-za-warudo)
-#+end_src
-* colorful compilation buffer
-#+begin_src emacs-lisp
-  (require 'ansi-color)
-  (defun colorize-compilation-buffer ()
-    (let ((buffer-read-only nil))
-      (ansi-color-apply-on-region (point-min) (point-max))))
-  (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
-#+end_src
-* Profiler Keymap
-#+begin_src emacs-lisp
-  (define-prefix-command '*profiler-map*)
-
-  (define-key *profiler-map* (kbd "s") #'profiler-start)
-  (define-key *profiler-map* (kbd "r") #'profiler-report)
-  (define-key *profiler-map* (kbd "S") #'profiler-stop)
-
-  (define-key *root-map* (kbd "p") '*profiler-map*)
-#+end_src
-* World time
-#+begin_src emacs-lisp
-    (setq world-clock-list
-          '(("America/Chicago" "Houston")
-            ("Asia/Taipei" "Taiwan")
-            ("Turkey" "Turkey")
-            ("Asia/Shanghai" "China")
-            ("Asia/Jakarta" "Indonesia")))
-#+end_src
-* auto-save files in same directory
-#+begin_src emacs-lisp
-  (setq backup-directory-alist `(("." . ,(ef "backups/"))))
-
-  (setq make-backup-files t               ; backup of a file the first time it is saved.
-        backup-by-copying t               ; don't clobber symlinks
-        version-control t                 ; version numbers for backup files
-        kept-old-versions 6               ; oldest versions to keep when a new numbered backup is made (default: 2)
-        kept-new-versions 9               ; newest versions to keep when a new numbered backup is made (default: 2)
-        auto-save-default t               ; auto-save every buffer that visits a file
-        auto-save-timeout 20              ; number of seconds idle time before auto-save (default: 30)
-        auto-save-interval 200            ; number of keystrokes between auto-saves (default: 300)
-        )
-#+end_src
-* New
-** transpose-frame
+* transpose-frame
 #+begin_src emacs-lisp
   (use-package transpose-frame)
 #+end_src
-** e2wm
+* e2wm
 #+begin_src emacs-lisp
   (use-package e2wm
     :bind (("M-+" . e2wm:start-management)))
 #+end_src
-** set-default-directory
-#+begin_src emacs-lisp
-  (defun set-default-directory (dir)
-    (interactive "f")
-    (setq default-directory dir))
-#+end_src
-** Scroll interval
-#+BEGIN_SRC emacs-lisp
-  (setq scroll-margin 1
-        hscroll-margin 2
-        hscroll-step 1
-        scroll-conservatively 101
-        scroll-preserve-screen-position t
-        mouse-wheel-scroll-amount '(3)
-        mouse-wheel-progressive-speed nil)
-#+END_SRC
-** Helpful view-mode
+* Helpful view-mode
 #+begin_src emacs-lisp
   (defun helpful--navigate-view-mode (orig button)
     (let ((w (window-parameter (selected-window) 'quit-restore)))
@@ -521,24 +371,63 @@
               :around
               #'helpful--navigate-view-mode)
 #+end_src
-** man select window
+* pavucontrol switch speakers headphones
 #+begin_src emacs-lisp
-  (setq Man-notify-method 'aggressive)
-#+end_src
-** find-file-view
-#+begin_src emacs-lisp
-  (defun view-mode-file ()
-    (interactive)
-    (call-interactively #'ido-find-file)
-    (view-mode))
+  (require 'cl)
 
-  (global-set-key (kbd "C-c C-v") #'view-mode-file)
+  (defvar laptop-sink-index 0)
+  (defvar hdmi-pcie-interface nil)
+
+  (defun setup-headphone-stuff ()
+    (interactive)
+    (let* ((result (shell-command-to-string "pactl list short sinks")))
+      (when (string-match "\\([0-9]\\).*analog-stereo" result)
+        (setq laptop-sink-index
+              (string-to-number
+               (match-string 1 result))))
+      (when (string-match "[0-9].*\\(pci-.*\\)\\.hdmi-stereo" result)
+        (setq hdmi-pcie-interface
+              (match-string 1 result))))
+
+    (when hdmi-pcie-interface
+      (let* ((result (shell-command-to-string "pacmd list-modules"))
+             (split (cdr (split-string result "index: "))))
+        (cl-loop for mod in split
+                 while (not
+                        (string-match (format "\\([0-9]+\\)\n.*\n.*name=\"%s\"" hdmi-pcie-interface)
+                                      mod))
+                 finally
+                 do (shell-command
+                     (format "pactl unload-module %s"
+                             (match-string 1 mod)))))))
+
+  (defun current-speakers ()
+    (let ((string (shell-command-to-string "pactl list sinks | grep 'Active Port: '")))
+      (if (string-match-p "headphones" string)
+          'headphones
+        'speakers)))
+
+  (defun toggle-audio-output ()
+    (interactive)
+    (if (eq (current-speakers)
+            'headphones)
+        (shell-command (format "pactl set-sink-port %d analog-output-speaker"
+                               laptop-sink-index))
+      (shell-command (format "pactl set-sink-port %d analog-output-headphones"
+                             laptop-sink-index)))
+    (message (format "Switched to: %s" (current-speakers))))
+
+  (exwm-global-set-key (kbd "s-s") #'toggle-audio-output)
+
+  ;; (use-exwm
+  ;;   :config
+  ;;   (add-hook 'exwm-init-hook #'setup-headphone-stuff))
 #+end_src
-** rmsbolt
+* rmsbolt
 #+begin_src emacs-lisp
 (use-package rmsbolt)
 #+end_src
-** ivy-posframe
+* ivy-posframe
 #+begin_src emacs-lisp
   (require 'cl)
 
@@ -601,7 +490,7 @@
       ))
 
 #+end_src
-** Elfeed
+* Elfeed
 #+begin_src
   (require 'elfeed)
   (setq elfeed-use-curl t)
@@ -611,64 +500,12 @@
   ;; enable elfeed-protocol
   (elfeed-protocol-enable)
 #+end_src
-** pavucontrol switch speakers headphones
-#+begin_src emacs-lisp
-  (require 'cl)
-
-  (defvar laptop-sink-index 0)
-  (defvar hdmi-pcie-interface nil)
-
-  (defun setup-headphone-stuff ()
-    (interactive)
-    (let* ((result (shell-command-to-string "pactl list short sinks")))
-      (when (string-match "\\([0-9]\\).*analog-stereo" result)
-        (setq laptop-sink-index
-              (string-to-number
-               (match-string 1 result))))
-      (when (string-match "[0-9].*\\(pci-.*\\)\\.hdmi-stereo" result)
-        (setq hdmi-pcie-interface
-              (match-string 1 result))))
-
-    (when hdmi-pcie-interface
-      (let* ((result (shell-command-to-string "pacmd list-modules"))
-             (split (cdr (split-string result "index: "))))
-        (cl-loop for mod in split
-                 while (not
-                        (string-match (format "\\([0-9]+\\)\n.*\n.*name=\"%s\"" hdmi-pcie-interface)
-                                      mod))
-                 finally
-                 do (shell-command
-                     (format "pactl unload-module %s"
-                             (match-string 1 mod)))))))
-
-  (defun current-speakers ()
-    (let ((string (shell-command-to-string "pactl list sinks | grep 'Active Port: '")))
-      (if (string-match-p "headphones" string)
-          'headphones
-        'speakers)))
-
-  (defun toggle-audio-output ()
-    (interactive)
-    (if (eq (current-speakers)
-            'headphones)
-        (shell-command (format "pactl set-sink-port %d analog-output-speaker"
-                               laptop-sink-index))
-      (shell-command (format "pactl set-sink-port %d analog-output-headphones"
-                             laptop-sink-index)))
-    (message (format "Switched to: %s" (current-speakers))))
-
-  (exwm-global-set-key (kbd "s-s") #'toggle-audio-output)
-
-  ;; (use-exwm
-  ;;   :config
-  ;;   (add-hook 'exwm-init-hook #'setup-headphone-stuff))
-#+end_src
-** shell-command+
+* shell-command+
 #+begin_src emacs-lisp
   (use-package shell-command+
     :bind ("M-!" . shell-command+))
 #+end_src
-** shackle-mode
+* shackle-mode
 #+begin_src emacs-lisp
   (use-package shackle)
 
@@ -699,66 +536,18 @@
 
   (exwm-global-set-key (kbd "s-p") #'the-plan)
 #+end_src
-** Emojis!
+* Emojis!
 #+begin_src emacs-lisp
   (use-package emojify)
 #+end_src
-** Window splitting function
-#+begin_src emacs-lisp
-  (defun split-window-sensibly-prefer-horizontal (&optional window)
-    "Based on split-window-sensibly, but designed to prefer a horizontal split,
-  i.e. windows tiled side-by-side."
-    (let ((window (or window (selected-window))))
-      (or (and (window-splittable-p window t)
-               ;; Split window horizontally
-               (with-selected-window window
-                 (split-window-right)))
-          (and (window-splittable-p window)
-               ;; Split window vertically
-               (with-selected-window window
-                 (split-window-below)))
-          (and
-           ;; If WINDOW is the only usable window on its frame (it is
-           ;; the only one or, not being the only one, all the other
-           ;; ones are dedicated) and is not the minibuffer window, try
-           ;; to split it horizontally disregarding the value of
-           ;; `split-height-threshold'.
-           (let ((frame (window-frame window)))
-             (or
-              (eq window (frame-root-window frame))
-              (catch 'done
-                (walk-window-tree (lambda (w)
-                                    (unless (or (eq w window)
-                                                (window-dedicated-p w))
-                                      (throw 'done nil)))
-                                  frame)
-                t)))
-           (not (window-minibuffer-p window))
-           (let ((split-width-threshold 0))
-             (when (window-splittable-p window t)
-               (with-selected-window window
-                 (split-window-right))))))))
-
-  (defun split-window-really-sensibly (&optional window)
-    (let ((window (or window (selected-window))))
-      (if (> (window-total-width window) (* 2 (window-total-height window)))
-          (with-selected-window window (split-window-sensibly-prefer-horizontal window))
-        (with-selected-window window (split-window-sensibly window)))))
-
-  (setq
-     split-height-threshold 4
-     split-width-threshold (if my/puppet-p 100 160)
-     split-window-preferred-function 'split-window-really-sensibly)
-
-#+end_src
-** dired-rsync
+* dired-rsync
 #+begin_src emacs-lisp
   (use-package dired-rsync
     :config
     (bind-key "C-c C-r" 'dired-rsync dired-mode-map)
     (add-to-list 'global-mode-string 'dired-rsync-modeline-status t))
 #+end_src
-** keyfreq
+* keyfreq
 #+begin_src emacs-lisp
   (use-package keyfreq
     :init
@@ -775,7 +564,7 @@
     (keyfreq-mode 1)
     (keyfreq-autosave-mode 1))
 #+end_src
-** Hammy?
+* Hammy?
 #+begin_src emacs-lisp#
   (use-package hammy
     :quelpa (hammy :fetcher github :repo "alphapapa/hammy.el"))
@@ -830,57 +619,16 @@
                                  (notify "Time for a sit-down...")
                                  (play-sound-file "~/Misc/Sounds/relax.wav")))))
 #+end_src
-** Auto dim buffers
+* Auto dim buffers
 #+begin_src emacs-lisp
   (use-package auto-dim-other-buffers)
 
   (set-face-attribute 'auto-dim-other-buffers-face nil :background "#700CB3")
 #+end_src
-** Splitting functions
-#+begin_src emacs-lisp
-  (defun mp-split-below (arg)
-    "Split window below from the parent or from root with ARG."
-    (interactive "P")
-    (split-window (if arg (frame-root-window)
-                    (window-parent (selected-window)))
-                  nil 'below nil))
-
-  (defun mp-split-left (arg)
-    "Split window below from the parent or from root with ARG."
-    (interactive "P")
-    (split-window (if arg (frame-root-window)
-                    (window-parent (selected-window)))
-                  nil 'left nil))
-#+end_src
-** Tramp configuration
-This is sort of implicit in the code, but I
-#+begin_src emacs-lisp
-  ;; This is sort the default in tramp, but I wanted to keep this here
-  ;; as a reminder that THIS is the way to communicate to a shell that
-  ;; we want a plain vanilla experience.
-
-  ;; The way to check this is in shell is as follows:
-  ;; if [[ "$TERM" != "dumb" ]]; then
-  ;;    # vterm configuration, etc.
-  ;; fi
-
-  ;; OR, the new way I've been doing this:
-  ;; [[ "$TERM" = "dumb" ]] && return
-  (setq tramp-terminal-type "dumb")
-
-  ;; To debug tramp, set the following variable (max value 11).
-
-  ;; (setq tramp-verbose 3)
-  ;; (setq tramp-verbose 9)
-#+end_src
-** Visualization tools
+* Visualization tools
 #+begin_src emacs-lisp
   (use-package graphviz-dot-mode)
   ;; TODO: There seems to be an issue with my face setup and svg
   ;; rendering.
   (use-package pair-tree)
-#+end_src
-* Gimme that process
-#+begin_src emacs-lisp
-  (require 'rgrep-patch)
 #+end_src

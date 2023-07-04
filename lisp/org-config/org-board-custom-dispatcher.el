@@ -42,7 +42,7 @@ added as a link in the `ARCHIVED_AT' property."
     (let ((default-directory directory))
       (start-process "org-board-youtube-dl" "*org-board-youtube-dl*" youtube-dl-binary
                      (car site))))
-   (t (apply orig path directory args site))))
+   (t (apply orig path directory args (list site)))))
 
 (advice-add #'org-board-wget-call
             :around

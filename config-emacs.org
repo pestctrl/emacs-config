@@ -1,3 +1,113 @@
+* buffer-window management
+#+begin_src emacs-lisp
+  (defun switch-to-buffer-force-same-window (buffer)
+    (interactive
+     (list (read-buffer-to-switch "Switch to buffer: ")))
+    (let ((switch-to-buffer-obey-display-actions nil))
+      (switch-to-buffer buffer nil t)))
+
+  (global-set-key (kbd "C-x B") #'switch-to-buffer-force-same-window)
+
+  (setq switch-to-buffer-obey-display-actions t)
+
+  (add-to-list 'display-buffer-alist
+               `("COMMIT_EDITMSG"
+                 display-buffer-in-side-window
+                 (side . right)
+                 (slot . 0)
+                 (window-parameters . ((no-delete-other-windows . t)))
+                 (window-width . 80)))
+
+  (add-to-list 'display-buffer-alist
+               `("*Async Shell Command*"
+                 display-buffer-in-side-window
+                 (side . left)
+                 (window-parameters . ((no-delete-other-windows . t)))
+                 (window-width . 80)))
+
+  (add-to-list 'display-buffer-alist
+               `((major-mode . magit-status-mode)
+                 display-buffer-in-side-window
+                 (side . right)
+                 (slot . 1)
+                 (window-parameters . ((no-delete-other-windows . t)))
+                 (window-width . 80)))
+
+  (add-to-list 'display-buffer-alist
+               `((major-mode . magit-log-mode)
+                 display-buffer-in-side-window
+                 (side . right)
+                 (slot . 2)
+                 (window-parameters . ((no-delete-other-windows . t)))
+                 (window-width . 100)))
+
+  ;; TODO: This should be fixed in future versions of emacs
+  (defun my/is-compilation-buffer (buffer &optional _rest)
+    (with-current-buffer buffer
+      (or compilation-minor-mode
+          (eq major-mode 'compilation-mode))))
+
+  ;; TODO: Show multiple deadgrep buffers in side-window
+  (add-to-list 'display-buffer-alist
+               `((major-mode . deadgrep-mode)
+                 display-buffer-in-side-window
+                 (side . right)
+                 (slot . 3)
+                 (window-parameters . ((no-delete-other-windows . t)))
+                 (window-width . 100)))
+
+  (add-to-list 'display-buffer-alist
+               `(my/is-compilation-buffer
+                 display-buffer-in-side-window
+                 (side . right)
+                 (slot . 4)
+                 (window-parameters . ((no-delete-other-windows . t)))
+                 (window-width . 80)))
+
+  (add-to-list 'display-buffer-alist
+               `((major-mode . helpful-mode)
+                 display-buffer-in-side-window
+                 (side . right)
+                 (slot . 5)
+                 (window-width . 80)))
+
+  (add-to-list 'display-buffer-alist
+               `((major-mode . Info-mode)
+                 display-buffer-in-side-window
+                 (side . right)
+                 (slot . 6)
+                 (window-width . 80)))
+
+  (require 'org-capture)
+
+  (defun my/is-org-capture-buffer (buffer &optional _rest)
+    (with-current-buffer buffer
+      (and (eq major-mode 'org-mode)
+           org-capture-mode)))
+
+  (add-to-list 'display-buffer-alist
+               `(my/is-org-capture-buffer
+                 display-buffer-in-side-window
+                 (side . left)
+                 (select . t)
+                 (window-width . 85)
+                 (window-parameters
+                  . ((no-delete-other-windows . t)
+                     (dedicated . t)))))
+
+  ;; (defun my/is-org-capture-buffer (buffer &optional _rest)
+  ;;   (with-current-buffer buffer
+  ;;     org-capture-mode))
+
+  ;; (add-to-list 'display-buffer-alist
+  ;;              `(my/is-org-capture-buffer
+  ;;                display-buffer-in-side-window
+  ;;                (side . left)
+  ;;                (slot . 0)
+  ;;                (window-width . 80)))
+
+  ;; (pop display-buffer-alist)
+#+end_src
 * Tramp configuration
 #+begin_src emacs-lisp
   ;; This is sort the default in tramp, but I wanted to keep this here

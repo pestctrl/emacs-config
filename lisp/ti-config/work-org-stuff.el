@@ -553,5 +553,21 @@
       (rx (or "prod"
               (and symbol-start "_" (+ nonl) "_" symbol-end))))
 
+(defun org-agenda-dump-for-meeting ()
+  (interactive)
+  (switch-or-create-tab "org-agenda-dump")
+  (let ((ignore-window-parameters t)
+        (window--sides-check t))
+    (delete-other-windows))
+  (split-window-horizontally)
+  (org-agenda nil "paw")
+  (my/switch-themes)
+  (-->
+   "%Y-%m-%d-agenda.html"
+   (format-time-string it)
+   (expand-file-name it "~/")
+   (org-agenda-write it))
+  (my/switch-themes))
+
 (provide 'work-org-stuff)
 ;;; work-org-stuff.el ends here

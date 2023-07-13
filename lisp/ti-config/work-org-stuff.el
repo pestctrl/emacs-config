@@ -149,7 +149,7 @@
             ((org-agenda-span (car (work/last-week-wednesday)))
              (org-agenda-start-day (cdr (work/last-week-wednesday)))
              (org-agenda-start-on-weekday 3)
-             (org-agenda-show-log '(closed))
+             (org-agenda-show-log '(clock state))
              (org-agenda-skip-function (lambda ()
                                          (let ((tags (org-get-tags)))
                                            (unless (and (or (member ,tag tags)

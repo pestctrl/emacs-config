@@ -150,7 +150,9 @@
         (let ((ignore-window-parameters t)
               (window--sides-inhibit-check t))
           (if (not side-win)
-              (delete-other-windows)
+              (progn
+                (set-window-dedicated-p win nil)
+                (delete-other-windows))
             (set-window-parameter win 'window-side nil)
             (set-window-parameter win 'no-delete-other-windows nil)
             (delete-other-windows))))))

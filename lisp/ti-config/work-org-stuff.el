@@ -559,12 +559,15 @@
   (let ((ignore-window-parameters t)
         (window--sides-check t))
     (delete-other-windows))
-  (split-window-horizontally)
   (org-agenda nil "paw")
   (my/switch-themes)
   (-->
    "%Y-%m-%d-agenda.html"
    (format-time-string it)
+   (expand-file-name it "~/")
+   (org-agenda-write it))
+  (-->
+   "agenda.html"
    (expand-file-name it "~/")
    (org-agenda-write it))
   (my/switch-themes))

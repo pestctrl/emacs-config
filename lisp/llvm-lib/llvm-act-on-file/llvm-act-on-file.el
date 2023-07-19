@@ -32,6 +32,7 @@
 (require 'act-on-llvm-source-file)
 (require 'act-on-llvm-dump-file)
 (require 'act-on-tablegen-file)
+(require 'act-on-asm-file)
 
 (defun ll/act-on-file (file)
   (interactive (list (or (and (eq major-mode 'dired-mode)

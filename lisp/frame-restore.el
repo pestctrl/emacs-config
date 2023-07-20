@@ -34,18 +34,22 @@
                             (not (string= "F1" (frame-parameter frame 'name))))))
                  (visible-frame-list)))
 
-(defvar fr/working-state nil)
+;; Upon emacs startup, we have a valid working state
+(defvar fr/working-state t)
+(defvar fr/startup t)
 
 (defun fr/give-up-working-state ()
   (interactive)
   (setq fr/working-state t))
 
-(fr/give-up-working-state)
-
+;; Whenever a new frame is created, and it's the first frame that's been
+;; created, our working state has been wrecked.
 (add-to-list 'server-after-make-frame-hook
              (lambda (&rest _)
-               (when (<= (length (fr/non-tty-frames)) 1)
-                 (setq fr/working-state nil))))
+               (if fr/startup
+                   (setq fr/startup nil)
+                 (when (<= (length (fr/non-tty-frames)) 1)
+                   (setq fr/working-state nil)))))
 
 (defun fr/save-if-appropriate (&rest _)
   (interactive)

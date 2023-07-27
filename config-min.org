@@ -101,7 +101,34 @@
       :config
       (with-eval-after-load 'projectile
         (define-key projectile-command-map (kbd "F") #'affe-find)
-        (define-key projectile-command-map (kbd "s G") #'affe-grep)))
+        (define-key projectile-command-map (kbd "s G") #'affe-grep))
+
+      (with-eval-after-load 'llvm-shared
+        (defun affe-quick-prompt-dirs (orig &optional dir initial)
+          (message "%s" dir)
+          (cl-flet ((dir-plus-subdirs
+                      (dir)
+                      (cons dir
+                            (->>
+                             (directory-files "/scratch/benson/tools4/cgt" t "[^.]")
+                             (remove-if #'(lambda (dir) (not (file-directory-p dir))))))))
+            (-->
+             (not (equal '(16) dir))
+             (if it default-directory
+               (completing-read "Quick select directory?"
+                                `(,(expand-file-name "lib/Target/Argo/"
+                                                     (lls/get-llvm-build-dir))
+                                  ,(expand-file-name "llvm/lib/Target/Argo/"
+                                                     (lls/get-llvm-root-dir))
+                                  ,@(dir-plus-subdirs
+                                     (expand-file-name "cgt/"
+                                                       (lls/conf-aux-get 'tools-directory))))))
+             (let ((default-directory it))
+               (funcall orig dir initial)))))
+
+        (advice-add #'affe-find
+                    :around
+                    #'affe-quick-prompt-dirs)))
 
     (setq vertico-multiform-commands
           '((find-file flat (vertico-cycle . t))))

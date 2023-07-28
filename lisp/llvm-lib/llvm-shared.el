@@ -43,6 +43,8 @@
 (defclass llvm-config ()
   ((root-dir :initarg :root-dir :type string)
    (build-dirs :initarg :build-dirs :type list)
+   (build-release-dir :initarg :build-release-dir :type string)
+   (build-debug-dir :initarg :build-debug-dir :type string)
    (target :initarg :target :type string)
    (bin-dirs :initarg :bin-dirs :type list :initform nil)
    (compile-command-fun :initarg :cc :type function :initform (lambda ()))

@@ -111,15 +111,20 @@
                       (cons dir
                             (->>
                              (directory-files "/scratch/benson/tools4/cgt" t "[^.]")
-                             (remove-if #'(lambda (dir) (not (file-directory-p dir))))))))
+                             (remove-if #'(lambda (dir) (not (file-directory-p dir))))
+                             (mapcar #'(lambda (x) (file-name-as-directory x)))))))
             (-->
              (not (equal '(16) dir))
              (if it default-directory
                (completing-read "Quick select directory?"
                                 `(,(expand-file-name "lib/Target/Argo/"
-                                                     (lls/get-llvm-build-dir))
+                                                     (lls/conf-get 'build-release-dir))
+                                  ,(expand-file-name "lib/Target/Argo/"
+                                                     (lls/conf-get 'build-debug-dir))
                                   ,(expand-file-name "llvm/lib/Target/Argo/"
                                                      (lls/get-llvm-root-dir))
+                                  ,(expand-file-name "llvm_cgt/argo/"
+                                                     (lls/conf-aux-get 'tools-directory))
                                   ,@(dir-plus-subdirs
                                      (expand-file-name "cgt/"
                                                        (lls/conf-aux-get 'tools-directory))))))

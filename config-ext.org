@@ -204,10 +204,9 @@
            ;; "#ecl"
            )))
 
-  (defun get-authinfo (host port)
-    (let* ((netrc (netrc-parse (ef "secrets/.authinfo.gpg")))
-           (hostentry (netrc-machine netrc host port)))
-      (when hostentry (netrc-get hostentry "password"))))
+  (defun get-authinfo (host port &optional user)
+    (let* ((hostentry (car (auth-source-search :host host :port port :user user))))
+      (when hostentry (funcall (plist-get hostentry :secret)))))
 
   (defun freenode-connect (nick password)
     (erc :server "irc.freenode.net" :port 6667

@@ -214,3 +214,19 @@
               :override
               #'my/exwm-input--fake-last-command)
 #+end_src
+* Disable Pop-ups mode
+#+begin_src emacs-lisp
+  (defun my/pop-buffer-ignore-exwm (buffer &optional norecord)
+    (not (eq 'exwm-mode
+             (with-current-buffer buffer
+               major-mode))))
+
+  (define-minor-mode exwm-disable-popups ""
+    :global t
+    (if exwm-disable-popups
+        (advice-add #'pop-to-buffer-same-window
+                    :before-while
+                    #'my/pop-buffer-ignore-exwm)
+      (advice-remove #'pop-to-buffer-same-window
+                     #'my/pop-buffer-ignore-exwm)))
+#+end_src

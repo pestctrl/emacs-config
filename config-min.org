@@ -13,6 +13,8 @@
 
   (setq backup-directory-alist `(("." . ,(concat user-emacs-directory "backups"))))
 
+  (setq xref-history-storage #'xref-window-local-history)
+
   (setq use-dialog-box nil)
 
   ;; Don't fricken suspend emacs

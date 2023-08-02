@@ -752,7 +752,11 @@
                     (with-current-buffer buffer
                       (if (eq major-mode 'exwm-mode)
                           (downcase (buffer-name))
-                        (ibuffer-buffer-file-name)))))
+                        (concat
+                         (symbol-name major-mode)
+                         " - "
+                         (or (ibuffer-buffer-file-name)
+                             ""))))))
         (not
          (string-lessp (downcase (or (exwm-name-or-directory (car a)) ""))
                        (downcase (or (exwm-name-or-directory (car b)) "")))))))

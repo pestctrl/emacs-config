@@ -50,6 +50,7 @@
    (compile-command-fun :initarg :cc :type function :initform (lambda ()))
    (dis-command-fun :initarg :dc :type function :initform (lambda ()))
    (llc-command-fun :initarg :llc :type function :initform (lambda ()))
+   (tramp-connection :initarg :tramp :type list :initform nil)
    ;; Cached compilation command options
    (target-clang-opts :initarg :clang-opts :initform nil)
    ;; Target + CPU -> compilation command options
@@ -93,6 +94,12 @@
   (lls/ensure-initialized)
   (setf (slot-value (lls/get-llvm-config) key)
         val))
+
+(defun lls/un-trampify (path)
+  (if-let ((vec (lls/conf-get 'tramp-connection)))
+      (with-parsed-tramp-file-name path nil
+        localname)
+    path))
 
 (defun lls/initialize ()
   (interactive)
@@ -263,37 +270,46 @@
 (setq lls/target-init-fun
       ;; TODO: load llvm-mode
       (lambda ()
-        (make-instance
-         'llvm-config
-         :root-dir (lls/guess-root-dir-fun)
-         :build-dirs (lls/guess-build-dirs-fun)
-         :target (completing-read "Which target? " '("X86" "ARM"))
-         :bin-dirs '("/usr/bin/")
-         :cc #'lls/default-comp-fun
-         :dc #'lls/default-dis-comm
-         :llc #'lls/default-llc-comm
-         :clang-opts-fun #'lls/default-clang-opts)))
+        (let ((root-dir (lls/guess-root-dir-fun))
+              tramp-conn)
+          (when (tramp-tramp-file-p root-dir)
+            (with-parsed-tramp-file-name root-dir nil
+              (setf tramp-conn v)))
+          (make-instance
+           'llvm-config
+           :tramp tramp-conn
+           :root-dir root-dir
+           :build-dirs (lls/guess-build-dirs-fun root-dir)
+           :target (completing-read "Which target? " '("X86" "ARM"))
+           :bin-dirs '("/usr/bin/")
+           :cc #'lls/default-comp-fun
+           :dc #'lls/default-dis-comm
+           :llc #'lls/default-llc-comm
+           :clang-opts-fun #'lls/default-clang-opts))))
 
 (defun lls/guess-root-dir-fun ()
-  ;; TODO: constant
-  "~/workspace/llvm-project.git/machine-outliner")
+  (if (-->
+       (shell-command-to-string "git remote get-url origin")
+       (string-trim it)
+       (string= it "https://github.com/llvm/llvm-project.git"))
+      (vc-root-dir)
+    ;; TODO: constant
+    "~/workspace/llvm-project.git/machine-outliner"))
 
-(defun lls/guess-build-dirs-fun ()
-  (when-let ((toplevel ;;(magit-toplevel (buffer-file-name (current-buffer)))
-              (lls/guess-root-dir-fun)))
-    (and (string-match-p "llvm-project" toplevel)
-         (let ((build-dir (expand-file-name "build" toplevel)))
-           (when (file-exists-p build-dir)
-             (--> build-dir
-                  (directory-files it t)
-                  (remove-if-not #'(lambda (dir)
-                                     (file-exists-p
-                                      (expand-file-name "build.ninja" dir)))
-                                 it)
-                  (sort it #'(lambda (x y)
-                               (cond ((string-match-p "^Release$" (file-name-nondirectory y)) nil)
-                                     ((string-match-p "^Release$" (file-name-nondirectory x)) t)
-                                     (t (string< x y)))))))))))
+(defun lls/guess-build-dirs-fun (root-dir)
+  (and (string-match-p "llvm-project" root-dir)
+       (let ((build-dir (expand-file-name "build" root-dir)))
+         (when (file-exists-p build-dir)
+           (--> build-dir
+                (directory-files it t)
+                (remove-if-not #'(lambda (dir)
+                                   (file-exists-p
+                                    (expand-file-name "build.ninja" dir)))
+                               it)
+                (sort it #'(lambda (x y)
+                             (cond ((string-match-p "^Release$" (file-name-nondirectory y)) nil)
+                                   ((string-match-p "^Release$" (file-name-nondirectory x)) t)
+                                   (t (string< x y))))))))))
 
 (provide 'llvm-shared)
 ;;; llvm-shared.el ends here

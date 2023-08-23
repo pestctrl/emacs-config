@@ -40,7 +40,7 @@
   (let* ((default-directory directory)
          (buffer-name (funcall lls/name-llvm-build-buffer directory tools)))
     (compilation-start
-     (lls/ninja-build-tools directory tools)
+     (lls/ninja-build-tools (lls/un-trampify directory) tools)
      nil
      (lambda (_) buffer-name))))
 

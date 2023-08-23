@@ -95,8 +95,16 @@
   (setf (slot-value (lls/get-llvm-config) key)
         val))
 
+(defun lls/tramp-connection ()
+  (lls/conf-get 'tramp-connection))
+
+(defun lls/trampify (path)
+  (if-let ((vec (lls/tramp-connection)))
+      (tramp-make-tramp-file-name vec path)
+    path))
+
 (defun lls/un-trampify (path)
-  (if-let ((vec (lls/conf-get 'tramp-connection)))
+  (if-let ((vec (lls/tramp-connection)))
       (with-parsed-tramp-file-name path nil
         localname)
     path))

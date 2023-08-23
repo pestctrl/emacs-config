@@ -40,8 +40,23 @@
                          (buffer-file-name (current-buffer))
                          (read-file-name "File? "))))
   (when (null file)
-    (setq file (make-temp-file nil nil ".ll"))
+    (let ((tmpf (if-let ((vec (lls/tramp-connection)))
+                    (tramp-make-tramp-temp-name vec)
+                  (make-temp-file nil nil ".ll")))))
+    (setq file tmpf)
     (write-file file))
+  ;; TODO: There are two "easy" solutions here:
+  ;;
+  ;; - Re-copy the file each time (costly network-wise)
+  ;; - Copy once with write-file (will change the working directory)
+  ;;
+  ;; The harder (but better) solution is to do a copy once, and keep a
+  ;; mapping of file-name to tmp-file-name, and doing a re-map each
+  ;; time. Maybe even re-copy if the file name has changed
+  (when-let ((vec (lls/tramp-connection))
+             (tmp (tramp-make-tramp-temp-name vec)))
+    (write-file tmp)
+    (setq file (lls/un-trampify tmp)))
   (pcase (file-name-extension file)
     ((and _ (guard (ll/is-test-file file)))
      (ll/act-on-test-file file))

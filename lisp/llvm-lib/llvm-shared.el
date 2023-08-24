@@ -218,11 +218,12 @@
                               collection)))))
 
 (defun lls/prompt-tool (tool-regexp &optional directories)
-  (my/completing-read tool-regexp
-                      (lls/get-tool tool-regexp
-                                    (or (and (eq 'string (type-of directories))
-                                             (list directories))
-                                        directories))))
+  (lls/un-trampify
+   (my/completing-read tool-regexp
+                       (lls/get-tool tool-regexp
+                                     (or (and (eq 'string (type-of directories))
+                                              (list directories))
+                                         directories)))))
 
 (defun lls/get-tool (tool-regexp &optional directories)
   (cl-mapcan #'(lambda (dir)
@@ -289,7 +290,10 @@
            :root-dir root-dir
            :build-dirs (lls/guess-build-dirs-fun root-dir)
            :target (completing-read "Which target? " '("X86" "ARM"))
-           :bin-dirs '("/usr/bin/")
+           :bin-dirs (list
+                      (--> "/usr/bin/"
+                           (if (not tramp-conn) it
+                             (tramp-make-tramp-file-name tramp-conn it))))
            :cc #'lls/default-comp-fun
            :dc #'lls/default-dis-comm
            :llc #'lls/default-llc-comm

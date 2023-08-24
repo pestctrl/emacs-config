@@ -96,7 +96,7 @@
 
 (defun ll/act-on-c-file (file)
   (let* ((action (aml/read-action-map ll/c-file-action-map)))
-    (--> (ll/build-clang-command file action)
+    (--> (ll/build-clang-command (lls/un-trampify file) action)
          (compilation-start
           it
           (aml/get-map-prop ll/c-file-action-map action :major-mode)

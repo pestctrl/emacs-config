@@ -33,14 +33,14 @@
    (cons (lls/get-llvm-build-dir) it)
    (reverse it)
    (cons (file-name-directory file) it)
-   (mapcar #'(lambda (x) (concat "-I" x)) it)
+   (mapcar #'(lambda (x) (concat "-I" (lls/un-trampify x))) it)
    (string-join it " ")))
 
 (defun ll-tblgen/gen-command (file flags output-file)
   (let ((bin (car (lls/get-tool "llvm-tblgen$"))))
     (format "%s %s %s %s"
             bin
-            file
+            (lls/un-trampify file)
             (ll-tblgen/get-includes file)
             (string-join
              (list
@@ -105,7 +105,7 @@
                     (flags (match-string 2)))
                 (setq out
                       (-->
-                       default-directory
+                       (file-name-directory (buffer-file-name buffer))
                        (replace-regexp-in-string
                         (expand-file-name "llvm" (lls/get-llvm-root-dir))
                         (lls/get-llvm-build-dir)
@@ -122,11 +122,12 @@
             (message (string-join (mapcar #'car commands) "\n"))
           commands)))))
 
-;; TODO: doesn't take a file name
-(defun ll-tblgen ()
+;; TODO: replace references to default-directory with grabbing the
+;; directory of file
+(defun ll-tblgen (file)
   (interactive)
   (when-let ((f (find-file-noselect (expand-file-name "CMakeLists.txt"
-                                                      default-directory))))
+                                                      (file-name-directory file)))))
     (let* ((action (read-key "[c]ompile [p]rint-records")))
       (when (not (member action '(?c ?p)))
         (error "Unknown action"))
@@ -141,11 +142,11 @@
           (setq comm (concat comm " --print-records")))
          ((eq action ?c)
           (setq comm (concat (format "mkdir -p %s"
-                                     (diredp-parent-dir out))
+                                     (lls/un-trampify (diredp-parent-dir out)))
                              " && "
                              comm
                              (format " -o %s"
-                                     out)))))
+                                     (lls/un-trampify out))))))
 
         (compilation-start
          comm

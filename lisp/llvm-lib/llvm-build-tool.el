@@ -37,8 +37,7 @@
     (my/completing-read "build directory" (lls/get-llvm-build-dirs))
     (progn
       (split-string (read-string "ninja -j X ") " "))))
-  (let* ((default-directory directory)
-         (buffer-name (funcall lls/name-llvm-build-buffer directory tools)))
+  (let* ((buffer-name (funcall lls/name-llvm-build-buffer directory tools)))
     (compilation-start
      (lls/ninja-build-tools (lls/un-trampify directory) tools)
      nil

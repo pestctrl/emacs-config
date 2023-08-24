@@ -34,45 +34,53 @@
 (require 'act-on-tablegen-file)
 (require 'act-on-asm-file)
 
-(defun ll/act-on-file (file)
+(defvar ll/buffer-map (make-hash-table :test #'equal))
+
+(defun ll/act-on-file (buffer)
   (interactive (list (or (and (eq major-mode 'dired-mode)
                               (dired-get-filename nil 'NO-ERROR))
-                         (buffer-file-name (current-buffer))
-                         (read-file-name "File? "))))
-  (when (null file)
-    (let ((tmpf (if-let ((vec (lls/tramp-connection)))
-                    (tramp-make-tramp-temp-name vec)
-                  (make-temp-file nil nil ".ll")))))
-    (setq file tmpf)
-    (write-file file))
-  ;; TODO: There are two "easy" solutions here:
-  ;;
-  ;; - Re-copy the file each time (costly network-wise)
-  ;; - Copy once with write-file (will change the working directory)
-  ;;
-  ;; The harder (but better) solution is to do a copy once, and keep a
-  ;; mapping of file-name to tmp-file-name, and doing a re-map each
-  ;; time. Maybe even re-copy if the file name has changed
-  (when-let ((vec (lls/tramp-connection))
-             (tmp (tramp-make-tramp-temp-name vec)))
-    (write-file tmp)
-    (setq file (lls/un-trampify tmp)))
-  (pcase (file-name-extension file)
-    ((and _ (guard (ll/is-test-file file)))
-     (ll/act-on-test-file file))
-    ((and "td" (guard (and (ll/is-llvm-source-file file))))
-     (ll-tblgen))
-    ((and _ (guard (ll/is-llvm-source-file file)))
-     (ll/act-on-llvm-source-file file))
-    ((and _ (guard (ll/is-dump-file file)))
-     (ll/act-on-llvm-dump-file file))
-    ("o" (ll/act-on-obj-file file))
-    ("out" (ll/act-on-obj-file file))
-    ("tiout" (ll/act-on-obj-file file))
-    ("c" (ll/act-on-c-file file))
-    ("asm" (ll/act-on-asm-file file))
-    ("ll" (ll/act-on-ll-file file))
-    (_ (message "Not sure what you'd like me to do with this file"))))
+                         (current-buffer))))
+  (with-current-buffer buffer
+    (when (buffer-modified-p)
+      (save-buffer)))
+  (let ((file (or (buffer-file-name)
+                  (aprog1 (make-temp-file nil nil ".ll")
+                    (write-file it)))))
+    (when-let ((vec (lls/tramp-connection))
+               ((not (file-remote-p file))))
+      ;; If there's a cache entry, and the cache timestamp matches,
+      ;; then we just reuse the file
+      (-->
+       (if-let* ((cache (gethash file ll/buffer-map))
+                 (time (visited-file-modtime))
+                 ((equal time (car cache))))
+           (cdr cache)
+         ;; Otherwise, generate a new tmp file, copy that over, and
+         ;; update the cache.
+         (let ((tmp (concat (tramp-make-tramp-temp-name vec)
+                            "." (file-name-extension file))))
+           (puthash file (cons time tmp) ll/buffer-map)
+           (copy-file file tmp)
+           tmp))
+       (setq file it)))
+    ;; Let further compilation-commands be run over tramp
+    (let ((default-directory (lls/get-llvm-root-dir)))
+      (pcase (file-name-extension file)
+        ((and _ (guard (ll/is-test-file file)))
+         (ll/act-on-test-file file))
+        ((and "td" (guard (and (ll/is-llvm-source-file file))))
+         (ll-tblgen file))
+        ((and _ (guard (ll/is-llvm-source-file file)))
+         (ll/act-on-llvm-source-file file))
+        ((and _ (guard (ll/is-dump-file file)))
+         (ll/act-on-llvm-dump-file file))
+        ("o" (ll/act-on-obj-file file))
+        ("out" (ll/act-on-obj-file file))
+        ("tiout" (ll/act-on-obj-file file))
+        ("c" (ll/act-on-c-file file))
+        ("asm" (ll/act-on-asm-file file))
+        ("ll" (ll/act-on-ll-file file))
+        (_ (message "Not sure what you'd like me to do with this file"))))))
 
 (provide 'llvm-act-on-file)
 ;;; llvm-act-on-file.el ends here

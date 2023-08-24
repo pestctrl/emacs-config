@@ -36,8 +36,19 @@
         result
       (when my/is-plaintext-mega-folder
         (let ((folder (expand-file-name str my/plaintext-mega-folder)))
-          (when (file-exists-p folder)
-            folder))))))
+          (or (and (file-exists-p folder)
+                   folder)
+              result))))))
+
+;; (defun my/plaintext-file (str)
+;;   (if-let ((result (expand-file-name str my/plaintext-migration-folder))
+;;            ((file-exists-p result)))
+;;       result
+;;     (if-let (((identity my/is-plaintext-mega-folder))
+;;              (folder (expand-file-name str my/plaintext-mega-folder))
+;;              ((file-exists-p folder)))
+;;         folder
+;;       result)))
 
 (provide 'my-plaintext-files)
 ;;; my-plaintext-files.el ends here

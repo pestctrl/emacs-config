@@ -67,8 +67,8 @@
   (hash-table-values lls/llvm-configs))
 
 (defun lls/get-llvm-config (&optional tab-name)
-  (gethash (or tab-name (alist-get 'name (tab-bar--current-tab)))
-           lls/llvm-configs))
+  (let ((tab-name (or tab-name (alist-get 'name (tab-bar--current-tab)))))
+    (gethash tab-name lls/llvm-configs)))
 
 (defun lls/set-llvm-config (conf &optional tab-name)
   (puthash (or tab-name (alist-get 'name (tab-bar--current-tab)))

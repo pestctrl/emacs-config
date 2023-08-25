@@ -94,7 +94,7 @@
                (mapcar #'(lambda (x) (string-trim x)) it)
                ;; TODO: assuming all commands will be llc
                (mapcar #'(lambda (x)
-                           (let (res)
+                           (let ((res x))
                              (setq res (string-replace "RUN: not " "RUN: " res))
                              (string-match (rx line-start
                                                (group
@@ -106,7 +106,8 @@
                                      ("%clang_cc1"
                                       (replace-match "clang -cc1" nil nil x 1))
                                      ("%clang"
-                                      (replace-match "clang" nil nil x 1))))
+                                      (replace-match "clang" nil nil x 1))
+                                     (t res)))
                              (string-match (rx line-start
                                                (group (or "clang" "llc"))
                                                " ")

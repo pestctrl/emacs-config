@@ -75,6 +75,7 @@
                    ;; (or (lsp-workspaces)
                    ;;     (y-or-n-p "Should I start LSP? "))
                    )
+          (lls/ensure-initialized)
           (lsp))))
     :config
 

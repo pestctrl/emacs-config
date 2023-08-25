@@ -178,5 +178,18 @@
       (insert new-line)
       (goto-char point))))
 
+(defun banner/create-llvm-banner (desc)
+  (interactive
+   (list (read-string "Description? ")))
+  (let ((start
+         (concat "//==--- "
+                 (file-name-nondirectory (buffer-file-name))
+                 " - " desc " "))
+        (end
+         (concat "-*- C++ -*-===//")))
+    (insert (string-pad start (- fill-column (length end)) ?-)
+            end
+            "\n")))
+
 (provide 'work-commentor)
 ;;; work-commentor.el ends here

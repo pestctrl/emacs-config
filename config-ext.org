@@ -219,7 +219,7 @@
   (defun irc-connect ()
     (interactive)
     (when (y-or-n-p "Connect to IRC? ")
-      (libera-connect "pestctrl" (get-authinfo "irc.libera.chat" "6697"))))
+      (libera-connect "pestctrl" (get-authinfo "irc.libera.chat" "6697" "pestctrl"))))
 #+end_src
 ** font-lock-studio
 #+begin_src emacs-lisp

@@ -105,5 +105,11 @@
     ))
 ;; (remove-hook 'window-size-change-functions #'hoagie-adjust-font-size)
 
+;; (setq doom-modeline-height 20) ; optional
+;; (if (facep 'mode-line-active)
+;;     (set-face-attribute 'mode-line-active nil :family "Roboto Mono" :height 100) ; For 29+
+;;   (set-face-attribute 'mode-line nil :family "Roboto Mono" :height 100))
+;; (set-face-attribute 'mode-line-inactive nil :family "Roboto Mono" :height 100)
+
 (provide 'fonts)
 ;;; fonts.el ends here

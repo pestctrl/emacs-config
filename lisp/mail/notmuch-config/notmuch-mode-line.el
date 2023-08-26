@@ -61,14 +61,18 @@
   (setq notmuch-unread-mode-line-string
         (notmuch-get-unread-string)))
 
-(add-to-list 'global-mode-string
-             ;; TODO: switch to using :propertize
-             `(:eval (propertize notmuch-unread-mode-line-string
-                                 'help-echo ,(purecopy "mouse-1: Open inbox")
-                                 'face (when (not (zerop notmuch-unread-inbox-count)) font-lock-warning-face)
-                                 'mouse-face 'mode-line-highlight
-		                         'local-map mode-line-notmuch-keymap))
-             t)
+;; For some reason, this is making my mode line big and chonky. I say
+;; "for some reason", but it's obviously the face choice. I'll debug
+;; it later.
+
+;; (add-to-list 'global-mode-string
+;;              ;; TODO: switch to using :propertize
+;;              `(:eval (propertize notmuch-unread-mode-line-string
+;;                                  'help-echo ,(purecopy "mouse-1: Open inbox")
+;;                                  'face (when (not (zerop notmuch-unread-inbox-count)) font-lock-warning-face)
+;;                                  'mouse-face 'mode-line-highlight
+;; 		                         'local-map mode-line-notmuch-keymap))
+;;              t)
 
 ;; (setq global-mode-string (butlast global-mode-string))
 

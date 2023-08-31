@@ -25,7 +25,7 @@
 ;;; Code:
 (use-package exwm-x)
 (use-package hydra)
-(require 'my-exwmx-quickrun)
+(require 'my-exwmx-quickrun-2)
 (require 'exwmx-appconfig)
 
 (defun lock-screen ()
@@ -36,22 +36,26 @@
   (interactive
    (list
     (completing-read "Name: "
-                     (mapcar (lambda (a) (plist-get a :instance))
+                     (mapcar (lambda (a) (plist-get a :pretty-name))
                              (exwmx-appconfig--get-all-appconfigs)))))
-  (if (and (get-buffer name)
-           (not (equal (get-buffer name) (current-buffer)))
-           (y-or-n-p (format "Already a buffer named \"%s\". Would you like to swap?" name)))
-      (let ((oname (completing-read "Name of other buffer: "
-                                    (mapcar (lambda (a) (plist-get a :instance))
-                                            (exwmx-appconfig--get-all-appconfigs)))))
-        (exwm-workspace-rename-buffer "This is a stupid name that no one would ever choose for a buffer, hopefully")
-        (with-current-buffer (get-buffer name)
-          (exwm-workspace-rename-buffer oname)
-          (setq-local exwm-instance-name oname))
-        (exwm-workspace-rename-buffer name)
-        (setq-local exwm-instance-name name))
-    (exwm-workspace-rename-buffer name)
-    (setq-local exwm-instance-name name)))
+  (cl-labels ((name-pretty (buffer name)
+                (with-current-buffer buffer
+                  (exwm-workspace-rename-buffer name)
+                  (setq-local exwmx-pretty-name name))))
+    (if (equal name (buffer-name))
+        (setq-local exwmx-pretty-name name)
+      (let ((obuffer (get-buffer name)))
+        (if (not obuffer)
+            (name-pretty (current-buffer) name)
+          (when  (y-or-n-p (format "Already a buffer named \"%s\". Would you like to swap?" name))
+            (let ((oname (completing-read "Name of other buffer: "
+                                          (mapcar (lambda (a) (plist-get a :instance))
+                                                  (exwmx-appconfig--get-all-appconfigs)))))
+              (name-pretty (current-buffer)
+                           "This is a stupid name that no one would ever choose for a buffer, hopefully")
+              (name-pretty obuffer oname)
+              (name-pretty (current-buffer)
+                           name))))))))
 
 ;; Add these hooks in a suitable place (e.g., as done in exwm-config-default)
 
@@ -88,15 +92,15 @@
 (define-key *root-map* (kbd "f") '*firefox-map*)
 
 (define-key *firefox-map* (kbd "c") (quickrun-lambda "google-chrome-stable" "chrome"))
-(define-key *firefox-map* (kbd "f") (quickrun-lambda "firefox -P default-release" "firefox"))
-(define-key *firefox-map* (kbd "1") (quickrun-lambda "firefox -P default-release" "firefox1"))
-(define-key *firefox-map* (kbd "2") (quickrun-lambda "firefox -P default-release" "firefox2"))
-(define-key *firefox-map* (kbd "3") (quickrun-lambda "firefox -P default-release" "firefox3"))
-(define-key *firefox-map* (kbd "4") (quickrun-lambda "firefox -P default-release" "firefox4"))
-(define-key *firefox-map* (kbd "d") (quickrun-lambda "firefox -P default-release" "development"))
-(define-key *firefox-map* (kbd "s") (quickrun-lambda "firefox -P default-release" "school"))
-(define-key *firefox-map* (kbd "w") (quickrun-lambda "firefox -P default-release" "work"))
-(define-key *firefox-map* (kbd "y") (quickrun-lambda "firefox -P default-release" "youtube"))
+(define-key *firefox-map* (kbd "f") (quickrun-lambda "firefox" "firefox"))
+(define-key *firefox-map* (kbd "1") (quickrun-lambda "firefox" "firefox1"))
+(define-key *firefox-map* (kbd "2") (quickrun-lambda "firefox" "firefox2"))
+(define-key *firefox-map* (kbd "3") (quickrun-lambda "firefox" "firefox3"))
+(define-key *firefox-map* (kbd "4") (quickrun-lambda "firefox" "firefox4"))
+(define-key *firefox-map* (kbd "d") (quickrun-lambda "firefox" "development"))
+(define-key *firefox-map* (kbd "s") (quickrun-lambda "firefox" "school"))
+(define-key *firefox-map* (kbd "w") (quickrun-lambda "firefox" "work"))
+(define-key *firefox-map* (kbd "y") (quickrun-lambda "firefox" "youtube"))
 
 ;; Musics
 (define-prefix-command '*music-map*)

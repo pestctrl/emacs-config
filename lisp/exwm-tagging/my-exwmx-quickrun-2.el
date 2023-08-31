@@ -101,7 +101,28 @@ or use `exwmx-appconfig-ignore' ignore."
        (or (not title) (exwmx--string-match-p instance exwm-title))
        (or (not pretty) (exwmx--string-match-p (format "^%s$" pretty) exwmx-pretty-name))))))
 
-(defun exwmx-find-buffer (appconfig)
+(defun exwmx-buffer-match-alist (alist buffer)
+  (cl-assert
+   (eq 'exwm-mode
+       (with-current-buffer buffer
+         major-mode)))
+  (with-current-buffer buffer
+    (-every
+     (lambda (rule)
+       (let* ((key (nth 0 rule))
+              (search-string (nth 1 rule))
+              (test-function (or (nth 2 rule) #'equal))
+              (prop-value
+               (pcase key
+                 (:class exwm-class-name)
+                 (:instance exwm-instance-name)
+                 (:title exwm-title)
+                 (:pretty-name exwmx-pretty-name))))
+         (and (functionp test-function)
+              (funcall test-function search-string prop-value))))
+     alist)))
+
+(defun exwmx-find-buffer (appconfig &optional alist)
   (let ((current (current-buffer))
         (buffers (buffer-list))
         (result '()))
@@ -109,7 +130,9 @@ or use `exwmx-appconfig-ignore' ignore."
       (let ((buffer (pop buffers)))
         (when (and (eq 'exwm-mode (with-current-buffer buffer
                                     major-mode))
-                   (exwmx-buffer-match-p appconfig buffer))
+                   (if alist
+                       (exwmx-buffer-match-alist appconfig buffer)
+                     (exwmx-buffer-match-p appconfig buffer)))
           (push buffer result))))
     (setq result (reverse result))
     ;; If two more buffers are found, switch between these buffer.
@@ -118,7 +141,19 @@ or use `exwmx-appconfig-ignore' ignore."
         (cadr result)
       (car result))))
 
-(exwmx-find-buffer '(:pretty-name "firefox"))
+(defun exwmx-find-buffers (appconfig &optional alist)
+  (let ((current (current-buffer))
+        (buffers (buffer-list))
+        (result '()))
+    (while buffers
+      (let ((buffer (pop buffers)))
+        (when (and (eq 'exwm-mode (with-current-buffer buffer
+                                    major-mode))
+                   (if alist
+                       (exwmx-buffer-match-alist appconfig buffer)
+                     (exwmx-buffer-match-p appconfig buffer)))
+          (push buffer result))))
+    (reverse result)))
 
 (defun exwmx-select-window ()
   (if (= 1 (length (window-list)))
@@ -129,7 +164,7 @@ or use `exwmx-appconfig-ignore' ignore."
                until (= c index)
                finally return win))))
 
-(defun my/exwmx-quickrun (command &optional search-alias ruler)
+(defun my/exwmx-quickrun (command &optional search-alias ruler no-manage)
   "Run `command' to launch an application, if application's window is found,
 just switch to this window, when `search-alias' is t, `command' will be regard
 as an appconfig alias and search it from `exwmx-appconfig-file', by default,
@@ -171,8 +206,9 @@ and :title or just a key list."
         (let ((exwm-layout-show-all-buffers nil))
           (exwm-workspace-switch-to-buffer buffer))
       (when cmd
-        (exwmx-register-x-window
-         matched-appconfig (exwmx-select-window))
+        (when (not no-manage)
+          (exwmx-register-x-window
+           matched-appconfig (exwmx-select-window)))
         (exwmx-shell-command cmd)))))
 
 (defmacro quickrun-lambda (cmd name)
@@ -252,26 +288,89 @@ and :title or just a key list."
    `((:class ,exwm-class-name))))
 
 (defun exwmx-manage-x-window ()
-  (if-let* ((appconfigs (exwmx-appconfig-candidates))
-            (matched-config
-             (-any (lambda (c) (and (gethash c exwmx/destination-windows)
-                                    c))
-                   appconfigs))
-            (name (plist-get matched-config :pretty-name))
-            (window (gethash matched-config exwmx/destination-windows)))
-      (unwind-protect
-          (progn
-            (exwm-workspace-rename-buffer name)
-            (when (and (window-live-p window)
-                       (not (eq window (selected-window))))
-              (let ((curr (current-buffer)))
-                (save-selected-window
-                  (previous-buffer)
-                  (window--display-buffer curr window 'reuse nil)))))
-        (setq-local exwmx-pretty-name name)
-        (remhash matched-config exwmx/destination-windows))
-    (exwm-workspace-rename-buffer
-     (or exwm-class-name exwm-instance-name exwm-title))))
+  (when (not (member #'exwmx/add-firefox-buffers exwm-manage-finish-hook))
+    (if-let* ((appconfigs (exwmx-appconfig-candidates))
+              (matched-config
+               (-any (lambda (c) (and (gethash c exwmx/destination-windows)
+                                      c))
+                     appconfigs))
+              (name (plist-get matched-config :pretty-name))
+              (window (gethash matched-config exwmx/destination-windows)))
+        (unwind-protect
+            (progn
+              (exwm-workspace-rename-buffer name)
+              (when (and (window-live-p window)
+                         (not (eq window (selected-window))))
+                (let ((curr (current-buffer)))
+                  (save-selected-window
+                    (previous-buffer)
+                    (window--display-buffer curr window 'reuse nil)))))
+          (setq-local exwmx-pretty-name name)
+          (remhash matched-config exwmx/destination-windows))
+      (exwm-workspace-rename-buffer
+       (or exwm-class-name exwm-instance-name exwm-title)))))
+
+(defvar exwmx/firefox-buffers nil)
+(defvar exwmx/buffer-name-timer nil)
+
+(defun exwmx/launch-firefox-windows ()
+  (interactive)
+  (unless (zerop (length (exwmx-find-buffers '(:class "firefox"))))
+    (user-error "Firefox already launched"))
+  (add-hook 'exwm-manage-finish-hook #'exwmx/add-firefox-buffers)
+  (my/exwmx-quickrun "firefox" nil nil t))
+
+(defun exwmx/add-firefox-buffers ()
+  (push (current-buffer) exwmx/firefox-buffers)
+  (when (timerp exwmx/buffer-name-timer)
+    (cancel-timer exwmx/buffer-name-timer))
+  (setq exwmx/buffer-name-timer
+        (run-at-time 3 nil #'exwmx/rename-firefox-windows)))
+
+;; (setq exwm-manage-finish-hook
+;;       (delq #'exwmx/add-firefox-buffers exwm-manage-finish-hook))
+
+(defun display-buffers-split-vertically (lob)
+  (delete-other-windows)
+  (let ((last (car (last lob))))
+    (dolist (b lob)
+      (display-buffer-same-window b nil)
+      (unless (eq b last)
+        (select-window (split-window-vertically)))))
+  (balance-windows))
+
+(defun exwmx/rename-firefox-windows ()
+  (unwind-protect
+      (save-window-excursion
+        (let ((appconfigs (exwmx-appconfig--search-all '((:class "firefox")))))
+          (when-let ((b (exwmx-find-buffer '((:title "YouTube" string-match-p)) t)))
+            (when (member b exwmx/firefox-buffers)
+              (exwmx-name-buffer "youtube" b )
+              (setq exwmx/firefox-buffers
+                    (delete b exwmx/firefox-buffers))
+              (setq appconfigs
+                    (remove-if #'(lambda (x)
+                                   (string= "youtube" (plist-get x :pretty-name)))
+                               appconfigs))))
+          (if (= 1 (length exwmx/firefox-buffers))
+              (exwmx-name-buffer "firefox" (car exwmx/firefox-buffers))
+            (delete-other-windows)
+            (let ((last (car (last exwmx/firefox-buffers))))
+              (display-buffers-split-vertically exwmx/firefox-buffers)
+              (dolist (b exwmx/firefox-buffers)
+                (let ((win (get-buffer-window b)))
+                  (select-window win)
+                  (-->
+                   (funcall-interactively #'exwmx-name-buffer nil b appconfigs)
+                   (setq appconfigs
+                         (remove-if #'(lambda (x)
+                                        (string= it
+                                                 (plist-get x :pretty-name)))
+                                    appconfigs)))
+                  (unless (eq b last)
+                    (delete-window win))))))))
+    (remove-hook 'exwm-manage-finish-hook #'exwmx/add-firefox-buffers)
+    (setq exwmx/firefox-buffers nil)))
 
 (add-hook 'exwm-manage-finish-hook 'exwmx-manage-x-window)
 

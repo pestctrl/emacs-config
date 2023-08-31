@@ -32,30 +32,40 @@
   (interactive)
   (shell-command "~/Github/my-projects/i3lock-fancy/i3lock-fancy & disown"))
 
-(defun exwmx-name-buffer (name)
-  (interactive
-   (list
-    (completing-read "Name: "
-                     (mapcar (lambda (a) (plist-get a :pretty-name))
-                             (exwmx-appconfig--get-all-appconfigs)))))
-  (cl-labels ((name-pretty (buffer name)
-                (with-current-buffer buffer
-                  (exwm-workspace-rename-buffer name)
-                  (setq-local exwmx-pretty-name name))))
-    (if (equal name (buffer-name))
-        (setq-local exwmx-pretty-name name)
-      (let ((obuffer (get-buffer name)))
-        (if (not obuffer)
-            (name-pretty (current-buffer) name)
-          (when  (y-or-n-p (format "Already a buffer named \"%s\". Would you like to swap?" name))
-            (let ((oname (completing-read "Name of other buffer: "
-                                          (mapcar (lambda (a) (plist-get a :instance))
-                                                  (exwmx-appconfig--get-all-appconfigs)))))
-              (name-pretty (current-buffer)
-                           "This is a stupid name that no one would ever choose for a buffer, hopefully")
-              (name-pretty obuffer oname)
-              (name-pretty (current-buffer)
-                           name))))))))
+(defun exwmx-prompt-pretty-name (prompt appconfigs)
+  (completing-read
+   prompt
+   (mapcar (lambda (a) (plist-get a :pretty-name))
+           appconfigs)))
+
+(defun exwmx-name-buffer (&optional name buffer appconfigs)
+  (interactive)
+  (setq appconfigs (or appconfigs (exwmx-appconfig--get-all-appconfigs))
+        buffer (or buffer (current-buffer))
+        name (or name (exwmx-prompt-pretty-name "Name: " appconfigs)))
+  (with-current-buffer buffer
+    (cl-labels ((name-pretty (buffer name)
+                  (with-current-buffer buffer
+                    (exwm-workspace-rename-buffer name)
+                    (setq-local exwmx-pretty-name name))
+                  name))
+      (if (equal name (buffer-name))
+          (setq-local exwmx-pretty-name name)
+        (let ((obuffer (get-buffer name)))
+          (if (not obuffer)
+              (name-pretty (current-buffer) name)
+            (if (not (y-or-n-p (format "Already a buffer named \"%s\". Would you like to swap?" name)))
+                exwmx-pretty-name
+              (let ((oname (exwmx-prompt-pretty-name
+                            "Name of other buffer: "
+                            (remove-if #'(lambda (x)
+                                           (string= name (plist-get x :pretty-name)))
+                                       appconfigs))))
+                (name-pretty (current-buffer)
+                             "This is a stupid name that no one would ever choose for a buffer, hopefully")
+                (name-pretty obuffer oname)
+                (name-pretty (current-buffer)
+                             name)))))))))
 
 ;; Add these hooks in a suitable place (e.g., as done in exwm-config-default)
 
@@ -91,16 +101,25 @@
 (define-prefix-command '*firefox-map*)
 (define-key *root-map* (kbd "f") '*firefox-map*)
 
+(defmacro quickrun-firefox (command tag)
+  (let ((name-gensym (intern (format "quickrun-comm-%s"
+                                     (or tag command)))))
+    `(defun ,name-gensym ()
+       (interactive)
+       (if (zerop (length (exwmx-find-buffers '(:class "firefox"))))
+           (exwmx/launch-firefox-windows)
+         (my/exwmx-quickrun ,command nil '(:pretty-name ,tag))))))
+
 (define-key *firefox-map* (kbd "c") (quickrun-lambda "google-chrome-stable" "chrome"))
-(define-key *firefox-map* (kbd "f") (quickrun-lambda "firefox" "firefox"))
-(define-key *firefox-map* (kbd "1") (quickrun-lambda "firefox" "firefox1"))
-(define-key *firefox-map* (kbd "2") (quickrun-lambda "firefox" "firefox2"))
-(define-key *firefox-map* (kbd "3") (quickrun-lambda "firefox" "firefox3"))
-(define-key *firefox-map* (kbd "4") (quickrun-lambda "firefox" "firefox4"))
-(define-key *firefox-map* (kbd "d") (quickrun-lambda "firefox" "development"))
-(define-key *firefox-map* (kbd "s") (quickrun-lambda "firefox" "school"))
-(define-key *firefox-map* (kbd "w") (quickrun-lambda "firefox" "work"))
-(define-key *firefox-map* (kbd "y") (quickrun-lambda "firefox" "youtube"))
+(define-key *firefox-map* (kbd "f") (quickrun-firefox "firefox" "firefox"))
+(define-key *firefox-map* (kbd "1") (quickrun-firefox "firefox" "firefox1"))
+(define-key *firefox-map* (kbd "2") (quickrun-firefox "firefox" "firefox2"))
+(define-key *firefox-map* (kbd "3") (quickrun-firefox "firefox" "firefox3"))
+(define-key *firefox-map* (kbd "4") (quickrun-firefox "firefox" "firefox4"))
+(define-key *firefox-map* (kbd "d") (quickrun-firefox "firefox" "development"))
+(define-key *firefox-map* (kbd "s") (quickrun-firefox "firefox" "school"))
+(define-key *firefox-map* (kbd "w") (quickrun-firefox "firefox" "work"))
+(define-key *firefox-map* (kbd "y") (quickrun-firefox "firefox" "youtube"))
 
 ;; Musics
 (define-prefix-command '*music-map*)

@@ -30,5 +30,28 @@
   (make-thread
    #'dmenu--cache-executable-files))
 
+(dmenu-refresh-applist)
+
+(add-to-list 'vertico-multiform-commands
+             '(exwmx-launch-program flat (vertico-cycle . t)))
+
+(defun read-program ()
+  (completing-read
+   "$ "
+   (append dmenu--history-list
+           (cl-remove-if (lambda (x)
+                           (member x dmenu--history-list))
+                         dmenu--cache-executable-files))))
+
+(defun exwmx-launch-program (command &optional process-name)
+  (interactive (list (read-program)))
+  (setq dmenu--history-list (cons command (remove command dmenu--history-list)))
+  (when (> (length dmenu--history-list)
+           dmenu-history-size)
+    (setcdr (nthcdr (- dmenu-history-size 1)
+                    dmenu--history-list)
+            nil))
+  (my/exwmx-quickrun command))
+
 (provide 'exwm-launch-program)
 ;;; exwm-launch-program.el ends here

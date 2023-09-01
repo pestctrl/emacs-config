@@ -25,8 +25,10 @@
 ;;; Code:
 (use-package exwm-x)
 (use-package hydra)
-(require 'my-exwmx-quickrun-2)
 (require 'exwmx-appconfig)
+(require 'my-exwmx-quickrun-2)
+(require 'exwmx-firefox)
+(require 'exwm-launch-program)
 
 (defun lock-screen ()
   (interactive)
@@ -106,9 +108,10 @@
                                      (or tag command)))))
     `(defun ,name-gensym ()
        (interactive)
-       (if (zerop (length (exwmx-find-buffers '(:class "firefox"))))
-           (exwmx/launch-firefox-windows)
-         (my/exwmx-quickrun ,command nil '(:pretty-name ,tag))))))
+       (if (not (zerop (length (exwmx-find-buffers '(:class "firefox")))))
+           (my/exwmx-quickrun ,command nil '(:pretty-name ,tag))
+         (exwmx-notify-x-window (exwmx-appconfig--search '((:pretty-name ,tag))))
+         (exwmx/launch-firefox-windows)))))
 
 (define-key *firefox-map* (kbd "c") (quickrun-lambda "google-chrome-stable" "chrome"))
 (define-key *firefox-map* (kbd "f") (quickrun-firefox "firefox" "firefox"))

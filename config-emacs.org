@@ -257,15 +257,13 @@
           (if (not side-win)
               (delete-other-windows)
             (delete-other-windows-vertically))
+        (set-window-dedicated-p win nil)
+        (when side-win
+          (set-window-parameter win 'window-side nil)
+          (set-window-parameter win 'no-delete-other-windows nil))
         (let ((ignore-window-parameters t)
               (window--sides-inhibit-check t))
-          (if (not side-win)
-              (progn
-                (set-window-dedicated-p win nil)
-                (delete-other-windows))
-            (set-window-parameter win 'window-side nil)
-            (set-window-parameter win 'no-delete-other-windows nil)
-            (delete-other-windows))))))
+          (delete-other-windows)))))
 
   (define-key pestctrl-minor-mode-map (kbd "C-x 1") #'my/delete-other-windows)
 #+end_src

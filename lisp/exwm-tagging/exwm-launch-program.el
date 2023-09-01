@@ -25,26 +25,10 @@
 ;;; Code:
 (use-package dmenu)
 
-(make-thread 
- #'dmenu--cache-executable-files)
-
-(defun read-program ()
-  (funcall #'ido-completing-read "$ "
-           (append dmenu--history-list
-                   (cl-remove-if (lambda (x)
-                                   (member x dmenu--history-list))
-                                 dmenu--cache-executable-files))))
-
-(defun launch-program (command &optional process-name)
-  (interactive (list (read-program)))
-  (setq dmenu--history-list (cons command (remove command dmenu--history-list)))
-  (when (> (length dmenu--history-list)
-           dmenu-history-size)
-    (setcdr (nthcdr (- dmenu-history-size 1)
-                    dmenu--history-list)
-            nil))
-  (let ((name (or process-name command)))
-    (start-process-shell-command name nil command)))
+(defun dmenu-refresh-applist ()
+  (interactive)
+  (make-thread
+   #'dmenu--cache-executable-files))
 
 (provide 'exwm-launch-program)
 ;;; exwm-launch-program.el ends here

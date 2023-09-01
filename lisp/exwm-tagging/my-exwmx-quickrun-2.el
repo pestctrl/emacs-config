@@ -218,6 +218,17 @@ and :title or just a key list."
        (interactive)
        (my/exwmx-quickrun ,cmd nil '(:pretty-name ,name)))))
 
+(add-to-list 'vertico-multiform-commands
+             '(exwmx-launch-program flat (vertico-cycle . t)))
+
+(defun read-program ()
+  (completing-read
+   "$ "
+   (append dmenu--history-list
+           (cl-remove-if (lambda (x)
+                           (member x dmenu--history-list))
+                         dmenu--cache-executable-files))))
+
 (defun exwmx-launch-program (command &optional process-name)
   (interactive (list (read-program)))
   (setq dmenu--history-list (cons command (remove command dmenu--history-list)))

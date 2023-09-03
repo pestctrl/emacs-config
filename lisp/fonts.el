@@ -23,30 +23,25 @@
 ;;; Commentary:
 
 ;;; Code:
+(require 'hoagie-adjust)
 
-(create-fontset-from-fontset-spec
- "-*-Roboto Mono-regular-normal-normal-*-*-*-*-*-m-0-fontset-default")
+;; If I reeaaaally wanted to do this property, I would use
+;; #'new-fontset, but that requires LOTS of background knowledge. Just
+;; look at the #'setup-default-fontset function.
+;;
+;; For now, I will just use the default fontset.
 
-;; HanWangKaiMediumChuIn
-;; (set-fontset-font "fontset-default" 'han (font-spec :size 16 :name "HanWangMingMediumChuIn"))
-;; (set-fontset-font "fontset-default" 'han (font-spec :size 16 :name "HanWangKaiMediumChuIn-20"))
+;; (create-fontset-from-fontset-spec
+;;  "-*-*-medium-r-normal-*-15-*-*-*-*-*-fontset-default")
 
-(set-fontset-font "fontset-default" 'unicode (font-spec :size 10 :name "FontAwesome"))
-(set-fontset-font "fontset-default" 'cyrillic (font-spec :size 15 :name "PT Sans Expert"))
+(set-fontset-font "fontset-default" 'ascii (font-spec :size 13 :name "Roboto Mono"))
 
-;; extra/adobe-source-code-pro-fonts
-(set-fontset-font "fontset-default" 'unicode (font-spec :name "SourceCodePro"))
-(set-fontset-font "fontset-default"
-                  (cons
-                   (decode-char 'ucs #x2500)
-                   (decode-char 'ucs #x257F))
-                  (font-spec :name "SourceCodePro"))
-
-;; adobe-source-han-sans-otc-fonts
-(set-fontset-font "fontset-default" 'han (font-spec :size 16 :name "SourceHanSans"))
-
-(set-fontset-font "fontset-default" 'ascii (font-spec :size 13 :name "RobotoMono"))
-(set-fontset-font "fontset-default" 'latin (font-spec :size 13 :name "RobotoMono"))
+;; 三寶飯
+;; "HanWangMingMediumChuIn"
+(let ((cf (font-spec :name "SourceHanSansTW"
+                     :size 18)))
+  (dolist (charset '(kana han cjk-misc bopomofo gb18030))
+    (set-fontset-font "fontset-default" charset cf)))
 
 (when my-ec/at-ti
   (set-fontset-font "fontset-default"
@@ -68,42 +63,6 @@
   (setq doom-modeline-height 20))
 
 (set-face-font 'default "fontset-default")
-
-;; (custom-set-faces
-;;  '(default ((t (:family "ETBookOT" :foundry "QUQA"
-;;                :slant normal :weight normal :height 120
-;;                :width normal :spacing 90)))))
-
-;;(set-face-attribute 'variable-pitch nil :font '(:family "ETBookOT"))
-
-
-(defvar frame-font-size-cache
-  (make-hash-table))
-
-;; Font size adjustment
-(defun hoagie-adjust-font-size (&optional frame)
-  "Inspired by https://emacs.stackexchange.com/a/44930/17066. FRAME is ignored.
-  If I let Windows handle DPI everything looks blurry."
-  (interactive)
-  ;; Using display names is unreliable...switched to checking the resolution
-  (let* ((attrs (frame-monitor-attributes)) ;; gets attribs for current frame
-         (monitor-name (cdr (assoc 'name attrs)))
-         (width-mm (second (assoc 'mm-size attrs)))
-         (width-px (fourth (assoc 'geometry attrs)))
-         (height-px (fifth (assoc 'geometry attrs)))
-         (size 10)) ;; default for first screen at work
-    (when (eq height-px 2880)
-      (let ((f (selected-frame)))
-        (set-face-attribute 'default f :height 130)
-        (set-face-attribute 'mode-line f :height 130)
-        ;; (set-face-attribute 'mode-line-inactive f :height 130)
-        (setq doom-modeline-height 30))
-      (exwm-randr-refresh))
-    ;; (unless (and (gethash frame frame-font-size-cache)
-    ;;              (= size (gethash frame frame-font-size-cache)))
-    ;;   (puthash frame size frame-font-size-cache))
-    ))
-;; (remove-hook 'window-size-change-functions #'hoagie-adjust-font-size)
 
 ;; (setq doom-modeline-height 20) ; optional
 ;; (if (facep 'mode-line-active)

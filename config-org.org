@@ -907,3 +907,17 @@
               :override
               #'my/org-dblock-write:kanban)
 #+end_src
+* Modern views
+#+begin_src emacs-lisp
+  (quelpa `(org-timeblock :repo "ichernyshovvv/org-timeblock" :fetcher github))
+  (use-package org-hyperscheduler)
+#+end_src
+* Pretty symbols
+#+begin_src emacs-lisp
+  ;; (add-hook 'org-mode-hook (lambda ()
+  ;;  "Beautify Org Checkbox Symbol"
+  ;;  (push '("[ ]" .  "☐") prettify-symbols-alist)
+  ;;  (push '("[X]" . "☑" ) prettify-symbols-alist)
+  ;;  (push '("[-]" . "❍" ) prettify-symbols-alist)
+  ;;  (prettify-symbols-mode)))
+#+end_src

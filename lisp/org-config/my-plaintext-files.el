@@ -24,11 +24,17 @@
 
 ;;; Code:
 
-(ec/load-or-ask-pred 'my/is-plaintext-mega-folder "Is there a megasync directory? ")
 (ec/load-or-ask-file 'my/plaintext-migration-folder "Where's the migration directory? ")
+(ec/load-or-ask-pred 'my/is-plaintext-mega-folder "Is there a megasync directory? ")
+(ec/load-or-ask-pred 'my/has-plaintext-object-folder "Have you setup the plaintext-object folder? ")
 
 (when my/is-plaintext-mega-folder
   (ec/load-or-ask-file 'my/plaintext-mega-folder "Where's the megasync directory? "))
+
+(defvar my/plaintext-object-folder nil)
+
+(when my/has-plaintext-object-folder
+  (ec/load-or-ask-file 'my/plaintext-object-folder "Where's the plaintext-object folder? "))
 
 (defun my/plaintext-file (str)
   (let ((result (expand-file-name str my/plaintext-migration-folder)))

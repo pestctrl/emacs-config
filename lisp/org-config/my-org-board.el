@@ -29,8 +29,8 @@
 
 (when (setq my/is-plaintext-mega-folder t)
   (setq org-attach-id-dir
-        (expand-file-name "org/org-board-data"
-                          my/plaintext-mega-folder)))
+        (expand-file-name "org-board-data"
+                          my/plaintext-object-folder)))
 
 (use-package org-board :demand t)
 (require 'org-board-custom-dispatcher)
@@ -39,8 +39,8 @@
 (setq org-board-wget-show-buffer nil)
 
 (defun mob/warn-if-no-mega-folder ()
-  (or my/is-plaintext-mega-folder
-      (user-error "Hey, you should probably setup megasync before using this")))
+  (or my/plaintext-object-folder
+      (user-error "Hey, you should probably setup plaintext-objects folder before using this")))
 
 (advice-add #'org-board-archive
             :before-while

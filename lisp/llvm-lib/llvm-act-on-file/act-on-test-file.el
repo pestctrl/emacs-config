@@ -95,11 +95,11 @@
                ;; TODO: assuming all commands will be llc
                (mapcar #'(lambda (x)
                            (let ((res x))
-                             (setq res (string-replace "RUN: not " "RUN: " res))
+                             (setq res (string-replace "not " "" res))
                              (string-match (rx line-start
                                                (group
-                                                (or "llc" "%clang" "%clang_cc1"))
-                                               " ")
+                                                (optional "%")
+                                                (+ (not space))))
                                            x)
                              (setq res
                                    (pcase (match-string 1 x)

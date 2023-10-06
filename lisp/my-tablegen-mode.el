@@ -47,7 +47,6 @@
      type-kw
      ))
   "Additional expressions to highlight in TableGen mode.")
-(put 'tablegen-mode 'font-lock-defaults '(tablegen-font-lock-keywords))
 
 ;; ---------------------- Syntax table ---------------------------
 
@@ -69,15 +68,15 @@
   (modify-syntax-entry ?*   ". 23"   tablegen-mode-syntax-table)
   (modify-syntax-entry ?\n  "> b"    tablegen-mode-syntax-table)
   ;; open paren (`(')
-  (modify-syntax-entry ?\(  "("      tablegen-mode-syntax-table)
-  (modify-syntax-entry ?\[  "("      tablegen-mode-syntax-table)
-  (modify-syntax-entry ?\{  "("      tablegen-mode-syntax-table)
-  (modify-syntax-entry ?\<  "("      tablegen-mode-syntax-table)
+  (modify-syntax-entry ?\(  "()"      tablegen-mode-syntax-table)
+  (modify-syntax-entry ?\[  "(]"      tablegen-mode-syntax-table)
+  (modify-syntax-entry ?\{  "(}"      tablegen-mode-syntax-table)
+  (modify-syntax-entry ?\<  "(>"      tablegen-mode-syntax-table)
   ;; close paren (`)')
-  (modify-syntax-entry ?\)  ")"      tablegen-mode-syntax-table)
-  (modify-syntax-entry ?\]  ")"      tablegen-mode-syntax-table)
-  (modify-syntax-entry ?\}  ")"      tablegen-mode-syntax-table)
-  (modify-syntax-entry ?\>  ")"      tablegen-mode-syntax-table)
+  (modify-syntax-entry ?\)  ")("      tablegen-mode-syntax-table)
+  (modify-syntax-entry ?\]  ")["      tablegen-mode-syntax-table)
+  (modify-syntax-entry ?\}  "){"      tablegen-mode-syntax-table)
+  (modify-syntax-entry ?\>  ")["      tablegen-mode-syntax-table)
   ;; string quote ('"')
   (modify-syntax-entry ?\"  "\""     tablegen-mode-syntax-table)
   )
@@ -90,38 +89,25 @@
 
 (defvar tablegen-mode-map nil)
 
-(if tablegen-mode-map
-    ()  ; Do not change the keymap if it is already set up.
-  (setq tablegen-mode-map (make-sparse-keymap))
-  (define-key tablegen-mode-map "\t"  'tab-to-tab-stop)
-  (define-key tablegen-mode-map "\es" 'center-line)
-  (define-key tablegen-mode-map "\eS" 'center-paragraph))
+(unless tablegen-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map "\t"  'tab-to-tab-stop)
+    (define-key map "\es" 'center-line)
+    (define-key map "\eS" 'center-paragraph)
+    (setq tablegen-mode-map map)))
 
 ;;;###autoload
 (define-derived-mode tablegen-mode prog-mode "Tablegen"
-  "Major mode for editing TableGen description files.
-\\{tablegen-mode-map}
-  Runs `tablegen-mode-hook' on startup."
-  ;; (use-local-map tablegen-mode-map)      ; Provides the local keymap.
-  (make-local-variable 'font-lock-defaults)
-
-  (setq
-        local-abbrev-table    tablegen-mode-abbrev-table
-	font-lock-defaults    `(tablegen-font-lock-keywords)
-	require-final-newline t
-        )
-
-  (set-syntax-table tablegen-mode-syntax-table)
-  (make-local-variable 'comment-start)
-  (setq comment-start "//")
-  (setq indent-tabs-mode nil)
-  (run-hooks 'tablegen-mode-hook))       ; Finally, this permits the user to
-                                         ;   customize the mode with a hook.
+  "Major mode for editing TableGen description files."
+  (interactive)
+  (kill-all-local-variables)
+  (setq-local font-lock-defaults '(tablegen-font-lock-keywords)
+              require-final-newline t
+              comment-start "//"
+              indent-tabs-mode nil))
 
 ;; Associate .td files with tablegen-mode
 ;;;###autoload
 (add-to-list 'auto-mode-alist (cons (purecopy "\\.td\\'")  'tablegen-mode))
 
 (provide 'my-tablegen-mode)
-
-;;; tablegen-mode.el ends here

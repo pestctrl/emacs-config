@@ -54,7 +54,7 @@
   (setq beacon-color "#006400")
 
   ;; Use my fork of chinese-etzy
-  (load-file (ef "my-etzy.el"))
+  (load-file (ef "lisp/my-etzy.el"))
 
   ;; If I ever decide to turn on display-lines-mode, use relative line
   ;; numbering

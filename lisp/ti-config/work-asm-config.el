@@ -26,6 +26,8 @@
 (require 'use-package)
 (use-package asm-mode)
 
+(modify-syntax-entry ?- "- " asm-mode-syntax-table)
+
 (add-hook 'asm-mode-hook
           (lambda ()
             (setq tab-width 8)))

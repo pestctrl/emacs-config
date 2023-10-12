@@ -27,6 +27,7 @@
 (use-package asm-mode)
 
 (modify-syntax-entry ?- "- " asm-mode-syntax-table)
+(modify-syntax-entry ?+ "- " asm-mode-syntax-table)
 
 (add-hook 'asm-mode-hook
           (lambda ()

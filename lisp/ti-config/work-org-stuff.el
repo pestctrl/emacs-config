@@ -529,18 +529,19 @@
     (org-roam-node-find
      nil
      nil
-     (my/org-roam-filter-by-tag "Project")
+     (my/org-roam-filter-by-tag '("Project" "active"))
      nil
      :templates
      '(("p" "project" plain ""
-        :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}: %^{Description}\n#+category: ${title}\n#+filetags: Project")
+        :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                           "#+title: ${title}: %^{Description}\n#+category: ${title}\n#+filetags: Project active")b
         :unnarrowed t))))
 
   (global-set-key (kbd "C-c n p") #'my/org-roam-find-project)
 
   (require 'my-org-roam-logger)
 
-  ;; (setq my/org-roam-logger-filter-fun (my/org-roam-filter-by-tag "Project"))
+  (setq my/org-roam-logger-filter-fun (my/org-roam-filter-by-tag '("Project" "active")))
   )
 
 (advice-add #'org-agenda-redo

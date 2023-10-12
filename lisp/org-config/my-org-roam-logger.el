@@ -51,9 +51,14 @@
 
 (defun my/org-roam-logger-capture-current (arg)
   (interactive "P")
-  (when (or (null my/current-logger-cache) (equal arg '(16)))
+  (when (or (null my/current-logger-cache)
+            (equal arg '(16))
+            (equal arg '(64)))
     (setq my/current-logger-cache
-          (org-roam-node-read nil my/org-roam-logger-filter-fun)))
+          (org-roam-node-read
+           nil
+           (when (not (equal arg '(64)))
+             my/org-roam-logger-filter-fun))))
 
   ;; On NEW nodes, org-roam-node-read generates an empty struct with
   ;; only a few things, one of which being an id. Do a sanity check to

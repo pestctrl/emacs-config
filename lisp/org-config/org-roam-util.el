@@ -24,10 +24,18 @@
 
 ;;; Code:
 (require 'org-roam)
+(require 'dash)
 
 (defun my/org-roam-filter-by-tag (tag-name)
-  (lambda (node)
-    (member tag-name (org-roam-node-tags node))))
+  (cond ((stringp tag-name)
+         (lambda (node)
+           (member tag-name (org-roam-node-tags node))))
+        ((listp tag-name)
+         (lambda (node)
+           (let ((tags (org-roam-node-tags node)))
+             (-all? (lambda (tag)
+                      (member tag tags))
+                    tag-name))))))
 
 (defun my/org-roam-list-notes-by-tag (tag-name)
   (mapcar #'org-roam-node-file

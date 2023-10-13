@@ -28,7 +28,8 @@
   (interactive (list (lls/conf-get 'root-dir)))
   (when (not (require 'my-tablegen-mode nil t))
     (load-file (expand-file-name "llvm/utils/emacs/tablegen-mode.el" root-dir)))
-  (load-file (expand-file-name "llvm/utils/emacs/llvm-mode.el" root-dir))
+  (when (not (require 'my-llvm-mode nil t))
+    (load-file (expand-file-name "llvm/utils/emacs/llvm-mode.el" root-dir)))
   (load-file (expand-file-name "llvm/utils/emacs/emacs.el" root-dir))
 
   (defface llvm-separator-face `((t (:background "gray25" :extend t :inherit font-lock-warning-face)))

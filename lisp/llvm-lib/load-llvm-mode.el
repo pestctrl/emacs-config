@@ -1,4 +1,4 @@
-;;; my-llvm-mode.el ---  -*- lexical-binding: t -*-
+;;; load-llvm-mode.el ---  -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2023 Benson Chu
 
@@ -26,8 +26,9 @@
 
 (defun load-llvm-mode (root-dir)
   (interactive (list (lls/conf-get 'root-dir)))
+  (when (not (require 'my-tablegen-mode nil t))
+    (load-file (expand-file-name "llvm/utils/emacs/tablegen-mode.el" root-dir)))
   (load-file (expand-file-name "llvm/utils/emacs/llvm-mode.el" root-dir))
-  (load-file (expand-file-name "llvm/utils/emacs/tablegen-mode.el" root-dir))
   (load-file (expand-file-name "llvm/utils/emacs/emacs.el" root-dir))
 
   (defface llvm-separator-face `((t (:background "gray25" :extend t :inherit font-lock-warning-face)))
@@ -69,5 +70,5 @@
    (setf it
          `(,(rx word-boundary (optional "-") )))))
 
-(provide 'my-llvm-mode)
-;;; my-llvm-mode.el ends here
+(provide 'load-llvm-mode)
+;;; load-llvm-mode.el ends here

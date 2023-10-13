@@ -26,7 +26,7 @@
 
 (require 'magit)
 (require 'eieio)
-(require 'my-llvm-mode)
+(require 'load-llvm-mode)
 
 ;; =========================== LLVM Rebuild ==========================
 

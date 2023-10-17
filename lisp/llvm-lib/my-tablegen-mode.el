@@ -100,7 +100,6 @@
 (define-derived-mode tablegen-mode prog-mode "Tablegen"
   "Major mode for editing TableGen description files."
   (interactive)
-  (kill-all-local-variables)
   (setq-local font-lock-defaults '(tablegen-font-lock-keywords)
               require-final-newline t
               comment-start "//"

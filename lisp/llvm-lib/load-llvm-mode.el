@@ -35,6 +35,15 @@
   (defface llvm-separator-face `((t (:background "gray25" :extend t :inherit font-lock-warning-face)))
     nil)
 
+  (progn
+    (-->
+     llvm-font-lock-keywords
+     (remove '("\\_<\\(a\\(?:fn\\|rcp\\)\\|contract\\|fast\\|n\\(?:inf\\|nan\\|sz\\)\\|reassoc\\)\\_>" . font-lock-keyword-face) llvm-font-lock-keywords)
+     (setq llvm-font-lock-keywords it))
+
+    (add-to-list 'llvm-font-lock-keywords
+                 `(,(regexp-opt '("nnan" "ninf" "nsz" "arcp" "contract" "afn" "reassoc" "fast") 'symbols) . 'shadow)))
+
   (add-to-list 'llvm-font-lock-keywords
                `(,(rx line-start (optional "# ") "***" (+ nonl) "***" (optional ":") "\n") . 'llvm-separator-face))
 

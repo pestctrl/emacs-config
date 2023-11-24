@@ -37,7 +37,10 @@
 (defun ll/act-on-ll-file (file)
   (let* ((action (aml/read-action-map ll/ll-file-action-map))
          (stop (when (member action '(stop-after stop-before))
-                 (read-string "Which pass? "))))
+                 (read-string "Which pass? ")))
+         ;; I just recently noticed that the default directory is changing, but
+         ;; I don't know what changed. Should investigate later.
+         (default-directory (file-name-directory file)))
     (compilation-start
      (concat
       (ll/build-llc-command file action)

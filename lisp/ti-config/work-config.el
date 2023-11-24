@@ -100,11 +100,11 @@
 
 (pop c-mode-common-hook)
 (add-hook 'c-mode-common-hook
-	  (function
-	   (lambda nil
-	     (if (and buffer-file-name (string-match "llvm" buffer-file-name))
-		 (progn
-		   (c-set-style "llvm.org"))))))
+	      (function
+	       (lambda nil
+	         (if (and buffer-file-name (string-match "llvm" buffer-file-name))
+		         (progn
+		           (c-set-style "llvm.org"))))))
 
 (define-key *root-map* (kbd "u")
   (lambda ()

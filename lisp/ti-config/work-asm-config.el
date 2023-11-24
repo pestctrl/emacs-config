@@ -26,8 +26,10 @@
 (require 'use-package)
 (use-package asm-mode)
 
-(modify-syntax-entry ?- "- " asm-mode-syntax-table)
-(modify-syntax-entry ?+ "- " asm-mode-syntax-table)
+(modify-syntax-entry ?- "-" asm-mode-syntax-table)
+(modify-syntax-entry ?+ "-" asm-mode-syntax-table)
+(modify-syntax-entry ?. "_" asm-mode-syntax-table)
+(modify-syntax-entry ?< "-" asm-mode-syntax-table)
 
 (add-hook 'asm-mode-hook
           (lambda ()
@@ -41,11 +43,11 @@
         (,(rx line-start (group (>= 2 (any "0-9A-f"))) ":" (* space) (group (+ " " (and  (= 4 (any "0-9A-f"))))))
          (1 font-lock-warning-face) (2 font-lock-constant-face))
         ;; Instructions
-        (,(rx line-start (* space) (* (+ (any "0-9A-f")) (+ (or ":" space))) (+ space) (optional "||" (+ space)) (group (+ (or (syntax word) (syntax symbol) "."))))
+        (,(rx line-start (* space) (optional (+ (any "0-9A-Fa-f")) ":") (* space) (optional "||" (+ space)) (group (+ (or (syntax word) (syntax symbol) "."))))
          (1 font-lock-keyword-face))
         ;; Dot directives
         (,(rx line-start (group (+ (or "." (syntax word) (syntax symbol)))) ":") (1 font-lock-function-name-face))
-        (,(rx "ADDR" digit) . font-lock-type-face)
+        (,(rx symbol-start (or "DIRM" (and "ADDR" digit)) symbol-end) . font-lock-type-face)
         (,(rx word-start
               (or (and (or "TDM" "TA" "UNC")
                        (optional digit)
@@ -53,13 +55,19 @@
                   (and (or "XM" "XD")
                        (+ digit))
                   (and (or "M" "A" "D")
-                       (or (+ digit)
-                           ".GT" ".LT" ".GEQ" ".LEQ" ".EQ" ".NEQ" ".HI" ".LO")))
+                       (+ digit)))
               word-end)
          . font-lock-variable-name-face)
+        (,(rx word-start
+              (and (or "M" "A" "D")
+                   (or ".GT" ".LT" ".GEQ" ".LEQ" ".EQ" ".NEQ" ".HI" ".LO"))
+              word-end)
+         . font-lock-keyword-face)
         (,(rx "@" (optional "(") (group (optional "(") (+ (or (syntax word) (syntax symbol)))) (or ")" symbol-end)) (1 font-lock-function-name-face))
         (,(rx "#" (optional "-") "0x" (+ alphanumeric)) . font-lock-constant-face)
-        (,(rx (or (* space)) "\n" (* space) "||" (+ space)) . 'asm-vliw-bar)))
+        ;; (,(rx (or (* space)) "\n" (* space) "||" (+ space)) . 'asm-vliw-bar)
+        (,(rx line-start (group (* space)) (syntax word)) . (1 'asm-vliw-bar))
+        ))
 
 (defun my/asm-back-to-label (arg)
   (interactive "P")
@@ -70,7 +78,13 @@
 
 (define-key asm-mode-map (kbd "C-M-a") #'my/asm-back-to-label)
 
-(defface asm-vliw-bar `((t (:background "gray25" :extend t :inherit font-lock-comment-face))) nil)
+(defface asm-vliw-bar
+  `((t ,(list
+         :background "gray25"
+         :extend t
+         :inherit font-lock-comment-face
+         :box '(:line-width 1 :color "gray30" :style raised))))
+  nil)
 
 (defun asm-clean-up ()
   (interactive)

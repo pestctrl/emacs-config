@@ -18,81 +18,138 @@
     table)
   "Syntax table used while in LLVM mode.")
 
-(defvar llvm-font-lock-keywords
-  (list
-   ;; Attributes
-   `(,(regexp-opt
+(defvar llvm-font-lock-keyword-words
+  `(
+    ;; Attributes
+    (,(regexp-opt
        '("alwaysinline" "argmemonly" "allocsize" "builtin" "cold" "convergent" "dereferenceable" "dereferenceable_or_null" "hot" "inaccessiblememonly"
          "inaccessiblemem_or_argmemonly" "inalloca" "inlinehint" "jumptable" "minsize" "mustprogress" "naked" "nobuiltin" "nonnull"
          "nocallback" "nocf_check" "noduplicate" "nofree" "noimplicitfloat" "noinline" "nomerge" "nonlazybind" "noprofile" "noredzone" "noreturn"
          "norecurse" "nosync" "noundef" "nounwind" "nosanitize_bounds" "nosanitize_coverage" "null_pointer_is_valid" "optforfuzzing" "optnone" "optsize" "preallocated" "readnone" "readonly" "returned" "returns_twice"
          "shadowcallstack" "speculatable" "speculative_load_hardening" "ssp" "sspreq" "sspstrong" "safestack" "sanitize_address" "sanitize_hwaddress" "sanitize_memtag"
-         "sanitize_thread" "sanitize_memory" "strictfp" "swifterror" "uwtable" "vscale_range" "willreturn" "writeonly" "immarg") 'symbols) . font-lock-constant-face)
-   ;; Variables
-   '("%[-a-zA-Z$._][-a-zA-Z$._0-9]*" . font-lock-variable-name-face)
-   ;; Labels
-   '("[-a-zA-Z$._0-9]+:" . font-lock-variable-name-face)
-   ;; Unnamed variable slots
-   '("%[-]?[0-9]+" . font-lock-variable-name-face)
-   ;; Types
-   `(,(regexp-opt
-       '("void" "i1" "i8" "i16" "i32" "i64" "i128" "half" "bfloat" "float" "double" "fp128" "x86_fp80" "ppc_fp128" "x86_mmx" "x86_amx"
-         "type" "label" "opaque" "token") 'symbols) . font-lock-type-face)
-   ;; Integer literals
-   '("\\b[-]?[0-9]+\\b" . font-lock-preprocessor-face)
-   ;; Floating point constants
-   '("\\b[-+]?[0-9]+.[0-9]*\\([eE][-+]?[0-9]+\\)?\\b" . font-lock-preprocessor-face)
-   ;; Hex constants
-   '("\\b0x[0-9A-Fa-f]+\\b" . font-lock-preprocessor-face)
-   ;; Keywords
-   `(,(regexp-opt
-       '(;; Toplevel entities
-         "declare" "define" "module" "target" "source_filename" "global" "constant" "const" "alias" "ifunc" "comdat"
-         "attributes" "uselistorder" "uselistorder_bb"
-         ;; Linkage types
-         "private" "internal" "weak" "weak_odr" "linkonce" "linkonce_odr" "available_externally" "appending" "common" "extern_weak" "external"
-         "uninitialized" "implementation" "..."
-         ;; Values
-         "true" "false" "null" "undef" "zeroinitializer" "none" "c" "asm" "blockaddress" "poison"
+         "sanitize_thread" "sanitize_memory" "strictfp" "swifterror" "uwtable" "vscale_range" "willreturn" "writeonly" "immarg")
+       'symbols)
+     . font-lock-constant-face)
+    ;; Keywords
+    (,(regexp-opt
+        '(;; Toplevel entities
+          "declare" "define" "module" "target" "source_filename" "global" "constant" "const" "alias" "ifunc" "comdat"
+          "attributes" "uselistorder" "uselistorder_bb"
+          ;; Linkage types
+          "private" "internal" "weak" "weak_odr" "linkonce" "linkonce_odr" "available_externally" "appending" "common" "extern_weak" "external"
+          "uninitialized" "implementation" "..."
+          ;; Values
+          "true" "false" "null" "undef" "zeroinitializer" "none" "c" "asm" "blockaddress" "poison"
 
-         ;; Calling conventions
-         "ccc" "fastcc" "coldcc" "webkit_jscc" "anyregcc" "preserve_mostcc" "preserve_allcc"
-         "cxx_fast_tlscc" "swiftcc" "tailcc" "swifttailcc" "cfguard_checkcc"
-         ;; Visibility styles
-         "default" "hidden" "protected"
-         ;; DLL storages
-         "dllimport" "dllexport"
-         ;; Thread local
-         "thread_local" "localdynamic" "initialexec" "localexec"
-         ;; Runtime preemption specifiers
-         "dso_preemptable" "dso_local" "dso_local_equivalent"
+          ;; Calling conventions
+          "ccc" "fastcc" "coldcc" "webkit_jscc" "anyregcc" "preserve_mostcc" "preserve_allcc"
+          "cxx_fast_tlscc" "swiftcc" "tailcc" "swifttailcc" "cfguard_checkcc"
+          ;; Visibility styles
+          "default" "hidden" "protected"
+          ;; DLL storages
+          "dllimport" "dllexport"
+          ;; Thread local
+          "thread_local" "localdynamic" "initialexec" "localexec"
+          ;; Runtime preemption specifiers
+          "dso_preemptable" "dso_local" "dso_local_equivalent"
 
-         "gc" "atomic" "no_cfi" "volatile" "personality" "prologue" "section") 'symbols) . font-lock-keyword-face)
-   ;; Arithmetic and Logical Operators
-   `(,(regexp-opt '("add" "sub" "mul" "sdiv" "udiv" "urem" "srem" "and" "or" "xor"
-                    "setne" "seteq" "setlt" "setgt" "setle" "setge") 'symbols) . font-lock-keyword-face)
-   ;; Floating-point operators
-   `(,(regexp-opt '("fadd" "fsub" "fneg" "fmul" "fdiv" "frem") 'symbols) . font-lock-keyword-face)
-   ;; Special instructions
-   `(,(regexp-opt '("phi" "tail" "call" "select" "to" "shl" "lshr" "ashr" "fcmp" "icmp" "va_arg" "landingpad" "freeze") 'symbols) . font-lock-keyword-face)
-   ;; Control instructions
-   `(,(regexp-opt '("ret" "br" "switch" "invoke" "resume" "unwind" "unreachable" "indirectbr" "callbr") 'symbols) . font-lock-keyword-face)
-   ;; Memory operators
-   `(,(regexp-opt '("malloc" "alloca" "free" "load" "store" "getelementptr" "fence" "cmpxchg" "atomicrmw") 'symbols) . font-lock-keyword-face)
-   ;; Casts
-   `(,(regexp-opt '("bitcast" "inttoptr" "ptrtoint" "trunc" "zext" "sext" "fptrunc" "fpext" "fptoui" "fptosi" "uitofp" "sitofp" "addrspacecast") 'symbols) . font-lock-keyword-face)
-   ;; Vector ops
-   `(,(regexp-opt '("extractelement" "insertelement" "shufflevector") 'symbols) . font-lock-keyword-face)
-   ;; Aggregate ops
-   `(,(regexp-opt '("extractvalue" "insertvalue") 'symbols) . font-lock-keyword-face)
-   ;; Metadata types
-   `(,(regexp-opt '("distinct") 'symbols) . font-lock-keyword-face)
-   ;; Atomic memory ordering constraints
-   `(,(regexp-opt '("unordered" "monotonic" "acquire" "release" "acq_rel" "seq_cst") 'symbols) . font-lock-keyword-face)
-   ;; Fast-math flags
-   `(,(regexp-opt '("nnan" "ninf" "nsz" "arcp" "contract" "afn" "reassoc" "fast") 'symbols) . font-lock-keyword-face)
-   ;; Use-list order directives
-   `(,(regexp-opt '("uselistorder" "uselistorder_bb") 'symbols) . font-lock-keyword-face))
+          "gc" "atomic" "no_cfi" "volatile" "personality" "prologue" "section") 'symbols) . font-lock-keyword-face)
+    ;; Arithmetic and Logical Operators
+    (,(regexp-opt '("add" "sub" "mul" "sdiv" "udiv" "urem" "srem" "and" "or" "xor"
+                     "setne" "seteq" "setlt" "setgt" "setle" "setge") 'symbols) . font-lock-keyword-face)
+    ;; Floating-point operators
+    (,(regexp-opt '("fadd" "fsub" "fneg" "fmul" "fdiv" "frem") 'symbols) . font-lock-keyword-face)
+    ;; Special instructions
+    (,(regexp-opt '("phi" "tail" "call" "select" "to" "shl" "lshr" "ashr" "fcmp" "icmp" "va_arg" "landingpad" "freeze") 'symbols) . font-lock-keyword-face)
+    ;; Control instructions
+    (,(regexp-opt '("ret" "br" "switch" "invoke" "resume" "unwind" "unreachable" "indirectbr" "callbr") 'symbols) . font-lock-keyword-face)
+    ;; Memory operators
+    (,(regexp-opt '("malloc" "alloca" "free" "load" "store" "getelementptr" "fence" "cmpxchg" "atomicrmw") 'symbols) . font-lock-keyword-face)
+    ;; Casts
+    (,(regexp-opt '("bitcast" "inttoptr" "ptrtoint" "trunc" "zext" "sext" "fptrunc" "fpext" "fptoui" "fptosi" "uitofp" "sitofp" "addrspacecast") 'symbols) . font-lock-keyword-face)
+    ;; Vector ops
+    (,(regexp-opt '("extractelement" "insertelement" "shufflevector") 'symbols) . font-lock-keyword-face)
+    ;; Aggregate ops
+    (,(regexp-opt '("extractvalue" "insertvalue") 'symbols) . font-lock-keyword-face)
+    ;; Metadata types
+    (,(regexp-opt '("distinct") 'symbols) . font-lock-keyword-face)
+    ;; Atomic memory ordering constraints
+    (,(regexp-opt '("unordered" "monotonic" "acquire" "release" "acq_rel" "seq_cst") 'symbols) . font-lock-keyword-face)
+    ;; Fast-math flags
+    (,(regexp-opt '("nnan" "ninf" "nsz" "arcp" "contract" "afn" "reassoc" "fast") 'symbols) . font-lock-keyword-face)
+    ;; Use-list order directives
+    (,(regexp-opt '("uselistorder" "uselistorder_bb") 'symbols) . font-lock-keyword-face)
+    (,(rx "@" symbol-start (+? nonl) symbol-end) . font-lock-function-name-face)
+    ;; Integer literals
+    ("\\b[-]?[0-9]+\\b" . font-lock-preprocessor-face)
+    ))
+
+(defvar llvm-pre-opcode-attributes
+  (rx symbol-start
+      (or "nnan" "ninf" "nsz" "arcp" "contract" "afn" "reassoc" "fast" "nsw" "nuw")
+      symbol-end))
+
+(defvar llvm-font-lock-keywords
+  `(
+    ;; Labels
+    (,(rx symbol-start
+          (group
+           (+ (or alphanumeric (any "._"))))
+          ":")
+     . font-lock-function-name-face)
+    ;; Labels
+    (,(rx symbol-start
+          (group "label")
+          " "
+          (group "%" (+ (or alphanumeric (any "._")))))
+     (1 font-lock-type-face) (2 font-lock-function-name-face))
+    ;; phi clauses
+    (,(rx "[" (* " ") (+ (not ",")) "," (* " ")
+          (group "%" (+ (or alphanumeric (any "_."))))
+          (* " ") "]")
+     (1 font-lock-function-name-face))
+    ;; Virtual registers with type attributes
+    (,(rx symbol-start "%" (+ (or alphanumeric (any "_.")))
+          ":"
+          (+ (or alphanumeric (any "_."))))
+     . font-lock-variable-name-face)
+    ;; Variables
+    (,(rx symbol-start (any "%$") (+ (or alphanumeric (any "_.")))) . font-lock-variable-name-face)
+    ;; Attributes
+    (,(rx "!" (+ (or alphanumeric (any "._")))) . 'shadow)
+    ;; Machine Opcodes
+    (,(rx "= "
+          (* (regexp llvm-pre-opcode-attributes) " ")
+          (group (+ (or alphanumeric (any "._")))))
+     . (1 font-lock-keyword-face))
+    (,(rx line-start
+          (optional (+ digit) "B")
+          (+ whitespace)
+          (group (+ (or alphanumeric (any "._"))))
+          (+ (not (any "=" "\n")))
+          line-end)
+     . (1 font-lock-keyword-face))
+    ;; Types
+    (,(rx symbol-start
+          (or "void"
+              "i1" "i8" "i16" "i32" "i64" "i128"
+              "half" "bfloat" "float" "double" "fp128"
+              "ptr"
+              "x86_fp80" "x86_mmx" "x86_amx" "ppc_fp128"
+              "type" "label" "opaque" "token")
+          symbol-end)
+     . font-lock-type-face)
+    ;; Floating point constants
+    ("\\b[-+]?[0-9]+.[0-9]*\\([eE][-+]?[0-9]+\\)?\\b" . font-lock-preprocessor-face)
+    ;; Hex constants
+    ("\\b0x[0-9A-Fa-f]+\\b" . font-lock-preprocessor-face)
+    ;; Integer literals
+    ("\\b[-]?[0-9]+\\b" . font-lock-preprocessor-face)
+    ;; Other Attributes
+    (,(rx (or "renamable" "killed " "implicit-def" "implicit" "debug-location" "nsw" "nuw" "align" "dead")) . 'shadow)
+
+    ,@llvm-font-lock-keyword-words
+    )
   "Syntax highlighting for LLVM.")
 
 ;;;###autoload

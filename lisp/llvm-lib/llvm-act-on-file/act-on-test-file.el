@@ -83,6 +83,11 @@
             (_ ""))
           file ))
 
+(defun ll/get-cc1-string (path)
+  (concat "clang -cc1 "
+          "-internal-isystem " (expand-file-name "lib/clang/16.0.0/include" path)
+          " -nostdsysteminc"))
+
 (defun ll/prompt-test-action (file action)
   ;; TODO: assumed build-dir constant, should take as argument and prompt
   ;; further up
@@ -104,7 +109,7 @@
                              (setq res
                                    (pcase (match-string 1 x)
                                      ("%clang_cc1"
-                                      (replace-match "clang -cc1" nil nil x 1))
+                                      (replace-match (ll/get-cc1-string dir) nil nil x 1))
                                      ("%clang"
                                       (replace-match "clang" nil nil x 1))
                                      (t res)))

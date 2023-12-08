@@ -189,7 +189,7 @@
                :children
                (("Automatic Review"
                  :keys "a"
-                 :file ,(my/org-file "entries/reviews.gpg")
+                 :file ,(my/org-file "reviews.gpg")
                  :function setup-automatic-review
                  :before-finalize finalize-review
                  :after-finalize clear-out-review-files
@@ -197,12 +197,12 @@
                  :template-file ,(my/org-file "templates/weekly-review.org"))
                 ("Manual Review"
                  :keys "m"
-                 :file ,(my/org-file "entries/reviews.gpg")
+                 :file ,(my/org-file "reviews.gpg")
                  :function setup-manual-review
                  :template-file ,(my/org-file "templates/weekly-review.org"))
                 ("Reorient"
                  :keys "o"
-                 :file ,(my/org-file "entries/reviews.gpg")
+                 :file ,(my/org-file "reviews.gpg")
                  :template-file ,(my/org-file "templates/reorient.org"))))
               ("Finances" :keys "f"
                :icon ,(all-the-icons-material "attach_money" :face 'all-the-icons-lgreen)
@@ -218,7 +218,7 @@
                  :file ,(my/plaintext-file "ledger-finance/ledger.ledger")
                  :template-file ,(my/org-file "templates/basic.ledger"))
                 ("Reconciliation" :keys "r"
-                 :file ,(my/org-file "entries/reviews.gpg")
+                 :file ,(my/org-file "reviews.gpg")
                  :olp ("Reviews")
                  :template-file ,(my/org-file "templates/finance-recon.org"))
                 ("Rent" :keys "R"
@@ -237,12 +237,12 @@
                :template "* %^{Title}\n#+begin_src emacs-lisp\n %?\n#+end_src")
               ("Journal" :keys "j" :children
                (("Decision Template"
-                 :file ,(my/org-file "gpg/journal.gpg")
+                 :file ,(my/org-file "journal.gpg")
                  :datetree t
                  :keys "d"
                  :template-file ,(my/org-file "templates/decide.org"))
                 ("Journal Entry" :keys "e"
-                 :file ,(my/org-file "gpg/journal.gpg")
+                 :file ,(my/org-file "journal.gpg")
                  :datetree t
                  :template "* %<%R> %?")
                 ("New Journal System" :keys "j"
@@ -250,7 +250,7 @@
                  :datetree t
                  :template "* %U\n%?")
                 ("Programming Interview Prep Journal" :keys "p"
-                 :file ,(my/org-file "gpg/journal.gpg")
+                 :file ,(my/org-file "journal.gpg")
                  :datetree t
                  :template "* ")))
               ("Create checklist" :keys "c" :children
@@ -268,14 +268,15 @@
                  :keys "w"
                  :file ,(my/agenda-file "dev.org")
                  :template-file ,(my/org-file "templates/work_travel_checklist.org"))
-                ("Morning routine"
-                 :keys "m"
-                 :file ,(my/org-file "entries/routines.org")
-                 :template-file ,(my/org-file "templates/morning-routine.org"))
-                ("Night routine"
-                 :keys "n"
-                 :file ,(my/org-file "entries/routines.org")
-                 :template-file ,(my/org-file "templates/evening-routine.org"))))
+                ;; ("Morning routine"
+                ;;  :keys "m"
+                ;;  :file ,(my/org-file "entries/routines.org")
+                ;;  :template-file ,(my/org-file "templates/morning-routine.org"))
+                ;; ("Night routine"
+                ;;  :keys "n"
+                ;;  :file ,(my/org-file "entries/routines.org")
+                ;;  :template-file ,(my/org-file "templates/evening-routine.org"))
+                ))
               ("Protocol"
                :keys "p"
                :file ,(my/agenda-file "incoming.org")
@@ -300,14 +301,14 @@
                    :function org-plan-goto
                    :template-file ,(my/org-file "templates/daily-plan-prompt.org"))))
                 ("Cringe" :keys "c"
-                 :file ,(my/org-file "gpg/cringe.gpg")
+                 :file ,(my/org-file "cringe.gpg")
                  :template "* %?")
-                ("Mental Model" :keys "m"
-                 :file ,(my/org-file "gpg/mental_models.gpg")
-                 :template "* %?")
+                ;; ("Mental Model" :keys "m"
+                ;;  :file ,(my/org-file "mental_models.gpg")
+                ;;  :template "* %?")
                 ("Important Information"
                  :keys "i"
-                 :file ,(my/org-file "gpg/important.gpg")
+                 :file ,(my/org-file "important.gpg")
                  :template "* %?")))
               ("Logging"
                :icon ,(all-the-icons-material "add_to_queue" :face 'all-the-icons-lblue)

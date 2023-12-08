@@ -81,6 +81,10 @@
  (expand-file-name "config-min.org"
                    user-emacs-directory))
 
+(org-babel-load-file
+ (expand-file-name "config-look-and-feel.org"
+                   user-emacs-directory))
+
 (setq my-switch-found (member "-min" command-line-args))
 (setq command-line-args (delete "-min" command-line-args))
 

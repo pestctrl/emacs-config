@@ -1,5 +1,12 @@
 #+PROPERTY: header-args:emacs-lisp :tangle "~/.emacs.d/config-ext.el" :comments both
 
+* posting source code
+#+begin_src emacs-lisp
+  (use-package webpaste)
+
+  (setq webpaste-paste-confirmation t)
+  (setq webpaste-provider-priority '("ix.io"))
+#+end_src
 * Ace jump
 #+BEGIN_SRC emacs-lisp
   (use-package ace-jump-mode

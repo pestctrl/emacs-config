@@ -1,0 +1,146 @@
+#+PROPERTY: header-args:emacs-lisp :tangle "~/.emacs.d/config-look-and-feel.el" :comments both
+
+* UI
+#+begin_src emacs-lisp
+  ;; dashboard looks cool
+  ;; (use-package dashboard)
+  ;; (setq fancy-splash-image "~/.emacs.d/res/icon.png")
+
+  ;; Disable tool and menu bar, keep the fringe though
+  (unless my/puppet-p
+    (tool-bar-mode -1)
+    (menu-bar-mode -1)
+    (scroll-bar-mode -1))
+
+  (when my/puppet-p
+    (define-key-after (default-value 'tool-bar-map) [separator-puppet] menu-bar-separator)
+    (tool-bar-add-item "left-arrow" #'previous-buffer 'puppet-previous-buffer)
+    (tool-bar-add-item "right-arrow" #'next-buffer 'puppet-next-buffer)
+    (tool-bar-add-item "saveas" #'save-some-buffers 'puppet-save)
+    ;; (when (and (boundp 'compilation-mode-tool-bar-map)
+    ;;            compilation-mode-tool-bar-map)
+    ;;   (save-excursion
+    ;;     (with-current-buffer (find-file-noselect "")
+    ;;       ;; eval-defun
+    ;;       )))
+    )
+
+  (fringe-mode '(10 . 10))
+  (set-face-attribute 'fringe nil :background "#222222")
+  ;; Need to configure all-the-icons so that mode-line doesn't look fat
+  ;; and ugly
+  (use-package all-the-icons
+    :config
+    (setq all-the-icons-scale-factor 0.9))
+
+  ;; The most efficient cool looking modeline I've found. Faster than even
+  ;; smart-mode-line
+  (use-package doom-modeline
+    :hook (window-setup . doom-modeline-mode)
+    :config
+    (advice-add #'fit-window-to-buffer :before #'doom-modeline-redisplay)
+
+    ;; Removes symlink bug w/ regards to doom-modeline
+    (setq doom-modeline-project-detection 'project)
+
+    (when (not my-ec/at-ti)
+      (setq doom-modeline-height 24)))
+
+  ;; Modeline display useful information
+  (setq global-mode-string '(" "))
+  (setq display-time-day-and-date t)
+
+  (display-battery-mode t)
+  (display-time-mode t)
+  (unless (or (eq 'windows-nt system-type)
+              (not (executable-find "df")))
+    (require 'display-hard-drive-space-mode)
+    (display-hard-drive-space-mode))
+#+end_src
+* theme
+#+begin_src emacs-lisp
+  (use-package color-theme-modern)
+  (load-theme 'calm-forest nil t)
+
+  (use-package modus-themes)
+  ;; (modus-themes-load-theme )
+  (load-theme 'modus-operandi nil t)
+
+  (add-to-list 'custom-theme-load-path (ef "lisp/themes"))
+  (require 'light-default-theme)
+  (load-theme 'light-default nil t)
+  (require 'dark-default-theme)
+  (load-theme 'dark-default nil t)
+  (require 'same-defaults-theme)
+  (load-theme 'same-defaults nil t)
+
+  (defvar current-theme 'dark)
+  (defvar dark-theme 'calm-forest)
+  (defvar light-theme 'modus-operandi)
+
+  (defun my/switch-themes ()
+    (interactive)
+    (disable-current-theme)
+    (setq current-theme (if (eq current-theme 'dark) 'light 'dark))
+    (enable-current-theme)
+    (set-background-mode current-theme))
+
+  (defun my/reload-theme ()
+    (interactive)
+    (disable-current-theme)
+    (enable-current-theme)
+    (set-background-mode current-theme))
+
+  (defun enable-current-theme ()
+    (pcase current-theme
+      ('light
+       (enable-theme light-theme)
+       (enable-theme 'light-default))
+      ('dark
+       (enable-theme dark-theme)
+       (enable-theme 'dark-default)))
+    (enable-theme 'same-defaults))
+
+  (defun disable-current-theme ()
+    (disable-theme 'same-defaults)
+    (pcase current-theme
+      ('light
+       (disable-theme 'light-default)
+       (disable-theme light-theme))
+      ('dark
+       (disable-theme 'dark-default)
+       (disable-theme dark-theme))))
+
+  (defun update-frame-background-mode ()
+    (mapc 'frame-set-background-mode (frame-list)))
+
+  (defun set-background-mode (mode)
+    (setq frame-background-mode mode)
+    (update-frame-background-mode))
+
+  (ec/load-or-ask-pred 'my/light-default "Use light-theme? ")
+
+  ;; Executable
+  (when (or my/light-default
+            my/puppet-p)
+    (setq current-theme 'light))
+
+  (enable-current-theme)
+#+end_src
+* colors
+#+begin_src emacs-lisp
+  (defun my/reading-color ()
+    (interactive)
+    (variable-pitch-mode)
+    (face-remap-add-relative 'default :foreground "white smoke"))
+
+  (add-hook 'Man-mode-hook
+            #'my/reading-color)
+
+  (add-hook 'w3m-mode-hook
+            #'my/reading-color)
+#+end_src
+* font
+#+begin_src emacs-lisp
+  (require 'fonts)
+#+end_src

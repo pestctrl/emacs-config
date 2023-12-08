@@ -27,7 +27,7 @@
 (require 'org-attach)
 (require 'my-org-agenda-files)
 
-(when (setq my/is-plaintext-mega-folder t)
+(when my/has-plaintext-object-folder
   (setq org-attach-id-dir
         (expand-file-name "org-board-data"
                           my/plaintext-object-folder)))

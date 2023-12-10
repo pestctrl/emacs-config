@@ -69,6 +69,9 @@
 (defun-prompt ec/load-or-ask-dir dir (sym prompt)
   (customize-save-variable sym (read-directory-name prompt)))
 
+(defun-prompt ec/load-or-ask-num num (sym prompt)
+  (customize-save-variable sym (read-number prompt)))
+
 (defun ec/rerun-prompt (prompt-arglist)
   (apply (symbol-function (gethash (car prompt-arglist) ec/prompt-functions))
          (append (cdr prompt-arglist)

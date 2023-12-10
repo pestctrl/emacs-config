@@ -24,6 +24,7 @@
 
 ;;; Code:
 (require 'hoagie-adjust)
+(require 'emacs-custom-load-or-ask)
 
 ;; If I reeaaaally wanted to do this property, I would use
 ;; #'new-fontset, but that requires LOTS of background knowledge. Just
@@ -33,6 +34,8 @@
 
 ;; (create-fontset-from-fontset-spec
 ;;  "-*-*-medium-r-normal-*-15-*-*-*-*-*-fontset-default")
+
+(ec/load-or-ask-num 'my-font-size "What would you like your font size to be? ")
 
 (set-fontset-font "fontset-default" 'ascii (font-spec :size 13 :name "Roboto Mono"))
 

@@ -260,18 +260,24 @@
 * navigation
 #+begin_src emacs-lisp
   ;; Scrollkeeper is helpful for scrolling up and down
-  (defun window-third-height ()
-    (max 1 (/ (1- (window-height (selected-window))) 3)))
+  (defvar window-third-height nil)
+
+  (defun get-window-third-height ()
+    (setq window-third-height
+          (max 1 (/ (1- (window-height (selected-window))) 3))))
+
+  (add-hook 'window-configuration-change-hook
+            'get-window-third-height)
 
   (defun scroll-up-third ()
     (interactive)
-    (pulse-momentary-highlight-one-line (point))
-    (scroll-up (window-third-height)))
+    ;; (pulse-momentary-highlight-one-line (point))
+    (scroll-up (or window-third-height 10)))
 
   (defun scroll-down-third ()
     (interactive)
-    (pulse-momentary-highlight-one-line (point))
-    (scroll-down (window-third-height)))
+    ;; (pulse-momentary-highlight-one-line (point))
+    (scroll-down (or window-third-height 10)))
 
   (global-set-key (kbd "C-v") 'scroll-up-third)
   (global-set-key (kbd "M-v") 'scroll-down-third)

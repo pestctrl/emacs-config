@@ -49,10 +49,22 @@
 * c++
 #+begin_src emacs-lisp
   (use-package lsp-mode
+    :custom
+    (lsp-completion-provider :none) ;; we use Corfu!
+    :init
+    (defun my/lsp-mode-setup-completion ()
+      (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+            '(flex))) ;; Configure flex
+    :hook
+    (lsp-completion-mode . my/lsp-mode-setup-completion)
     :config
     (with-eval-after-load 'lsp-clangd
       (add-to-list 'lsp-clients-clangd-args
                    "-j=16"))
+
+    (add-hook 'lsp-mode-hook
+              (lambda ()
+                (auto-highlight-symbol-mode -1)))
 
     ;; (setq lsp-disabled-clients nil)
 

@@ -35,6 +35,9 @@
 (require 'frame-restore)
 (require 'ti-config)
 
+(put 'magit-log-mode 'magit-log-default-arguments
+     '("--graph" "-n64" "--decorate"))
+
 ;; https://github.com/Alexander-Miller/treemacs/issues/1017#issuecomment-1515602288
 (add-to-list 'image-types 'svg)
 

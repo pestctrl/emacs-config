@@ -32,6 +32,10 @@
             :override
             #'my/tab-bar-select-tab)
 
+(advice-add #'tab-bar-auto-width
+            :override
+            #'my/tab-bar-auto-width)
+
 (defun my/tab-bar-select-tab (&optional tab-number)
   "Switch to the tab by its absolute position TAB-NUMBER in the tab bar.
 When this command is bound to a numeric key (with a key prefix or modifier key
@@ -219,6 +223,87 @@ Negative TAB-NUMBER counts tabs from the end of the tab bar."
     (force-mode-line-update)
     (unless tab-bar-mode
       (message "Added new tab at %s" tab-bar-new-tab-to))))
+
+;; items: (tab-bar-format-list tab-bar-format)
+;; TODO: make these tabs smaller dammit
+(defun my/tab-bar-auto-width (items)
+  "Return tab-bar items with resized tab names."
+  (unless tab-bar--auto-width-hash
+    (define-hash-table-test 'tab-bar--auto-width-hash-test
+                            #'equal-including-properties
+                            #'sxhash-equal-including-properties)
+    (setq tab-bar--auto-width-hash
+          (make-hash-table :test 'tab-bar--auto-width-hash-test)))
+  (let ((tabs nil)    ;; list of resizable tabs
+        (non-tabs "") ;; concatenated names of non-resizable tabs
+        (width 0))    ;; resize tab names to this width
+    (dolist (item items)
+      (when (and (eq (nth 1 item) 'menu-item) (stringp (nth 2 item)))
+        (if (memq (get-text-property 0 'face (nth 2 item))
+                  tab-bar-auto-width-faces)
+            (push item tabs)
+          (unless (eq (nth 0 item) 'align-right)
+            (setq non-tabs (concat non-tabs (nth 2 item)))))))
+    (when tabs
+      (add-face-text-property 0 (length non-tabs) 'tab-bar t non-tabs)
+      (setq width (/ (- (frame-inner-width)
+                        (string-pixel-width non-tabs))
+                     (length tabs)))
+      (when tab-bar-auto-width-min
+        (setq width (max width (if (window-system)
+                                   (nth 0 tab-bar-auto-width-min)
+                                 (nth 1 tab-bar-auto-width-min)))))
+      (when tab-bar-auto-width-max
+        (setq width (min width (if (window-system)
+                                   (nth 0 tab-bar-auto-width-max)
+                                 (nth 1 tab-bar-auto-width-max)))))
+      (dolist (item tabs)
+        (setf (nth 2 item)
+              (with-memoization (gethash (list (selected-frame)
+                                               width (nth 2 item))
+                                         tab-bar--auto-width-hash)
+                (let* ((name (nth 2 item))
+                       (len (length name))
+                       (close-p (get-text-property (1- len) 'close-tab name))
+                       (continue t)
+                       (prev-width (string-pixel-width name))
+                       curr-width)
+                  (cond
+                   ((< prev-width width)
+                    (let* ((space (apply #'propertize " "
+                                         (text-properties-at 0 name)))
+                           (ins-pos (- len (if close-p
+                                               (length tab-bar-close-button)
+                                             0)))
+                           (prev-name name))
+                      (while continue
+                        (setq name (concat (substring name 0 ins-pos)
+                                           space
+                                           (substring name ins-pos)))
+                        (setq curr-width (string-pixel-width name))
+                        (if (< curr-width width)
+                            (setq prev-width curr-width
+                                  prev-name name)
+                          ;; Set back a shorter name
+                          (setq name prev-name
+                                continue nil)))))
+                   ((> prev-width width)
+                    (let ((del-pos1 (if close-p -2 -1))
+                          (del-pos2 (if close-p -1 nil)))
+                      (while continue
+                        (setq name (concat (substring name 0 del-pos1)
+                                           (and del-pos2
+                                                (substring name del-pos2))))
+                        (setq curr-width (string-pixel-width name))
+                        (if (> curr-width width)
+                            (setq prev-width curr-width)
+                          (setq continue nil)))
+                      (let* ((len (length name))
+                             (pos (- len (if close-p 1 0))))
+                        (add-face-text-property
+                         (max 0 (- pos 2)) (max 0 pos) 'shadow nil name)))))
+                  name)))))
+    items))
 
 (provide 'tab-bar-patch)
 ;;; tab-bar-patch.el ends here

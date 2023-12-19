@@ -155,5 +155,33 @@
 
 (use-package realgud-lldb)
 
+;; Needed for elpy to work on work machine
+(defun my/elpy-patch ()
+  (if (or (not elpy-rpc-pythonpath)
+          (not (file-exists-p (expand-file-name "elpy/__init__.py"
+                                                elpy-rpc-pythonpath))))
+      process-environment
+    (let* ((old-pythonpath (getenv "PYTHONPATH"))
+           (new-pythonpath (if old-pythonpath
+                               (concat elpy-rpc-pythonpath
+                                       path-separator
+                                       (expand-file-name "~/.local/lib/python3.10/site-packages")
+                                       path-separator
+                                       old-pythonpath)
+                             elpy-rpc-pythonpath)))
+      (cons (concat "PYTHONPATH=" new-pythonpath)
+            (append process-environment
+                    (when (and (string-equal system-type "windows-nt")
+                               (>= (string-match-p
+                                    (regexp-quote "utf-8")
+                                    (format "%s" buffer-file-coding-system))) 0)
+                      (list
+                       "PYTHONIOENCODING=utf-8"
+                       "PYTHONLEGACYWINDOWSSTDIO=1")))))))
+
+(advice-add #'elpy-rpc--environment
+            :override
+            #'my/elpy-patch)
+
 (provide 'work-config)
 ;;; work-config.el ends here

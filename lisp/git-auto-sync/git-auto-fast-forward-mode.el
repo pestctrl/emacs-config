@@ -38,7 +38,7 @@
 (defun ga/on-auto-branch (dir)
   (with-current-buffer (dired-noselect dir)
     (member (magit-get-current-branch)
-            '("desktop" "gaming-laptop" "puppet" "mobile" "laptop"))))
+            '("desktop" "gaming-laptop" "puppet" "mobile" "laptop" "nixframe"))))
 
 (defun ga/should-be-automatic (dir)
   (with-current-buffer (dired-noselect dir)

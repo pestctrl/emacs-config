@@ -35,9 +35,9 @@
 (require 'my-org-agenda-files)
 (setq gaff/watch-directories (list (list (file-name-as-directory my/org-folder)
                                          "origin/desktop" "origin/gaming-laptop" "origin/puppet" "origin/mobile"
-                                         "origin/laptop")
+                                         "origin/laptop" "origin/nixframe")
                                    (list (file-name-as-directory (my/plaintext-file "ledger-finance"))
-                                         "origin/gaming-laptop" "origin/puppet" "origin/desktop")))
+                                         "origin/gaming-laptop" "origin/puppet" "origin/desktop" "origin/nixframe")))
 
 ;; TODO: apparently this messes with exwm initialization somehow. Not
 ;; sure how. Even running 10 seconds after messes with exwm init.

@@ -30,7 +30,8 @@ added as a link in the `ARCHIVED_AT' property."
                          options
                          urls)))
 
-(defvar youtube-dl-binary "/usr/bin/yt-dlp")
+(defvar youtube-dl-binary
+  (executable-find "yt-dlp"))
 
 (defun org-board-dispatch-special (orig path directory args site)
   (cond

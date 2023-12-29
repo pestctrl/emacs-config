@@ -31,20 +31,25 @@
 (when my/is-plaintext-mega-folder
   (ec/load-or-ask-file 'my/plaintext-mega-folder "Where's the megasync directory? "))
 
-(defvar my/plaintext-object-folder nil)
-
 (when my/has-plaintext-object-folder
   (ec/load-or-ask-file 'my/plaintext-object-folder "Where's the plaintext-object folder? "))
 
 (defun my/plaintext-file (str)
-  (let ((result (expand-file-name str my/plaintext-folder)))
-    (if (file-exists-p result)
-        result
-      (when my/is-plaintext-mega-folder
-        (let ((folder (expand-file-name str my/plaintext-mega-folder)))
-          (or (and (file-exists-p folder)
-                   folder)
-              result))))))
+  (let ((result (expand-file-name str my/plaintext-folder))
+        (mega-folder
+         (when my/is-plaintext-mega-folder
+           (expand-file-name str my/plaintext-mega-folder)))
+        (object-folder
+         (when my/has-plaintext-object-folder
+           (expand-file-name str my/plaintext-object-folder))))
+    (cond ((file-exists-p result)
+           result)
+          ((and object-folder
+                (file-exists-p object-folder))
+           object-folder)
+          ((and mega-folder
+                (file-exists-p mega-folder))
+           mega-folder))))
 
 ;; (defun my/plaintext-file (str)
 ;;   (if-let ((result (expand-file-name str my/plaintext-migration-folder))

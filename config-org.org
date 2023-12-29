@@ -7,7 +7,7 @@
 #+end_src
 * Plugins
 ** fstree
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC
   (add-to-list 'load-path
                (ef "submodule/org-fstree"))
   (require 'org-fstree)

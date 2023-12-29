@@ -246,6 +246,19 @@
   (setq epg-gpg-program "gpg2")
   ;; (setq auth-source-debug t)
   (setq auth-sources `((:source ,(ef "secrets/.authinfo.gpg"))))
+
+  (when-let* ((gpg (executable-find "gpg2"))
+              (version (shell-command-to-string (format "%s --version" gpg)))
+              ((string-match (rx "gpg (GnuPG) "
+                                 (group (+ digit)
+                                        (+ "."
+                                           (+ digit))))
+                             version))
+              (version (match-string 1 version))
+              (number (string-to-number
+                       (string-replace "." "" version)))
+              ((>= number 241)))
+    (fset 'epg-wait-for-status 'ignore))
 #+end_src
 * delete-other-side-windows
 #+begin_src emacs-lisp

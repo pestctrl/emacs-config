@@ -154,11 +154,7 @@ When called programmatically and FILES is nil, REGEXP is expected
 to specify a command to run.
 
 If CONFIRM is non-nil, the user will be given an opportunity to edit the
-command before it's run.
-
-Interactively, the user can use the \\`M-c' command while entering
-the regexp to indicate whether the grep should be case sensitive
-or not."
+command before it's run."
   (interactive
    (progn
      (grep-compute-defaults)
@@ -174,24 +170,16 @@ or not."
 					                      nil default-directory t))
 		        (confirm (equal current-prefix-arg '(4))))
 	       (list regexp files dir confirm))))))
-  ;; If called non-interactively, also compute the defaults if we
-  ;; haven't already.
-  (unless grep-find-template
-    (grep-compute-defaults))
   (when (and (stringp regexp) (> (length regexp) 0))
     (unless (and dir (file-accessible-directory-p dir))
       (setq dir default-directory))
-    (unless (string-equal (file-remote-p dir) (file-remote-p default-directory))
-      (let ((default-directory dir))
-        (grep-compute-defaults)))
     (if (null files)
 	    (if (not (string= regexp (if (consp grep-find-command)
 				                     (car grep-find-command)
 				                   grep-find-command)))
-	        (compilation-start regexp #'grep-mode))
+	        (compilation-start regexp 'grep-mode))
       (setq dir (file-name-as-directory (expand-file-name dir)))
-      (let* ((case-fold-search (read-regexp-case-fold-search regexp))
-             (command (rgrep-default-command regexp files nil)))
+      (let ((command (rgrep-default-command regexp files nil)))
 	    (when command
 	      (if confirm
 	          (setq command
@@ -201,7 +189,7 @@ or not."
           (grep--save-buffers)
 	      (prog1
               (let ((default-directory dir))
-	            (compilation-start command #'grep-mode))
+	            (compilation-start command 'grep-mode))
 	        ;; Set default-directory if we started rgrep in the *grep* buffer.
 	        (if (eq next-error-last-buffer (current-buffer))
 	            (setq default-directory dir))))))))

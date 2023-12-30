@@ -142,7 +142,6 @@
       (setq exwm-background/current-transparency 95)))
 
   (define-key *window-map* (kbd "t") 'exwm-background/window-transparency-hydra/body)
-  (setq window-system-default-frame-alist `((x . ((alpha . (,exwm-background/current-transparency . 50))))))
   (exwm-global-set-key (kbd "s-v") #'exwm-background/toggle-viewing-background)
   (exwm-global-set-key (kbd "s-b") #'exwm-background/exwm-background-window) ;; TODO: Fix keybinding
   ;; (define-key desktop-environment-mode-map (kbd "<S-XF86MonBrightnessDown>") #'exwm-background/decrease-transparency)

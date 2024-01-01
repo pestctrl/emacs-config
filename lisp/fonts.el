@@ -35,9 +35,9 @@
 ;; (create-fontset-from-fontset-spec
 ;;  "-*-*-medium-r-normal-*-15-*-*-*-*-*-fontset-default")
 
-(ec/load-or-ask-num 'my-font-size "What would you like your font size to be? ")
+(ec/load-or-ask-num 'my-font-size "What would you like your font size to be (10-16)? ")
 
-(set-fontset-font "fontset-default" 'ascii (font-spec :size 13 :name "Roboto Mono"))
+(set-fontset-font "fontset-default" 'ascii (font-spec :size my-font-size :name "Roboto Mono"))
 
 ;; 三寶飯
 ;; "HanWangMingMediumChuIn"

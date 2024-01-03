@@ -151,9 +151,38 @@
 
 (use-package realgud
   :config
-  (setq realgud-window-split-orientation 'horizontal))
+  (setq realgud-window-split-orientation 'horizontal)
+  (setq realgud:pdb-command-name "python3 -m pdb"
+        realgud:remake-command-name "/db/sds/packages2/remake/bin/remake"))
 
 (use-package realgud-lldb)
+
+;; Get lldb working
+(setenv "PYTHONPATH"
+        (concat
+         (expand-file-name "~/.local/lib/python3.10/site-packages")
+         path-separator
+         (getenv "PYTHONPATH")
+         path-separator
+         "/usr/lib/llvm-14/lib/python3.10/dist-packages/"))
+
+;; (defun my/patch-pythonpath (orig &rest args)
+;;   (let* ((penv
+;;           (remove-if #'(lambda (x)
+;;                          (string-match-p "^PYTHONPATH=" x))
+;;                      process-environment))
+;;          (new-pythonpath
+;;           (concat (expand-file-name "~/.local/lib/python3.10/site-packages")
+;;                   path-separator
+;;                   (getenv "PYTHONPATH")))
+;;          (process-environment
+;;           (cons (concat "PYTHONPATH=" new-pythonpath)
+;;                 penv)))
+;;     (apply orig args)))
+
+;; (advice-add #'ein:jupyter-server--run
+;;             :around
+;;             #'my/patch-pythonpath)
 
 ;; Needed for elpy to work on work machine
 (defun my/elpy-patch ()

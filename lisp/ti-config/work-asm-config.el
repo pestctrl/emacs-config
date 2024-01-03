@@ -83,7 +83,7 @@
          :background "gray25"
          :extend t
          :inherit font-lock-comment-face
-         :box '(:line-width 1 :color "gray30" :style raised))))
+         :box `(:line-width 1 :color "gray30" :style ,(if (>= emacs-major-version 30) 'released-button 'raised)))))
   nil)
 
 (defun asm-clean-up ()

@@ -446,7 +446,8 @@
     (corfu-cycle t)
     (corfu-auto t)
     :init
-    (global-corfu-mode))
+    (add-hook 'prog-mode-hook
+              'corfu-mode))
 
   ;; Magit
   (use-package magit)

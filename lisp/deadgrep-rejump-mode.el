@@ -26,59 +26,84 @@
 (require 'deadgrep)
 
 (defun my/deadgrep-new-tab (orig &rest args)
-  (let ((tab-name (alist-get 'name (tab-bar--current-tab))))
-    (unless (string-match-p "-deadgrep$" tab-name)
-      (switch-or-create-tab (concat tab-name "-deadgrep"))))
-  (when (window-parameter (selected-window) 'window-side)
-    (window-toggle-side-windows))
-  (let ((ignore-window-parameters t))
-    (delete-other-windows))
-  (apply orig args)
-  (deadgrep-rejump-mode 1)
-  (setq my/drj-buffer deadgrep-buffer))
+  (if (not (y-or-n-p "Deadgrep rejump mode? "))
+      (apply orig args)
+    (let ((tab-name (alist-get 'name (tab-bar--current-tab))))
+      (unless (string-match-p "-deadgrep$" tab-name)
+        (setq my/drj-tab (concat tab-name "-deadgrep"))
+        (switch-or-create-tab (concat tab-name "-deadgrep"))))
+    (when (window-parameter (selected-window) 'window-side)
+      (window-toggle-side-windows))
+    (let ((ignore-window-parameters t))
+      (delete-other-windows))
+    (apply orig args)
+    (deadgrep-rejump-mode 1)
+    (setq my/drj-buffer (current-buffer))))
+
+(defun deadgrep-fold-everything ()
+  (interactive)
+  (when deadgrep-rejump-mode
+    (with-current-buffer my/drj-buffer
+      (save-excursion
+        (goto-char (point-min))
+        (condition-case nil
+            (while (not (eobp))
+              (progn
+                (deadgrep--move-match t 'deadgrep-filename-face)
+                (deadgrep-toggle-file-results)))
+          (error nil))))))
+
+(add-hook 'deadgrep-finished-hook
+          #'deadgrep-fold-everything)
 
 (advice-add #'deadgrep
             :around
             #'my/deadgrep-new-tab)
 
 (defvar my/drj-buffer nil)
+(defvar my/drj-tab nil)
 ;; (make-variable-buffer-local 'my/deadgrep-rejump-buffer)
+
+(defun my/drj-jump (next-fun)
+  (when-let ((win (get-buffer-window my/drj-buffer)))
+    (let* ((curr-win (selected-window)))
+      (select-window win)
+      (funcall next-fun)
+      (deadgrep--visit-result
+       #'(lambda (f-name)
+           ;; MUST HAPPEN BEFORE select-window, implicitly using
+           ;; default-directory
+           (let ((buffer (find-file-noselect f-name)))
+             (select-window curr-win)
+             (switch-to-buffer buffer))))
+      (recenter))))
 
 (defun my/drj-previous ()
   (interactive)
-  (when-let ((win (get-buffer-window my/drj-buffer)))
-    (select-window win)
-    (deadgrep-backward-match)
-    (deadgrep-visit-result)))
+  (my/drj-jump #'deadgrep-backward-match))
 
 (defun my/drj-next ()
   (interactive)
-  (when-let ((win (get-buffer-window my/drj-buffer)))
-    (select-window win)
-    (deadgrep-forward-match)
-    (deadgrep-visit-result)))
+  (my/drj-jump #'deadgrep-forward-match))
 
 (defvar deadgrep-rejump-mode-map nil)
 (unless deadgrep-rejump-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "M-n") #'my/drj-next)
     (define-key map (kbd "M-p") #'my/drj-previous)
-    (define-key map (kbd "q") #'(lambda () (interactive) (deadgrep-rejump-mode -1)))
+    (define-key map (kbd "M-q") #'(lambda () (interactive) (deadgrep-rejump-mode -1)))
     (setq deadgrep-rejump-mode-map map)))
 
 (define-minor-mode deadgrep-rejump-mode ""
   :global t
   :keymap deadgrep-rejump-mode-map
-  (unless deadgrep-rejump-mode
-    (close-tab-switch)))
-
-(defun my/drj-setup (orig &rest args)
-  (delete-other-windows)
-  (recenter))
-
-(advice-add #'deadgrep--visit-result
-            :after
-            #'my/drj-setup)
+  (if deadgrep-rejump-mode
+      (when my/drj-buffer
+        (user-error "drj already in progress, can't start another"))
+    (switch-or-create-tab my/drj-tab)
+    (close-tab-switch)
+    (setq my/drj-buffer nil
+          my/drj-tab nil)))
 
 (provide 'deadgrep-rejump-mode)
 ;;; deadgrep-rejump-mode.el ends here

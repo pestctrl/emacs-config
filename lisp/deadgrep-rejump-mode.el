@@ -25,32 +25,35 @@
 ;;; Code:
 (require 'deadgrep)
 
-(defun my/deadgrep-new-tab (&rest args)
+(defun my/deadgrep-new-tab (orig &rest args)
   (let ((tab-name (alist-get 'name (tab-bar--current-tab))))
     (unless (string-match-p "-deadgrep$" tab-name)
       (switch-or-create-tab (concat tab-name "-deadgrep"))))
   (when (window-parameter (selected-window) 'window-side)
     (window-toggle-side-windows))
   (let ((ignore-window-parameters t))
-    (delete-other-windows)))
+    (delete-other-windows))
+  (apply orig args)
+  (deadgrep-rejump-mode 1)
+  (setq my/drj-buffer deadgrep-buffer))
 
 (advice-add #'deadgrep
-            :before
+            :around
             #'my/deadgrep-new-tab)
 
 (defvar my/drj-buffer nil)
-(make-variable-buffer-local 'my/deadgrep-rejump-buffer)
+;; (make-variable-buffer-local 'my/deadgrep-rejump-buffer)
 
 (defun my/drj-previous ()
   (interactive)
-  (when-let ((win (get-buffer-window my/deadgrep-rejump-buffer)))
+  (when-let ((win (get-buffer-window my/drj-buffer)))
     (select-window win)
     (deadgrep-backward-match)
     (deadgrep-visit-result)))
 
 (defun my/drj-next ()
   (interactive)
-  (when-let ((win (get-buffer-window my/deadgrep-rejump-buffer)))
+  (when-let ((win (get-buffer-window my/drj-buffer)))
     (select-window win)
     (deadgrep-forward-match)
     (deadgrep-visit-result)))
@@ -64,19 +67,17 @@
     (setq deadgrep-rejump-mode-map map)))
 
 (define-minor-mode deadgrep-rejump-mode ""
-  nil nil deadgrep-rejump-mode-map
-  (setq my/deadgrep-rejump-buffer nil))
+  :global t
+  :keymap deadgrep-rejump-mode-map
+  (unless deadgrep-rejump-mode
+    (close-tab-switch)))
 
 (defun my/drj-setup (orig &rest args)
-  (let ((deadgrep-buffer (current-buffer)))
-    (apply orig args)
-    (deadgrep-rejump-mode 1)
-    (setq my/deadgrep-rejump-buffer deadgrep-buffer)
-    (delete-other-windows)
-    (recenter)))
+  (delete-other-windows)
+  (recenter))
 
 (advice-add #'deadgrep--visit-result
-            :around
+            :after
             #'my/drj-setup)
 
 (provide 'deadgrep-rejump-mode)

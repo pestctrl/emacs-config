@@ -34,6 +34,8 @@
 (require 'machine-scheduler-debug-mode)
 (require 'frame-restore)
 (require 'ti-config)
+(require 'bisect-mode)
+(require 'deadgrep-rejump-mode)
 
 (put 'magit-log-mode 'magit-log-default-arguments
      '("--graph" "-n64" "--decorate"))

@@ -79,3 +79,6 @@
 [submodule "tree-sitter"]
 	path = tree-sitter
 	url = git@github.com:pestctrl/my-emacs-ts.git
+[submodule "submodule/slime-star"]
+	path = submodule/slime-star
+	url = https://github.com/mmontone/slime-star.git

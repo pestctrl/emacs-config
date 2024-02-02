@@ -210,6 +210,10 @@
                        "PYTHONIOENCODING=utf-8"
                        "PYTHONLEGACYWINDOWSSTDIO=1")))))))
 
+(setq inferior-lisp-program "/db/sds/packages2/lem/bin/ros -Q run")
+(setq slime-contribs '(slime-fancy slime-star))
+(add-to-list 'load-path "~/.emacs.d/submodule/slime-star")
+
 (advice-add #'elpy-rpc--environment
             :override
             #'my/elpy-patch)

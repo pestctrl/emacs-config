@@ -545,7 +545,8 @@
 
   (require 'my-org-roam-logger)
 
-  (setq my/org-roam-logger-filter-fun (my/org-roam-filter-by-tag '("Project" "active")))
+  (setq my/org-roam-logger-filter-fun nil;; (my/org-roam-filter-by-tag '("Project" "active"))
+        )
   )
 
 (advice-add #'org-agenda-redo

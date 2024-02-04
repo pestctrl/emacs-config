@@ -24,9 +24,24 @@
 
 ;;; Code
 
-(require 'mbsync)
-(require 'notmuch-config)
+;; (require 'mbsync)
+;; (require 'notmuch-config)
 (require 'mu4e-configuration)
+
+(setq user-mail-address "me@mail.pestctrl.io"
+      user-full-name "Benson Chu")
+
+(setq smtpmail-smtp-server "smtp.fastmail.com"
+      smtpmail-smtp-service 465
+      smtpmail-stream-type 'ssl
+      send-mail-function 'smtpmail-send-it
+      message-send-mail-function 'smtpmail-send-it)
+
+(mailcap-add "text/html" "/usr/bin/xdg-open %s ")
+
+(setq mail-specify-envelope-from t
+      message-sendmail-envelope-from 'header
+      mail-envelope-from 'header)
 
 (provide 'emacs-mail)
 ;;; emacs-mail.el ends here

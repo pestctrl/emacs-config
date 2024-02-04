@@ -42,17 +42,17 @@
 
   ;; (global-set-key (kbd "<f8>") 'mu4e)
 
-  (setq mu4e-maildir "~/.mail/fastmail"
-        mu4e-sent-folder   "/Sent"
-        mu4e-drafts-folder "/Drafts"
-        mu4e-refile-folder "/Archive"
-        mu4e-trash-folder "/Trash")
+  (setq mu4e-maildir "~/.mail"
+        mu4e-sent-folder   "/fastmail/Sent"
+        mu4e-drafts-folder "/fastmail/Drafts"
+        mu4e-refile-folder "/fastmail/Archive"
+        mu4e-trash-folder "/fastmail/Trash")
 
   (setq mu4e-maildir-shortcuts
-        '(("/INBOX" . ?i)
-          ("/INBOX/tracking" . ?t)
-          ("/INBOX/unsorted" . ?u)
-          ("/Archive" . ?a)))
+        '(("/fastmail/INBOX" . ?i)
+          ("/fastmail/INBOX/tracking" . ?t)
+          ("/fastmail/INBOX/unsorted" . ?u)
+          ("/fastmail/Archive" . ?a)))
 
   (setq mu4e-bookmarks
         '(( :name  "Unread messages"
@@ -82,9 +82,10 @@
     (interactive)
     (let ((addresses
            '("bensonchu457@fastmail.com"
-             "bensonchu457@gmail.com")))
+             "bensonchu457@gmail.com"
+             "me@mail.pestctrl.io")))
       (async-shell-command
-       (format "mu init --maildir=~/.mail/fastmail/ %s"
+       (format "mu init --maildir=~/.mail/ %s"
                (--> addresses
                     (mapcar #'(lambda (x) (concat "--my-address=" x)) it)
                     (string-join it " "))))))

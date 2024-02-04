@@ -59,10 +59,13 @@
            ,@body)))))
 
 (defun gac-use-magit-push (buffer)
-  (let ((default-directory (file-name-directory (buffer-file-name buffer)))
-        (magit-pre-start-git-hook (memq 'magit-maybe-save-repository-buffers
-                                        magit-pre-start-git-hook)))
-    (magit-push-current-to-pushremote nil)))
+  (when (string= "03" (format-time-string "%m"))
+    (error "Surely you've setup the server now, right?"))
+  (unless (string= "NixDawn" (system-name))
+    (let ((default-directory (file-name-directory (buffer-file-name buffer)))
+          (magit-pre-start-git-hook (memq 'magit-maybe-save-repository-buffers
+                                          magit-pre-start-git-hook)))
+      (magit-push-current-to-pushremote nil))))
 
 (advice-add #'gac-push :override #'gac-use-magit-push)
 

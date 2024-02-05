@@ -56,9 +56,12 @@
 
 (require 'libs)
 
-(when (and my-ec/at-ti
-           (string-match-p ".*NATIVE_COMP.*" system-configuration-features))
-  (setenv "PATH" (concat "/db/sds/packages2/emacs-master/bin:" (getenv "PATH"))))
+(when (native-comp-available-p)
+  (require 'comp-run)
+  (add-to-list 'native-comp-jit-compilation-deny-list
+               ".*realgud.*")
+  (when my-ec/at-ti
+    (setenv "PATH" (concat "/db/sds/packages2/emacs-master/bin:" (getenv "PATH")))))
 
 (require 'my-keymap)
 

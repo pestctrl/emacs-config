@@ -57,13 +57,14 @@
 (require 'libs)
 
 (when (native-comp-available-p)
-  (if (<= emacs-major-version 28)
-      (require 'comp)
-    (require 'comp-run))
-
-  (when (boundp 'native-comp-jit-compilation-deny-list)
-    (add-to-list 'native-comp-jit-compilation-deny-list
-		         ".*realgud.*"))
+  (cond ((<= emacs-major-version 28)
+         (require 'comp)
+         (add-to-list 'native-comp-deferred-compilation-deny-list
+		              ".*realgud.*"))
+        (t
+         (require 'comp-run)
+         (add-to-list 'native-comp-jit-compilation-deny-list
+		              ".*realgud.*")))
   ;; (setenv "PATH" (concat "/db/sds/packages2/emacs-master/bin:" (getenv "PATH")))
   )
 

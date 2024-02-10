@@ -54,7 +54,8 @@
     ,(my/org-file "entries/reviews.gpg")))
 
 (defconst my/aux-refile-files
-  `(,(my/agenda-file "vrchat_things.org")))
+  `(,(my/agenda-file "vrchat_things.org")
+    ,(my/org-file "journal2.gpg")))
 
 (custom-set-variables
  `(org-agenda-files

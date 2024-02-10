@@ -63,8 +63,7 @@
 
   (when (boundp 'native-comp-jit-compilation-deny-list)
     (add-to-list 'native-comp-jit-compilation-deny-list
-		 ".*realgud.*")
-    )
+		         ".*realgud.*"))
   ;; (setenv "PATH" (concat "/db/sds/packages2/emacs-master/bin:" (getenv "PATH")))
   )
 

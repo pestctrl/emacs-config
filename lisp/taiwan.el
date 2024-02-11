@@ -38,3 +38,5 @@
     (add-valid "COORDINATES" coordinates)
     (add-valid "WEBSITE" website)
     (add-valid "GOOGLE_MAPS_URL" maps-url)))
+
+(provide 'taiwan)

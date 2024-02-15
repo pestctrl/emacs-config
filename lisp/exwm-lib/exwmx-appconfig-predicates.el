@@ -110,15 +110,21 @@ or use `exwmx-appconfig-ignore' ignore."
        (with-current-buffer buffer
          major-mode)))
   (with-current-buffer buffer
-    (-every
-     (lambda (rule)
-       (let* ((key (nth 0 rule))
-              (search-string (nth 1 rule))
-              (test-function (or (nth 2 rule) #'equal))
-              (prop-value (exwm-buffer-extract-prop buffer key)))
-         (and (functionp test-function)
-              (funcall test-function search-string prop-value))))
-     alist)))
+    (let ((one-matched nil))
+      (and
+       (-every
+        (lambda (rule)
+          (let* ((key (nth 0 rule))
+                 (search-string (nth 1 rule))
+                 (test-function (or (nth 2 rule) #'equal))
+                 (prop-value (exwm-buffer-extract-prop buffer key)))
+            (when (and (functionp test-function)
+                       (funcall test-function search-string prop-value))
+              (when search-string
+                (setq one-matched t))
+              t)))
+        alist)
+       one-matched))))
 
 (defun exwmx-find-buffers (appconfig &optional alist)
   (let (result)

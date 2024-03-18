@@ -413,6 +413,69 @@
       (insert "\n|-"))
     (org-table-align)))
 
+(defun lldb-filename-to-org-link (filename)
+  (setq filename
+        (string-replace ":" "::" filename))
+  (save-match-data
+    (if (string-match (rx line-start "/scratch/benson/" (+ alphanumeric) "/llvm_cgt/llvm-project/"
+                          (group (+ nonl)))
+                      filename)
+        (format "[[%s][LLVM/%s]]"
+                filename
+                (match-string 1 filename))
+      (string-match (rx line-start (optional "/")
+                        (+ (and (+ (not "/")) "/" ))
+                        (group
+                         (+ nonl)))
+                    filename)
+      (format "[[%s][%s]]"
+              filename
+              (match-string 1 filename)))))
+
+(defun lldb-stacktrace-to-org-table ()
+  (interactive)
+  ;; (narrow-to-region (point) (point))
+  ;; (save-excursion
+  ;;   (yank))
+  (let ((regexp
+         (rx (and line-start (+ nonl)
+                  "frame #" (group (+ digit))
+                  ": 0x" (= 16 alphanumeric) " " (+ nonl) "`"
+                  (group
+                   (+? nonl))
+                  (optional
+                   "(" (+? nonl) ")")
+                  (or
+                   line-end
+                   (and
+                    " at "
+                    (group
+                     (+ nonl))))))))
+    (while (re-search-forward regexp
+                              nil t)
+      (let ((num (match-string 1))
+            (function (match-string 2))
+            (filename (match-string 3)))
+
+        (save-match-data
+          (while
+              (when (string-match-p "<[^<>]+>" function)
+                (setq function
+                      (replace-regexp-in-string "<[^<>]+>" "" function)))))
+
+        (when filename
+          (setq filename
+                (lldb-filename-to-org-link filename)))
+
+        (replace-match (format "|%s|%s|%s|" num function (or filename ""))))))
+  (goto-char (point-min))
+  (org-table-sort-lines nil ?N)
+  (save-excursion
+    (insert "|-\n|#|Function Name|File & Line Number|Link|\n|-\n")
+    (end-of-buffer)
+    (insert "\n|-"))
+  (org-table-align))
+
 
 (setq show-tab-bar-new-tab t)
 

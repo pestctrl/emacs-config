@@ -10,7 +10,8 @@
 
 * Mail
 #+begin_src emacs-lisp
-  (require 'emacs-mail)
+  (when (not my-ec/at-ti)
+    (require 'emacs-mail))
 #+end_src
 * Ace jump
 #+BEGIN_SRC emacs-lisp

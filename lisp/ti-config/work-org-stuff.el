@@ -582,6 +582,12 @@
            :target
            (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
                           "#+title: ${title}\n"
+                          ("Journal" "%<%b %d, %Y>")))
+          ("J" "Journal with source" entry "* %<%H:%M> %?\n:PROPERTIES:\n:LOCATION: %a\n:END:"
+           :unnarrowed t
+           :target
+           (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
+                          "#+title: ${title}\n"
                           ("Journal" "%<%b %d, %Y>")))))
 
   (require 'org-roam-util)
@@ -608,7 +614,7 @@
 
   (require 'my-org-roam-logger)
 
-  (setq my/org-roam-logger-filter-fun nil;; (my/org-roam-filter-by-tag '("Project" "active"))
+  (setq my/org-roam-logger-filter-fun nil ;; (my/org-roam-filter-by-tag '("Project" "active"))
         )
   )
 

@@ -91,8 +91,7 @@
 (defun ll/prompt-test-action (file action)
   ;; TODO: assumed build-dir constant, should take as argument and prompt
   ;; further up
-  (let* ((dir (lls/get-llvm-build-dir))
-         (commands
+  (let* ((commands
           (--> (ll/get-test-run-commands file)
                ;; TODO: assumed that first command will DWIM
                (mapcar #'(lambda (x) (car (split-string x "|"))) it)
@@ -118,9 +117,7 @@
                                                " ")
                                            res)
                              (replace-match
-                              (expand-file-name (match-string 1 res)
-                                                (expand-file-name "bin"
-                                                                  dir))
+                              (lls/prompt-tool (match-string 1 res))
                               nil nil res 1)))
                        it)
                (mapcar #'(lambda (x)

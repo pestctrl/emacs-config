@@ -35,8 +35,10 @@
   (interactive
    (list
     (my/completing-read "build directory" (lls/get-llvm-build-dirs))
-    (progn
-      (split-string (read-string "ninja -j X ") " "))))
+    (-->
+     (completing-read-multiple "ninja -j X "
+                               '("clang"
+                                 "llc")))))
   (let* ((buffer-name (funcall lls/name-llvm-build-buffer directory tools)))
     (compilation-start
      (lls/ninja-build-tools (lls/un-trampify directory) tools)

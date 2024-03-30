@@ -4,7 +4,7 @@
 
 (defvar previous-line nil)
 
-(defun org-cycle-hide-drawers (state)
+(defun my/org-cycle-hide-drawers (state)
   "Re-hide all drawers after a visibility state change."
   (when (and (derived-mode-p 'org-mode)
              (not (memq state '(overview folded contents))))

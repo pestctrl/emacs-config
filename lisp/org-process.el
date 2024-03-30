@@ -161,6 +161,7 @@
            (setf (alist-get category db)
                  (point-marker))
            nil)
+       (recenter)
        (let* ((category-name (ivy-completing-read "Category? " (sort (mapcar #'car db) #'ivy-string<)))
               (category (intern category-name))
               (entry (assoc category db)))

@@ -8,6 +8,33 @@
   (setq webpaste-provider-priority '("ix.io"))
 #+end_src
 
+* Notifications
+#+begin_src emacs-lisp
+  (use-package ednc
+    :config
+    ;; (defun stack-notifications (&optional hide)
+    ;;   (mapconcat (lambda (notification)
+    ;;                (let ((app-name (ednc-notification-app-name notification)))
+    ;;                  (unless (member app-name hide)
+    ;;                    (push app-name hide)
+    ;;                    (ednc-format-notification notification))))
+    ;;              (ednc-notifications) ""))
+    ;; (nconc global-mode-string '((:eval (list-notifications))))
+    ;; (add-hook 'ednc-notification-presentation-functions
+    ;;           (lambda (&rest _) (force-mode-line-update t)))
+
+    (defun show-notification-in-buffer (old new)
+      (let ((name (format "Notification %d" (ednc-notification-id (or old new)))))
+        (with-current-buffer (get-buffer-create name)
+          (if (not new)
+              (kill-buffer)
+            (let ((inhibit-read-only t))
+              (if old (erase-buffer) (ednc-view-mode))
+              (insert (ednc-format-notification new t))
+              (my/display-buffer-in-side-window 'left (current-buffer)))))))
+    (add-hook 'ednc-notification-presentation-functions
+              #'show-notification-in-buffer))
+#+end_src
 * Mail
 #+begin_src emacs-lisp
   (when (not my-ec/at-ti)

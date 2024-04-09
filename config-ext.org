@@ -31,7 +31,11 @@
             (let ((inhibit-read-only t))
               (if old (erase-buffer) (ednc-view-mode))
               (insert (ednc-format-notification new t))
-              (my/display-buffer-in-side-window 'left (current-buffer)))))))
+              (my/display-buffer-in-side-window
+               'bottom
+               (current-buffer)
+               nil
+               '(window-height . 6)))))))
     (add-hook 'ednc-notification-presentation-functions
               #'show-notification-in-buffer))
 #+end_src

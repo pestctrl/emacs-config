@@ -51,7 +51,7 @@
   `(prog1 ,place
      (setf ,place (1+ ,place))))
 
-(defun my/display-buffer-in-side-window (side buffer-or-name &optional slot-override)
+(defun my/display-buffer-in-side-window (side buffer-or-name &optional slot-override &rest params)
   (interactive
    (list (my/emacs-read-side)
          (read-buffer-to-switch "Switch to buffer in side window: ")))
@@ -65,7 +65,8 @@
      `((side . ,side)
        (slot . ,slot)
        (dedicated . t)
-       (window-parameters (no-delete-other-windows . t))))))
+       (window-parameters (no-delete-other-windows . t))
+       ,@params))))
 
 (defun my/find-file-side-window (side filename &optional slot-override)
   (interactive

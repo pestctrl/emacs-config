@@ -409,7 +409,7 @@
 
   ;; dired configuration
   (setq dired-dwim-target t)
-  (setq dired-listing-switches "-al  --group-directories-first --sort=extension")
+  (setq dired-listing-switches "-alh  --group-directories-first --sort=extension")
 
   (when (string-match-p ".*NATIVE_COMP.*" system-configuration-features)
     (require 'dired-native-compile)

@@ -77,7 +77,7 @@
   (defun my/run-ledger-report (arg)
     (interactive "P")
     (let ((fname (my/run-report-get-file-name arg)))
-      (notmuch-mua-mail "benedi.chu@hotmail.com" (if arg "Rent" "Finance Report")
-                        '((From . "bensonchu457@fastmail.com")))
+      (mu4e~compose-mail "benedi.chu@hotmail.com" (if arg "Rent" "Finance Report")
+                         '(("From" . "bensonchu457@fastmail.com")))
       (mml-attach-file fname)))
 #+end_src

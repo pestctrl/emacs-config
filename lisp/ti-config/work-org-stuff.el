@@ -567,6 +567,11 @@
            :target (file+head+olp "%<%Y-%m-%d>.org"
                                   "#+title: %<%Y-%m-%d>\n#+filetags: %<:%Y:%B:>\n"
                                   ("Journal")))
+          ("e" "Exit Interrupt" entry (file "~/org/templates/exit-interrupt.org")
+           :unnarrowed t
+           :target (file+head+olp "%<%Y-%m-%d>.org"
+                                  "#+title: %<%Y-%m-%d>\n#+filetags: %<:%Y:%B:>\n"
+                                  ("Journal")))
           ("s" "Standup" plain "%?"
            :unnarrowed t
            :target (file+head+olp "%<%Y-%m-%d>.org"
@@ -646,6 +651,23 @@
    (expand-file-name it "~/")
    (org-agenda-write it))
   (my/switch-themes))
+
+(defun ti/generate-org-exit-interrupt ()
+  (-->
+   '(
+     "Update org-agenda"
+     "Close Tabs"
+     "Clean Coffee Cup (if used)"
+     )
+   (if (not (string= "Friday" (format-time-string "%A")))
+       it
+     (append
+      it
+      '(
+        "Fill out TICA information"
+        "Close Emacs and Putty"
+        )))
+   ))
 
 (provide 'work-org-stuff)
 ;;; work-org-stuff.el ends here

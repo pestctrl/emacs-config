@@ -52,6 +52,19 @@
            (lls/get-dis-command-fun tmp-file nil))
      " && ")))
 
+(defun ll/read-pass-name (prompt)
+  (completing-read
+   prompt
+   '("pipeliner"
+     "mi-loop-unroll"
+     "machine-scheduler"
+     "twoaddressinstruction"
+     "greedy"
+     "argo-partitioner"
+     "finalize-isel"
+     "early-ifcvt"
+     "early-if-predicator")))
+
 (defun ll/build-clang-command (file action)
   (if (eq action 'output-dis)
       (ll/clang-output-disassemble-command file)
@@ -60,8 +73,8 @@
       (string-join
        (list (lls/get-clang-command-fun compiler file compiler-action)
              (pcase action
-               ('debug (format "-mllvm -debug-only=%s" (read-string "Which pass? ")))
-               ('before-after (let ((pass (read-string "Which pass? ")))
+               ('debug (format "-mllvm -debug-only=%s" (ll/read-pass-name "Which pass? ")))
+               ('before-after (let ((pass (ll/read-pass-name "Which pass? ")))
                                 (format "-mllvm -print-before=%s -mllvm -print-after=%s" pass pass)))
                ('changed "-mllvm -print-before-all"))
              " ")

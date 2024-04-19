@@ -122,5 +122,28 @@
            (add-hook 'compilation-finish-local-sticky
                      #'ll/c-file-sentinel)))))
 
+(defun ll/diff-before-after ()
+  (interactive)
+  (let (b1 e1 b2 e2)
+    (compilation-minor-mode -1)
+    (save-excursion
+      (goto-char (point-min))
+      (re-search-forward "IR Dump Before")
+      (beginning-of-line)
+      (setq b1 (point))
+      (re-search-forward "# End machine code")
+      (end-of-line)
+      (setq e1 (point))
+      (re-search-forward "IR Dump After")
+      (beginning-of-line)
+      (setq b2 (point))
+      (re-search-forward "# End machine code")
+      (end-of-line)
+      (setq e2 (point)))
+
+    (ediff-regions-internal
+     (current-buffer) b1 e1 (current-buffer) b2 e2
+     nil nil nil nil)))
+
 (provide 'act-on-c-file)
 ;;; act-on-c-file.el ends here

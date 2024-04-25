@@ -496,7 +496,7 @@ If REMOVE is non-nil, remove cfmap from other modes."
                 (cond
                  ((eq type 'line)
                   (if (eq (point) (line-end-position))
-                      (insert "|   ")
+                      (insert "|" (make-string arrow-length ? ))
                     (delete-char 1)
                     (if (eq (point) (line-end-position))
                         (insert "|")

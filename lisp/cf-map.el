@@ -449,6 +449,42 @@ If REMOVE is non-nil, remove cfmap from other modes."
   (interactive)
   (cfmap-mode 1))
 
+(defun cfmap-min-available-lane (left-pad line-beg line-end)
+  (let ((lane-available (make-hash-table))
+        (max-lanes 0))
+    (save-excursion
+      (goto-line line-beg)
+      (save-excursion
+        ;; TODO: off-by-one?
+        (dotimes (i (- line-end line-beg))
+          (let* ((columns
+                  (-->
+                   (- (line-end-position)
+                      (line-beginning-position))
+                   (- it left-pad)
+                   (1- it)
+                   (/ it 3))))
+            (when (> columns max-lanes)
+              (setq max-lanes columns)))
+          (forward-line 1)))
+      (dotimes (i max-lanes)
+        (puthash i lane-available t))
+      (save-excursion
+        (dotimes (i (- line-end line-beg))
+          (forward-char (+ 1 left-pad))
+
+          (let ((end (line-end-position))
+                (cur 0))
+            (while (< (point) (line-end-position))
+              (unless (looking-at-p " ")
+                (puthash cur 0 lane-available))
+              (forward-char 3)
+              (cl-incf cur)))))
+      )))
+
+(with-current-buffer (get-buffer "*scratch0*")
+  (cfmap-min-available-lane 3 12 20))
+
 (defun cfmap-draw-arrow (dir start end num left-pad arrow-length)
   (cl-labels ((insert-arrow-part (type)
                 (beginning-of-line)
@@ -460,9 +496,11 @@ If REMOVE is non-nil, remove cfmap from other modes."
                 (cond
                  ((eq type 'line)
                   (if (eq (point) (line-end-position))
-                      (insert "|")
+                      (insert "|   ")
                     (delete-char 1)
-                    (insert "+")))
+                    (if (eq (point) (line-end-position))
+                        (insert "|")
+                      (insert "+"))))
                  ((eq type 'ingress)
                   (insert
                    (concat "+"
@@ -473,13 +511,12 @@ If REMOVE is non-nil, remove cfmap from other modes."
                    (concat "+"
                            (make-string arrow-length ?-))))))
               (my-next-line ()
-                (forward-line
-                 (if (eq dir 'up) -1 1 ))))
-    (when (cfmap-needs-aligning)
-      (setq left-pad
-            arrow-length (+ 2 arrow-length)))
+                (forward-line 1)))
     (goto-line (1+ start))
-    (insert-arrow-part 'egress)
+    (insert-arrow-part
+     (if (eq dir 'up)
+         'ingress
+       'egress))
     (let ((i 0)
           (end (abs (- start end))))
       (while (< i end)
@@ -487,13 +524,16 @@ If REMOVE is non-nil, remove cfmap from other modes."
         (insert-arrow-part 'line)
         (cl-incf i))
       (my-next-line))
-    (insert-arrow-part 'ingress)))
+    (insert-arrow-part
+     (if (eq dir 'up)
+         'egress
+       'ingress))))
 
 (defvar cfmap-test
   '(-1
     (5 . 20)
     (10 . 2)
-    ;; (6 . 11)
+    (1 . 22)
     ;; (22 . 25)
     ))
 
@@ -514,7 +554,7 @@ If REMOVE is non-nil, remove cfmap from other modes."
               start end direction)
           (if (< a b)
               (cfmap-draw-arrow 'down a b 3 (1+ (* counter 3)) (* 3 (- len counter)))
-            (cfmap-draw-arrow 'up a b 3 (1+ (* counter 3)) (* 3 (- len counter))))
+            (cfmap-draw-arrow 'up b a 3 (1+ (* counter 3)) (* 3 (- len counter))))
           )
         (cl-incf counter)))))
 

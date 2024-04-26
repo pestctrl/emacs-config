@@ -285,7 +285,7 @@ cfmap buffer."
   :type '(repeat symbol)
   :group 'cfmap)
 
-(defcustom cfmap-major-modes '(prog-mode)
+(defcustom cfmap-major-modes '(asm-mode)
   "Major modes for which a cfmap should be created.
 This can also be a parent mode like 'prog-mode.
 If nil, a cfmap must be explicitly created for each buffer."
@@ -375,7 +375,7 @@ from `cfmap-major-modes' (excluding the minibuffer)."
 
 (defun cfmap-create-window ()
   ;; TODO: Should be based on max arrow length of the buffer
-  (let ((width 15)
+  (let ((width 114)
 	buffer-window)
     ;; The existing window becomes the cfmap
     (setq buffer-window (split-window-horizontally width))
@@ -428,6 +428,7 @@ If REMOVE is non-nil, remove cfmap from other modes."
   :lighter " MMap"
   (if cfmap-mode
       (progn
+        (olivetti-mode -1)
 	(when (and cfmap-major-modes
 		   (apply 'derived-mode-p cfmap-major-modes))
 	  (unless (cfmap-get-window)
@@ -440,6 +441,7 @@ If REMOVE is non-nil, remove cfmap from other modes."
 	;; Hook into other modes.
 	(cfmap-setup-hooks))
     ;; Turn it off
+    (olivetti-mode 1)
     (cfmap-kill)
     (cfmap-setup-hooks t)))
 
@@ -457,7 +459,10 @@ If REMOVE is non-nil, remove cfmap from other modes."
     ;; (22 . 25)
     ))
 
-;; (cfmap-render-buffer (get-buffer "*scratch0*") cfmap-test)
+;; (cfmap-render-buffer (get-buffer "*scratch0*") '((10 . 1) (2 . 1)))
+;; (cfmap-render-buffer (get-buffer-create "*scratch0*") (cfmap-buffer-to-point-list (find-file-noselect "/tmp/simplify.asm")))
+
+(require 'ti-cfmap)
 
 (defun cfmap-new-cfmap ()
   "Create new cfmap BUFNAME for current buffer and window.
@@ -474,7 +479,7 @@ Re-use already existing cfmap window if possible."
          )
 	(edges (window-pixel-edges)))
     ;; Remember the active buffer currently displayed in the cfmap.
-    (cfmap-render-buffer other-buffer cfmap-test)
+    (cfmap-render-buffer other-buffer (cfmap-buffer-to-point-list currentbuffer))
     (setq cfmap-active-buffer (current-buffer))
     (with-selected-window win
       ;; Now set up the cfmap:
@@ -554,15 +559,28 @@ When FORCE, enforce update of the active region."
 	(cfmap-update-current-buffer force)
       ;; We have entered a buffer for which no cfmap should be
       ;; displayed. Check if we should de
-      (when (and (cfmap-get-window)
-		 (cfmap-need-to-delete-window))
-	;; We wait a tiny bit before deleting the window, since we
-	;; might only be temporarily in another buffer.
-	(run-with-timer 0.3 nil
-			(lambda ()
-			  (when (and (null (cfmap-active-current-buffer-p))
-				     (cfmap-get-window))
-			    (delete-window (cfmap-get-window)))))))))
+      (if (and cfmap-major-modes
+	       (apply 'derived-mode-p cfmap-major-modes))
+	  (progn
+	    ;; Create window if necessary...
+	    (unless (cfmap-get-window)
+	      (cfmap-create-window))
+	    ;; ...and re-create cfmap with new buffer...
+	    (cfmap-new-cfmap)
+	    ;; Redisplay
+	    (sit-for 0)
+	    ;; ...and call update again.
+	    (cfmap-update t))
+
+        (when (and (cfmap-get-window)
+		   (cfmap-need-to-delete-window))
+	  ;; We wait a tiny bit before deleting the window, since we
+	  ;; might only be temporarily in another buffer.
+	  (run-with-timer 0.3 nil
+			  (lambda ()
+			    (when (and (null (cfmap-active-current-buffer-p))
+				       (cfmap-get-window))
+			      (delete-window (cfmap-get-window))))))))))
 
 (defun cfmap-need-to-delete-window ()
   "Check if we should delete the cfmap window.

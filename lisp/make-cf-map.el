@@ -24,15 +24,6 @@
 
 ;;; Code:
 
-(defvar cfmap-test
-  '((5 . 11)
-    (7 . 3)
-    (15 . 18)
-    (2 . 22)
-    (24 . 30)
-    ;; (22 . 25)
-    ))
-
 (defun cfmap--point-inside (p r)
   (and
    (< (car r) p)
@@ -49,90 +40,102 @@
    (cfmap--point-inside (cdr r2) r1)
    (cfmap--inside r1 r2)))
 
-(progn
-  (defun cfmap-transform (cfmap)
-    (let ((new-list))
-      (dolist (l cfmap)
-        (let ((a (car l))
-              (b (cdr l)))
-          (push (if (< a b)
-                    (cons 'down
-                          (cons a b))
-                  (cons 'up
-                        (cons b a)))
-                new-list)))
-      (sort new-list
-            (lambda (x y)
-              (let ((size1 (/ (abs (- (cadr x) (cddr x))) 5))
-                    (size2 (/ (abs (- (cadr y) (cddr y))) 5)))
-                (if (not (= size1 size2))
-                    (< size1 size2)
-                  (< (cadr x) (cadr y))))))))
+(defun cfmap-transform (cfmap)
+  (let ((new-list))
+    (dolist (l cfmap)
+      (let ((a (car l))
+            (b (cdr l)))
+        (push (if (< a b)
+                  (cons 'down
+                        (cons a b))
+                (cons 'up
+                      (cons b a)))
+              new-list)))
+    (sort new-list
+          (lambda (x y)
+            (let ((size1 (/ (abs (- (cadr x) (cddr x))) 5))
+                  (size2 (/ (abs (- (cadr y) (cddr y))) 5)))
+              (if (not (= size1 size2))
+                  (< size1 size2)
+                (< (cadr x) (cadr y))))))))
 
-  (defvar cfmap-transformed (cfmap-transform cfmap-test)))
+(defvar cfmap-transformed (cfmap-transform cfmap-test))
 
 (defun cfmap-draw-arrow (dir start end arrow-length)
-  (cl-labels ((insert-arrow-part (type &optional end)
+  (cl-labels ((insert-arrow-part (type num &optional end)
                 (beginning-of-line)
                 (if (eq type 'line)
-                 (progn
-                   (unless (looking-at-p "\n")
-                     (delete-forward-char 1))
-                   (insert "│"))
-                 (let ((intersect (if end "└" "┌")))
-                   (cond
-                    ((eq type 'ingress)
-                     (if (eq (point) (line-end-position))
-                         (insert
-                          (concat intersect
-                                  (make-string (1- arrow-length) ?─)
-                                  "►"))
-                       (delete-forward-char 1)
-                       (insert intersect)
-                       (dotimes (i (1- arrow-length))
-                         (let ((char
-                                (if (looking-at-p "│") "┼" "─")))
-                           (unless (looking-at-p "\n")
-                             (delete-forward-char 1))
-                           (insert char)))
-                       (insert "►")))
-                    ((eq type 'egress)
-                     (if (eq (point) (line-end-position))
-                         (insert
-                          (concat intersect
-                                  (make-string arrow-length ?─)))
-                       (delete-forward-char 1)
-                       (insert intersect)
-                       (dotimes (i arrow-length)
-                         (let ((char
-                                (if (looking-at-p "│") "┼" "─")))
-                           (unless (looking-at-p "\n")
-                             (delete-forward-char 1))
-                           (insert char)))))))))
+                    (progn
+                      (unless (looking-at-p "\n")
+                        (delete-forward-char 1))
+                      (insert (if (= num 0)
+                                  (if (eq dir 'up)
+                                      "▲"
+                                    "▼")
+                                "│")))
+                  (let ((intersect (if end "└" "┌")))
+                    (cond
+                     ((eq type 'ingress)
+                      (if (eq (point) (line-end-position))
+                          (insert
+                           (concat intersect
+                                   (make-string (1- arrow-length) ?─)
+                                   "►"))
+                        (delete-forward-char 1)
+                        (insert intersect)
+                        (dotimes (i (1- arrow-length))
+                          (let ((char
+                                 (cond ((looking-at-p (rx (or "│" "┼"))) "┼")
+                                       ((looking-at-p (rx (or "┌" "┬"))) "┬")
+                                       ((looking-at-p (rx (or "└" "┴"))) "┴")
+                                       (t "─"))))
+                            (unless (looking-at-p "\n")
+                              (delete-forward-char 1))
+                            (insert char)))
+                        (unless (looking-at-p "\n")
+                          (delete-forward-char 1))
+                        (insert "►")))
+                     ((eq type 'egress)
+                      (if (eq (point) (line-end-position))
+                          (insert
+                           (concat intersect
+                                   (make-string arrow-length ?─)))
+                        (delete-forward-char 1)
+                        (insert intersect)
+                        (dotimes (i arrow-length)
+                          (let ((char
+                                 (cond ((looking-at-p "│") "┼")
+                                       ((looking-at-p "┌") "┬")
+                                       ((looking-at-p "└") "┴")
+                                       (t "─"))))
+                            (unless (looking-at-p "\n")
+                              (delete-forward-char 1))
+                            (insert char)))))))))
               (my-next-line ()
                 (forward-line 1)))
     (goto-line start)
     (insert-arrow-part
      (if (eq dir 'up)
          'ingress
-       'egress))
+       'egress) 1)
     (let ((i 0)
           (end (1- (abs (- start end)))))
       (while (< i end)
         (my-next-line)
-        (insert-arrow-part 'line)
+        (insert-arrow-part 'line (mod i 5))
         (cl-incf i))
       (my-next-line))
     (insert-arrow-part
      (if (eq dir 'up)
          'egress
        'ingress)
+     1
      t)))
 
 (defun cfmap-render-buffer (buffer cfmap)
   (with-current-buffer buffer
     (erase-buffer)
-    (dotimes (i 637)
+    (dotimes (i 4000)
       (insert "\n"))
     (let* ((remaining (cfmap-transform cfmap))
            (arrow-length 3)
@@ -177,8 +180,6 @@
 
         (setq remaining (reverse new-list)
               arrow-length (+ 2 arrow-length))))))
-
-;; (cfmap-render-buffer (get-buffer "*scratch0*") cfmap-test)
 
 (provide 'make-cf-map)
 ;;; make-cf-map.el ends here

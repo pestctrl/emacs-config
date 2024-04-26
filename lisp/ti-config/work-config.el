@@ -160,13 +160,16 @@
 (use-package realgud-lldb)
 
 ;; Get lldb working
-(setenv "PYTHONPATH"
-        (concat
-         (expand-file-name "~/.local/lib/python3.10/site-packages")
-         path-separator
-         (getenv "PYTHONPATH")
-         path-separator
-         "/usr/lib/llvm-14/lib/python3.10/dist-packages/"))
+(defun lldb-setup-python ()
+  (interactive)
+  (setenv "PYTHONPATH"
+          (concat
+           (expand-file-name "~/.local/lib/python3.10/site-packages")
+           path-separator
+           (getenv "PYTHONPATH")
+           path-separator
+           "/usr/lib/llvm-14/lib/python3.10/dist-packages/")))
+(lldb-setup-python)
 
 ;; (defun my/patch-pythonpath (orig &rest args)
 ;;   (let* ((penv

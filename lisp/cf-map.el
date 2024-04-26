@@ -468,20 +468,26 @@ If REMOVE is non-nil, remove cfmap from other modes."
   "Create new cfmap BUFNAME for current buffer and window.
 Re-use already existing cfmap window if possible."
   (interactive)
-  (let ((currentbuffer (current-buffer))
-	(win (cfmap-get-window))
-        (line-numbers (count-lines (point-min) (point-max)))
-	;; (indbuf (make-indirect-buffer (current-buffer)
-	;; 			      (concat cfmap-buffer-name "_temp"))
-        ;;         )
-        (other-buffer
-         (get-buffer-create (concat cfmap-buffer-name "_other"))
-         )
-	(edges (window-pixel-edges)))
+  (let* ((currentbuffer (current-buffer))
+	 (win (cfmap-get-window))
+         (line-numbers (count-lines (point-min) (point-max)))
+	 ;; (indbuf (make-indirect-buffer (current-buffer)
+	 ;; 			      (concat cfmap-buffer-name "_temp"))
+         ;;         )
+         (other-buffer
+          (get-buffer-create (concat cfmap-buffer-name "-" (buffer-name))))
+         (buffer-width (with-current-buffer other-buffer
+                         cfmap-width))
+	 (edges (window-pixel-edges)))
     ;; Remember the active buffer currently displayed in the cfmap.
-    (cfmap-render-buffer other-buffer (cfmap-buffer-to-point-list currentbuffer))
+    (unless buffer-width
+      (cfmap-render-buffer other-buffer (cfmap-buffer-to-point-list currentbuffer))
+      (setq buffer-width
+            (with-current-buffer other-buffer
+              cfmap-width)))
     (setq cfmap-active-buffer (current-buffer))
     (with-selected-window win
+      (window-resize win (1+ (- buffer-width (window-width))) t)
       ;; Now set up the cfmap:
       (when (window-dedicated-p)
 	(set-window-dedicated-p nil nil))

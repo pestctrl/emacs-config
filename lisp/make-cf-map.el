@@ -24,6 +24,9 @@
 
 ;;; Code:
 
+(defvar cfmap-width nil)
+(make-variable-buffer-local 'cfmap-width)
+
 (defun cfmap--point-inside (p r)
   (and
    (< (car r) p)
@@ -179,7 +182,8 @@
           (string-rectangle start end "  "))
 
         (setq remaining (reverse new-list)
-              arrow-length (+ 2 arrow-length))))))
+              arrow-length (+ 2 arrow-length)))
+      (setq cfmap-width arrow-length))))
 
 (provide 'make-cf-map)
 ;;; make-cf-map.el ends here

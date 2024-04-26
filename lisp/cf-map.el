@@ -88,6 +88,8 @@
 ;; - Lots of bug fixes.
 
 ;; Silence byte compiler
+(require 'make-cf-map)
+
 (declare-function semantic-active-p "semantic/fw")
 (declare-function semantic-fetch-tags "semantic")
 (declare-function semantic-tag-class "semantic/tag")
@@ -372,15 +374,12 @@ from `cfmap-major-modes' (excluding the minibuffer)."
     (kill-buffer cfmap-buffer-name)))
 
 (defun cfmap-create-window ()
-  (let ((width (round (* (window-width)
-			 cfmap-width-fraction)))
+  ;; TODO: Should be based on max arrow length of the buffer
+  (let ((width 15)
 	buffer-window)
-    (when (< width cfmap-minimum-width)
-      (setq width cfmap-minimum-width))
-
     ;; The existing window becomes the cfmap
     (setq buffer-window (split-window-horizontally width))
-      ;; Restore prev/next buffers in the new window
+    ;; Restore prev/next buffers in the new window
 
     (set-window-next-buffers buffer-window
 			     (window-next-buffers))
@@ -449,89 +448,8 @@ If REMOVE is non-nil, remove cfmap from other modes."
   (interactive)
   (cfmap-mode 1))
 
-(defun cfmap-min-available-lane (left-pad line-beg line-end)
-  (let ((lane-available (make-hash-table))
-        (max-lanes 0))
-    (save-excursion
-      (goto-line line-beg)
-      (save-excursion
-        ;; TODO: off-by-one?
-        (dotimes (i (- line-end line-beg))
-          (let* ((columns
-                  (-->
-                   (- (line-end-position)
-                      (line-beginning-position))
-                   (- it left-pad)
-                   (1- it)
-                   (/ it 3))))
-            (when (> columns max-lanes)
-              (setq max-lanes columns)))
-          (forward-line 1)))
-      (dotimes (i max-lanes)
-        (puthash i lane-available t))
-      (save-excursion
-        (dotimes (i (- line-end line-beg))
-          (forward-char (+ 1 left-pad))
-
-          (let ((end (line-end-position))
-                (cur 0))
-            (while (< (point) (line-end-position))
-              (unless (looking-at-p " ")
-                (puthash cur 0 lane-available))
-              (forward-char 3)
-              (cl-incf cur)))))
-      )))
-
-(with-current-buffer (get-buffer "*scratch0*")
-  (cfmap-min-available-lane 3 12 20))
-
-(defun cfmap-draw-arrow (dir start end num left-pad arrow-length)
-  (cl-labels ((insert-arrow-part (type)
-                (beginning-of-line)
-                (forward-char num)
-                (dotimes (i left-pad)
-                  (if (eq (point) (line-end-position))
-                      (insert " ")
-                    (forward-char 1)))
-                (cond
-                 ((eq type 'line)
-                  (if (eq (point) (line-end-position))
-                      (insert "|" (make-string arrow-length ? ))
-                    (delete-char 1)
-                    (if (not (looking-at-p "|"))
-                        (insert "|")
-                      (insert "+"))))
-                 ((eq type 'ingress)
-                  (insert
-                   (concat "+"
-                           (make-string (1- arrow-length) ?-)
-                           ">")))
-                 ((eq type 'egress)
-                  (insert
-                   (concat "+"
-                           (make-string arrow-length ?-))))))
-              (my-next-line ()
-                (forward-line 1)))
-    (goto-line start)
-    (insert-arrow-part
-     (if (eq dir 'up)
-         'ingress
-       'egress))
-    (let ((i 0)
-          (end (1- (abs (- start end)))))
-      (while (< i end)
-        (my-next-line)
-        (insert-arrow-part 'line)
-        (cl-incf i))
-      (my-next-line))
-    (insert-arrow-part
-     (if (eq dir 'up)
-         'egress
-       'ingress))))
-
 (defvar cfmap-test
-  '(-1
-    (5 . 11)
+  '((5 . 11)
     (7 . 3)
     (15 . 18)
     (2 . 22)
@@ -539,92 +457,7 @@ If REMOVE is non-nil, remove cfmap from other modes."
     ;; (22 . 25)
     ))
 
-(defun cfmap--point-inside (p r)
-  (and
-   (< (car r) p)
-   (< p (cdr r))))
-
-(defun cfmap--inside (r1 r2)
-  (and
-   (cfmap--point-inside (car r1) r2)
-   (cfmap--point-inside (cdr r1) r2)))
-
-(defun cfmap-overlapping (r1 r2)
-  (or
-   (cfmap--point-inside (car r2) r1)
-   (cfmap--point-inside (cdr r2) r1)
-   (cfmap--inside r1 r2)))
-
-(defun cfmap-regionify (list)
-  (let ((points (sort (cdr cfmap-test)
-                      (lambda (x y)
-                        (< (car x) (car y)))))
-        (remaining list)
-        regions
-        cur-region)
-    (labels ((make-one-region
-              ()
-              (let ((region-over nil)
-                    (depth 0)
-                    the-region super-region
-                    sub-regions)
-                (while (and (not region-over)
-                            (not (zerop (length remaining))))
-                  (let* ((curr-region (car remaining))
-                         (curr-start (car curr-region))
-                         (curr-end (cdr curr-region)))
-                    (cond
-                     ((not super-region)
-                      (push curr-region the-region)
-                      (setq super-region (copy-tree curr-region)
-                            remaining (cdr remaining)))
-                     ((not (cfmap-overlapping super-region curr-region))
-                      ;; Region is officially over
-                      (setq region-over t))
-                     ((not (cfmap--inside curr-region super-region))
-                      ;; Extend current region
-                      (push curr-region the-region)
-                      (setcdr super-region curr-end)
-                      (setq remaining (cdr remaining)))
-                     (t
-                      (push (make-one-region) sub-regions)))))
-                (list :region (reverse the-region)
-                      :subregions (reverse sub-regions)))))
-      (while (not (zerop (length remaining)))
-        (push (make-one-region) regions))
-      )
-    regions))
-
-(defun cfmap-max-live (region)
-  )
-
-;; (cfmap-regionify cfmap-test)
-
-(defvar cfmap-arrow-depth 0)
-
-(progn
-  (with-current-buffer (get-buffer "*scratch0*")
-    (setq cfmap-arrow-depth 3)
-    (erase-buffer)
-    ;; (dotimes (i 637)
-    ;;   (insert (format "%3d" i) "\n"))
-    (dotimes (i 637)
-      (insert "\n"))
-    (let* ((lines (reverse (cdr cfmap-test)))
-           (len (length lines))
-           (counter 0))
-      (dolist (l lines)
-        (let ((a (car l))
-              (b (cdr l))
-              start end direction)
-          (if (< a b)
-              (cfmap-draw-arrow 'down a b 0 (* counter 3) (* 3 (- len counter)))
-            (cfmap-draw-arrow 'up b a 0 (* counter 3) (* 3 (- len counter))))
-          )
-        (cl-incf counter)))))
-
-(defun render-cfmap-alist (alist buffer)
-  )
+;; (cfmap-render-buffer (get-buffer "*scratch0*") cfmap-test)
 
 (defun cfmap-new-cfmap ()
   "Create new cfmap BUFNAME for current buffer and window.
@@ -636,12 +469,12 @@ Re-use already existing cfmap window if possible."
 	;; (indbuf (make-indirect-buffer (current-buffer)
 	;; 			      (concat cfmap-buffer-name "_temp"))
         ;;         )
-        (other-buffer (get-buffer-create (concat cfmap-buffer-name "_other")))
+        (other-buffer
+         (get-buffer-create (concat cfmap-buffer-name "_other"))
+         )
 	(edges (window-pixel-edges)))
-    (with-current-buffer other-buffer
-      (dotimes (i line-numbers)
-        (insert (number-to-string i) "\n")))
     ;; Remember the active buffer currently displayed in the cfmap.
+    (cfmap-render-buffer other-buffer cfmap-test)
     (setq cfmap-active-buffer (current-buffer))
     (with-selected-window win
       ;; Now set up the cfmap:
@@ -742,7 +575,8 @@ This depends on `cfmap-automatically-delete-window'."
   "Update cfmap for the current buffer."
   (let* ((win (cfmap-get-window))
 	 (start (window-start))
-         (line-number (line-number-at-pos start))
+         (line-number-start (line-number-at-pos start))
+         (line-number-point (line-number-at-pos (point)))
 	 (pt (point)))
     (when (and (null win)
 	       cfmap-recreate-window)
@@ -762,15 +596,15 @@ This depends on `cfmap-automatically-delete-window'."
       (let ((line-point
              (save-excursion
                (goto-char (point-min))
-               (forward-line (1- line-number))
+               (forward-line (1- line-number-start))
                (point))))
         (set-window-start nil line-point))
       (goto-char pt)
       (beginning-of-line)
       (when cfmap-highlight-line
-	(cfmap-highlight-line)))))
+	(cfmap-highlight-line line-number-point)))))
 
-(defun cfmap-highlight-line ()
+(defun cfmap-highlight-line (linum)
   "Highlight current line in the cfmap."
   (unless cfmap-line-overlay
     (setq cfmap-line-overlay (make-overlay (point) (1+ (point)) nil t))
@@ -779,7 +613,11 @@ This depends on `cfmap-automatically-delete-window'."
    cfmap-line-overlay 'face
    `(:background ,(face-background 'cfmap-current-line-face)
 		 :foreground ,(face-foreground 'cfmap-current-line-face)))
-  (move-overlay cfmap-line-overlay (point) (line-beginning-position 2)))
+  (save-excursion
+    (goto-line linum)
+    (let ((beg (line-beginning-position))
+          (end (line-end-position)))
+      (move-overlay cfmap-line-overlay beg (1+ end)))))
 
 ;;; Overlay movement
 

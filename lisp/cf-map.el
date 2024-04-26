@@ -498,7 +498,7 @@ If REMOVE is non-nil, remove cfmap from other modes."
                   (if (eq (point) (line-end-position))
                       (insert "|" (make-string arrow-length ? ))
                     (delete-char 1)
-                    (if (eq (point) (line-end-position))
+                    (if (not (looking-at-p "|"))
                         (insert "|")
                       (insert "+"))))
                  ((eq type 'ingress)
@@ -512,13 +512,13 @@ If REMOVE is non-nil, remove cfmap from other modes."
                            (make-string arrow-length ?-))))))
               (my-next-line ()
                 (forward-line 1)))
-    (goto-line (1+ start))
+    (goto-line start)
     (insert-arrow-part
      (if (eq dir 'up)
          'ingress
        'egress))
     (let ((i 0)
-          (end (abs (- start end))))
+          (end (1- (abs (- start end)))))
       (while (< i end)
         (my-next-line)
         (insert-arrow-part 'line)
@@ -531,11 +531,74 @@ If REMOVE is non-nil, remove cfmap from other modes."
 
 (defvar cfmap-test
   '(-1
-    (5 . 20)
-    (10 . 2)
-    (1 . 22)
+    (5 . 11)
+    (7 . 3)
+    (15 . 18)
+    (2 . 22)
+    (24 . 30)
     ;; (22 . 25)
     ))
+
+(defun cfmap--point-inside (p r)
+  (and
+   (< (car r) p)
+   (< p (cdr r))))
+
+(defun cfmap--inside (r1 r2)
+  (and
+   (cfmap--point-inside (car r1) r2)
+   (cfmap--point-inside (cdr r1) r2)))
+
+(defun cfmap-overlapping (r1 r2)
+  (or
+   (cfmap--point-inside (car r2) r1)
+   (cfmap--point-inside (cdr r2) r1)
+   (cfmap--inside r1 r2)))
+
+(defun cfmap-regionify (list)
+  (let ((points (sort (cdr cfmap-test)
+                      (lambda (x y)
+                        (< (car x) (car y)))))
+        (remaining list)
+        regions
+        cur-region)
+    (labels ((make-one-region
+              ()
+              (let ((region-over nil)
+                    (depth 0)
+                    the-region super-region
+                    sub-regions)
+                (while (and (not region-over)
+                            (not (zerop (length remaining))))
+                  (let* ((curr-region (car remaining))
+                         (curr-start (car curr-region))
+                         (curr-end (cdr curr-region)))
+                    (cond
+                     ((not super-region)
+                      (push curr-region the-region)
+                      (setq super-region (copy-tree curr-region)
+                            remaining (cdr remaining)))
+                     ((not (cfmap-overlapping super-region curr-region))
+                      ;; Region is officially over
+                      (setq region-over t))
+                     ((not (cfmap--inside curr-region super-region))
+                      ;; Extend current region
+                      (push curr-region the-region)
+                      (setcdr super-region curr-end)
+                      (setq remaining (cdr remaining)))
+                     (t
+                      (push (make-one-region) sub-regions)))))
+                (list :region (reverse the-region)
+                      :subregions (reverse sub-regions)))))
+      (while (not (zerop (length remaining)))
+        (push (make-one-region) regions))
+      )
+    regions))
+
+(defun cfmap-max-live (region)
+  )
+
+;; (cfmap-regionify cfmap-test)
 
 (defvar cfmap-arrow-depth 0)
 
@@ -543,8 +606,10 @@ If REMOVE is non-nil, remove cfmap from other modes."
   (with-current-buffer (get-buffer "*scratch0*")
     (setq cfmap-arrow-depth 3)
     (erase-buffer)
+    ;; (dotimes (i 637)
+    ;;   (insert (format "%3d" i) "\n"))
     (dotimes (i 637)
-      (insert (format "%3d" i) "\n"))
+      (insert "\n"))
     (let* ((lines (reverse (cdr cfmap-test)))
            (len (length lines))
            (counter 0))
@@ -553,8 +618,8 @@ If REMOVE is non-nil, remove cfmap from other modes."
               (b (cdr l))
               start end direction)
           (if (< a b)
-              (cfmap-draw-arrow 'down a b 3 (1+ (* counter 3)) (* 3 (- len counter)))
-            (cfmap-draw-arrow 'up b a 3 (1+ (* counter 3)) (* 3 (- len counter))))
+              (cfmap-draw-arrow 'down a b 0 (* counter 3) (* 3 (- len counter)))
+            (cfmap-draw-arrow 'up b a 0 (* counter 3) (* 3 (- len counter))))
           )
         (cl-incf counter)))))
 

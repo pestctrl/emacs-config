@@ -91,7 +91,8 @@
 (defun ll/prompt-test-action (file action)
   ;; TODO: assumed build-dir constant, should take as argument and prompt
   ;; further up
-  (let* ((commands
+  (let* ((lookups (make-hash-table :test #'equal))
+         (commands
           (--> (ll/get-test-run-commands file)
                ;; TODO: assumed that first command will DWIM
                (mapcar #'(lambda (x) (car (split-string x "|"))) it)
@@ -116,9 +117,13 @@
                                                (group (or "clang" "llc"))
                                                " ")
                                            res)
-                             (replace-match
-                              (lls/prompt-tool (match-string 1 res))
-                              nil nil res 1)))
+                             (let* ((tool (match-string 1 res))
+                                    (resolved
+                                     (save-match-data
+                                       (or (gethash tool lookups)
+                                           (aprog1 (lls/prompt-tool tool)
+                                             (puthash tool it lookups))))))
+                               (replace-match resolved nil nil res 1))))
                        it)
                (mapcar #'(lambda (x)
                            (string-replace "%s" file x))

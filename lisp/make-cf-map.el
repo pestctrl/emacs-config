@@ -62,7 +62,7 @@
                   (< size1 size2)
                 (< (cadr x) (cadr y))))))))
 
-(defvar cfmap-transformed (cfmap-transform cfmap-test))
+;; (defvar cfmap-transformed (cfmap-transform cfmap-test))
 
 (defface cfmap-face1
   `((t ,(list

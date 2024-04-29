@@ -412,11 +412,12 @@ If REMOVE is non-nil, remove cfmap from other modes."
 	(remove-hook 'hs-show-hook 'cfmap-sync-overlays)
 	(remove-hook 'flycheck-after-syntax-check-hook 'cfmap-sync-overlays))
     ;; outline-(minor-)mode
-    (add-hook 'outline-view-change-hook 'cfmap-sync-overlays)
-    ;; hideshow
-    (add-hook 'hs-hide-hook 'cfmap-sync-overlays)
-    (add-hook 'hs-show-hook 'cfmap-sync-overlays)
-    (add-hook 'flycheck-after-syntax-check-hook 'cfmap-sync-overlays)))
+    ;; (add-hook 'outline-view-change-hook 'cfmap-sync-overlays)
+    ;; ;; hideshow
+    ;; (add-hook 'hs-hide-hook 'cfmap-sync-overlays)
+    ;; (add-hook 'hs-show-hook 'cfmap-sync-overlays)
+    ;; (add-hook 'flycheck-after-syntax-check-hook 'cfmap-sync-overlays)
+    ))
 
 ;;; Cfmap creation / killing
 
@@ -450,14 +451,14 @@ If REMOVE is non-nil, remove cfmap from other modes."
   (interactive)
   (cfmap-mode 1))
 
-(defvar cfmap-test
-  '((5 . 11)
-    (7 . 3)
-    (15 . 18)
-    (2 . 22)
-    (24 . 30)
-    ;; (22 . 25)
-    ))
+;; (defvar cfmap-test
+;;   '((5 . 11)
+;;     (7 . 3)
+;;     (15 . 18)
+;;     (2 . 22)
+;;     (24 . 30)
+;;     ;; (22 . 25)
+;;     ))
 
 ;; (cfmap-render-buffer (get-buffer "*scratch0*") '((10 . 1) (2 . 1)))
 ;; (cfmap-render-buffer (get-buffer-create "*scratch0*") (cfmap-buffer-to-point-list (find-file-noselect "/tmp/simplify.asm")))

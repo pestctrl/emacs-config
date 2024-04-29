@@ -94,12 +94,19 @@
          :foreground "#FFED18")))
   nil)
 
+(defface cfmap-face6
+  `((t ,(list
+         :inherit 'default
+         :foreground "white")))
+  nil)
+
 (defvar cfmap-faces
   '(cfmap-face1
     cfmap-face2
     cfmap-face3
     cfmap-face4
-    cfmap-face5))
+    cfmap-face5
+    cfmap-face6))
 
 (defun cfmap-draw-arrow (dir start end arrow-length)
   (let ((arrow-face (nth (mod (/ (1- arrow-length) 2)

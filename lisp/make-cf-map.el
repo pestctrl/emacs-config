@@ -126,7 +126,11 @@
                                            "▲"
                                          "▼")
                                      "│")))
-                    (let ((intersect (if end "└" "┌")))
+                    (let ((intersect
+                           (if (or (and end (looking-at-p "┌"))
+                                   (and (not end) (looking-at-p "└")))
+                               "├"
+                             (if end "└" "┌"))))
                       (cond
                        ((eq type 'ingress)
                         (if (eq (point) (line-end-position))

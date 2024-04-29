@@ -227,16 +227,24 @@
 
         (overwrite-mode -1)
 
-        (let ((start (save-excursion
-                       (goto-line super-start)
-                       (line-beginning-position)))
-              (end (save-excursion
-                     (goto-line super-end)
-                     (line-beginning-position))))
-          (string-rectangle start end "  "))
-
         (setq remaining (reverse new-list)
-              arrow-length (+ 2 arrow-length)))
+              arrow-length (+ 2 arrow-length))
+
+        (when (not (zerop (length remaining)))
+          (let ((start (save-excursion
+                         (goto-line super-start)
+                         (line-beginning-position)))
+                (end (save-excursion
+                       (goto-line super-end)
+                       (line-beginning-position))))
+            (string-rectangle start end "  "))))
+      (let ((start (save-excursion
+                     (goto-line super-start)
+                     (line-beginning-position)))
+            (end (save-excursion
+                   (goto-line super-end)
+                   (line-beginning-position))))
+        (string-rectangle start end " "))
       (setq cfmap-width arrow-length))))
 
 (provide 'make-cf-map)

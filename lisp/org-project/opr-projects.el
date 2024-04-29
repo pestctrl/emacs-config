@@ -55,14 +55,14 @@
         'stuck
       'active)))
 
-(defun seq-status? ()
+(defun seq-status? (&optional seek-active)
   (if (olc/any-todo-children?
         (or (member (opr/type-of-task) '(active))
-            (eq 'active (opr/type-of-project))))
+            (eq 'active (opr/type-of-project seek-active))))
       'active
     (if (olc/any-todo-children?
           (or (eq 'wait (opr/type-of-task))
-              (eq 'invis (opr/type-of-project))))
+              (eq 'invis (opr/type-of-project seek-active))))
       'invis
       'stuck)))
 
@@ -114,7 +114,7 @@
                  (t
                   (let ((status (pcase state
                                   ("EMPTY" (empty-status?))
-                                  ("SEQ" (seq-status?))
+                                  ("SEQ" (seq-status? greedy-active))
                                   ("META" (meta-status? greedy-active))
                                   ("ONE" (when (eq 'project (opr/ambiguous-task-or-project))
                                            (seq-status?)))

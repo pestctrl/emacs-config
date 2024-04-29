@@ -375,7 +375,7 @@ from `cfmap-major-modes' (excluding the minibuffer)."
 
 (defun cfmap-create-window ()
   ;; TODO: Should be based on max arrow length of the buffer
-  (let ((width 114)
+  (let ((width 2)
 	buffer-window)
     ;; The existing window becomes the cfmap
     (setq buffer-window (split-window-horizontally width))

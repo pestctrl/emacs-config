@@ -42,7 +42,7 @@
 
 (defclass llvm-config ()
   ((root-dir :initarg :root-dir :type string)
-   (build-dirs :initarg :build-dirs :type list)
+   (build-dirs-fun :initarg :build-dirs-fun :type function)
    (build-release-dir :initarg :build-release-dir :type string)
    (build-debug-dir :initarg :build-debug-dir :type string)
    (target :initarg :target :type string)
@@ -51,8 +51,6 @@
    (dis-command-fun :initarg :dc :type function :initform (lambda ()))
    (llc-command-fun :initarg :llc :type function :initform (lambda ()))
    (tramp-connection :initarg :tramp :type list :initform nil)
-   ;; Cached compilation command options
-   (target-clang-opts :initarg :clang-opts :initform nil)
    ;; Target + CPU -> compilation command options
    (target-clang-opts-fun :initarg :clang-opts-fun :type function :initform (lambda ()))
    (aux-props :initarg :aux-props :type list :initform nil)))
@@ -123,14 +121,7 @@
                                     (mapcar #'(lambda (x) (alist-get 'name x)))
                                     (remove-if-not #'(lambda (x) (lls/get-llvm-config x)))))))
              (lls/get-llvm-config tab-name))))
-    (aprog1 (funcall lls/target-init-fun)
-      (setf (slot-value it 'build-dirs)
-            (let ((r (rx (or "RelWithAsserts" "Release"))))
-              (sort (slot-value it 'build-dirs)
-                    #'(lambda (x y)
-                        (cond ((string-match-p r y) nil)
-                              ((string-match-p r x) t)
-                              (t (string< x y))))))))))
+    (funcall lls/target-init-fun)))
   (load-llvm-mode (lls/conf-get 'root-dir))
   (message "llvm-lib initialize!"))
 
@@ -177,7 +168,7 @@
 
 (defun lls/get-llvm-build-dirs ()
   (lls/ensure-initialized)
-  (lls/conf-get 'build-dirs))
+  (funcall (lls/conf-get 'build-dirs-fun)))
 
 (defun lls/get-llvm-bin-dir ()
   (car (lls/get-llvm-bin-dirs)))
@@ -199,13 +190,9 @@
                 (cons dir
                       (lls/conf-get 'build-dirs))))
 
-(defun lls/get-clang-options ()
-  (lls/get-cached-value 'target-clang-opts (lls/conf-get 'target-clang-opts-fun)))
-
-(defun lls/swap-clang-options ()
-  (interactive)
-  (lls/conf-set 'target-clang-opts
-                (funcall (lls/conf-get 'target-clang-opts-fun))))
+(defun lls/get-clang-options (&optional file compiler)
+  (funcall (lls/conf-get 'target-clang-opts-fun)
+           :compiler compiler :filename file))
 
 ;; =============================== Misc ==============================
 
@@ -276,28 +263,29 @@
   (concat "llvm-objdump --disassemble "
           file " "))
 
-(setq lls/target-init-fun
-      ;; TODO: load llvm-mode
-      (lambda ()
-        (let ((root-dir (lls/guess-root-dir-fun))
-              tramp-conn)
-          (when (tramp-tramp-file-p root-dir)
-            (with-parsed-tramp-file-name root-dir nil
-              (setf tramp-conn v)))
-          (make-instance
-           'llvm-config
-           :tramp tramp-conn
-           :root-dir root-dir
-           :build-dirs (lls/guess-build-dirs-fun root-dir)
-           :target (completing-read "Which target? " '("X86" "ARM"))
-           :bin-dirs (list
-                      (--> "/usr/bin/"
-                           (if (not tramp-conn) it
-                             (tramp-make-tramp-file-name tramp-conn it))))
-           :cc #'lls/default-comp-fun
-           :dc #'lls/default-dis-comm
-           :llc #'lls/default-llc-comm
-           :clang-opts-fun #'lls/default-clang-opts))))
+(when (not lls/target-init-fun)
+  (setq lls/target-init-fun
+        ;; TODO: load llvm-mode
+        (lambda (&key filename compiler)
+          (let ((root-dir (lls/guess-root-dir-fun))
+                tramp-conn)
+            (when (tramp-tramp-file-p root-dir)
+              (with-parsed-tramp-file-name root-dir nil
+                (setf tramp-conn v)))
+            (make-instance
+             'llvm-config
+             :tramp tramp-conn
+             :root-dir root-dir
+             :build-dirs (lls/guess-build-dirs-fun root-dir)
+             :target (completing-read "Which target? " '("X86" "ARM"))
+             :bin-dirs (list
+                        (--> "/usr/bin/"
+                             (if (not tramp-conn) it
+                               (tramp-make-tramp-file-name tramp-conn it))))
+             :cc #'lls/default-comp-fun
+             :dc #'lls/default-dis-comm
+             :llc #'lls/default-llc-comm
+             :clang-opts-fun #'lls/default-clang-opts)))))
 
 (defun lls/guess-root-dir-fun ()
   (if (-->

@@ -38,7 +38,6 @@
 (define-key *llvm-map* (kbd "M-w") #'ll/kill-gdb-command)
 (define-key *llvm-map* (kbd "i") #'ll/prompt-for-instr-info)
 (define-key *llvm-map* (kbd "I") #'lls/initialize)
-(define-key *llvm-map* (kbd "o") #'lls/swap-clang-options)
 (define-key *llvm-map* (kbd "t") #'ll/jump-to-tablegen)
 
 (provide 'llvm-lib)

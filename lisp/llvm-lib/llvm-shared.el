@@ -42,11 +42,11 @@
 
 (defclass llvm-config ()
   ((root-dir :initarg :root-dir :type string)
+   (bin-dirs-fun :initarg :bin-dirs-fun :type function)
    (build-dirs-fun :initarg :build-dirs-fun :type function)
    (build-release-dir :initarg :build-release-dir :type string)
    (build-debug-dir :initarg :build-debug-dir :type string)
    (target :initarg :target :type string)
-   (bin-dirs :initarg :bin-dirs :type list :initform nil)
    (compile-command-fun :initarg :cc :type function :initform (lambda ()))
    (dis-command-fun :initarg :dc :type function :initform (lambda ()))
    (llc-command-fun :initarg :llc :type function :initform (lambda ()))
@@ -177,7 +177,7 @@
   (lls/ensure-initialized)
   (append (mapcar #'(lambda (x) (expand-file-name "bin" x))
                   (lls/get-llvm-build-dirs))
-          (lls/conf-get 'bin-dirs)))
+          (funcall (lls/conf-get 'bin-dirs-fun))))
 
 (defun lls/get-llvm-build-dir ()
   (car (lls/get-llvm-build-dirs)))

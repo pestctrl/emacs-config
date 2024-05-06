@@ -567,6 +567,11 @@
            :target (file+head+olp "%<%Y-%m-%d>.org"
                                   "#+title: %<%Y-%m-%d>\n#+filetags: %<:%Y:%B:>\n"
                                   ("Journal")))
+          ("e" "Entry Interrupt" entry (file "~/org/templates/entry-interrupt.org")
+           :unnarrowed t
+           :target (file+head+olp "%<%Y-%m-%d>.org"
+                                  "#+title: %<%Y-%m-%d>\n#+filetags: %<:%Y:%B:>\n"
+                                  ("Journal")))
           ("e" "Exit Interrupt" entry (file "~/org/templates/exit-interrupt.org")
            :unnarrowed t
            :target (file+head+olp "%<%Y-%m-%d>.org"

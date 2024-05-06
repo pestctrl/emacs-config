@@ -137,16 +137,19 @@
               (setq projectile-indexing-method 'hybrid)
               (setq projectile-auto-update-cache nil)
               (global-set-key (kbd (if (and (not (daemonp))
-                                                 (null window-system))
-                                            "C-c ."
-                                          "C-c C-."))
-                                   'projectile-command-map))
+                                            (null window-system))
+                                       "C-c ."
+                                     "C-c C-."))
+                              'projectile-command-map))
     :config
     (projectile-mode)
     (add-to-list 'projectile-globally-ignored-directories
                  ".ccls")
 
-    (when (null window-system)
+    (when (and (null window-system)
+               (not (and (boundp 'server-process)
+                         (memq (process-status server-process)
+                               '(connect listen open run)))))
       (define-key c++-mode-map (kbd "C-c .") nil)
       (define-key c++-mode-map (kbd "C-c . .") #'c-set-style)
       (define-key org-mode-map (kbd "C-c .") nil)

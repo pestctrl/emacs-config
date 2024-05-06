@@ -567,7 +567,7 @@
            :target (file+head+olp "%<%Y-%m-%d>.org"
                                   "#+title: %<%Y-%m-%d>\n#+filetags: %<:%Y:%B:>\n"
                                   ("Journal")))
-          ("e" "Entry Interrupt" entry (file "~/org/templates/entry-interrupt.org")
+          ("E" "Entry Interrupt" entry (file "~/org/templates/entry-interrupt.org")
            :unnarrowed t
            :target (file+head+olp "%<%Y-%m-%d>.org"
                                   "#+title: %<%Y-%m-%d>\n#+filetags: %<:%Y:%B:>\n"
@@ -602,31 +602,36 @@
 
   (require 'org-roam-util)
 
-  (defun my/org-roam-find-project ()
-    (interactive)
-    ;; Select a project file to open, creating it if necessary
-    (org-roam-node-find
-     nil
-     nil
-     (my/org-roam-filter-by-tag '("Project" "active"))
-     nil
-     :templates
-     '(("p" "project" plain ""
+  (defvar my/project-templates
+    '(("p" "project" plain ""
         :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
                            "#+title: ${title}: %^{Description}\n#+category: ${title}\n#+filetags: Project active")
         :unnarrowed t)
        ("s" "sandbox" plain ""
         :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
-                           "#+title: ${title}: %^{Description}\n#+category: ${title}\n#+filetags: Project active\n#+PROPERTY: header-args:bash :dir /scratch/benson/sandbox/${title} :results output verbatim :exports results :noweb yes")
-        :unnarrowed t))))
+                           "#+title: ${title}: %^{Description}\n#+category: ${title}\n#+filetags: Project active\n#+PROPERTY: header-args:bash :dir /scratch/benson/sandbox/${title} :results output verbatim :exports results :noweb yes"))))
 
-  (global-set-key (kbd "C-c n p") #'my/org-roam-find-project)
+  (defun my/org-roam-find-projects ()
+    (interactive)
+    ;; Select a project file to open, creating it if necessary
+    (org-roam-node-find nil nil
+                        (my/org-roam-filter-by-tag '("Project"))
+                        nil :templates my/project-templates))
+
+  (defun my/org-roam-find-active-projects ()
+    (interactive)
+    ;; Select a project file to open, creating it if necessary
+    (org-roam-node-find nil nil
+                        (my/org-roam-filter-by-tag '("Project" "active"))
+                        nil :templates my/project-templates))
+
+  (global-set-key (kbd "C-c n p") #'my/org-roam-find-active-projects)
+  (global-set-key (kbd "C-c n p") #'my/org-roam-find-projects)
 
   (require 'my-org-roam-logger)
 
   (setq my/org-roam-logger-filter-fun nil ;; (my/org-roam-filter-by-tag '("Project" "active"))
-        )
-  )
+        ))
 
 (advice-add #'org-agenda-redo
             :around
@@ -673,6 +678,10 @@
         "Close Emacs and Putty"
         )))
    ))
+
+(defun ti/show-jira-items ()
+  (interactive)
+  (shell-command "jira issue list --plain -a'Benson Chu' -s~Closed | grep -v 'Done$'"))
 
 (provide 'work-org-stuff)
 ;;; work-org-stuff.el ends here

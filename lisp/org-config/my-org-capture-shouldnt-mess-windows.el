@@ -45,8 +45,9 @@
     ;; This basically means that we don't change window configurations when
     ;; there are previous buffers to be seen. IDK if this will have unintended
     ;; consequences, because...
-    (when (zerop (length (window-prev-buffers)))
-      (delete-window))
+    (if (zerop (length (window-prev-buffers)))
+        (delete-window)
+      (previous-buffer))
     ;; current-window-configuration will encode a buffer that's about to be
     ;; deleted. I tested it, and it does what I want, so maybe there's no
     ;; problem?

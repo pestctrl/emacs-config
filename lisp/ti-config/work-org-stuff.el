@@ -626,7 +626,7 @@
                         nil :templates my/project-templates))
 
   (global-set-key (kbd "C-c n p") #'my/org-roam-find-active-projects)
-  (global-set-key (kbd "C-c n p") #'my/org-roam-find-projects)
+  (global-set-key (kbd "C-c n P") #'my/org-roam-find-projects)
 
   (require 'my-org-roam-logger)
 
@@ -643,13 +643,8 @@
       (rx (or "prod"
               (and symbol-start "_" (+ nonl) "_" symbol-end))))
 
-(defun org-agenda-dump-for-meeting ()
+(defun my/org-agenda-save ()
   (interactive)
-  (switch-or-create-tab "org-agenda-dump")
-  (let ((ignore-window-parameters t)
-        (window--sides-check t))
-    (delete-other-windows))
-  (org-agenda nil "paw")
   (my/switch-themes)
   (-->
    "%Y-%m-%d-agenda.html"
@@ -661,6 +656,19 @@
    (expand-file-name it "~/")
    (org-agenda-write it))
   (my/switch-themes))
+
+(defun org-agenda-dump-for-meeting ()
+  (interactive)
+  (switch-or-create-tab "org-agenda-dump")
+  (let ((ignore-window-parameters t)
+        (window--sides-check t))
+    (delete-other-windows))
+  (save-window-excursion
+    (org-agenda nil "paw"))
+  (split-window-horizontally)
+  (org-agenda-redo-all)
+  (my/org-agenda-save)
+  (close-tab-switch))
 
 (defun ti/generate-org-exit-interrupt ()
   (-->

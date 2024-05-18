@@ -36,7 +36,8 @@
     (LLVMIR       :key ?l    :major-mode llvm-mode :buffer-string "llvm-ir"            :description "[l]lvm-ir"                :compiler-action llvm-ir)
     (before-after :key ?p    :major-mode llvm-mode :buffer-string "print-before-after" :description "[p]rint before/after"     :compiler-action assemble)
     (changed      :key ?P    :major-mode llvm-mode :buffer-string "print-changed"      :description "[P]rint before/after all" :compiler-action assemble)
-    (executable   :key ?\^M  :major-mode nil       :buffer-string "executable"         :description "[RET]Executable"               :compiler-action executable)))
+    (executable   :key ?\^M  :major-mode nil       :buffer-string "executable"         :description "[RET]Executable"          :compiler-action executable)
+    (diff         :key ?D    :major-mode nil       :buffer-string "diff"               :description "[D]iff"                   :compiler-action assemble)))
 
 (defun ll/ensure-clang-binary-built (dir)
   ;; TODO: assumed build-dir constant, should take as argument and prompt
@@ -109,18 +110,24 @@
 
 (defun ll/act-on-c-file (file)
   (let* ((action (aml/read-action-map ll/c-file-action-map)))
-    (--> (ll/build-clang-command (lls/un-trampify file) action)
-         (compilation-start
-          it
-          (aml/get-map-prop ll/c-file-action-map action :major-mode)
-          (lambda (x)
-            (format "*%s-%s*"
-                    (file-name-nondirectory file)
-                    (aml/get-map-prop ll/c-file-action-map action
-                                      :buffer-string))))
-         (with-current-buffer it
-           (add-hook 'compilation-finish-local-sticky
-                     #'ll/c-file-sentinel)))))
+    (let ((comm (ll/build-clang-command (lls/un-trampify file) action)))
+      (if (eq action 'diff)
+          (let ((second-command (ll/build-clang-command (lls/un-trampify file) action))
+                (pipe (if (y-or-n-p "Diff assembly (y) or debug (n)? ")
+                          ">" "2>")))
+            (when (not
+                   (and (zerop (shell-command (format "%s %s /tmp/old.asm" comm pipe)))
+                        (zerop (shell-command (format "%s %s /tmp/new.asm" second-command pipe)))))
+              (error "One of the commands failed"))
+            (ediff-files "/tmp/old.asm" "/tmp/new.asm"))
+        (compilation-start
+         comm
+         (aml/get-map-prop ll/c-file-action-map action :major-mode)
+         (lambda (x)
+           (format "*%s-%s*"
+                   (file-name-nondirectory file)
+                   (aml/get-map-prop ll/c-file-action-map action
+                                     :buffer-string))))))))
 
 (defun ll/diff-before-after ()
   (interactive)

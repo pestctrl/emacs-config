@@ -141,11 +141,10 @@
 (defun projectile-dont-switch-when-conf-available (x)
   (if-let ((dir (lls/conf-get-safe 'root-dir))
            (tools-dir
-            (progn
-              (string-match (rx line-start
-                                "/scratch"
-                                (group "/benson/tools" (+ (not "/")) "/"))
-                            dir)
+            (when (string-match (rx line-start
+                                    "/scratch"
+                                    (group "/benson/tools" (* (not "/")) "/"))
+                                dir)
               (match-string 1 dir))))
       (remove-if #'(lambda (path)
                      (and (string-match-p (rx "/benson/tools")

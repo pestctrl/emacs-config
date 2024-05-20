@@ -55,7 +55,9 @@
   (let ((session-window (format "%s:%s" "emacs-async" name)))
     (-->
      (list
-      (format "tmux new-window -t \"emacs-async\" ';' rename-window %s" name)
+      (if (member name (ts/existing-windows))
+          (format "tmux send-keys -t %s C-c" session-window)
+        (format "tmux new-window -t \"emacs-async\" ';' rename-window %s" name))
       (format "tmux send-keys -t %s \"%s\" C-m"
               session-window
               command))

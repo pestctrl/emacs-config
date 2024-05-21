@@ -121,7 +121,7 @@
                                     (resolved
                                      (save-match-data
                                        (or (gethash tool lookups)
-                                           (aprog1 (lls/prompt-tool tool)
+                                           (aprog1 (lls/prompt-tool (concat tool "$"))
                                              (puthash tool it lookups))))))
                                (replace-match resolved nil nil res 1))))
                        it)

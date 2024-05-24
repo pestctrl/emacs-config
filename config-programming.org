@@ -147,9 +147,7 @@
                  ".ccls")
 
     (when (and (null window-system)
-               (not (and (boundp 'server-process)
-                         (memq (process-status server-process)
-                               '(connect listen open run)))))
+               (not (daemonp)))
       (define-key c++-mode-map (kbd "C-c .") nil)
       (define-key c++-mode-map (kbd "C-c . .") #'c-set-style)
       (define-key org-mode-map (kbd "C-c .") nil)

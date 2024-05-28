@@ -195,12 +195,13 @@
              my/frozen-time)
            zone))
 
-  (defun my/decode-time (original &optional time zone)
+  (defun my/decode-time (original &optional time zone form)
     (apply original
            (if time
                time
              my/frozen-time)
-           zone))
+           zone
+           form))
 
   ;; Change and freeze time
   (defun za-warudo ()

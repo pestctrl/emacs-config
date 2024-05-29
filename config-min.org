@@ -934,6 +934,14 @@
 
       (define-key vterm-mode-map my/keymap-key nil)
 
+      (defun vterm/delete-to-side (arg)
+        (interactive "P")
+        (if arg
+            (vterm-send "C-u")
+          (vterm-send "C-k")))
+
+      (define-key vterm-mode-map (kbd "C-k") #'vterm/delete-to-side)
+
       (defun get-vterm-buffer (name)
         (if-let (buf (get-buffer name))
             buf

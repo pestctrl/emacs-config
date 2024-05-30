@@ -136,11 +136,11 @@
               (setq projectile-require-project-root t)
               (setq projectile-indexing-method 'hybrid)
               (setq projectile-auto-update-cache nil)
-              (global-set-key (kbd (if (and (not (daemonp))
-                                            (null window-system))
-                                       "C-c ."
-                                     "C-c C-."))
-                              'projectile-command-map))
+              (if (and (not (daemonp))
+                       (null window-system))
+                  (global-set-key "C-c ." 'projectile-command-map)
+                (global-set-key "C-c C-." 'projectile-command-map)
+                (global-set-key (kbd "C-c M-[ emacs-C-.") 'projectile-command-map)))
     :config
     (projectile-mode)
     (add-to-list 'projectile-globally-ignored-directories

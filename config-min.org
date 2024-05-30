@@ -1087,3 +1087,8 @@
           browse-url-browser-function 'browse-url-generic
           search-web-default-browser 'browse-url-generic))
 #+end_src
+* Terminal compatibility
+#+begin_src emacs-lisp
+  (global-set-key (kbd "M-[ emacs-C-SPC") #'set-mark-command)
+  (global-set-key (kbd "M-[ emacs-C-/") #'undo)
+#+end_src

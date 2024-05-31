@@ -126,21 +126,22 @@
 * Projectile
 #+begin_src emacs-lisp
   (use-package projectile
-    :init   (progn
-              (setq projectile-enable-caching t)
-              (setq projectile-git-submodule-command nil)
-              (setq projectile-completion-system 'default)
+    :init
+    (progn
+      (setq projectile-enable-caching t)
+      (setq projectile-git-submodule-command nil)
+      (setq projectile-completion-system 'default)
 
-              ;; (setq counsel-projectile-switch-project-action 'projectile-vc)
-              (setq projectile-switch-project-action 'projectile-dired)
-              (setq projectile-require-project-root t)
-              (setq projectile-indexing-method 'hybrid)
-              (setq projectile-auto-update-cache nil)
-              (if (and (not (daemonp))
-                       (null window-system))
-                  (global-set-key (kbd "C-c M-[ emacs-C-.") 'projectile-command-map)
-                (global-set-key (kbd "C-c C-.") 'projectile-command-map)
-                (global-set-key (kbd "C-c M-[ emacs-C-.") 'projectile-command-map)))
+      ;; (setq counsel-projectile-switch-project-action 'projectile-vc)
+      (setq projectile-switch-project-action 'projectile-dired)
+      (setq projectile-require-project-root t)
+      (setq projectile-indexing-method 'hybrid)
+      (setq projectile-auto-update-cache nil)
+      (if (and (not (daemonp))
+               (null window-system))
+          (global-set-key (kbd "C-c M-[ emacs-C-.") 'projectile-command-map)
+        (global-set-key (kbd "C-c C-.") 'projectile-command-map)
+        (global-set-key (kbd "C-c M-[ emacs-C-.") 'projectile-command-map)))
     :config
     (projectile-mode)
     (add-to-list 'projectile-globally-ignored-directories

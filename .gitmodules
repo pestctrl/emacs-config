@@ -82,3 +82,6 @@
 [submodule "submodule/slime-star"]
 	path = submodule/slime-star
 	url = https://github.com/mmontone/slime-star.git
+[submodule "submodule/term-keys"]
+	path = submodule/term-keys
+	url = https://github.com/CyberShadow/term-keys

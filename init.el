@@ -31,6 +31,7 @@
                              user-emacs-directory)))
       (normal-top-level-add-subdirs-to-load-path))))
 
+(require 'term-compat)
 (require 'emacs-custom-load-or-ask)
 (require 'my-predicates)
 

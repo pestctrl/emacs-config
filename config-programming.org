@@ -138,8 +138,8 @@
               (setq projectile-auto-update-cache nil)
               (if (and (not (daemonp))
                        (null window-system))
-                  (global-set-key "C-c ." 'projectile-command-map)
-                (global-set-key "C-c C-." 'projectile-command-map)
+                  (global-set-key (kbd "C-c .") 'projectile-command-map)
+                (global-set-key (kbd "C-c C-.") 'projectile-command-map)
                 (global-set-key (kbd "C-c M-[ emacs-C-.") 'projectile-command-map)))
     :config
     (projectile-mode)

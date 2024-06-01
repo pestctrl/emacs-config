@@ -24,6 +24,7 @@
 
 ;;; Code:
 (require 'cl-lib)
+
 (if (and (<= 30 emacs-major-version)
          (< 0 emacs-minor-version))
     (message "No longer need this patch, hopefully!")

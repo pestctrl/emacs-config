@@ -26,7 +26,7 @@
 
 (global-set-key (kbd "M-[ emacs-C-SPC") #'set-mark-command)
 (global-set-key (kbd "M-[ emacs-C-/") #'undo)
-
+(global-set-key (kbd "M-[ emacs-C-<backspace>") #'backward-kill-word)
 
 (with-eval-after-load 'org
   (define-key org-mode-map (kbd "C-c M-[ emacs-C-,") #'org-insert-structure-template))

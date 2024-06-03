@@ -221,5 +221,10 @@
             :override
             #'my/elpy-patch)
 
+(add-to-list 'load-path
+             "/usr/local/share/emacs/site-lisp/mu4e")
+
+(require 'mu4e)
+
 (provide 'work-config)
 ;;; work-config.el ends here

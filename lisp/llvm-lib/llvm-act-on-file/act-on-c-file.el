@@ -108,18 +108,22 @@
                     (cdr compilation-arguments)))
         (call-interactively #'recompile)))))
 
+(defun ll/diff-c-on-two-compilations (file )
+  (let ((comm (ll/build-clang-command (lls/un-trampify file) action))
+        (second-command (ll/build-clang-command (lls/un-trampify file) action))
+        (pipe (if (y-or-n-p "Diff assembly (y) or debug (n)? ")
+                  ">" "2>")))
+    (when (not
+           (and (zerop (shell-command (format "%s %s /tmp/old.asm" comm pipe)))
+                (zerop (shell-command (format "%s %s /tmp/new.asm" second-command pipe)))))
+      (error "One of the commands failed"))
+    (ediff-files "/tmp/old.asm" "/tmp/new.asm")))
+
 (defun ll/act-on-c-file (file)
   (let* ((action (aml/read-action-map ll/c-file-action-map)))
-    (let ((comm (ll/build-clang-command (lls/un-trampify file) action)))
-      (if (eq action 'diff)
-          (let ((second-command (ll/build-clang-command (lls/un-trampify file) action))
-                (pipe (if (y-or-n-p "Diff assembly (y) or debug (n)? ")
-                          ">" "2>")))
-            (when (not
-                   (and (zerop (shell-command (format "%s %s /tmp/old.asm" comm pipe)))
-                        (zerop (shell-command (format "%s %s /tmp/new.asm" second-command pipe)))))
-              (error "One of the commands failed"))
-            (ediff-files "/tmp/old.asm" "/tmp/new.asm"))
+    (if (eq action 'diff)
+        (ll/diff-c-on-two-compilations file)
+      (let ((comm (ll/build-clang-command (lls/un-trampify file) action)))
         (compilation-start
          comm
          (aml/get-map-prop ll/c-file-action-map action :major-mode)

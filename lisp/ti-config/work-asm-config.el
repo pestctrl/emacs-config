@@ -76,7 +76,16 @@
     (re-search-backward (rx "<" (+ nonl) ">:")))
   (beginning-of-line))
 
+(defun my/asm-forward-label (arg)
+  (interactive "P")
+  (end-of-line)
+  (if arg
+      (re-search-forward (rx "<" (not "$") (* nonl) ">:"))
+    (re-search-forward (rx "<" (+ nonl) ">:")))
+  (beginning-of-line))
+
 (define-key asm-mode-map (kbd "C-M-a") #'my/asm-back-to-label)
+(define-key asm-mode-map (kbd "C-M-e") #'my/asm-forward-label)
 
 (defface asm-vliw-bar
   `((t ,(list

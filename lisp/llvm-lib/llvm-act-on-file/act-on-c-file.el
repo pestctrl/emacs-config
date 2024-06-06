@@ -72,7 +72,10 @@
     (let ((compiler-action (aml/get-map-prop ll/c-file-action-map action :compiler-action))
           (compiler (lls/prompt-tool "clang$")))
       (string-join
-       (list (lls/get-clang-command-fun compiler file compiler-action)
+       (list (lls/get-clang-command-fun
+              :compiler compiler
+              :file file
+              :action compiler-action)
              (pcase action
                ('debug (format "-mllvm -debug-only=%s" (ll/read-pass-name "Which pass? ")))
                ('before-after (let ((pass (ll/read-pass-name "Which pass? ")))

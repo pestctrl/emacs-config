@@ -189,9 +189,9 @@
                 (cons dir
                       (lls/conf-get 'build-dirs))))
 
-(defun lls/get-clang-options (&optional file compiler)
-  (funcall (lls/conf-get 'target-clang-opts-fun)
-           :compiler compiler :filename file))
+(defun lls/get-clang-options (&rest args)
+  (apply (lls/conf-get 'target-clang-opts-fun)
+         args))
 
 ;; =============================== Misc ==============================
 

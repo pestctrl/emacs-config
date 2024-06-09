@@ -41,7 +41,8 @@
 #+end_src
 * Mail
 #+begin_src emacs-lisp
-  (when (not my-ec/at-ti)
+  (when (and (not my-ec/at-ti)
+             (not my-ec/is-wsl))
     (require 'emacs-mail))
 #+end_src
 * Ace jump

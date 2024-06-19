@@ -64,7 +64,7 @@
            tmp))
        (setq file it)))
     ;; Let further compilation-commands be run over tramp
-    (let ((default-directory (lls/get-llvm-root-dir)))
+    (let ((default-directory (file-name-directory file)))
       (pcase (file-name-extension file)
         ((and _ (guard (ll/is-test-file file)))
          (ll/act-on-test-file file))

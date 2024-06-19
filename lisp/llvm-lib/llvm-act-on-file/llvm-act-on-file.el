@@ -78,6 +78,7 @@
         ("out" (ll/act-on-obj-file file))
         ("tiout" (ll/act-on-obj-file file))
         ("c" (ll/act-on-c-file file))
+        ("inc" (ll/act-on-c-file file))
         ("asm" (ll/act-on-asm-file file))
         ("ll" (ll/act-on-ll-file file))
         (_ (message "Not sure what you'd like me to do with this file"))))))

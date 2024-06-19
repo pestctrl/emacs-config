@@ -545,6 +545,10 @@
 
     (require 'ediff-transition)
 
+    (advice-add #'ediff-quit
+                :after
+                #'tab-bar-close-tab)
+
     (defun ediff-copy-both-to-C ()
       (interactive)
       (ediff-copy-diff ediff-current-difference nil 'C nil

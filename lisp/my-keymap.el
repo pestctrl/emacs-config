@@ -33,6 +33,8 @@
 (exwm-global-set-key (kbd "s-k") (lambda () (interactive) (kill-buffer (current-buffer))))
 (exwm-global-set-key (kbd "M-Q") #'bury-buffer)
 (exwm-global-set-key (kbd "M-o") #'other-window)
+(exwm-global-set-key (kbd "M-p") #'previous-buffer)
+(exwm-global-set-key (kbd "M-n") #'next-buffer)
 (exwm-global-set-key (kbd "s-o") #'org-agenda)
 (exwm-global-set-key (kbd "s-u") #'org-capture)
 ;; (add-to-list 'exwm-input-global-keys

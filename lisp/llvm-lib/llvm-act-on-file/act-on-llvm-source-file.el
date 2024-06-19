@@ -25,7 +25,12 @@
 ;;; Code:
 
 (defun ll/is-llvm-source-file (file)
-  (string-match-p ".*llvm-project.*" file))
+  (string-match-p
+   (rx line-start (+ nonl)
+       "/llvm-project/"
+       (or "llvm" "clang")
+       "/")
+   file))
 
 (defun ll/act-on-llvm-source-file (file)
   (let ((dir (lls/get-llvm-build-dir)))

@@ -256,6 +256,13 @@
       (list "~/org/refile.org"
             "~/org/all.org"))
 
+(defun my/update-org-agenda-files ()
+  (interactive)
+  (setq org-agenda-files
+        (cons "~/org/refile.org"
+              (cons "~/org/all.org"
+                    (my/get-org-roam-files-by-tags '("Project" "active"))))))
+
 (setq org-refile-targets `((nil :maxlevel . 9)
                            (org-agenda-files :maxlevel . 9)))
 
@@ -624,6 +631,52 @@
     (org-roam-node-find nil nil
                         (my/org-roam-filter-by-tag '("Project" "active"))
                         nil :templates my/project-templates))
+
+  (defun my/get-org-roam-files-by-tags (tags)
+    (->>
+     (org-roam-node-list)
+     (remove-if-not (my/org-roam-filter-by-tag tags))
+     (mapcar #'org-roam-node-file)
+     (-uniq)))
+
+  (defun org-agenda-insert-breaks-between (str1 str2)
+    (let ((r (rx line-start
+                 (= 17 nonl)
+                 (not ".")))
+          begin end)
+      (save-excursion
+        (goto-char (point-min))
+        (re-search-forward str1 nil t)
+        (setq begin (point))
+        (re-search-forward str2 nil t)
+        (setq end (point))
+        (save-restriction
+          (narrow-to-region begin end)
+          (goto-char (point-min))
+          (re-search-forward r nil t)
+          (while (re-search-forward r nil t)
+            (beginning-of-line)
+            (insert "  " (make-string (- (window-width) 3) ?-) "\n")
+            (next-line))))))
+
+  (defun org-agenda-break-up-subtrees ()
+    (let ((buffer-read-only nil))
+      (org-agenda-insert-breaks-between
+       "^Stuck Projects"
+       "^Active Projects")
+      (org-agenda-insert-breaks-between
+       "^Active Projects"
+       (rx line-start
+           (or
+            "Monday"
+            "Tuesday"
+            "Wednesday"
+            "Thursday"
+            "Friday"
+            "Saturday"
+            "Sunday")))))
+
+  (add-hook 'org-agenda-finalize-hook #'org-agenda-break-up-subtrees)
 
   (global-set-key (kbd "C-c n p") #'my/org-roam-find-active-projects)
   (global-set-key (kbd "C-c n P") #'my/org-roam-find-projects)

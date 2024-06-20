@@ -604,12 +604,12 @@
 
   (defvar my/project-templates
     '(("p" "project" plain ""
-        :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
-                           "#+title: ${title}: %^{Description}\n#+category: ${title}\n#+filetags: Project active")
-        :unnarrowed t)
-       ("s" "sandbox" plain ""
-        :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
-                           "#+title: ${title}: %^{Description}\n#+category: ${title}\n#+filetags: Project active\n#+PROPERTY: header-args:bash :dir /scratch/benson/sandbox/${title} :results output verbatim :exports results :noweb yes"))))
+       :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                          "#+title: ${title}: %^{Description}\n#+category: ${title}\n#+filetags: Project active")
+       :unnarrowed t)
+      ("s" "sandbox" plain ""
+       :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                          "#+title: ${title}: %^{Description}\n#+category: ${title}\n#+filetags: Project active\n#+PROPERTY: header-args:bash :dir /scratch/benson/sandbox/${title} :results output verbatim :exports results :noweb yes"))))
 
   (defun my/org-roam-find-projects ()
     (interactive)

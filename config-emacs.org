@@ -258,7 +258,7 @@
               (version (match-string 1 version))
               (number (string-to-number
                        (string-replace "." "" version)))
-              ((>= number 241)))
+              ((>= 243 number 241)))
     (fset 'epg-wait-for-status 'ignore))
 #+end_src
 * delete-other-side-windows

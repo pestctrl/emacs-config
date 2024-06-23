@@ -45,7 +45,16 @@
     (setq doom-modeline-project-detection 'project)
 
     (when (not my-ec/at-ti)
-      (setq doom-modeline-height 24)))
+      (setq doom-modeline-height 24))
+
+    (defun my/dont-check-project-samba (orig &rest args)
+      (and (not (string-match-p "^/smb:") default-directory)
+           (apply orig args)))
+
+    (advice-add #'doom-modeline-project-p
+                :around
+                #'my/dont-check-project-samba)
+    )
 
   ;; Modeline display useful information
   (setq global-mode-string '(" "))

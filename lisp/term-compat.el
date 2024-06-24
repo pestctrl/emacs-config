@@ -32,7 +32,8 @@
 (with-eval-after-load 'org
   (define-key org-mode-map (kbd "C-c M-[ emacs-C-,") #'org-insert-structure-template)
   (define-key org-mode-map (kbd "M-[ emacs-C-<return>") #'org-insert-heading-respect-content)
-  (define-key org-mode-map (kbd "M-[ emacs-C-S-<return>") #'org-insert-todo-heading))
+  (define-key org-mode-map (kbd "M-[ emacs-M-S-<return>") #'org-insert-todo-heading)
+  (define-key org-mode-map (kbd "M-[ emacs-C-S-<return>") #'org-insert-todo-heading-respect-content))
 
 (with-eval-after-load 'vterm
   (define-key vterm-mode-map (kbd "M-[ emacs-C-<backspace>")

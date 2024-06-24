@@ -31,14 +31,10 @@
                    (group
                     (+ (any "-" alphanumeric))))))
     (-->
-     (shell-command-to-string "tmux list-windows -t emacs-async")
+     (shell-command-to-string "tmux list-windows -t emacs-async -F '#{window_name}'")
      (split-string it "\n")
      (reverse it)
-     (cdr it)
-     (mapcar #'(lambda (x)
-                 (string-match regex x)
-                 (match-string 1 x))
-             it))))
+     (cdr it))))
 
 (defun ts/send-transient-command (name command)
   (interactive

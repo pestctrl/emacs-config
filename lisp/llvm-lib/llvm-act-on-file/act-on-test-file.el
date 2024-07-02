@@ -114,7 +114,7 @@
                                       (replace-match "clang" nil nil x 1))
                                      (t res)))
                              (string-match (rx line-start
-                                               (group (or "clang" "llc"))
+                                               (group (or "clang" "llc" "llvm-mc"))
                                                " ")
                                            res)
                              (let* ((tool (match-string 1 res))

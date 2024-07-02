@@ -29,6 +29,10 @@
 
 (require 'mu4e)
 
+(with-eval-after-load 'mu4e-view
+  (add-hook 'mu4e-view-mode-hook
+            #'olivetti-mode))
+
 (add-hook 'mbsync-postsync-hooks
           '(lambda (&rest _ignore)
              (mu4e-update-mail-and-index t)))
@@ -48,12 +52,19 @@
       mu4e-trash-folder "/work/Trash")
 
 (setq mu4e-maildir-shortcuts
-      '(("/work/INBOX" . ?i)))
+      '((:key ?i :maildir "/work/INBOX")
+        (:key ?c :maildir "/work/INBOX/C29")
+        (:key ?j :maildir "/work/INBOX/Jira")
+        (:key ?d :maildir "/work/Done")
+        (:key ?a :maildir "/work/Done")))
 
 (setq mu4e-bookmarks
       '(( :name  "Unread messages"
           :query "flag:unread AND NOT flag:trashed"
           :key ?u)
+        ( :name  "Inbox"
+          :query "maildir:/work/INBOX AND NOT flag:trashed"
+          :key ?i)
         ( :name "Today's messages"
           :query "date:today..now"
           :key ?t)

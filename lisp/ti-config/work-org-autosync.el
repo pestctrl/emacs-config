@@ -29,7 +29,7 @@
 (use-package keychain-environment)
 
 (setq gac-automatically-add-new-files-p nil)
-(setq-default gac-debounce-interval 10)
+(setq-default gac-debounce-interval 20)
 
 (defmacro defun-cached (name args &rest body)
   (let ((var-name (intern (concat (symbol-name name) "--cached"))))

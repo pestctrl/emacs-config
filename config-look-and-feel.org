@@ -48,7 +48,7 @@
       (setq doom-modeline-height 24))
 
     (defun my/dont-check-project-samba (orig &rest args)
-      (and (not (string-match-p "^/smb:") default-directory)
+      (and (not (string-match-p "^/smb:" default-directory))
            (apply orig args)))
 
     (advice-add #'doom-modeline-project-p

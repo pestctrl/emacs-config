@@ -41,7 +41,7 @@
    (let ((command (read-string "Command? ")))
      (list (first (split-string command " "))
            command)))
-  (ts/send-sticky-command name (concat command " && exit")))
+  (ts/send-sticky-command name (concat command " && echo '======== DONE ========' && sleep 5 && exit")))
 
 (defun ts/send-sticky-command (name command)
   (interactive

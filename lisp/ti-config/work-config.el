@@ -53,8 +53,6 @@
   (setq request-curl-options '("--noproxy \"*\""))
   (setq ein:jupyter-server-command "~/.local/bin/jupyter"))
 
-(use-package deadgrep)
-
 (use-package cmake-mode
   :config
   (defun my/cmake-jump-to-definiton (sym)
@@ -83,6 +81,13 @@
 (when-let (exe (executable-find "rg"))
   (use-package deadgrep
     :config
+    (defun my/deadgrep-add-sort (args)
+      (cons "--sort=path" args))
+
+    (advice-add #'deadgrep--arguments
+                :filter-return
+                #'my/deadgrep-add-sort)
+
     (setq deadgrep-executable exe)
     (setq deadgrep-project-root-function
           #'(lambda ()

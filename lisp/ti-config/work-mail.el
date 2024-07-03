@@ -29,6 +29,8 @@
 
 (require 'mu4e)
 
+(require 'ti-mail-identity)
+
 (with-eval-after-load 'mu4e-view
   (add-hook 'mu4e-view-mode-hook
             #'olivetti-mode))
@@ -46,7 +48,7 @@
 ;; (global-set-key (kbd "<f8>") 'mu4e)
 
 (setq mu4e-maildir "~/.mail"
-      mu4e-sent-folder   "/work/Sent"
+      mu4e-sent-folder   "/work/Sent Items"
       mu4e-drafts-folder "/work/Drafts"
       mu4e-refile-folder "/work/Archive"
       mu4e-trash-folder "/work/Trash")
@@ -55,7 +57,6 @@
       '((:key ?i :maildir "/work/INBOX")
         (:key ?c :maildir "/work/INBOX/C29")
         (:key ?j :maildir "/work/INBOX/Jira")
-        (:key ?d :maildir "/work/Done")
         (:key ?a :maildir "/work/Done")))
 
 (setq mu4e-bookmarks
@@ -152,6 +153,22 @@
 (advice-add #'mu4e~headers-thread-prefix
             :override
             #'my/mu4e~headers-thread-prefix)
+
+(defun my/mu4e-compose-edit-ignore-draft()
+  "Edit an existing draft message."
+  (interactive)
+  (let* ((msg (mu4e-message-at-point)))
+    (mu4e--draft
+     'edit
+     (lambda ()
+       (with-current-buffer
+           (find-file-noselect (mu4e-message-readable-path msg))
+         (mu4e--delimit-headers)
+         (current-buffer))))))
+
+(advice-add #'mu4e-compose-edit
+            :override
+            #'my/mu4e-compose-edit-ignore-draft)
 
 (provide 'work-mail)
 ;;; work-mail.el ends here

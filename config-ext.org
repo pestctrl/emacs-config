@@ -138,15 +138,21 @@
           (save-restriction
             (narrow-to-region start end)
             (beginning-of-buffer)
-            (replace-regexp (rx "    "
-                                (or "*" "!")
-                                " "
-                                (group (+ (not (any " " "\n")))))
-                            "    \\1  ")
-            (replace-regexp (rx (and " " (+ " ")
-                                     ";; [" (+ (any digit "-" "=" "/")) "]"
-                                     line-end))
-                            "")))))
+            (save-excursion
+              (replace-regexp (rx "    "
+                                  (or "*" "!")
+                                  " "
+                                  (group (+ (not (any " " "\n")))))
+                              "    \\1  "))
+            (save-excursion
+              (replace-regexp (rx (and " " (+ " ")
+                                       ";; [" (+ (any digit "-" "=" "/")) "]"
+                                       line-end))
+                              ""))
+            (save-excursion
+              (replace-regexp (rx line-start (group (+ (any "/" digit)) " ")
+                                  " ")
+                              "\\1"))))))
 
     (advice-add #'ledger-fully-complete-xact
                 :after

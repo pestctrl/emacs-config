@@ -56,27 +56,69 @@
                        ((string-match-p "^eDP" b) nil)
                        (t nil))))))
 
-(defun position-screen (screen relative-to)
-  (interactive (cl-destructuring-bind (primary . secondary) (my/get-screens)
-                 (list (completing-read "Which screen? " secondary)
-                       (completing-read "Against which screen? " (cons primary secondary)))))
-  (let ((response (completing-read (format "Resolution for %s? " screen) '("2560x1440" "1920x1080" "3840x2160" "1680x1050") nil t "^"))
-        (pos (completing-read "Position? " '("left-of" "above") nil t "^")))
-    (shell-command (format "xrandr --output %s --mode %s --%s %s" screen response pos relative-to))))
+(require 'emacs-custom-load-or-ask)
+
+(defclass screen-config ()
+  ((name :initarg :name :type string)
+   (width :initarg :width :type number)
+   (height :initarg :height :type number)
+   (xpos :initarg :xpos :type number)
+   (ypos :initarg :ypos :type number)))
+
+(defun my/read-screen-configuration ()
+  (when (y-or-n-p "Read a screen configuration? ")
+    (let ((screens (my/get-screens))
+          (x-offset 0)
+          screen-configs)
+      (while screens
+        (let* ((screen-name
+                (completing-read
+                 "Which screen is on the leftmost side? "
+                 screens))
+               (resolution
+                (-->
+                 (format "Screen resolution for '%s'? " screen-name)
+                 (completing-read
+                  it
+                  '("3840x2160" "2560x1440" "1920x1080" "2256x1504"))
+                 (string-trim it)
+                 (split-string it "x")))
+               (y-pos
+                (read-number "Y offset (0)? " 0)))
+          (setq screens (delete screen-name screens))
+          (push (make-instance
+                 'screen-config
+                 :name screen-name
+                 :width (string-to-number (car resolution))
+                 :height (string-to-number (cadr resolution))
+                 :xpos x-offset :ypos y-pos)
+                screen-configs)
+          (setq x-offset (+ x-offset (string-to-number (car resolution))))))
+      (reverse screen-configs))))
+
+(defun-prompt ec/load-or-ask-screen-config screen-config (sym prompt)
+  (customize-save-variable sym (my/read-screen-configuration)))
+
+(ec/load-or-ask-screen-config 'my-ec/screen-config
+                              "Read a screen configuration? ")
 
 (defun my/setup-screens ()
   (interactive)
   (unwind-protect
-      (let ((count 1))
-        (setq exwm-workspace-number (length (my/get-screens)))
-        (cl-destructuring-bind (primary . secondaries) (my/get-screens)
-          (cl-loop for secondary in secondaries
-                   do (when (y-or-n-p (format "Monitor %s detected.  Setup? " secondary))
-                        (position-screen secondary primary)
-                        (cl-incf count))))
+      (progn
+        (-->
+         #'(lambda (screen-config)
+             (format "xrandr --output %s --mode %dx%d --pos %dx%d"
+                     (slot-value screen-config 'name)
+                     (slot-value screen-config 'width)
+                     (slot-value screen-config 'height)
+                     (slot-value screen-config 'xpos)
+                     (slot-value screen-config 'ypos)))
+         (mapconcat it my-ec/screen-config " && ")
+         (shell-command it))
         (setup-workspace-monitors)
         (setup-wallpaper)
-        (setq exwm-workspace-number count)
+        (setq exwm-workspace-number (length my-ec/screen-config))
         (exwm-workspace-after-monitor-change))))
 
 (defun my/minimal-setup-screens ()

@@ -28,7 +28,7 @@
   (make-hash-table))
 
 ;; Font size adjustment
-(defun hoagie-adjust-font-size (&optional frame)
+(defun my/dynamically-adjust-font-size (&optional frame)
   "Inspired by https://emacs.stackexchange.com/a/44930/17066. FRAME is ignored.
   If I let Windows handle DPI everything looks blurry."
   (interactive)
@@ -54,6 +54,20 @@
     ;;              (= size (gethash frame frame-font-size-cache)))
     ;;   (puthash frame size frame-font-size-cache))
     ))
+
+(defun my/adjust-font-size (&optional arg)
+  (interactive "P")
+  (if (not arg)
+      (my/dynamically-adjust-font-size)
+    (let ((font-height (read-number "Font Height (%)? "))
+          (f (selected-frame)))
+      (set-face-attribute 'default f :height font-height)
+      (set-face-attribute 'mode-line f :height font-height)
+      (setq-default olivetti-body-width
+                    (if (and (> font-height 120)
+                               (boundp 'olivetti-body-width))
+                        80
+                      140)))))
 
 ;; (remove-hook 'window-size-change-functions #'hoagie-adjust-font-size)
 

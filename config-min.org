@@ -1041,7 +1041,8 @@
            (org-mode . olivetti-mode)
            (dired-mode . olivetti-mode)
            (org-agenda . olivetti-mode)
-           (Info-mode . olivetti-mode))
+           (Info-mode . olivetti-mode)
+           (message-mode . olivetti-mode))
     :config
     (add-to-list 'window-persistent-parameters
                  '(spilt-window . t))

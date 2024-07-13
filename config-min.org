@@ -1051,7 +1051,11 @@
                 :before
                 'olivetti-reset-all-windows)
 
-    (setq-default olivetti-body-width 140))
+    (setq-default olivetti-body-width 140)
+
+    (with-eval-after-load 'mu4e
+      (add-hook 'mu4e-view-mode-hook
+                'olivetti-mode)))
 #+end_src
 ** w3m
 #+begin_src emacs-lisp

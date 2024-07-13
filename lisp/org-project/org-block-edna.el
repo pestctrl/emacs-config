@@ -32,19 +32,15 @@
              (not (string= "BLOCKED"
                            (plist-get change-plist :from)))
              (y-or-n-p "Mark blocking task? "))
-    (let* ((headline (save-excursion
-                       (beginning-of-line)
-                       (looking-at (format org-heading-keyword-regexp-format
-                                           (regexp-opt org-todo-keywords-1)))
-                       (match-string 2)))
+    (let* ((id-origin (org-id-get-create))
            (id (org-id-get-with-outline-path-completion '((nil :maxlevel . 9))))
-           (edna-string (format "siblings(\"%s\") todo!(%s)"
-                                headline
+           (edna-string (format "ids(\"%s\") todo!(%s)"
+                                id-origin
                                 (plist-get change-plist :from))))
       (save-excursion
         (org-id-goto id)
         (let ((old-edna (or (org-entry-get (point) "TRIGGER") "")))
-          (unless (string-match-p headline old-edna)
+          (unless (string-match-p id-origin old-edna)
             (org-entry-put (point) "TRIGGER"
                            (concat old-edna " " edna-string))))))))
 

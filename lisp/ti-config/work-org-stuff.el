@@ -697,45 +697,6 @@
               (and symbol-start "_" (+ nonl) "_" symbol-end)
               "Project" "active")))
 
-(defun my/org-agenda-save ()
-  (interactive)
-  (save-window-excursion
-    (my/switch-themes)
-    (unwind-protect
-        (progn
-          (let ((accept nil)
-                (width 100))
-            (while (not accept)
-              (delete-other-windows)
-              (split-window-horizontally 100)
-              (org-agenda-redo-all)
-              (setq accept (y-or-n-p "Looks good? ")
-                    width (if accept width
-                            (read-number "Width? " 100)))))
-          (-->
-           "%Y-%m-%d-agenda.html"
-           (format-time-string it)
-           (expand-file-name it "~/")
-           (org-agenda-write it))
-          (-->
-           "agenda.html"
-           (expand-file-name it "~/")
-           (org-agenda-write it))))
-    (my/switch-themes)))
-
-(defun org-agenda-dump-for-meeting ()
-  (interactive)
-  (switch-or-create-tab "org-agenda-dump")
-  (let ((ignore-window-parameters t)
-        (window--sides-check t))
-    (delete-other-windows))
-  (save-window-excursion
-    (org-agenda nil "paw"))
-  (split-window-horizontally)
-  (org-agenda-redo-all)
-  (my/org-agenda-save)
-  (close-tab-switch))
-
 (defun ti/generate-org-exit-interrupt ()
   (-->
    '(

@@ -219,5 +219,44 @@
 
 (setq org-confirm-babel-evaluate nil)
 
+(use-package htmlize)
+
+(defun my/org-agenda-save ()
+  (interactive)
+  (save-window-excursion
+    (my/switch-themes)
+    (unwind-protect
+        (progn
+          (let ((accept nil)
+                (width 100))
+            (while (not accept)
+              (let ((ignore-window-parameters t)
+                    (window--sides-check t))
+                (delete-other-windows))
+              (split-window-horizontally 100)
+              (org-agenda-redo-all)
+              (setq accept (y-or-n-p "Looks good? ")
+                    width (if accept width
+                            (read-number "Width? " 100)))))
+          (let ((org-agenda-buffer-name (buffer-name)))
+            (-->
+             "%Y-%m-%d-agenda.html"
+             (format-time-string it)
+             (expand-file-name it "~/")
+             (org-agenda-write it nil nil (buffer-file-name)))
+            (-->
+             "agenda.html"
+             (expand-file-name it "~/")
+             (org-agenda-write it nil nil (buffer-file-name)))))
+      (my/switch-themes))))
+
+(defun org-agenda-dump-for-meeting ()
+  (interactive)
+  (switch-or-create-tab "org-agenda-dump")
+  (save-window-excursion
+    (org-agenda nil "paw"))
+  (my/org-agenda-save)
+  (close-tab-switch))
+
 (provide 'my-org-misc)
 ;;; my-org-misc.el ends here

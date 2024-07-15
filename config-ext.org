@@ -240,8 +240,10 @@
   (require 'netrc)
   (erc-hl-nicks)
   (erc-colorize-mode)
-  (setq erc-user-full-name "Benson Chu")
-  (setq erc-kill-buffer-on-part t)
+  (setq erc-user-full-name "Benson Chu"
+        erc-kill-buffer-on-part t
+        erc-track-exclude-types
+        '("JOIN" "QUIT" "PART" "NICK" "333" "353"))
   (setq erc-autojoin-channels-alist
         '(("freenode.net" "#emacs" "#org-mode"
            ;; "##linux" "#compilers" "#pltclub"
@@ -249,7 +251,7 @@
            ;; "#sbcl" "#ecl"
            )
           ("libera.chat" "#emacs" "#org-mode" "#archlinux"
-           "#commonlisp" "#sbcl" "#compilers"
+           "#commonlisp" "#sbcl" "#compilers" "#nixos"
            ;; "##linux" "#pltclub"
            ;; "##cs" "##computerscience" "##programming" "#lisp" "##lisp"
            ;; "#ecl"

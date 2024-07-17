@@ -121,11 +121,6 @@
         (setq exwm-workspace-number (length my-ec/screen-config))
         (exwm-workspace-after-monitor-change))))
 
-(defun my/minimal-setup-screens ()
-  (interactive)
-  (setup-workspace-monitors)
-  (setup-wallpaper))
-
 (defun my/disconnect-screen (screen)
   (interactive (list (let ((screens (cdr (my/get-screens))))
                        (or (and (zerop (1- (length screens)))

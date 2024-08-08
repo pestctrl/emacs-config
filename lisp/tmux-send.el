@@ -39,7 +39,11 @@
 (defun ts/send-transient-command (name command)
   (interactive
    (let ((command (read-string "Command? ")))
-     (list (first (split-string command " "))
+     (list (progn
+             (string-match
+              (rx (optional (or "." "..") "/") (group (+ (not " "))) " ")
+              command)
+             (match-string 1 command))
            command)))
   (ts/send-sticky-command name (concat command " && echo '======== DONE ========' && sleep 5 && exit")))
 
@@ -53,8 +57,8 @@
      (list
       (if (member name (ts/existing-windows))
           (format "tmux send-keys -t %s C-c" session-window)
-        (format "tmux new-window -t \"emacs-async\" ';' rename-window %s" name))
-      (format "tmux send-keys -t %s \"%s\" C-m"
+        (format "tmux new-window -t \"emacs-async\" ';' rename-window '%s'" name))
+      (format "tmux send-keys -t '%s' '%s' C-m"
               session-window
               command))
      (string-join it " && ")

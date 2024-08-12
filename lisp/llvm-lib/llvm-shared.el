@@ -143,11 +143,11 @@
            (tools-dir
             (when (string-match (rx line-start
                                     "/scratch"
-                                    (group "/benson/tools" (* (not "/")) "/"))
+                                    (group "/benson/_repos-work/tools" (* (not "/")) "/"))
                                 dir)
               (match-string 1 dir))))
       (remove-if #'(lambda (path)
-                     (and (string-match-p (rx "/benson/tools")
+                     (and (string-match-p (rx "/benson/_repos-work/tools")
                                           path)
                           (not (string-match-p tools-dir path))))
                  x)

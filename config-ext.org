@@ -574,3 +574,34 @@
   ;; rendering.
   (use-package pair-tree)
 #+end_src
+* Launch vterm
+#+begin_src emacs-lisp
+  (require 'vterm)
+  (require 'dired)
+
+  (defun vterm--my-new ()
+    (save-window-excursion
+      (vterm t)))
+
+  (defun dired-open-with-vterm (command &optional arg file-list)
+    (interactive
+     (let ((files (dired-get-marked-files t current-prefix-arg nil nil t)))
+       (list
+        ;; Want to give feedback whether this file or marked files are used:
+        (dired-read-shell-command "& on %s: " current-prefix-arg files)
+        current-prefix-arg
+        files)))
+    (let ((buffer (vterm--my-new))
+          (buffer-name (format "<vterm-%s>"
+                               (string-replace " " "-" command)))
+          (command (dired-shell-stuff-it command file-list t arg)))
+      (when-let ((existing (get-buffer buffer-name)))
+        (kill-buffer existing))
+      (switch-to-buffer buffer)
+      (sit-for 0.1)
+      (rename-buffer buffer-name)
+      (vterm-insert command)
+      (vterm-send-return)))
+
+  (define-key dired-mode-map (kbd "V") #'dired-open-with-vterm)
+#+end_src

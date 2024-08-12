@@ -641,7 +641,7 @@
 
   (defun org-agenda-insert-breaks-between (str1 str2)
     (let ((r (rx line-start
-                 (= 17 nonl)
+                 (= 18 nonl)
                  (not ".")))
           begin end)
       (save-excursion

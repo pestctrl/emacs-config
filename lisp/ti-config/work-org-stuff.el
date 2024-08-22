@@ -718,5 +718,9 @@
   (interactive)
   (shell-command "jira issue list --plain -a'Benson Chu' -s~Closed | grep -v 'Done$'"))
 
+(add-to-list 'org-latex-packages-alist '("" "color"))
+(add-to-list 'org-latex-packages-alist '("" "listings"))
+(setq org-latex-src-block-backend 'listings)
+
 (provide 'work-org-stuff)
 ;;; work-org-stuff.el ends here

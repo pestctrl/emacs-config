@@ -116,9 +116,10 @@
         (second-command (ll/build-clang-command (lls/un-trampify file) action))
         (pipe (if (y-or-n-p "Diff assembly (y) or debug (n)? ")
                   ">" "2>")))
-    (when (not
-           (and (zerop (shell-command (format "%s %s /tmp/old.asm" comm pipe)))
-                (zerop (shell-command (format "%s %s /tmp/new.asm" second-command pipe)))))
+    (when (save-window-excursion
+            (not
+             (and (zerop (shell-command (format "%s %s /tmp/old.asm" comm pipe)))
+                  (zerop (shell-command (format "%s %s /tmp/new.asm" second-command pipe))))))
       (error "One of the commands failed"))
     (ediff-files "/tmp/old.asm" "/tmp/new.asm")))
 

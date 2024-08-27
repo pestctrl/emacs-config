@@ -111,7 +111,7 @@
                     (cdr compilation-arguments)))
         (call-interactively #'recompile)))))
 
-(defun ll/diff-c-on-two-compilations (file )
+(defun ll/diff-c-on-two-compilations (file action)
   (let ((comm (ll/build-clang-command (lls/un-trampify file) action))
         (second-command (ll/build-clang-command (lls/un-trampify file) action))
         (pipe (if (y-or-n-p "Diff assembly (y) or debug (n)? ")
@@ -125,7 +125,7 @@
 (defun ll/act-on-c-file (file)
   (let* ((action (aml/read-action-map ll/c-file-action-map)))
     (if (eq action 'diff)
-        (ll/diff-c-on-two-compilations file)
+        (ll/diff-c-on-two-compilations file action)
       (let ((comm (ll/build-clang-command (lls/un-trampify file) action)))
         (compilation-start
          comm

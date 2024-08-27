@@ -69,5 +69,20 @@
 (defun ts/send-command-with-notify (command)
   )
 
+(require 'dired)
+
+(defun dired-tmux (command &optional arg file-list)
+  (interactive
+   (let ((files (dired-get-marked-files t current-prefix-arg nil nil t)))
+     (list
+      ;; Want to give feedback whether this file or marked files are used:
+      (dired-read-shell-command "& on %s: " current-prefix-arg files)
+      current-prefix-arg
+      files)))
+  (let ((full-command (dired-shell-stuff-it command file-list t arg)))
+    (ts/send-transient-command command full-command)))
+
+(define-key dired-mode-map (kbd "G") #'dired-tmux)
+
 (provide 'tmux-send)
 ;;; tmux-send.el ends here

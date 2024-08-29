@@ -41,8 +41,7 @@
 #+end_src
 * Mail
 #+begin_src emacs-lisp
-  (when (and (not my-ec/at-ti)
-             (not my-ec/is-wsl))
+  (when (ec/load-or-ask-pred 'my-ec/enable-mail "Enable mail? ")
     (require 'emacs-mail))
 #+end_src
 * Ace jump

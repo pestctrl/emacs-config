@@ -26,6 +26,7 @@
 (require 'mmt)
 (require 'cl)
 (require 'libs)
+(require 'anaphora)
 
 (setq custom-file (ef "customize.el"))
 (load custom-file 'noerror)

@@ -59,25 +59,25 @@
 * Sending reports to mom
 #+begin_src emacs-lisp
   (defun my/run-report-get-file-name (arg)
-    (let* ((default-directory (my/plaintext-file "ledger-finance"))
-           (buf
-            (save-window-excursion
-              (compilation-start (format "./mom_report.sh %s"
-                                         (if arg "end" "mid"))
-                                 nil (lambda (_) "*ledger-report*")))))
+    (aprog1 (--> (format "./mom_report_2.sh %s"
+                         (if arg "end" "mid"))
+                 (shell-command-to-string it)
+                 (string-trim it))
       (save-window-excursion
-        (display-buffer-same-window buf nil)
+        (let ((buff (find-buffer-visiting it)))
+          (if (not buff)
+              (find-file it)
+            (switch-to-buffer buff)
+            (revert-buffer nil t)))
         (when (not (y-or-n-p "Looks good? "))
-          (user-error "Fix up ledger.ledger and try again")))
-      (let ((str (with-current-buffer buf
-                   (buffer-string))))
-        (string-match (rx line-start "Filename: " (group (+ nonl))) str)
-        (match-string 1 str))))
+          (user-error "Fix up ledger.ledger and try again")))))
 
   (defun my/run-ledger-report (arg)
     (interactive "P")
-    (let ((fname (my/run-report-get-file-name arg)))
-      (mu4e~compose-mail "benedi.chu@hotmail.com" (if arg "Rent" "Finance Report")
+    (let* ((default-directory (expand-file-name "report_2"
+                                                (my/plaintext-file "ledger-finance")))
+           (fname (my/run-report-get-file-name arg)))
+      (mu4e-compose-mail "benedi.chu@hotmail.com" (if arg "Rent" "Finance Report")
                          '(("From" . "bensonchu457@fastmail.com")))
       (mml-attach-file fname)))
 #+end_src

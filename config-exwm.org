@@ -68,7 +68,7 @@
 
      ;; Actually launch programs
      (require 'exwm-launch-program)
-     (define-key *root-map* (kbd "C-p") #'launch-program)
+     (define-key *root-map* (kbd "C-p") #'exwmx-launch-program)
 
      ;; Shut down
      (add-hook 'exwm-exit-hook 'org-save-all-org-buffers)

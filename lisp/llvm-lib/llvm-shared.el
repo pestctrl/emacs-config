@@ -236,7 +236,7 @@
               ("X86" "x86_64")
               ("ARM" "arm")))))
 
-(cl-defun lls/default-comp-fun (compiler file action &key output rest)
+(cl-defun lls/default-comp-fun (&key compiler file action output rest)
   (string-join
    (list compiler
          (lls/get-clang-options)

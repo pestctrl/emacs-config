@@ -107,9 +107,9 @@
                                                 (+ (not space))))
                                            x)
                              (setq res
-                                   (pcase (match-string 1 x)
+                                   (apcase (match-string 1 x)
                                      ("%clang_cc1"
-                                      (replace-match (ll/get-cc1-string dir) nil nil x 1))
+                                      (replace-match (ll/get-cc1-string it) nil nil x 1))
                                      ("%clang"
                                       (replace-match "clang" nil nil x 1))
                                      (t res)))

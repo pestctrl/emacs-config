@@ -111,7 +111,19 @@
                     (cdr compilation-arguments)))
         (call-interactively #'recompile)))))
 
-(defun ll/diff-c-on-two-compilations (file action)
+(defun ll/diff-on-optionset (file action)
+  (let ((comm (ll/build-clang-command (lls/un-trampify file) action))
+        (extra-option (read-string "Extra option? "))
+        (pipe (if (y-or-n-p "Diff assembly (y) or debug (n)? ")
+                  ">" "2>")))
+    (when (save-window-excursion
+            (not
+             (and (zerop (shell-command (format "%s %s /tmp/no-option.asm" comm pipe)))
+                  (zerop (shell-command (format "%s %s %s /tmp/yes-option.asm" comm extra-option pipe))))))
+      (error "One of the commands failed"))
+    (ediff-files "/tmp/no-option.asm" "/tmp/yes-option.asm")))
+
+(defun ll/diff-on-compiler (file action)
   (let ((comm (ll/build-clang-command (lls/un-trampify file) action))
         (second-command (ll/build-clang-command (lls/un-trampify file) action))
         (pipe (if (y-or-n-p "Diff assembly (y) or debug (n)? ")
@@ -122,6 +134,13 @@
                   (zerop (shell-command (format "%s %s /tmp/new.asm" second-command pipe))))))
       (error "One of the commands failed"))
     (ediff-files "/tmp/old.asm" "/tmp/new.asm")))
+
+(defun ll/diff-c-on-two-compilations (file action)
+  (let ((choice (read-char "Diff compiler versions (v) or diff options (o)? ")))
+    (pcase choice
+      (?v (ll/diff-on-compiler file action))
+      (?o (ll/diff-on-optionset file action))
+      (_ (error "Invalid choice")))))
 
 (defun ll/act-on-c-file (file)
   (let* ((action (aml/read-action-map ll/c-file-action-map)))

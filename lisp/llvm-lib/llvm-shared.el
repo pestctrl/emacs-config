@@ -262,6 +262,13 @@
   (concat "llvm-objdump --disassemble "
           file " "))
 
+(defun lls/lldb (binary)
+  (interactive
+   (list (lls/prompt-tool (rx (or "clang" "llc") line-end))))
+  (realgud--lldb
+   (format "lldb %s"
+           binary)))
+
 (defun lls/default-target-init ()
   (let ((root-dir (lls/guess-root-dir-fun))
         tramp-conn)

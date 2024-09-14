@@ -268,14 +268,14 @@
                  :keys "w"
                  :file ,(my/agenda-file "dev.org")
                  :template-file ,(my/org-file "templates/work_travel_checklist.org"))
-                ;; ("Morning routine"
-                ;;  :keys "m"
-                ;;  :file ,(my/org-file "entries/routines.org")
-                ;;  :template-file ,(my/org-file "templates/morning-routine.org"))
-                ;; ("Night routine"
-                ;;  :keys "n"
-                ;;  :file ,(my/org-file "entries/routines.org")
-                ;;  :template-file ,(my/org-file "templates/evening-routine.org"))
+                ("Morning routine"
+                 :keys "m"
+                 :file ,(my/org-file "random/routines.org")
+                 :template-file ,(my/org-file "templates/morning-routine.org"))
+                ("Night routine"
+                 :keys "n"
+                 :file ,(my/org-file "random/routines.org")
+                 :template-file ,(my/org-file "templates/evening-routine.org"))
                 ))
               ("Protocol"
                :keys "p"

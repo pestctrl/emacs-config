@@ -43,7 +43,6 @@
 ;; https://github.com/Alexander-Miller/treemacs/issues/1017#issuecomment-1515602288
 (add-to-list 'image-types 'svg)
 
-(add-to-list 'auto-mode-alist '("\\.map$" . ti-linker-map-mode))
 (add-to-list 'auto-mode-alist '("\\.cdis$" . asm-mode))
 (add-to-list 'auto-mode-alist '("\\.cmd$" . conf-mode))
 (add-to-list 'auto-mode-alist '("\\.fsdump$" . argo-fastsim-dump-mode))

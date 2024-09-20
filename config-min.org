@@ -67,6 +67,8 @@
 
   ;; Show the column number!
   (column-number-mode t)
+
+  (global-set-key (kbd "C-x C-p") #'pp-macroexpand-last-sexp)
 #+end_src
 
 * switching keyboards

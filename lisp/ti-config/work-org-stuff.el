@@ -556,6 +556,7 @@
          ("C-c n f" . org-roam-node-find)
          ("C-c n c" . org-roam-capture)
          ("C-c n T" . org-roam-dailies-goto-today)
+         ("C-c n F" . my/org-roam-find-daily)
          ("C-c n t" . org-roam-dailies-capture-today)
          ("C-c n i" . org-roam-node-insert)
          ("C-c n j" . my/org-roam-logger-capture-current)
@@ -572,22 +573,22 @@
         '(("j" "Journal" entry "* %<%H:%M> %?"
            :unnarrowed t
            :target (file+head+olp "%<%Y-%m-%d>.org"
-                                  "#+title: %<%Y-%m-%d>\n#+filetags: %<:%Y:%B:>\n"
+                                  "#+title: %<%Y-%m-%d>\n#+filetags: :dailies:%<%Y:%B:>\n"
                                   ("Journal")))
           ("E" "Entry Interrupt" entry (file "~/org/templates/entry-interrupt.org")
            :unnarrowed t
            :target (file+head+olp "%<%Y-%m-%d>.org"
-                                  "#+title: %<%Y-%m-%d>\n#+filetags: %<:%Y:%B:>\n"
+                                  "#+title: %<%Y-%m-%d>\n#+filetags: :dailies:%<%Y:%B:>\n"
                                   ("Journal")))
           ("e" "Exit Interrupt" entry (file "~/org/templates/exit-interrupt.org")
            :unnarrowed t
            :target (file+head+olp "%<%Y-%m-%d>.org"
-                                  "#+title: %<%Y-%m-%d>\n#+filetags: %<:%Y:%B:>\n"
+                                  "#+title: %<%Y-%m-%d>\n#+filetags: :dailies:%<%Y:%B:>\n"
                                   ("Journal")))
           ("s" "Standup" plain "%?"
            :unnarrowed t
            :target (file+head+olp "%<%Y-%m-%d>.org"
-                                  "#+title: %<%Y-%m-%d>\n#+filetags: %<:%Y:%B:>\n"
+                                  "#+title: %<%Y-%m-%d>\n#+filetags: :dailies:%<%Y:%B>:\n"
                                   ("Standup Notes for %u")))))
 
   (setq org-roam-capture-templates
@@ -684,7 +685,31 @@
   (require 'my-org-roam-logger)
 
   (setq my/org-roam-logger-filter-fun nil ;; (my/org-roam-filter-by-tag '("Project" "active"))
-        ))
+        )
+
+  (use-package consult-org-roam
+    :demand t
+    :commands (my/org-roam-find-daily)
+    :config
+    (require 'org-roam-util)
+
+    (defun consult-org-roam-file-find (arg)
+      "Find org-roam node with preview, if ARG open in other window."
+      (interactive "P")
+      (cl-letf (((symbol-function 'org-roam-node-read)
+                 (symbol-function 'consult-org-roam-node-read)))
+        (let ((other-window (if arg t nil)))
+          (org-roam-node-find other-window nil #'consult-org-roam--node-file-p))))
+
+    (defun my/org-roam-find-daily ()
+      (interactive)
+      (cl-letf (((symbol-function 'org-roam-node-read)
+                 (symbol-function 'consult-org-roam-node-read)))
+        (org-roam-node-find nil nil
+                            (my/org-roam-filter-by-tag "dailies")
+                            (lambda (x y)
+                              (string-lessp (org-roam-node-file (cdr y))
+                                            (org-roam-node-file (cdr x)))))))))
 
 (advice-add #'org-agenda-redo
             :around

@@ -29,6 +29,7 @@
 (modify-syntax-entry ?- "-" asm-mode-syntax-table)
 (modify-syntax-entry ?+ "-" asm-mode-syntax-table)
 (modify-syntax-entry ?. "_" asm-mode-syntax-table)
+(modify-syntax-entry ?@ "_" asm-mode-syntax-table)
 (modify-syntax-entry ?< "-" asm-mode-syntax-table)
 
 (add-hook 'asm-mode-hook
@@ -118,6 +119,19 @@
       (beginning-of-line)
       (setq end (point)))
     (narrow-to-region start end)))
+
+(defun asm-jump-to-label ()
+  (interactive)
+  (xref-push-marker-stack)
+  (let ((addr (symbol-name (symbol-at-point))))
+    (goto-char (point-min))
+    (cond
+     ((string-match (rx line-start "@" (group (+ nonl))) addr)
+      (re-search-forward (format "<%s>:" (match-string 1 addr))))
+     (t (re-search-forward
+         (concat "^" addr ":"))))))
+
+(define-key asm-mode-map (kbd "M-.") #'asm-jump-to-label)
 
 (add-hook 'asm-mode-hook
           (lambda ()

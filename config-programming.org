@@ -198,7 +198,7 @@
     :commands slime slime-switch-lisps
     :hook ((inferior-lisp-mode . inferior-slime-mode))
     :config
-    (setq inferior-lisp-program "/usr/bin/sbcl")
+    (setq inferior-lisp-program (executable-find "sbcl"))
 
     (defun slime-switch-lisps (lisp)
       (interactive (list (completing-read "Which lisp? "
@@ -208,7 +208,9 @@
     (let ((clhs-file "~/quicklisp/clhs-use-local.el"))
       (if (file-exists-p clhs-file)
           (load-file clhs-file)
-        (warn "clhs not installed. Please install"))))
+        (warn "clhs not installed. Please install")))
+
+    (define-key slime-prefix-map (kbd "C-L") #'slime-load-system))
 
   (use-package slime-company
     :after slime company

@@ -210,7 +210,8 @@
           (load-file clhs-file)
         (warn "clhs not installed. Please install")))
 
-    (define-key slime-prefix-map (kbd "C-L") #'slime-load-system))
+    (define-key slime-prefix-map (kbd "C-l") #'slime-load-file)
+    (define-key slime-prefix-map (kbd "C-S-l") #'slime-load-system))
 
   (use-package slime-company
     :after slime company

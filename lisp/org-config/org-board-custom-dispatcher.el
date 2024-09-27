@@ -43,6 +43,19 @@ added as a link in the `ARCHIVED_AT' property."
     (let ((default-directory directory))
       (start-process "org-board-youtube-dl" "*org-board-youtube-dl*" youtube-dl-binary
                      (car site))))
+   ((and
+     (= (length site) 1)
+     (string-match-p "reddit" (car site)))
+    (message "Invoking custom reddit dispatcher!")
+    (make-directory directory)
+    (let ((default-directory directory))
+      (start-process "org-board-reddit-archive" "*org-board-reddit-archive*"
+                     (executable-find "python3")
+                     "/home/benson/RedditArchiver-standalone/RedditArchiver.py"
+                     "-c"
+                     "/home/benson/RedditArchiver-standalone/config.yaml"
+                     "-i"
+                     (car site))))
    (t (apply orig path directory args (list site)))))
 
 (advice-add #'org-board-wget-call

@@ -31,6 +31,8 @@
                              user-emacs-directory)))
       (normal-top-level-add-subdirs-to-load-path))))
 
+(require 'libs)
+
 (require 'term-compat)
 (require 'emacs-custom-load-or-ask)
 (require 'my-predicates)
@@ -54,8 +56,6 @@
 (require 'quelpa-use-package)
 
 (setq use-package-always-ensure t)
-
-(require 'libs)
 
 (when (native-comp-available-p)
   (require 'comp)

@@ -31,10 +31,6 @@
                              user-emacs-directory)))
       (normal-top-level-add-subdirs-to-load-path))))
 
-(when my-ec/at-ti
-  (require 'work-proxy-config)
-  (ti-proxy-mode 1))
-
 ;; fetch the list of packages available
 (unless package-archive-contents
   (package-refresh-contents))
@@ -46,14 +42,19 @@
 
 (require 'libs)
 
-(require 'term-compat)
 (require 'emacs-custom-load-or-ask)
 (require 'my-predicates)
+
+(when my-ec/at-ti
+  (require 'work-proxy-config)
+  (ti-proxy-mode 1))
 
 (require 'org)
 (require 'use-package)
 (require 'quelpa)
 (require 'quelpa-use-package)
+
+(require 'term-compat)
 
 (setq use-package-always-ensure t)
 

@@ -59,10 +59,15 @@
 * Sending reports to mom
 #+begin_src emacs-lisp
   (defun my/run-report-get-file-name (arg)
-    (aprog1 (--> (format "./mom_report_2.sh %s"
-                         (if arg "end" "mid"))
-                 (shell-command-to-string it)
-                 (string-trim it))
+    (aprog1
+        (with-temp-buffer
+          (let ((return-code
+                 (--> (format "./mom_report_2.sh %s"
+                              (if arg "end" "mid"))
+                      (call-process-shell-command it nil (current-buffer)))))
+            (if (not (eq return-code 0))
+                (error "Script is broken")
+              (string-trim (buffer-string)))))
       (save-window-excursion
         (let ((buff (find-buffer-visiting it)))
           (if (not buff)

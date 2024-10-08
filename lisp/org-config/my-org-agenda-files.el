@@ -66,7 +66,7 @@
      ,(my/agenda-file "dev.org")
      ,(my/agenda-file "prod.org")
      ,(my/agenda-file "habits.org")
-     ,(my/agenda-file "calendar.org"))))
+     ,(my/agenda-file "calendars/production.org"))))
 
 (defconst my/all-agenda-files
   (cons (my/agenda-file "eternal.org")

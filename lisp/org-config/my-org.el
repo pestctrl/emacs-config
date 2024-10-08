@@ -32,16 +32,16 @@
 (require 'org-delay)
 
 (require 'my-org-misc)
-(require 'my-org-autosync)
 (require 'my-org-indent)
 (require 'my-org-agenda-commands)
 (require 'my-org-capture-templates)
 (require 'org-other-additions)
+(require 'my-org-autosync)
 
 (require 'my-org-capture-shouldnt-mess-windows)
 
 (require 'self-chat-mode)
-(require 'caldav)
+(require 'my-org-caldav)
 
 (provide 'my-org)
 ;;; my-org.el ends here

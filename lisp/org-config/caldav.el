@@ -1,9 +1,9 @@
-;;; my-org.el ---  -*- lexical-binding: t -*-
+;;; caldav.el ---  -*- lexical-binding: t -*-
 
-;; Copyright (C) 2020 Benson Chu
+;; Copyright (C) 2024 Benson Chu
 
 ;; Author: Benson Chu <bensonchu457@gmail.com>
-;; Created: [2020-05-03 14:42]
+;; Created: [2024-10-08 05:56]
 
 ;; This file is not part of GNU Emacs
 
@@ -23,25 +23,22 @@
 ;;; Commentary:
 
 ;;; Code:
-(require 'org)
-(require 'org-overrides)
+(require 'org-caldav)
 
-(require 'org-loop)
-(require 'org-process)
-(require 'org-project)
-(require 'org-delay)
+;; URL of the caldav server
+(setq org-caldav-url "https://nextcloud.notak8scluster.ddnsfree.com/remote.php/dav/calendars/lambda")
 
-(require 'my-org-misc)
-(require 'my-org-autosync)
-(require 'my-org-indent)
-(require 'my-org-agenda-commands)
-(require 'my-org-capture-templates)
-(require 'org-other-additions)
+;; calendar ID on server
+(setq org-caldav-calendar-id "lambda-production")
 
-(require 'my-org-capture-shouldnt-mess-windows)
+;; Org filename where new entries from calendar stored
+(setq org-caldav-inbox (my/agenda-file "calendar.org"))
 
-(require 'self-chat-mode)
-(require 'caldav)
+;; Additional Org files to check for calendar events
+(setq org-caldav-files nil)
 
-(provide 'my-org)
-;;; my-org.el ends here
+;; Usually a good idea to set the timezone manually
+(setq org-icalendar-timezone "America/Chicago")
+
+(provide 'caldav)
+;;; caldav.el ends here

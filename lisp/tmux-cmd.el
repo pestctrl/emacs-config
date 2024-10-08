@@ -96,21 +96,24 @@
     (list ,@body)
     ;; TODO: Should be strict about this, don't let this implicitly happen
     (flatten-list it)
-    (string-join it " && ")))
+    (string-join it " && ")
+    (format "{ %s; }" it)))
 
 (defmacro shell-or (&rest body)
   `(-->
     (list ,@body)
     ;; TODO: Should be strict about this, don't let this implicitly happen
     (flatten-list it)
-    (string-join it " || ")))
+    (string-join it " || ")
+    (format "{ %s; }" it)))
 
 (defmacro shell-then (&rest body)
   `(-->
     (list ,@body)
     ;; TODO: Should be strict about this, don't let this implicitly happen
     (flatten-list it)
-    (string-join it " ; ")))
+    (string-join it " ; ")
+    (format "{ %s; }" it)))
 
 (defmacro shell-let* (let-clauses &rest body)
   (declare (indent 1))

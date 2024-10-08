@@ -116,10 +116,14 @@
                      (slot-value screen-config 'ypos)))
          (mapconcat it my-ec/screen-config " && ")
          (shell-command it))
-        (setup-workspace-monitors)
-        (setup-wallpaper)
-        (setq exwm-workspace-number (length my-ec/screen-config))
-        (exwm-workspace-after-monitor-change))))
+        (my/update-exwm-after-monitor-change))))
+
+(defun my/update-exwm-after-monitor-change ()
+  (interactive)
+  (setup-workspace-monitors)
+  (setup-wallpaper)
+  (setq exwm-workspace-number (length my-ec/screen-config))
+  (exwm-workspace-after-monitor-change))
 
 (defun my/disconnect-screen (screen)
   (interactive (list (let ((screens (cdr (my/get-screens))))

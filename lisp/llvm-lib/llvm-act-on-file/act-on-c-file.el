@@ -45,10 +45,12 @@
   (lls/ninja-build-tools dir '("clang")))
 
 (defun ll/clang-output-disassemble-command (file)
-  (let ((compiler (lls/prompt-tool "clang$" (lls/get-llvm-bin-dir)))
+  (let ((compiler (lls/prompt-tool "clang$"))
         (tmp-file (make-temp-file (file-name-sans-extension (file-name-nondirectory file)))))
     (string-join
-     (list (lls/get-clang-command-fun compiler file 'compile
+     (list (lls/get-clang-command-fun :compiler compiler
+                                      :file file
+                                      :action 'compile
                                       :output tmp-file)
            (lls/get-dis-command-fun tmp-file nil))
      " && ")))

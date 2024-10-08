@@ -111,6 +111,32 @@
 
     (use-package affe
       :config
+      (defun my/affe-find (&optional dir initial)
+        "Fuzzy find in DIR with optional INITIAL input."
+        (interactive "P")
+        (pcase-let* ((`(,prompt ,paths ,dir) (consult--directory-prompt "Fuzzy find" dir))
+                     (default-directory dir))
+          (consult--read
+           (thread-first (consult--async-sink)
+                         (consult--async-refresh-timer 0.05)
+                         (consult--async-map (lambda (x) (string-remove-prefix "./" x)))
+                         (affe--async (affe--command affe-find-command paths))
+                         (consult--async-split #'consult--split-nil))
+           :prompt prompt
+           :sort nil
+           :require-match t
+           :history '(:input affe--find-history)
+           :initial initial
+           :category 'file
+           :add-history (thing-at-point 'filename)
+           :state (lambda (action cand)
+                    (when (and cand (eq action 'return))
+                      (find-file (expand-file-name cand dir)))))))
+
+      (advice-add #'affe-find
+                  :override
+                  #'my/affe-find)
+
       (with-eval-after-load 'projectile
         (define-key projectile-command-map (kbd "F") #'affe-find)
         (define-key projectile-command-map (kbd "s G") #'affe-grep))

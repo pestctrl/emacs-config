@@ -117,30 +117,42 @@
 
 (defmacro shell-let* (let-clauses &rest body)
   (declare (indent 1))
-  (let* ((front-clause (car let-clauses))
-         (symbol-name (symbol-name (car front-clause)))
-         (shell-name (string-replace "-" "_" (upcase symbol-name)))
-         (shell-ref-name (format "${%s}" shell-name))
-         (let-value (cadr front-clause)))
-    (if (not front-clause)
-        `(list ,@body)
-      (when (or
-             (not (consp let-value))
-             (not (member (car let-value)
-                          '(run set))))
-        (user-error "Each let form should start with run or set"))
-      `(let ((,(car front-clause) ,shell-ref-name))
-         (shell-and
-          ,(if (and (consp let-value)
-                    (eq 'set (car let-value)))
-               `(format "%s=\"%s\""
-                        ,shell-name
-                        ,(cadr let-value))
-             `(format "%s=$(%s)"
-                      ,shell-name
-                      ,(cadr let-value)))
-          (shell-let* ,(cdr let-clauses)
-            ,@body))))))
+  (let* ((shell-let-clauses
+          (mapcar #'(lambda (x)
+                      (let ((symbol (car x)))
+                        `(,symbol
+                          ,(--> symbol
+                                (symbol-name it)
+                                (upcase it)
+                                (string-replace "-" "_" it)
+                                (format "${%s}" it)))))
+                  let-clauses))
+         (shell-commands
+          (mapcar #'(lambda (x)
+                      (let ((let-value (cadr x))
+                            (shell-name
+                             (--> (car x)
+                                  (symbol-name it)
+                                  (upcase it)
+                                  (string-replace "-" "_" it))))
+                        (when (or
+                               (not (consp let-value))
+                               (not (member (car let-value)
+                                            '(run set))))
+                          (user-error "Each let form should start with run or set"))
+                        (if (and (consp let-value)
+                                 (eq 'set (car let-value)))
+                            `(format "%s=\"%s\""
+                                     ,shell-name
+                                     ,(cadr let-value))
+                          `(format "%s=$(%s)"
+                                   ,shell-name
+                                   ,(cadr let-value)))))
+                  let-clauses)))
+    `(let ,shell-let-clauses
+       (shell-and
+        ,@shell-commands
+        ,@body))))
 
 (provide 'tmux-cmd)
 ;;; tmux-cmd.el ends here

@@ -163,6 +163,7 @@
       (doct `(("Tasks" :keys "t" :children
                (("New Refile Task"
                  :keys "t"
+                 :prepend t
                  :icon ,(all-the-icons-octicon "inbox" :face 'all-the-icons-yellow :v-adjust 0.01)
                  :file ,(my/agenda-file "refile.org")
                  :template "* STUFF %?\n:PROPERTIES:\n:CREATED: %U\n:VIEWING: %a\n:END:")
@@ -279,10 +280,12 @@
                 ))
               ("Protocol"
                :keys "p"
+               :prepend t
                :file ,(my/agenda-file "incoming.org")
                :template "* STUFF %^{Title}\n:PROPERTIES:\n:CREATED: %U\n:URL: %:link\n:END:\n#+begin_example\n%i\n#+end_example\n%?")
               ("Protocol Link"
                :keys "L"
+               :prepend t
                :file ,(my/agenda-file "incoming.org")
                :before-finalize my/org-board-prompt
                :template "* STUFF %? [[%:link][%:description]]\n:PROPERTIES:\n:CREATED: %U\n:URL: %:link\n:END:")

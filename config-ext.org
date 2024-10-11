@@ -81,6 +81,40 @@
     (setq dynamic-reports
           '(("budgetcal" "%(binary) -f ~/MEGA/org/entries/food.ledger --daily --add-budget reg Expenses")))
 
+    (use-package stripes)
+
+    (add-hook 'ledger-report-after-report-hook
+              #'(lambda ()
+                  (stripes-mode 2)))
+
+    (require 'parse-time)
+
+    (defun ledger-narrow-to-date-range ()
+      (interactive)
+      (goto-char (line-beginning-position))
+      (when (looking-at
+             (rx (and
+                  (separated-list " - "
+                                  (group (= 2 digit)) "-" (group (= 3 alpha))
+                                  "-" (= 2 digit)))))
+        (let ((year (match-string 1))
+              (month-start (cdr (assoc (downcase (match-string 2)) parse-time-months))))
+          (setq ledger-report-cmd
+                (--> ledger-report-cmd
+                     (string-replace " -M" "" it)
+                     (string-replace " -n" "" it)
+                     (string-replace " -A" "" it)
+                     (concat it
+                             " "
+                             (format " -b 20%s-%d"
+                                     year
+                                     month-start)
+                             (format " -e 20%s-%d" year (1+ month-start)))))
+          (ledger-report-redo))))
+
+    (define-key ledger-report-mode-map (kbd "n")
+                #'ledger-narrow-to-date-range)
+
     (defun ledger-dynamic-report ()
       (interactive)
       (let* ((ledger-reports dynamic-reports)
@@ -101,7 +135,12 @@
       (let ((average-string "-A -M -n"))
         (unless (string-match-p average-string ledger-report-cmd)
           (setq ledger-report-cmd
-                (concat ledger-report-cmd " " average-string))
+                (--> ledger-report-cmd
+                     (replace-regexp-in-string
+                      (rx " -b " (+ (not " "))) "" it)
+                     (replace-regexp-in-string
+                      (rx " -e " (+ (not " "))) "" it)
+                     (concat it " " average-string)))
           (ledger-report-redo))))
 
     (setq ledger-amount-regexp

@@ -115,6 +115,26 @@
     (define-key ledger-report-mode-map (kbd "n")
                 #'ledger-narrow-to-date-range)
 
+    (defun ledger-accounts-expand-includes (orig)
+      (let (includes)
+        (save-excursion
+          (goto-char (point-min))
+          (while (re-search-forward (rx line-start "include "
+                                        (group (+ nonl)))
+                                    nil t)
+            (push (match-string 1) includes)))
+        (append
+         (cl-mapcon #'(lambda (file)
+                        (with-current-buffer (find-file-noselect
+                                              (expand-file-name file))
+                          (ledger-accounts-in-buffer)))
+                    includes)
+         (funcall orig))))
+
+    (advice-add #'ledger-accounts-in-buffer
+                :around
+                #'ledger-accounts-expand-includes)
+
     (defun ledger-dynamic-report ()
       (interactive)
       (let* ((ledger-reports dynamic-reports)

@@ -41,6 +41,9 @@
        (list :calendar-id "lambda-production"
              :inbox (my/agenda-file "calendars/production.org"))))
 
+(setq org-caldav-save-directory
+      (my/agenda-file ""))
+
 ;; Additional Org files to check for calendar events
 (setq org-caldav-files nil)
 

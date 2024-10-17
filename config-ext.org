@@ -124,7 +124,7 @@
                                     nil t)
             (push (match-string 1) includes)))
         (append
-         (cl-mapcon #'(lambda (file)
+         (cl-mapcan #'(lambda (file)
                         (with-current-buffer (find-file-noselect
                                               (expand-file-name file))
                           (ledger-accounts-in-buffer)))

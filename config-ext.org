@@ -135,6 +135,13 @@
                 :around
                 #'ledger-accounts-expand-includes)
 
+    (defun check-account-in-buffer (account)
+      (member (list account) (ledger-accounts-in-buffer)))
+
+    (advice-add #'ledger-reconcile-check-valid-account
+                :override
+                #'check-account-in-buffer)
+
     (defun ledger-dynamic-report ()
       (interactive)
       (let* ((ledger-reports dynamic-reports)

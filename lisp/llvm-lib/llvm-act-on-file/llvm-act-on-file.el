@@ -81,6 +81,7 @@
         ("inc" (ll/act-on-c-file file))
         ("asm" (ll/act-on-asm-file file))
         ("ll" (ll/act-on-ll-file file))
+        ("mir" (ll/act-on-ll-file file))
         (_ (message "Not sure what you'd like me to do with this file"))))))
 
 (provide 'llvm-act-on-file)

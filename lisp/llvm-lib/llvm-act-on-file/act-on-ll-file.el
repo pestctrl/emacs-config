@@ -31,8 +31,8 @@
     (stop-after   :key ?s  :major-mode llvm-mode :buffer-string "after-%s"  :description "[s]top-after")
     (stop-before  :key ?S  :major-mode llvm-mode :buffer-string "before-%s" :description "[S]top-before")))
 
-(defun ll/build-llc-command (file action)
-  (lls/get-llc-command-fun file action))
+(defun ll/build-llc-command (file action &optional output)
+  (lls/get-llc-command-fun :file file :action action :output output))
 
 (defun ll/act-on-ll-file (file)
   (let* ((action (aml/read-action-map ll/ll-file-action-map))
@@ -40,20 +40,24 @@
                  (read-string "Which pass? ")))
          ;; I just recently noticed that the default directory is changing, but
          ;; I don't know what changed. Should investigate later.
-         (default-directory (file-name-directory file)))
-    (compilation-start
-     (concat
-      (ll/build-llc-command file action)
-      (when (member action '(stop-after stop-before))
-        (format "--%s=%s" (symbol-name action) stop)))
-     (aml/get-map-prop ll/ll-file-action-map action :major-mode)
-     (lambda (_)
-       (format "*%s-%s*"
-               (file-name-nondirectory file)
-               (let ((str (aml/get-map-prop ll/ll-file-action-map action :buffer-string)))
-                 (if (not (member action '(stop-before stop-after)))
-                     str
-                   (format str stop))))))))
+         (default-directory (file-name-directory file))
+         (output (make-temp-file (concat file) nil ".mir")))
+    (aprog1
+        (compilation-start
+         (concat
+          (ll/build-llc-command file action output)
+          (when (member action '(stop-after stop-before))
+            (format "--%s=%s" (symbol-name action) stop)))
+         (aml/get-map-prop ll/ll-file-action-map action :major-mode)
+         (lambda (_)
+           (format "*%s-%s*"
+                   (file-name-nondirectory file)
+                   (let ((str (aml/get-map-prop ll/ll-file-action-map action :buffer-string)))
+                     (if (not (member action '(stop-before stop-after)))
+                         str
+                       (format str stop))))))
+      (with-current-buffer it
+        (setq ll/act-on-file-output output)))))
 
 (provide 'act-on-ll-file)
 ;;; act-on-ll-file.el ends here

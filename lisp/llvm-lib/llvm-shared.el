@@ -248,15 +248,25 @@
            ('preprocess "-E")
            ('llvm-ir "-S -emit-llvm")
            ('executable ""))
-         (format "-o %s"
-                 (or output
-                     (and (eq action 'executable) "a.out")
-                     "-")))
+         "-o -"
+         (or (and output
+                  (format "| tee %s" output))
+             ""))
    " "))
 
-(defun lls/default-llc-comm (file _action)
-  (concat "llc -o - "
-          file " "))
+(cl-defun lls/default-llc-comm (&key llc file _action output)
+  (concat
+   (read-string
+    "llc invocation: "
+    (string-join
+     (list
+      (or llc "llc")
+      file
+      "-o -")
+     " "))
+   (or (and output
+            (format " | tee %s" output))
+       "")))
 
 (defun lls/default-dis-comm (file _action)
   (concat "llvm-objdump --disassemble "

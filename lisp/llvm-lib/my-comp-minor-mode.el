@@ -57,7 +57,8 @@ commands of Compilation major mode are available.  See
 
 (defun my/enable-comp-keys-if-separate-mode (orig &rest args)
   (let ((ht compilation-finish-local-transient)
-        (hs compilation-finish-local-sticky))
+        (hs compilation-finish-local-sticky)
+        (lbc-abi lbc/act-buffer-info))
     (-->
      (car args)
      (replace-regexp-in-string
@@ -74,7 +75,8 @@ commands of Compilation major mode are available.  See
             (set-process-filter (get-buffer-process it) nil))
           (compilation-minor-mode t)
           (setq compilation-finish-local-sticky hs)
-          (setq compilation-finish-local-transient ht)))
+          (setq compilation-finish-local-transient ht)
+          (setq lbc/act-buffer-info lbc-abi)))
       (with-selected-window (display-buffer it)
         (when (eq major-mode 'compilation-mode)
           (goto-char (point-max)))))))

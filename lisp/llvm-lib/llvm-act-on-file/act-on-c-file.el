@@ -68,7 +68,7 @@
      "early-ifcvt"
      "early-if-predicator")))
 
-(defun ll/build-clang-command (file action)
+(defun ll/build-clang-command (file action &optional output)
   (if (eq action 'output-dis)
       (ll/clang-output-disassemble-command file)
     (let ((compiler-action (aml/get-map-prop ll/c-file-action-map action :compiler-action))
@@ -77,7 +77,8 @@
        (list (lls/get-clang-command-fun
               :compiler compiler
               :file file
-              :action compiler-action)
+              :action compiler-action
+              :output output)
              (pcase action
                ('debug (format "-mllvm -debug-only=%s" (ll/read-pass-name "Which pass? ")))
                ('before-after (let ((pass (ll/read-pass-name "Which pass? ")))
@@ -144,19 +145,27 @@
       (?o (ll/diff-on-optionset file action))
       (_ (error "Invalid choice")))))
 
+;; TODO: Very dirty
+(defvar ll/act-on-file-output nil)
+(make-variable-buffer-local 'll/act-on-file-output)
+
 (defun ll/act-on-c-file (file)
-  (let* ((action (aml/read-action-map ll/c-file-action-map)))
+  (let* ((action (aml/read-action-map ll/c-file-action-map))
+         (output (make-temp-file (concat file) nil ".ll")))
     (if (eq action 'diff)
         (ll/diff-c-on-two-compilations file action)
-      (let ((comm (ll/build-clang-command (lls/un-trampify file) action)))
-        (compilation-start
-         comm
-         (aml/get-map-prop ll/c-file-action-map action :major-mode)
-         (lambda (x)
-           (format "*%s-%s*"
-                   (file-name-nondirectory file)
-                   (aml/get-map-prop ll/c-file-action-map action
-                                     :buffer-string))))))))
+      (let ((comm (ll/build-clang-command (lls/un-trampify file) action output)))
+        (aprog1
+            (compilation-start
+             comm
+             (aml/get-map-prop ll/c-file-action-map action :major-mode)
+             (lambda (x)
+               (format "*%s-%s*"
+                       (file-name-nondirectory file)
+                       (aml/get-map-prop ll/c-file-action-map action
+                                         :buffer-string))))
+          (with-current-buffer it
+            (setq ll/act-on-file-output output)))))))
 
 (defun ll/diff-before-after ()
   (interactive)

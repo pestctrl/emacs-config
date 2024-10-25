@@ -254,19 +254,31 @@
              ""))
    " "))
 
-(cl-defun lls/default-llc-comm (&key llc file _action output)
-  (concat
-   (read-string
-    "llc invocation: "
-    (string-join
-     (list
-      (or llc "llc")
-      file
-      "-o -")
-     " "))
-   (or (and output
-            (format " | tee %s" output))
-       "")))
+(defun ll/read-pass ()
+  (completing-read "Which pass? "
+                   '("finalize-isel"
+                     "machine-scheduler"
+                     "greedy")))
+
+(cl-defun lls/default-llc-comm (&key llc file action output pass)
+  (let ((llc (or llc "llc")))
+    (concat
+     (cond
+      ((member action '(run-pass stop-before stop-after start-before start-after))
+       (format "%s %s -o - -%s=%s"
+               llc file (symbol-name action) pass))
+      (t
+       (read-string
+        "llc invocation: "
+        (string-join
+         (list
+          llc
+          file
+          "-o -")
+         " "))))
+     (or (and output
+              (format " | tee %s" output))
+         ""))))
 
 (defun lls/default-dis-comm (file _action)
   (concat "llvm-objdump --disassemble "

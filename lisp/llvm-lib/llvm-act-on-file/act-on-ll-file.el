@@ -28,34 +28,41 @@
 
 (defvar ll/ll-file-action-map
   '((assembly     :key ?a  :major-mode asm-mode  :buffer-string "assembly"  :description "[a]ssembly")
-    (stop-after   :key ?s  :major-mode llvm-mode :buffer-string "after-%s"  :description "[s]top-after")
-    (stop-before  :key ?S  :major-mode llvm-mode :buffer-string "before-%s" :description "[S]top-before")))
+    (run-pass     :key ?o  :major-mode llvm-mode :buffer-string "run-%s"  :description "run-[o]ne-pass")
+    (stop-after   :key ?a  :major-mode llvm-mode :buffer-string "stop-after-%s"  :description "stop-[a]fter")
+    (stop-before  :key ?b  :major-mode llvm-mode :buffer-string "stop-before-%s" :description "stop-[b]efore")
+    (start-after  :key ?A  :major-mode llvm-mode :buffer-string "start-after-%s"  :description "start-[A]fter")
+    (start-before :key ?B  :major-mode llvm-mode :buffer-string "start-before-%s" :description "start-[B]efore")))
 
-(defun ll/build-llc-command (file action &optional output)
-  (lls/get-llc-command-fun :file file :action action :output output))
+(defun ll/build-llc-command (file action &optional output pass)
+  (lls/get-llc-command-fun :file file :action action :output output :pass pass
+                           :llc (lls/prompt-tool "llc$")))
 
 (defun ll/act-on-ll-file (file)
   (let* ((action (aml/read-action-map ll/ll-file-action-map))
-         (stop (when (member action '(stop-after stop-before))
-                 (read-string "Which pass? ")))
+         (pass (when (member action '(stop-after stop-before start-before start-after run-pass))
+                 (ll/read-pass)))
          ;; I just recently noticed that the default directory is changing, but
          ;; I don't know what changed. Should investigate later.
          (default-directory (file-name-directory file))
-         (output (make-temp-file (concat file) nil ".mir")))
+         (output (make-temp-file
+                  (concat (file-name-sans-extension file) "-")
+                  nil ".mir")))
     (aprog1
         (compilation-start
-         (concat
-          (ll/build-llc-command file action output)
-          (when (member action '(stop-after stop-before))
-            (format "--%s=%s" (symbol-name action) stop)))
+         (ll/build-llc-command file action output pass)
          (aml/get-map-prop ll/ll-file-action-map action :major-mode)
          (lambda (_)
            (format "*%s-%s*"
                    (file-name-nondirectory file)
                    (let ((str (aml/get-map-prop ll/ll-file-action-map action :buffer-string)))
-                     (if (not (member action '(stop-before stop-after)))
+                     (if (not (member action
+                                      (list
+                                       'stop-before 'stop-after
+                                       'start-before 'start-after
+                                       'run-pass)))
                          str
-                       (format str stop))))))
+                       (format str pass))))))
       (with-current-buffer it
         (setq ll/act-on-file-output output)))))
 

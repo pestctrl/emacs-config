@@ -151,7 +151,7 @@
 
 (defun ll/act-on-c-file (file)
   (let* ((action (aml/read-action-map ll/c-file-action-map))
-         (output (make-temp-file (concat file) nil ".ll")))
+         (output (make-temp-file (concat (file-name-sans-extension file) "-") nil ".ll")))
     (if (eq action 'diff)
         (ll/diff-c-on-two-compilations file action)
       (let ((comm (ll/build-clang-command (lls/un-trampify file) action output)))

@@ -302,7 +302,7 @@
      :tramp tramp-conn
      :root-dir root-dir
      :build-dirs-fun (lls/guess-build-dirs-fun root-dir)
-     :target (completing-read "Which target? " '("X86" "ARM"))
+     :target (completing-read "Which target? " '("X86" "ARM" "Hexagon" "AIE"))
      :bin-dirs-fun (lambda ()
                      (list
                       (--> "/usr/bin/"
@@ -324,26 +324,26 @@
        (string-trim it)
        (member it
                '("https://github.com/llvm/llvm-project.git"
-                 "git@github.com:llvm/llvm-project")))
+                 "git@github.com:llvm/llvm-project"
+                 "https://github.com/Xilinx/llvm-aie")))
       (vc-root-dir)
     ;; TODO: constant
     "~/workspace/llvm-project.git/machine-outliner"))
 
 (defun lls/guess-build-dirs-fun (root-dir)
   (lambda ()
-    (and (string-match-p "llvm-project" root-dir)
-         (let ((build-dir (expand-file-name "build" root-dir)))
-           (when (file-exists-p build-dir)
-             (--> build-dir
-                  (directory-files it t)
-                  (remove-if-not #'(lambda (dir)
-                                     (file-exists-p
-                                      (expand-file-name "build.ninja" dir)))
-                                 it)
-                  (sort it #'(lambda (x y)
-                               (cond ((string-match-p "^Release$" (file-name-nondirectory y)) nil)
-                                     ((string-match-p "^Release$" (file-name-nondirectory x)) t)
-                                     (t (string< x y)))))))))))
+    (let ((build-dir (expand-file-name "build" root-dir)))
+      (when (file-exists-p build-dir)
+        (--> build-dir
+             (directory-files it t)
+             (remove-if-not #'(lambda (dir)
+                                (file-exists-p
+                                 (expand-file-name "build.ninja" dir)))
+                            it)
+             (sort it #'(lambda (x y)
+                          (cond ((string-match-p "^Release$" (file-name-nondirectory y)) nil)
+                                ((string-match-p "^Release$" (file-name-nondirectory x)) t)
+                                (t (string< x y))))))))))
 
 (provide 'llvm-shared)
 ;;; llvm-shared.el ends here

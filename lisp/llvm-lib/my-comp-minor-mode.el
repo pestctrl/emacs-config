@@ -24,6 +24,7 @@
 
 ;;; Code:
 (require 'anaphora)
+(require 'llvm-buffer-chain)
 
 (define-minor-mode compilation-minor-mode
   "Toggle Compilation minor mode.
@@ -77,6 +78,8 @@ commands of Compilation major mode are available.  See
           (setq compilation-finish-local-sticky hs)
           (setq compilation-finish-local-transient ht)
           (setq lbc/act-buffer-info lbc-abi)))
+      (sit-for 0.05)
+      ;; Why doesn't this pop up in a side-window?
       (with-selected-window (display-buffer it)
         (when (eq major-mode 'compilation-mode)
           (goto-char (point-max)))))))

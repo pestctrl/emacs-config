@@ -108,10 +108,10 @@
 
 (defvar lbc/act-buffer-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map (kbd "M-s") #'lbc/act-jump-to-source-file-buffer)
-    (define-key map (kbd "M-d") #'lbc/act-jump-to-dest-file-buffer)
-    (define-key map (kbd "M-a") #'lbc/act-jump-to-previous-act-buffer)
-    (define-key map (kbd "M-e") #'lbc/act-jump-to-next-act-buffer)
+    (define-key map (kbd "s") #'lbc/act-jump-to-source-file-buffer)
+    (define-key map (kbd "d") #'lbc/act-jump-to-dest-file-buffer)
+    (define-key map (kbd "M-b") #'lbc/act-jump-to-previous-act-buffer)
+    (define-key map (kbd "M-f") #'lbc/act-jump-to-next-act-buffer)
     (define-key map (kbd "a")   #'lbc/act-again)
     map))
 

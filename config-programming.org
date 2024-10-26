@@ -368,3 +368,11 @@
   ;; (setq treesit-language-source-alist '())
   (setq treesit-font-lock-level 5)
 #+end_src
+* lua
+#+begin_src emacs-lisp
+  (use-package lua-mode)
+#+end_src
+* 0x0
+#+begin_src emacs-lisp
+  (use-package 0x0)
+#+end_src

@@ -174,7 +174,7 @@
                                           current-name)
                                   slot-val))))))))))
 
-(defvar cc/detect-extensions-functions nil)
+(defvar cc/detect-extensions-function nil)
 
 (cl-defun cc/get-clang-options (&key filename compiler action)
   (interactive)

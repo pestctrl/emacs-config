@@ -146,17 +146,12 @@
       (?o (ll/diff-on-optionset file action))
       (_ (error "Invalid choice")))))
 
-;; TODO: Very dirty
-(defvar ll/act-on-file-output nil)
-(make-variable-buffer-local 'll/act-on-file-output)
-
 (defun ll/act-on-c-file (file)
   (let* ((action (aml/read-action-map ll/c-file-action-map))
          (output (ll/make-tmp-file
                   file
                   (cond
-                   ((eq action 'assemble)
-                    ".S")
+                   ((eq action 'assemble) ".S")
                    (t ".ll")))))
     (if (eq action 'diff)
         (ll/diff-c-on-two-compilations file action)

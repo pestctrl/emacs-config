@@ -24,6 +24,10 @@
 
 ;;; Code:
 
+;; TODO: Very dirty
+(defvar ll/act-on-file-output nil)
+(make-variable-buffer-local 'll/act-on-file-output)
+
 (defun ll/make-tmp-file (file ext)
   (let ((file-directory (file-name-directory file))
         fname temporary-file-directory)

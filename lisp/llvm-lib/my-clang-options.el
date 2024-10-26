@@ -43,11 +43,11 @@
 (register-prebaked-optionset clang-subtargets "ARM" cortex-m33
   :target "-target arm -mcpu=cortex-m33 -mfpu=vfpv3-d16 -mfloat-abi=hard -mlittle-endian")
 
-(register-prebaked-optionset clang-subtargets "riscv" rv32im
+(register-prebaked-optionset clang-subtargets "RISCV" rv32im
   :target "-target riscv32-unknown-elf -march=rv32im -mabi=ilp32"
   :optimization "-O3")
 
-(register-prebaked-optionset clang-subtargets "riscv" rv32imafc
+(register-prebaked-optionset clang-subtargets "RISCV" rv32imafc
   :target "-target riscv32-unknown-elf -march=rv32imafc -mabi=ilp32f -mno-relax"
   :optimization "-O3")
 

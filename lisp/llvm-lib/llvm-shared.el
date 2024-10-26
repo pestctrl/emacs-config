@@ -296,7 +296,7 @@
      :tramp tramp-conn
      :root-dir root-dir
      :build-dirs-fun (lls/guess-build-dirs-fun root-dir)
-     :target (completing-read "Which target? " '("X86" "ARM" "Hexagon" "AIE"))
+     :target (completing-read "Which target? " '("X86" "ARM" "Hexagon" "AIE" "RISCV"))
      :bin-dirs-fun (lambda ()
                      (list
                       (--> "/usr/bin/"

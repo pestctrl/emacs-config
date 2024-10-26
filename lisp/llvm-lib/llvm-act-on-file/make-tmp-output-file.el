@@ -24,7 +24,6 @@
 
 ;;; Code:
 
-;; TODO: Very dirty
 (defvar ll/act-on-file-output nil)
 (make-variable-buffer-local 'll/act-on-file-output)
 

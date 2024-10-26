@@ -26,22 +26,22 @@
 (require 'clang-command)
 
 (register-prebaked-optionset clang-subtargets "ARM" cortex-r4-soft-float
-  :target "-mcpu=cortex-r4 -mfpu=none -mfloat-abi=soft -mlittle-endian")
+  :target "-target arm -mcpu=cortex-r4 -mfpu=none -mfloat-abi=soft -mlittle-endian")
 
 (register-prebaked-optionset clang-subtargets "ARM" cortex-hard-float
-  :target "-mcpu=cortex-r4 -mfpu=vfpv3-d16 -mfloat-abi=hard -mlittle-endian")
+  :target "-target arm -mcpu=cortex-r4 -mfpu=vfpv3-d16 -mfloat-abi=hard -mlittle-endian")
 
 (register-prebaked-optionset clang-subtargets "ARM" cortex-hard-float-tmu
-  :target "-mcpu=cortex-r4 -mfpu=vfpv3-d16 -mfloat-abi=hard -mlittle-endian")
+  :target "-target arm -mcpu=cortex-r4 -mfpu=vfpv3-d16 -mfloat-abi=hard -mlittle-endian")
 
 (register-prebaked-optionset clang-subtargets "ARM" cortex-m0
-  :target "-mcpu=cortex-m0 -mlittle-endian -mthumb")
+  :target "-target arm -mcpu=cortex-m0 -mlittle-endian -mthumb")
 
 (register-prebaked-optionset clang-subtargets "ARM" cortex-m4
-  :target "-mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16")
+  :target "-target arm -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16")
 
 (register-prebaked-optionset clang-subtargets "ARM" cortex-m33
-  :target "-mcpu=cortex-m33 -mfpu=vfpv3-d16 -mfloat-abi=hard -mlittle-endian")
+  :target "-target arm -mcpu=cortex-m33 -mfpu=vfpv3-d16 -mfloat-abi=hard -mlittle-endian")
 
 (register-prebaked-optionset clang-subtargets "riscv" rv32im
   :target "-target riscv32-unknown-elf -march=rv32im -mabi=ilp32"

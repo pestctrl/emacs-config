@@ -27,6 +27,7 @@
 (require 'magit)
 (require 'eieio)
 (require 'load-llvm-mode)
+(require 'my-clang-options)
 
 ;; =========================== LLVM Rebuild ==========================
 
@@ -229,13 +230,6 @@
   (apply (lls/conf-get 'dis-command-fun) args))
 
 ;; ========================= LLVM Build Dirs =========================
-(defun lls/default-clang-opts ()
-  (let ((target (lls/conf-get 'target)))
-    (concat "--target="
-            (pcase target
-              ("X86" "x86_64")
-              ("ARM" "arm")))))
-
 (cl-defun lls/default-comp-fun (&key compiler file action output rest)
   (string-join
    (list compiler
@@ -311,7 +305,7 @@
      :cc #'lls/default-comp-fun
      :dc #'lls/default-dis-comm
      :llc #'lls/default-llc-comm
-     :clang-opts-fun #'lls/default-clang-opts)))
+     :clang-opts-fun #'cc/get-clang-options)))
 
 (when (not lls/target-init-fun)
   (setq lls/target-init-fun

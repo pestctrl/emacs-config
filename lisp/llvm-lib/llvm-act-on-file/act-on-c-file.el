@@ -152,7 +152,12 @@
 
 (defun ll/act-on-c-file (file)
   (let* ((action (aml/read-action-map ll/c-file-action-map))
-         (output (ll/make-tmp-file file ".ll")))
+         (output (ll/make-tmp-file
+                  file
+                  (cond
+                   ((eq action 'assemble)
+                    ".S")
+                   (t ".ll")))))
     (if (eq action 'diff)
         (ll/diff-c-on-two-compilations file action)
       (let ((comm (ll/build-clang-command (lls/un-trampify file) action output)))

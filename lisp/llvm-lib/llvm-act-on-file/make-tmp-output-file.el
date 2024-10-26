@@ -25,12 +25,14 @@
 ;;; Code:
 
 (defun ll/make-tmp-file (file ext)
-  (let (fname temporary-file-directory)
-    (if (string-match-p (rx "/.tmp") file)
+  (let ((file-directory (file-name-directory file))
+        fname temporary-file-directory)
+    (if (string-match-p (rx "/tmp") file)
         (setq fname (file-name-sans-extension file)
-              temporary-file-directory (file-name-directory file))
+              temporary-file-directory file-directory)
       (setq fname (file-name-nondirectory (file-name-sans-extension file))
-            temporary-file-directory (expand-file-name ".tmp" default-directory)))
+            temporary-file-directory (expand-file-name "tmp" file-directory)))
+
     (make-temp-file (concat fname "-")
                     nil ext)))
 

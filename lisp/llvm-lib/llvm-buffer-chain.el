@@ -77,12 +77,17 @@
 
 (defun lbc/act-jump-to-dest-file-buffer ()
   (interactive)
-  (aif (slot-value lbc/act-buffer-info 'dest-file)
-      (progn
-        (pop-to-buffer
-         (find-file-noselect it))
-        (delete-other-windows))
-    (user-error "No destination file")))
+  (let ((dest-file (slot-value lbc/act-buffer-info 'dest-file))
+        (buff (current-buffer)))
+    (if (not dest-file)
+        (user-error "No destination file")
+      (let ((buffer (find-file-noselect dest-file)))
+        (with-current-buffer buffer
+          (lbc/source-buffer-mode 1)
+          (setf (slot-value lbc/source-buffer-info 'producing-act-buffer)
+                buff))
+        (pop-to-buffer buffer)
+        (delete-other-windows)))))
 
 (defun lbc/act-jump-to-previous-act-buffer ()
   (interactive)
@@ -121,12 +126,13 @@
 (defun lbc/dump ()
   (interactive)
   (when lbc/act-buffer-info
-    (with-slots (previous-buffer next-buffer source-file dest-file) lbc/info
+    (with-slots (previous-act-buffer next-act-buffer source-file dest-file) lbc/act-buffer-info
       (message "previous: %s\nnext: %s\nsource: %s\ndest: %s"
-               previous-buffer next-buffer source-file dest-file))))
+               previous-act-buffer next-act-buffer source-file dest-file))))
 
 (defun lbc/around-act (orig &rest args)
   (let ((buff-orig (current-buffer))
+        (previous-act (slot-value lbc/source-buffer-info 'producing-act-buffer))
         (act-buffer (apply orig args)))
     (with-current-buffer buff-orig
       ;; Make sure info is initialized
@@ -143,6 +149,14 @@
             (buffer-file-name buff-orig))
       (setf (slot-value lbc/act-buffer-info 'dest-file)
             ll/act-on-file-output))
+
+    (when previous-act
+      (with-current-buffer act-buffer
+        (setf (slot-value lbc/act-buffer-info 'previous-act-buffer)
+              previous-act))
+      (with-current-buffer previous-act
+        (setf (slot-value lbc/act-buffer-info 'next-act-buffer)
+              act-buffer)))
 
     ;; TODO: every act should produce a file by default
     ;; (setf (slot-value lbc/act-buffer-info 'dest-file)

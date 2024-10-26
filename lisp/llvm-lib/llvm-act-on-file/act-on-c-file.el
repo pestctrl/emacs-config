@@ -27,6 +27,7 @@
 (require 'llvm-shared)
 (require 'action-map-lib)
 (require 'anaphora)
+(require 'make-tmp-output-file)
 
 (defvar ll/c-file-action-map
   '((debug        :key ?d    :major-mode llvm-mode :buffer-string "debug"              :description "[d]ebug pass"             :compiler-action assemble)
@@ -151,7 +152,7 @@
 
 (defun ll/act-on-c-file (file)
   (let* ((action (aml/read-action-map ll/c-file-action-map))
-         (output (make-temp-file (concat (file-name-sans-extension file) "-") nil ".ll")))
+         (output (ll/make-tmp-file file ".ll")))
     (if (eq action 'diff)
         (ll/diff-c-on-two-compilations file action)
       (let ((comm (ll/build-clang-command (lls/un-trampify file) action output)))

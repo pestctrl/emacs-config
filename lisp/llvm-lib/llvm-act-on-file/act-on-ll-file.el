@@ -25,6 +25,7 @@
 ;;; Code:
 (require 'llvm-shared)
 (require 'action-map-lib)
+(require 'make-tmp-output-file)
 
 (defvar ll/ll-file-action-map
   '((assembly     :key ?a  :major-mode asm-mode  :buffer-string "assembly"  :description "[a]ssembly")
@@ -45,9 +46,12 @@
          ;; I just recently noticed that the default directory is changing, but
          ;; I don't know what changed. Should investigate later.
          (default-directory (file-name-directory file))
-         (output (make-temp-file
-                  (concat (file-name-sans-extension file) "-")
-                  nil ".mir")))
+         (output (ll/make-tmp-file
+                  file
+                  (cond
+                   ((eq action 'assembly)
+                    ".S")
+                   (t ".mir")))))
     (aprog1
         (compilation-start
          (ll/build-llc-command file action output pass)

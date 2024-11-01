@@ -80,9 +80,11 @@
 
   (defvar my/email-accounts
     '("bensonchu457@fastmail.com"
+      "bensonchu@fastmail.com"
       "bensonchu457@gmail.com"
       "me@mail.pestctrl.io"
-      "dev@mail.pestctrl.io"))
+      "dev@mail.pestctrl.io"
+      "accounts@mail.pestctrl.io"))
 
   (defun my/mu-init ()
     (interactive)
@@ -94,16 +96,16 @@
 
   (defun my-mu4e-set-account ()
     (setq user-mail-address
-          (if (not mu4e-compose-parent-message)
+          (or (and mu4e-compose-parent-message
+                   (mu4e-contact-email
+                    (-any
+                     #'(lambda (x)
+                         (mu4e-message-contact-field-matches-me mu4e-compose-parent-message
+                                                                x))
+                     '(:to :cc :bcc :from))))
               (completing-read "Compose with account: "
                                my/email-accounts
-                               nil t)
-            (mu4e-contact-email
-             (-any
-              #'(lambda (x)
-                  (mu4e-message-contact-field-matches-me mu4e-compose-parent-message
-                                                         x))
-              '(:to :cc :bcc :from))))))
+                               nil t))))
 
   (add-hook 'mu4e-compose-pre-hook 'my-mu4e-set-account)
 

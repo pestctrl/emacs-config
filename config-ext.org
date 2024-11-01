@@ -41,7 +41,9 @@
 #+end_src
 * Mail
 #+begin_src emacs-lisp
-  (when (ec/load-or-ask-pred 'my-ec/enable-mail "Enable mail? ")
+  (when (and
+         (ec/load-or-ask-pred 'my-ec/enable-mail "Enable mail? ")
+         my-ec/authinfo-exists)
     (require 'emacs-mail))
 #+end_src
 * Ace jump

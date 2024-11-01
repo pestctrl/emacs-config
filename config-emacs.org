@@ -238,28 +238,32 @@
 #+end_src
 * encryption
 #+begin_src emacs-lisp
-  (require 'epa-file)
-  (epa-file-enable)
-  (setq epa-pinentry-mode 'loopback)
-  (setq epa-file-cache-passphrase-for-symmetric-encryption t)
-  (setenv "GPG_AGENT_INFO" nil)
+  (let ((authinfo-file (expand-file-name "~/.authinfo")))
+    (if (not (setq my-ec/authinfo-exists
+                   (file-exists-p authinfo-file)))
+        (warn ".authinfo file missing, remember to setup seafile. Mail config is also prevented from loading")
+      (require 'epa-file)
+      (epa-file-enable)
+      (setq epa-pinentry-mode 'loopback)
+      (setq epa-file-cache-passphrase-for-symmetric-encryption t)
+      (setenv "GPG_AGENT_INFO" nil)
 
-  (setq epg-gpg-program "gpg2")
-  ;; (setq auth-source-debug t)
-  (setq auth-sources `((:source ,(ef "secrets/.authinfo.gpg"))))
+      (setq epg-gpg-program "gpg2")
+      ;; (setq auth-source-debug t)
+      (setq auth-sources `((:source ,authinfo-file)))
 
-  (when-let* ((gpg (executable-find "gpg2"))
-              (version (shell-command-to-string (format "%s --version" gpg)))
-              ((string-match (rx "gpg (GnuPG) "
-                                 (group (+ digit)
-                                        (+ "."
-                                           (+ digit))))
-                             version))
-              (version (match-string 1 version))
-              (number (string-to-number
-                       (string-replace "." "" version)))
-              ((>= 243 number 241)))
-    (fset 'epg-wait-for-status 'ignore))
+      (when-let* ((gpg (executable-find "gpg2"))
+                  (version (shell-command-to-string (format "%s --version" gpg)))
+                  ((string-match (rx "gpg (GnuPG) "
+                                     (group (+ digit)
+                                            (+ "."
+                                               (+ digit))))
+                                 version))
+                  (version (match-string 1 version))
+                  (number (string-to-number
+                           (string-replace "." "" version)))
+                  ((>= 243 number 241)))
+        (fset 'epg-wait-for-status 'ignore))))
 #+end_src
 * delete-other-side-windows
 #+begin_src emacs-lisp

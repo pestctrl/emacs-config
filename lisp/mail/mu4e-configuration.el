@@ -167,7 +167,7 @@
                   (append mu4e~headers-thread-state '(t))))
         ;; Return the thread prefix.
         (format "%s%s"
-                prefix
+                (propertize prefix 'face 'mu4e-related-face)
                 (if duplicate
                     (mu4e~headers-thread-prefix-map 'duplicate) "")))))
 

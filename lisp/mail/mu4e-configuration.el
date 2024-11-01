@@ -78,17 +78,44 @@
                   x)
                 mu4e-bookmarks))
 
+  (defvar my/email-accounts
+    '("bensonchu457@fastmail.com"
+      "bensonchu457@gmail.com"
+      "me@mail.pestctrl.io"
+      "dev@mail.pestctrl.io"))
+
   (defun my/mu-init ()
     (interactive)
-    (let ((addresses
-           '("bensonchu457@fastmail.com"
-             "bensonchu457@gmail.com"
-             "me@mail.pestctrl.io")))
-      (async-shell-command
-       (format "mu init --maildir=~/.mail/ %s"
-               (--> addresses
-                    (mapcar #'(lambda (x) (concat "--my-address=" x)) it)
-                    (string-join it " "))))))
+    (async-shell-command
+     (format "mu init --maildir=~/.mail/ %s"
+             (--> my/email-accounts
+                  (mapcar #'(lambda (x) (concat "--my-address=" x)) it)
+                  (string-join it " ")))))
+
+  (defun my-mu4e-set-account ()
+    (setq user-mail-address
+          (if (not mu4e-compose-parent-message)
+              (completing-read "Compose with account: "
+                               my/email-accounts
+                               nil t)
+            (mu4e-contact-email
+             (-any
+              #'(lambda (x)
+                  (mu4e-message-contact-field-matches-me mu4e-compose-parent-message
+                                                         x))
+              '(:to :cc :bcc :from))))))
+
+  (add-hook 'mu4e-compose-pre-hook 'my-mu4e-set-account)
+
+  (if (not (string= mu4e-mu-version "1.12.5"))
+      (warn "Remove this advice, bug has been fixed")
+    (defun my/mu4e-run-pre-hook (compose-type compose-func &optional parent)
+      (let ((mu4e-compose-parent-message parent)
+            (mu4e-compose-type compose-type))
+        (run-hooks 'mu4e-compose-pre-hook)))
+    (advice-add #'mu4e--draft
+                :before
+                #'my/mu4e-run-pre-hook))
 
   ;; (setcar mu4e-headers-thread-last-child-prefix "╰┬►")
   ;; (setcar mu4e-headers-thread-first-child-prefix "├┬►")

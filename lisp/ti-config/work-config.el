@@ -46,6 +46,7 @@
 (add-to-list 'auto-mode-alist '("\\.cdis$" . asm-mode))
 (add-to-list 'auto-mode-alist '("\\.cmd$" . conf-mode))
 (add-to-list 'auto-mode-alist '("\\.fsdump$" . argo-fastsim-dump-mode))
+(add-to-list 'auto-mode-alist `("/Makefile\\.[^/]*\\'" . makefile-mode))
 
 (use-package ein
   :config

@@ -46,17 +46,35 @@
   (dolist (charset '(kana han cjk-misc bopomofo gb18030))
     (set-fontset-font "fontset-default" charset cf)))
 
-(when my-ec/at-ti
+(if my-ec/at-ti
+    (progn
+      (set-fontset-font "fontset-default"
+                        (cons
+                         (decode-char 'ucs #x2500)
+                         (decode-char 'ucs #x257F))
+                        (font-spec :name "Latin Modern Math" :size 12))
+      (set-fontset-font "fontset-default"
+                        (cons
+                         (decode-char 'ucs #x2997)
+                         (decode-char 'ucs #x2997))
+                        (font-spec :size 8 :avgwidth 8 :name "STIXGeneral" :weight 'normal)))
   (set-fontset-font "fontset-default"
                     (cons
                      (decode-char 'ucs #x2500)
-                     (decode-char 'ucs #x257F))
-                    (font-spec :name "Latin Modern Math" :size 12))
+                     (decode-char 'ucs #x25CF))
+                    (font-spec :name "DejaVu Sans Mono" :size 14))
+
   (set-fontset-font "fontset-default"
                     (cons
-                     (decode-char 'ucs #x2997)
-                     (decode-char 'ucs #x2997))
-                    (font-spec :size 8 :avgwidth 8 :name "STIXGeneral" :weight 'normal)))
+                     (decode-char 'ucs #x2191)
+                     (decode-char 'ucs #x2191))
+                    (font-spec :name "DejaVu Sans Mono" :size 12))
+
+  (set-fontset-font "fontset-default"
+                    (cons
+                     (decode-char 'ucs #x26A1)
+                     (decode-char 'ucs #x26A1))
+                    (font-spec :name "DejaVu Sans Mono" :size 14)))
 
 (when my-ec/at-ti
   (set-fontset-font "fontset-default" 'ascii (font-spec :size 11 :name "RobotoMono"))

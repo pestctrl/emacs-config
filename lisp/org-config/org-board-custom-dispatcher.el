@@ -42,7 +42,7 @@ added as a link in the `ARCHIVED_AT' property."
     (make-directory directory)
     (let ((default-directory directory))
       (start-process "org-board-youtube-dl" "*org-board-youtube-dl*" youtube-dl-binary
-                     (car site))))
+                     "-f 137+140" (car site))))
    ((and
      (= (length site) 1)
      (string-match-p "reddit" (car site)))

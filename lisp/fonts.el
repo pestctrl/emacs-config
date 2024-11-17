@@ -74,7 +74,7 @@
                     (cons
                      (decode-char 'ucs #x26A1)
                      (decode-char 'ucs #x26A1))
-                    (font-spec :name "DejaVu Sans Mono" :size 14)))
+                    (font-spec :name "Symbols Nerd Font Mono" :size 16)))
 
 (when my-ec/at-ti
   (set-fontset-font "fontset-default" 'ascii (font-spec :size 11 :name "RobotoMono"))

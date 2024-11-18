@@ -76,7 +76,7 @@
 
 (defun ll/build-lit-command (file action)
   (format "%s %s %s"
-          (car (lls/get-tool "llvm-lit"))
+          (lls/prompt-tool "llvm-lit")
           (pcase action
             ('verbose "-v")
             ('all "-a")

@@ -238,7 +238,10 @@
 #+end_src
 * encryption
 #+begin_src emacs-lisp
-  (let ((authinfo-file (expand-file-name "~/.authinfo")))
+  (let ((authinfo-file
+         (if my-ec/at-ti
+             (ef "secrets/.authinfo.gpg")
+           (expand-file-name "~/.authinfo"))))
     (if (not (setq my-ec/authinfo-exists
                    (file-exists-p authinfo-file)))
         (warn ".authinfo file missing, remember to setup seafile. Mail config is also prevented from loading")

@@ -68,7 +68,7 @@
                     (cons
                      (decode-char 'ucs #x2191)
                      (decode-char 'ucs #x2191))
-                    (font-spec :name "DejaVu Sans Mono" :size 12))
+                    (font-spec :name "DejaVu Sans Mono" :size 13))
 
   (set-fontset-font "fontset-default"
                     (cons

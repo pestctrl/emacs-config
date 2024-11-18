@@ -38,8 +38,9 @@
              "Unix Makefiles")
            nil nil initial-input history)))
 
-(add-to-list 'vertico-multiform-commands
-             '(cmake:-G flat (vertico-cycle . t)))
+;; (with-eval-after-load 'vertico-multiform
+;;   (add-to-list 'vertico-multiform-commands
+;;                '(cmake:-G flat (vertico-cycle . t))))
 
 (transient-define-argument cmake:-G ()
   :description "Generator"

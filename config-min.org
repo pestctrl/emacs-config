@@ -502,10 +502,8 @@
         '(display-buffer-in-side-window
           (side . left)
           (dedicated . t)
-          (select . t)
           (inhibit-same-window . t)
-          (window-parameters
-           (no-other-window . t))))
+          (window-parameters (no-other-window . t))))
   (global-set-key (kbd "C-x g") 'magit-status)
   (global-set-key (kbd "C-x M-g") 'magit-dispatch)
 
@@ -544,6 +542,14 @@
 
   (transient-append-suffix 'magit-worktree "c"
     '("C" "[async] branch and worktree" my/magit-worktree-branch))
+
+  ;; This is fixed in 5478d4e of magit/transient (committed )
+  ;; (require 'transient-bug)
+  ;; (with-eval-after-load 'vertico-multiform
+  ;;   (add-to-list 'vertico-multiform-commands
+  ;;                '(magit:--author flat (vertico-cycle . t)))
+  ;;   (add-to-list 'vertico-multiform-commands
+  ;;                '(magit:-- flat (vertico-cycle . t))))
 
   ;; Update all submodules
   (defun magit-submodule-update-recursive ()

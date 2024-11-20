@@ -34,7 +34,7 @@
 (defvar llvm-core-count 8)
 
 (defun lls/ninja-build-tools (build-dir tools-list &optional verbose)
-  (format "ninja --color=always -C %s -j %d %s %s 2>&1 | tee ninja.log"
+  (format "set -o pipefail && ninja --color=always -C %s -j %d %s %s 2>&1 | tee ninja.log"
           build-dir llvm-core-count
           (if verbose "-v" "")
           (string-join tools-list " ")))

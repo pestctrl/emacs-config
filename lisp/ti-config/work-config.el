@@ -174,6 +174,11 @@
            path-separator
            "/usr/lib/llvm-14/lib/python3.10/dist-packages/")))
 (advice-add #'realgud--lldb :before #'lldb-setup-python)
+
+(advice-add #'ein:jupyter-server-start
+            :before
+            #'(lambda (&rest _ignore)
+                (setenv "PYTHONPATH" "")))
 ;; (advice-remove #'lls/lldb #'lldb-setup-python)
 
 ;; (defun my/patch-pythonpath (orig &rest args)

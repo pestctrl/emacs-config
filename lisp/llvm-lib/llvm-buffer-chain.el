@@ -132,11 +132,12 @@
 
 (defun lbc/around-act (orig &rest args)
   (let ((buff-orig (current-buffer))
-        (previous-act (slot-value lbc/source-buffer-info 'producing-act-buffer))
-        (act-buffer (apply orig args)))
+        (act-buffer (apply orig args))
+        previous-act)
     (with-current-buffer buff-orig
       ;; Make sure info is initialized
       (lbc/source-buffer-mode 1)
+      (setq previous-act (slot-value lbc/source-buffer-info 'producing-act-buffer))
 
       (setf (slot-value lbc/source-buffer-info 'next-act-buffer)
             act-buffer))

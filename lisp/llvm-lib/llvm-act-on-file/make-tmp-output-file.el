@@ -36,6 +36,7 @@
       (setq fname (file-name-nondirectory (file-name-sans-extension file))
             temporary-file-directory (expand-file-name "tmp" file-directory)))
 
+    (make-directory temporary-file-directory)
     (make-temp-file (concat fname "-")
                     nil ext)))
 

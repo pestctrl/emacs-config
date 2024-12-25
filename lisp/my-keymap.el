@@ -32,11 +32,11 @@
 (exwm-global-set-key (kbd "M-T") 'flop-frame)
 (exwm-global-set-key (kbd "s-k") (lambda () (interactive) (kill-buffer (current-buffer))))
 (exwm-global-set-key (kbd "M-Q") #'bury-buffer)
-(exwm-global-set-key (kbd "M-o") #'other-window)
 (exwm-global-set-key (kbd "M-P") #'previous-buffer)
 (exwm-global-set-key (kbd "M-N") #'next-buffer)
-(exwm-global-set-key (kbd "s-o") #'org-agenda)
+(exwm-global-set-key (kbd "s-o") #'other-window)
 (exwm-global-set-key (kbd "s-u") #'org-capture)
+(global-set-key (kbd "M-o") #'other-window)
 ;; (add-to-list 'exwm-input-global-keys
 ;;              (cons (kbd "C-g") #'keyboard-quit))
 

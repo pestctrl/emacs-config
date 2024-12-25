@@ -24,19 +24,24 @@
        :config
        (with-eval-after-load "exwm"
          (add-to-list 'exwm-input-global-keys
-                      (cons ,keybinding ,function))))
+                      (cons ,keybinding ,function))))))
+
+(defmacro exwm-line-mode-set-key (keybinding function)
+  `(progn
+     (with-eval-after-load "exwm"
+       (define-key exwm-mode-map ,keybinding ,function))
      (define-key pestctrl-minor-mode-map ,keybinding ,function)))
 
 (pestctrl-minor-mode 1)
 
-(exwm-global-set-key (kbd "M-T") 'flop-frame)
-(exwm-global-set-key (kbd "s-k") (lambda () (interactive) (kill-buffer (current-buffer))))
-(exwm-global-set-key (kbd "M-Q") #'bury-buffer)
-(exwm-global-set-key (kbd "M-P") #'previous-buffer)
-(exwm-global-set-key (kbd "M-N") #'next-buffer)
-(exwm-global-set-key (kbd "s-o") #'other-window)
+(exwm-global-set-key (kbd "s-k") #'kill-current-buffer)
 (exwm-global-set-key (kbd "s-u") #'org-capture)
-(global-set-key (kbd "M-o") #'other-window)
+
+(exwm-line-mode-set-key (kbd "M-T") 'flop-frame)
+(exwm-line-mode-set-key (kbd "M-Q") #'bury-buffer)
+(exwm-line-mode-set-key (kbd "M-P") #'previous-buffer)
+(exwm-line-mode-set-key (kbd "M-N") #'next-buffer)
+(exwm-line-mode-set-key (kbd "M-o") #'other-window)
 ;; (add-to-list 'exwm-input-global-keys
 ;;              (cons (kbd "C-g") #'keyboard-quit))
 
@@ -55,7 +60,7 @@
 
 (define-prefix-command '*root-map*)
 (define-key *root-map* (kbd my/keymap-key) (key-binding (kbd "C-t")))
-(exwm-global-set-key (kbd my/keymap-key) '*root-map*)
+(exwm-line-mode-set-key (kbd my/keymap-key) '*root-map*)
 
 (define-key *root-map* (kbd "C-n") 'switch-window)
 (define-key *root-map* (kbd "i") 'org-mru-clock-in)

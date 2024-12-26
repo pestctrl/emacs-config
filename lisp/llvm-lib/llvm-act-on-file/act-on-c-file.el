@@ -151,7 +151,10 @@
          (output (ll/make-tmp-file
                   file
                   (cond
-                   ((eq action 'assemble) ".S")
+                   ((eq 'assemble
+                        (aml/get-map-prop ll/c-file-action-map action
+                                          :compiler-action))
+                    ".S")
                    (t ".ll")))))
     (if (eq action 'diff)
         (ll/diff-c-on-two-compilations file action)

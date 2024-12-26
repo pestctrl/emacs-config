@@ -200,21 +200,25 @@
 
 ;; =============================== Misc ==============================
 
-(defun my/completing-read (prompt collection)
+(defun my/completing-read (prompt collection &optional initial-input)
   (let ((len (length collection)))
     (cond ((< len 1)
            (user-error "Uhhh, no %ss? " prompt))
           ((= len 1) (car collection))
           (t (completing-read (format "Which %s? " prompt)
-                              collection)))))
+                              collection nil nil initial-input)))))
 
 (defun lls/prompt-tool (tool-regexp &optional directories)
   (lls/un-trampify
-   (my/completing-read tool-regexp
-                       (lls/get-tool tool-regexp
-                                     (or (and (eq 'string (type-of directories))
-                                              (list directories))
-                                         directories)))))
+   (let (;;(vertico-sort-function nil)
+         )
+     (my/completing-read tool-regexp
+                         (lls/get-tool tool-regexp
+                                       (or (and (eq 'string (type-of directories))
+                                                (list directories))
+                                           directories))
+                         (concat (file-name-nondirectory (ti/current-tools-directory))
+                                 " ")))))
 
 (defun lls/get-tool (tool-regexp &optional directories)
   (cl-mapcan #'(lambda (dir)

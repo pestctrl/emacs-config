@@ -352,5 +352,21 @@
                                 ((string-match-p "^Release$" (file-name-nondirectory x)) t)
                                 (t (string< x y))))))))))
 
+(defun lls/cmake-here (directory build-type target)
+  (interactive
+   (list (expand-file-name "llvm"
+                           (projectile-project-root))
+         (completing-read "Build Type? "
+                          '("Release"
+                            "Debug"
+                            "RelWithDebInfo"))
+         (lls/conf-get 'target)))
+  (let* ((comm-temp
+          "cmake %s -G Ninja -DCMAKE_BUILD_TYPE='%s' -DLLVM_ENABLE_PROJECTS='clang' -DLLVM_TARGETS_TO_BUILD='%s' -DCMAKE_C_COMPILER='clang' -DCMAKE_CXX_COMPILER='clang++'")
+         (command (read-string
+                   "CMake Command? "
+                   (format comm-temp directory build-type target))))
+    (compile command)))
+
 (provide 'llvm-shared)
 ;;; llvm-shared.el ends here

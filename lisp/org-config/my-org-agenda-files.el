@@ -34,12 +34,13 @@
 (defun my/org-file (str)
   (if (not (string-match-p "\\.gpg$" str))
       (my/plaintext-file (concat (file-name-as-directory "org") str))
-    (let ((path
-           (--> my/plaintext-object-folder
-                (expand-file-name "gpg" it)
-                (expand-file-name str it))))
-      (when (file-exists-p path)
-        path))))
+    (when my/has-plaintext-object-folder
+      (let ((path
+             (--> my/plaintext-object-folder
+                  (expand-file-name "gpg" it)
+                  (expand-file-name str it))))
+        (when (file-exists-p path)
+          path)))))
 
 (my/org-file "entries/reviews.gpg")
 

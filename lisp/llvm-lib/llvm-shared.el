@@ -28,14 +28,12 @@
 (require 'eieio)
 (require 'load-llvm-mode)
 (require 'my-clang-options)
+(require 'my-nprocs)
 
 ;; =========================== LLVM Rebuild ==========================
 
 (defvar llvm-core-count
-  (--> "nproc"
-       (shell-command-to-string it)
-       (string-to-number it)
-       (- it 16)))
+  (nprocs))
 
 (defun lls/ninja-build-tools (build-dir tools-list &optional verbose)
   (format "set -o pipefail && CLICOLOR_FORCE=1 ninja -C %s -j %d %s %s 2>&1 | tee ninja.log"

@@ -59,9 +59,11 @@
     :hook
     (lsp-completion-mode . my/lsp-mode-setup-completion)
     :config
+    (require 'my-nprocs)
     (with-eval-after-load 'lsp-clangd
       (add-to-list 'lsp-clients-clangd-args
-                   "-j=16"))
+                   (format "-j=%d"
+                           (nprocs))))
 
     (setq lsp-clangd-binary-path
           (executable-find "clangd"))

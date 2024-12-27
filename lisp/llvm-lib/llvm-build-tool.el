@@ -24,6 +24,7 @@
 
 ;;; Code:
 (require 'llvm-shared)
+(require 'tmux-cmd)
 
 (defvar lls/name-llvm-build-buffer
   (lambda (directory tools)
@@ -31,19 +32,31 @@
             (file-name-nondirectory directory)
             (string-join tools ","))))
 
-(defun ll/llvm-build-tool (directory tools)
-  (interactive
-   (list
-    (my/completing-read "build directory" (lls/get-llvm-build-dirs))
-    (-->
-     (completing-read-multiple "ninja -j X "
-                               '("clang"
-                                 "llc")))))
-  (let* ((buffer-name (funcall lls/name-llvm-build-buffer directory tools)))
-    (compilation-start
-     (lls/ninja-build-tools (lls/un-trampify directory) tools)
-     nil
-     (lambda (_) buffer-name))))
+;; (defun ll/llvm-build-tool (directory tools)
+;;   (interactive
+;;    (list
+;;     (my/completing-read "build directory" (lls/get-llvm-build-dirs))
+;;     (-->
+;;      (completing-read-multiple "ninja -j X "
+;;                                '("clang"
+;;                                  "llc")))))
+;;   (let* ((buffer-name (funcall lls/name-llvm-build-buffer directory tools)))
+;;     (compilation-start
+;;      (lls/ninja-build-tools (lls/un-trampify directory) tools)
+;;      nil
+;;      (lambda (_) buffer-name))))
+
+(defun-tmux-cmd-2 ll/llvm-build-tool (directory tools)
+  (:tmux-type transient
+   :interactive
+   ((list
+      (my/completing-read "build directory" (lls/get-llvm-build-dirs))
+      (completing-read-multiple "ninja -j X "
+                                '("clang"
+                                  "llc")))))
+  (name (funcall lls/name-llvm-build-buffer directory tools))
+
+  (lls/ninja-build-tools (lls/un-trampify directory) tools))
 
 (provide 'llvm-build-tool)
 ;;; llvm-build-tool.el ends here

@@ -320,6 +320,7 @@
   (let ((repo-remotes
          '("https://github.com/llvm/llvm-project.git"
            "git@github.com:llvm/llvm-project"
+           "git@github.com:llvm/llvm-project.git"
            "https://github.com/MPACT-ORG/llvm-project"
            "https://github.com/Xilinx/llvm-aie")))
     (if (-->

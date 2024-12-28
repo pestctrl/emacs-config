@@ -16,7 +16,7 @@
     (add-drawer "^http"
                 "WEBSITE")
     (add-drawer "^English:"
-                "ENGLISH")
+                "ENGLISH_TRANSLATION")
     (goto-char (line-end-position))
     (insert "\n:PROPERTIES:")
     (re-search-forward "goo.gl" nil t)
@@ -24,9 +24,10 @@
     (insert "\n:END:")
     (widen)))
 
-(defun my/populate-taiwan-fields (address website maps-url coordinates)
+(defun my/populate-taiwan-fields (english address website maps-url coordinates)
   (interactive
    (list
+    (read-string "English? ")
     (read-string "Address? ")
     (read-string "Website? ")
     (read-string "Google Maps URL? ")
@@ -34,6 +35,7 @@
   (cl-flet ((add-valid (key value)
               (when (not (string-empty-p value))
                 (org-entry-put (point) key value))))
+    (add-valid "ENGLISH_TRANSLATION" english)
     (add-valid "ADDRESS" address)
     (add-valid "COORDINATES" coordinates)
     (add-valid "WEBSITE" website)

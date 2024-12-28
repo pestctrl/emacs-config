@@ -29,6 +29,7 @@
 (require 'load-llvm-mode)
 (require 'my-clang-options)
 (require 'my-nprocs)
+(require 'use-package)
 (use-package realgud-lldb)
 
 ;; =========================== LLVM Rebuild ==========================

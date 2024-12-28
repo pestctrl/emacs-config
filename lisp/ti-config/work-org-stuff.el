@@ -483,7 +483,6 @@
     (insert "\n|-"))
   (org-table-align))
 
-
 (setq show-tab-bar-new-tab t)
 
 (defmacro org-babel-comint-with-output (meta &rest body)

@@ -43,5 +43,7 @@
 (require 'self-chat-mode)
 (require 'my-org-caldav)
 
+(require 'org-table-convert)
+
 (provide 'my-org)
 ;;; my-org.el ends here

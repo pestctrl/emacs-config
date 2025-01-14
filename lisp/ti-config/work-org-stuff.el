@@ -444,6 +444,7 @@
          ("C-c n j" . my/org-roam-logger-capture-current)
          :map org-mode-map
          ("C-M-i" . completion-at-point))
+  :commands my/get-org-roam-files-by-tags
   :config
   (org-roam-db-autosync-enable)
   (setq org-roam-capture-templates
@@ -524,8 +525,10 @@
 
   (defun org-agenda-insert-breaks-between (str1 str2)
     (let ((r (rx line-start
-                 (= 18 nonl)
-                 (not ".")))
+                 "  "
+                 (+ (not whitespace))
+                 (+ whitespace)
+                 (not (any whitespace "."))))
           begin end)
       (save-excursion
         (goto-char (point-min))

@@ -364,7 +364,7 @@
 ;;                                     (substring contents begin (match-end 0))))))
 ;;                    (org-roam--get-title-or-slug file))))
 
-(require 'org-table-covert)
+(require 'org-table-convert)
 
 (setq show-tab-bar-new-tab t)
 

@@ -231,7 +231,8 @@
             :override
             #'my/elpy-patch)
 
-(require 'work-mail)
+(when my-ec/enable-mail
+  (require 'work-mail))
 
 (provide 'work-config)
 ;;; work-config.el ends here

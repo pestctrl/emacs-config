@@ -38,6 +38,9 @@
   (let ((monitors (my/get-screens)))
     (setq exwm-workspace-number (length monitors))))
 
+(defun exwm-workspace-current-monitor ()
+  (plist-get exwm-randr-workspace-monitor-plist exwm-workspace-current-index))
+
 (defun setup-workspace-monitors ()
   (setq exwm-randr/current-offset 0)
   (setq exwm-randr-workspace-monitor-plist

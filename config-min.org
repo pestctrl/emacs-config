@@ -483,7 +483,9 @@
     (corfu-auto t)
     :init
     (add-hook 'prog-mode-hook
-              'corfu-mode))
+              'corfu-mode)
+    :config
+    (require 'corfu-hack))
 
   ;; Magit
   (use-package magit)

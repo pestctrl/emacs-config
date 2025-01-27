@@ -26,21 +26,33 @@
 (require 'exwm-screens)
 (require 'corfu)
 
+;; (defun get-focused-monitor-geometry ()
+;;   "Get the geometry of the monitor displaying the selected frame in EXWM."
+;;   (let* ((name
+;;           (-->
+;;            (format "xrandr | grep %s"
+;;                    (exwm-workspace-current-monitor))
+;;            (shell-command-to-string it))))
+;;     (string-match (rx (+? nonl)
+;;                       (group (+ digit)) "x" (group (+ digit)) "+"
+;;                       (group (+ digit)) "+" (group (+ digit)))
+;;                   name)
+;;     (list (string-to-number (match-string 3 name)) ; X
+;;           (string-to-number (match-string 4 name)) ; Y
+;;           (string-to-number (match-string 1 name)) ; Width
+;;           (string-to-number (match-string 2 name)) ; Height
+;;           )))
+
+;; Requires libXrandr
 (defun get-focused-monitor-geometry ()
   "Get the geometry of the monitor displaying the selected frame in EXWM."
-  (let* ((name
-          (-->
-           (format "xrandr | grep %s"
-                   (exwm-workspace-current-monitor))
-           (shell-command-to-string it))))
-    (string-match (rx (+? nonl)
-                      (group (+ digit)) "x" (group (+ digit)) "+"
-                      (group (+ digit)) "+" (group (+ digit)))
-                  name)
-    (list (string-to-number (match-string 3 name)) ; X
-          (string-to-number (match-string 4 name)) ; Y
-          (string-to-number (match-string 1 name)) ; Width
-          (string-to-number (match-string 2 name)) ; Height
+  (let* ((monitor-attrs (frame-monitor-attributes))
+         (workarea (assoc 'workarea monitor-attrs))
+         (geometry (cdr workarea)))
+    (list (nth 0 geometry)              ; X
+          (nth 1 geometry)              ; Y
+          (nth 2 geometry)              ; Width
+          (nth 3 geometry)              ; Height
           )))
 
 ;; (get-focused-monitor-geometry)

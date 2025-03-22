@@ -29,11 +29,12 @@
 ;;; Code:
 
 (defmacro use-exwm (&rest body)
-  `(use-package exwm
+  `(when my-ec/enable-exwm
+     (use-package exwm
      :ensure nil
      :defer t
      :quelpa (exwm :fetcher ,(if (or noninteractive my-ec/at-ti) "github" "github-ssh") :repo "pestctrl/exwm")
-     ,@body))
+     ,@body)))
 
 (provide 'use-exwm)
 ;;; use-exwm.el ends here

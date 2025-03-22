@@ -485,7 +485,8 @@
     (add-hook 'prog-mode-hook
               'corfu-mode)
     :config
-    (require 'corfu-hack))
+    (when my-ec/enable-exwm
+      (require 'corfu-hack)))
 
   ;; Magit
   (use-package magit)

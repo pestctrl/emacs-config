@@ -40,6 +40,8 @@
   (unless (package-installed-p package)
     (package-install package)))
 
+(setq use-package-always-ensure t)
+
 (require 'libs)
 
 (require 'emacs-custom-load-or-ask)
@@ -55,8 +57,6 @@
 (require 'quelpa-use-package)
 
 (require 'term-compat)
-
-(setq use-package-always-ensure t)
 
 (when (native-comp-available-p)
   (require 'comp)

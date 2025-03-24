@@ -367,7 +367,7 @@
                             "RelWithDebInfo"))
          (lls/conf-get 'target)))
   (let* ((comm-temp
-          "cmake %s -G Ninja -DCMAKE_BUILD_TYPE='%s' -DLLVM_ENABLE_PROJECTS='clang' -DLLVM_TARGETS_TO_BUILD='%s' -DCMAKE_C_COMPILER='clang' -DCMAKE_CXX_COMPILER='clang++'")
+          "cmake %s -G Ninja -DCMAKE_BUILD_TYPE='%s' -DLLVM_ENABLE_PROJECTS='clang;llvm' -DLLVM_TARGETS_TO_BUILD='%s' -DCMAKE_C_COMPILER='clang' -DCMAKE_CXX_COMPILER='clang++' -DLLVM_ENABLE_ASSERTIONS=On")
          (command (read-string
                    "CMake Command? "
                    (format comm-temp directory build-type target))))

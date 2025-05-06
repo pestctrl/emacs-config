@@ -120,9 +120,9 @@
   (when mvt/minor-mode
     (add-hook 'kill-buffer-hook #'mvt/kill-hook)))
 
-(defun multi-vterm-tab ()
+(defun multi-vterm-tab (arg)
   "Create new vterm buffer."
-  (interactive)
+  (interactive "P")
   (let* ((tab-name (alist-get 'name (tab-bar--current-tab)))
          (tab-sym (intern tab-name))
          (mvti (mvt/get-or-create-info tab-sym)))
@@ -130,6 +130,7 @@
       (switch-to-buffer
        (or (and buffer
                 (buffer-live-p buffer)
+                (not arg)
                 buffer)
            (mvt/create-buffer tab-name mvti))))))
 

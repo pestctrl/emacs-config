@@ -35,6 +35,11 @@
 
 (defvar mvt/info (make-hash-table))
 
+(defun mvt/get-or-create-info (symbol)
+  (or (gethash symbol mvt/info)
+      (puthash symbol (make-instance 'multi-vterm-tab-info)
+               mvt/info)))
+
 ;; (setq mvt/info nil)
 
 (defun mvt/format-buffer-name (tab-name index)
@@ -76,7 +81,7 @@
   (let* ((info (mvt/extract-info))
          (tab-name (car info))
          (start (cdr info))
-         (mvt-info (gethash (intern tab-name) mvt/info))
+         (mvt-info (mvt/get-or-create-info (intern tab-name)))
          (max-num
           (-->
            (slot-value mvt-info 'max-number)
@@ -98,8 +103,7 @@
   (when mvt/minor-mode
     (let ((info (mvt/extract-info)))
       (push (cdr info)
-            (slot-value (gethash (intern (car info))
-                                 mvt/info)
+            (slot-value (mvt/get-or-create-info (intern (car info)))
                         'free-numbers))
       (mvt/next))))
 
@@ -120,9 +124,7 @@
   (interactive)
   (let* ((tab-name (alist-get 'name (tab-bar--current-tab)))
          (tab-sym (intern tab-name))
-         (mvti (or (gethash tab-sym mvt/info)
-                   (puthash tab-sym (make-instance 'multi-vterm-tab-info)
-                            mvt/info))))
+         (mvti (mvt/get-or-create-info tab-sym)))
     (let ((buffer (slot-value mvti 'recent-buffer)))
       (switch-to-buffer
        (or (and buffer

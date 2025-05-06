@@ -69,6 +69,32 @@
          (switch-to-buffer it)
        it))))
 
+(defun mvt/get-all-buffers (tab-name)
+  (let* ((tab-sym (intern tab-name))
+         (mvti (mvt/get-or-create-info tab-sym))
+         (max-num (slot-value mvti 'max-number))
+         buffs)
+    (dotimes (i max-num)
+      (awhen (get-buffer (mvt/format-buffer-name tab-name i))
+        (push it buffs)))
+    (reverse buffs)))
+
+;; (mvt/get-all-buffers (alist-get 'name (tab-bar--current-tab)))
+
+(defun mvt/compact-terminals (tab-name)
+  (interactive
+   (list (alist-get 'name (tab-bar--current-tab))))
+  (let* ((tab-sym (intern tab-name))
+         (mvti (mvt/get-or-create-info tab-sym))
+         (all-buffers (mvt/get-all-buffers tab-name))
+         (iter 0))
+    (dolist (buff all-buffers)
+      (with-current-buffer buff
+        (rename-buffer (mvt/format-buffer-name tab-name iter)))
+      (incf iter))
+    (setf (slot-value mvti 'free-numbers) nil
+          (slot-value mvti 'max-number) (1- iter))))
+
 (defun mvt/extract-info ()
   (when mvt/minor-mode
     (let ((buffer-name (buffer-name)))

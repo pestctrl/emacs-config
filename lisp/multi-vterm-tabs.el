@@ -88,7 +88,8 @@
            (1+ it)))
          last-buffer)
     (while (progn
-             (setq start (mod (1+ start) max-num))
+             (when (not (= max-num 0))
+               (setq start (mod (1+ start) max-num)))
              (not (setq last-buffer
                         (get-buffer (mvt/format-buffer-name tab-name start))))))
     (setf (slot-value mvt-info 'recent-buffer)

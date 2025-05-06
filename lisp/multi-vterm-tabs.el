@@ -44,14 +44,13 @@
 (defvar mvt/regex
   (rx (and "*" (group (+ nonl)) "-vterm<" (group (+ digit)) ">" "*")))
 
-(defun mvt/create-buffer (tab-name mvti)
+(defun mvt/create-buffer (tab-name)
   (interactive
-   (let ((name (alist-get 'name (tab-bar--current-tab))))
-     (list name
-           (gethash (intern name) mvt/info))))
-  (let ((index (or (pop (slot-value mvti 'free-numbers))
-                   (cl-incf (slot-value mvti 'max-number))))
-        vterm-name)
+   (list (alist-get 'name (tab-bar--current-tab))))
+  (let* ((mvti (gethash (intern tab-name) mvt/info))
+         (index (or (pop (slot-value mvti 'free-numbers))
+                    (cl-incf (slot-value mvti 'max-number))))
+         vterm-name)
     (setq vterm-name (mvt/format-buffer-name tab-name index))
     (-->
      (or (get-buffer vterm-name)

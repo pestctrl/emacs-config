@@ -158,7 +158,7 @@
                 (buffer-live-p buffer)
                 (not arg)
                 buffer)
-           (mvt/create-buffer tab-name mvti))))))
+           (mvt/create-buffer tab-name))))))
 
 (defun mvt/find-all-terms-in-tab (tab-name)
   (remove-if-not #'(lambda (b)

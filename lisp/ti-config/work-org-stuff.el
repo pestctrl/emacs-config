@@ -459,6 +459,18 @@
            :target (file+head+olp "%<%Y-%m-%d>.org"
                                   "#+title: %<%Y-%m-%d>\n#+filetags: :dailies:%<%Y:%B:>\n"
                                   ("Journal")))
+          ("J" "Journal with source" entry "* %<%H:%M> %?\n:PROPERTIES:\n:LOCATION: %a\n:END:"
+           :unnarrowed t
+           :target
+           (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
+                          "#+title: ${title}\n"
+                          ("Journal" "%<%b %d, %Y>")))
+          ("s" "source location" entry "* %^{Short Description? }\n:PROPERTIES:\n:DATE: [%<%Y-%m-%d %H:%M>]\n:LOCATION: %a\n:END:\n\n%?"
+           :unnarrowed t
+           :target
+           (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
+                          "#+title: ${title}\n"
+                          ("Reference")))
           ("E" "Entry Interrupt" entry (file "~/org/templates/entry-interrupt.org")
            :unnarrowed t
            :target (file+head+olp "%<%Y-%m-%d>.org"

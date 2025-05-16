@@ -1,5 +1,12 @@
 #+PROPERTY: header-args:emacs-lisp :tangle "~/.emacs.d/config-ext.el" :comments both
 
+* Augmentations
+
+** vterm
+#+begin_src emacs-lisp
+  (require 'vterm-aux)
+#+end_src
+
 * posting source code
 #+begin_src emacs-lisp
   (use-package webpaste)

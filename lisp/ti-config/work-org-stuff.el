@@ -446,6 +446,7 @@
          ("C-M-i" . completion-at-point))
   :commands my/get-org-roam-files-by-tags
   :config
+  (require 'org-roam-util)
   (org-roam-db-autosync-enable)
   (setq org-roam-capture-templates
         '(("d" "default" plain "%?" :target
@@ -515,13 +516,6 @@
     (org-roam-node-find nil nil
                         (my/org-roam-filter-by-tag '("Project" "active"))
                         nil :templates my/project-templates))
-
-  (defun my/get-org-roam-files-by-tags (tags)
-    (->>
-     (org-roam-node-list)
-     (remove-if-not (my/org-roam-filter-by-tag tags))
-     (mapcar #'org-roam-node-file)
-     (-uniq)))
 
   (defun org-agenda-insert-breaks-between (str1 str2)
     (let ((r (rx line-start

@@ -37,6 +37,13 @@
                       (member tag tags))
                     tag-name))))))
 
+(defun my/get-org-roam-files-by-tags (tags)
+  (->>
+   (org-roam-node-list)
+   (remove-if-not (my/org-roam-filter-by-tag tags))
+   (mapcar #'org-roam-node-file)
+   (-uniq)))
+
 (defun my/org-roam-list-notes-by-tag (tag-name)
   (mapcar #'org-roam-node-file
           (seq-filter

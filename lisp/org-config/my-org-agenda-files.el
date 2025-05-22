@@ -24,6 +24,7 @@
 
 ;;; Code:
 (require 'my-plaintext-files)
+(require 'org-roam-util)
 
 (defconst my/org-folder
   (my/plaintext-file "org"))
@@ -68,6 +69,24 @@
      ,(my/agenda-file "prod.org")
      ,(my/agenda-file "habits.org")
      ,(my/agenda-file "calendars/production.org"))))
+
+(defun my/update-org-agenda-files ()
+  (interactive)
+  (setq org-agenda-files
+        (append
+         `(,(my/agenda-file "plan.org")
+           ,(my/agenda-file "thoughts.org")
+           ,(my/agenda-file "refile.org")
+           ,(my/agenda-file "sandbox.org")
+           ,(my/agenda-file "dev.org")
+           ,(my/agenda-file "prod.org")
+           ,(my/agenda-file "habits.org")
+           ,(my/agenda-file "calendars/production.org"))
+         (my/get-org-roam-files-by-tags '("Project" "active")))))
+
+(advice-add #'org-agenda
+            :before
+            #'my/update-org-agenda-files)
 
 (defconst my/all-agenda-files
   (cons (my/agenda-file "eternal.org")

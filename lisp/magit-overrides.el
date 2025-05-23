@@ -75,6 +75,9 @@
 (transient-append-suffix 'magit-log "s"
   '("A" "Ancestry path" magit-show-ancestor-merges))
 
+(transient-append-suffix 'magit-fetch "-t"
+  '("-f" "Force fetch" "--force"))
+
 ;; This is fixed in 5478d4e of magit/transient (committed )
 ;; (require 'transient-bug)
 ;; (with-eval-after-load 'vertico-multiform

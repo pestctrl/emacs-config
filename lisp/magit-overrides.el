@@ -55,11 +55,25 @@
   (magit-run-git-async "worktree" "add" (if force "-B" "-b")
                        branch (magit--expand-worktree path) start-point))
 
+(defun magit-show-ancestor-merges (revs &optional args files)
+  (interactive (cons (magit-read-starting-point "Ancestry path for: ")
+                     (magit-diff-arguments)))
+  (let ((flags "--merges --oneline --reverse --first-parent"))
+    (async-shell-command
+     (shell-and
+      (format "git --no-pager log --oneline %s~1..%s"
+              revs revs)
+      (format "git --no-pager log %s %s..origin/main | cut -c -70 | head -n 10"
+              flags revs)))))
+
 (transient-append-suffix 'magit-worktree "b"
   '("B" "[async] worktree" my/magit-worktree-checkout))
 
 (transient-append-suffix 'magit-worktree "c"
   '("C" "[async] branch and worktree" my/magit-worktree-branch))
+
+(transient-append-suffix 'magit-log "s"
+  '("A" "Ancestry path" magit-show-ancestor-merges))
 
 ;; This is fixed in 5478d4e of magit/transient (committed )
 ;; (require 'transient-bug)

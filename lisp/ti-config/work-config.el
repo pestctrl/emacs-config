@@ -218,7 +218,7 @@
                     (when (and (string-equal system-type "windows-nt")
                                (>= (string-match-p
                                     (regexp-quote "utf-8")
-                                    (format "%s" buffer-file-coding-system))) 0)
+                                    (format "%s" buffer-file-coding-system))))
                       (list
                        "PYTHONIOENCODING=utf-8"
                        "PYTHONLEGACYWINDOWSSTDIO=1")))))))

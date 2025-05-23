@@ -485,6 +485,9 @@
     (add-hook 'prog-mode-hook
               'corfu-mode)
     :config
+    (unless window-system
+      (use-package corfu-terminal)
+      (corfu-terminal-mode 1))
     (when my-ec/enable-exwm
       (require 'corfu-hack)))
 

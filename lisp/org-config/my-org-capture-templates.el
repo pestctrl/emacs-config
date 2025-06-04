@@ -250,7 +250,10 @@
                  :function my/org-find-journal
                  :datetree t
                  :template "* %U\n%?")
-                ("Programming Interview Prep Journal" :keys "p"
+                ("Puppet" :keys "p"
+                 :file ,(my/org-file "puppet.gpg")
+                 :template "* %T \n%?")
+                ("Programming Interview Prep Journal" :keys "P"
                  :file ,(my/org-file "journal.gpg")
                  :datetree t
                  :template "* ")))

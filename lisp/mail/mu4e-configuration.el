@@ -109,16 +109,6 @@
 
   (add-hook 'mu4e-compose-pre-hook 'my-mu4e-set-account)
 
-  (if (not (string= mu4e-mu-version "1.12.5"))
-      (warn "Remove this advice, bug has been fixed")
-    (defun my/mu4e-run-pre-hook (compose-type compose-func &optional parent)
-      (let ((mu4e-compose-parent-message parent)
-            (mu4e-compose-type compose-type))
-        (run-hooks 'mu4e-compose-pre-hook)))
-    (advice-add #'mu4e--draft
-                :before
-                #'my/mu4e-run-pre-hook))
-
   ;; (setcar mu4e-headers-thread-last-child-prefix "╰┬►")
   ;; (setcar mu4e-headers-thread-first-child-prefix "├┬►")
   ;; (setcar mu4e-headers-thread-connection-prefix "│")

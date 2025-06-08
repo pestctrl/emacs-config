@@ -12,15 +12,15 @@
   "This is a mode where I become crazy and talk to myself."
   (setq font-lock-defaults '(self-chat-highlights)))
 
+(modify-syntax-entry ?\" " " self-chat-mode-syntax-table)
+
 (define-key self-chat-mode-map (kbd "RET") #'self-chat-insert-next)
 (define-key self-chat-mode-map (kbd "DEL") #'delete-self-chat-line)
-(define-key self-chat-mode-map (kbd "C-DEL") #'delete-self-chat-text)
+(define-key self-chat-mode-map (kbd "C-DEL") #'sc/delete-full-line)
+(define-key self-chat-mode-map (kbd "M-DEL") #'delete-self-chat-text)
 
 (defun self-chat-insert-next ()
   (interactive)
-  (when (not (bolp))
-    (call-interactively #'newline)
-    (call-interactively #'newline))
   (call-interactively #'user-chat/body))
 
 (defun chat-pre ()
@@ -28,11 +28,28 @@
             (not (= self-chat-num self-chat-last)))
     (setq self-chat-last2 self-chat-last
           self-chat-last self-chat-num))
+  ;; Are we fixing up an old line, or creating a new one?
+  (if (save-excursion
+        (beginning-of-line)
+        (not (looking-at (rx (+ nonl) ":"))))
+      (progn
+        (beginning-of-line)
+        (kill-line))
+    (call-interactively #'newline)
+    (call-interactively #'newline))
   (insert "> "))
 
 (defun chat-post ()
   (if-let ((name (alist-get self-chat-num self-chat-alist)))
       (insert name ": ")))
+
+(defun sc/delete-full-line ()
+  (interactive)
+  (set-mark-command nil)
+  (previous-line)
+  (previous-line)
+  (end-of-line)
+  (call-interactively #'kill-region))
 
 (defun delete-self-chat-text ()
   (interactive)
@@ -51,12 +68,10 @@
     (call-interactively #'kill-ring-save))
   (cond ((= 0 (length (current-kill 0)))
          (call-interactively #'backward-char))
-        ((string-match-p "^> [A-z]*: $" (current-kill 0))
-         (set-mark-command nil)
-         (previous-line)
-         (previous-line)
-         (end-of-line)
-         (call-interactively #'kill-region))
+        ((string-match-p
+          (rx line-start ">" (optional " ") (optional (+ alpha) ":" (optional " ")) line-end)
+          (current-kill 0))
+         (sc/delete-full-line))
         (t
          (call-interactively #'delete-backward-char))))
 
@@ -104,6 +119,7 @@
                ("Coop" "c" "cornsilk")
                ("Net" "n" "magenta")
                ("Someone" "s" "dim gray")
-               ("Everyone" "e" "pale green")))
+               ("Everyone" "e" "pale green")
+               ("Note" "N" "dim gray")))
 
 (provide 'self-chat-mode)

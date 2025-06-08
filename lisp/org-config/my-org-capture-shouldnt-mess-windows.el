@@ -42,16 +42,18 @@
 
 (defun my/org-capture-finalize-shouldnt-mess-windows (&rest args)
   (save-window-excursion
-    ;; This basically means that we don't change window configurations when
-    ;; there are previous buffers to be seen. IDK if this will have unintended
-    ;; consequences, because...
-    (if (zerop (length (window-prev-buffers)))
-        (delete-window)
-      (previous-buffer))
-    ;; current-window-configuration will encode a buffer that's about to be
-    ;; deleted. I tested it, and it does what I want, so maybe there's no
-    ;; problem?
-    (org-capture-put :return-to-wconf (current-window-configuration))))
+    (let ((buffer (current-buffer)))
+      ;; This basically means that we don't change window configurations when
+      ;; there are previous buffers to be seen. IDK if this will have unintended
+      ;; consequences, because...
+      (if (zerop (length (window-prev-buffers)))
+          (delete-window)
+        (previous-buffer))
+      ;; current-window-configuration will encode a buffer that's about to be
+      ;; deleted. I tested it, and it does what I want, so maybe there's no
+      ;; problem?
+      (with-current-buffer buffer
+        (org-capture-put :return-to-wconf (current-window-configuration))))))
 
 (advice-add #'org-capture-finalize
             :before

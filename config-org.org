@@ -516,7 +516,7 @@
 #+end_src
 * Insert inactive timestamp after last org-datetree--find-create
 #+begin_src emacs-lisp
-  (defun org-datetree--find-create-add-timestamp (regex-template year &optional month day insert)
+  (defun org-datetree--find-create-add-timestamp (&rest args)
     (save-excursion
       (when day
         (let ((lnum (line-number-at-pos)))
@@ -666,6 +666,7 @@
                 ("i" . org-roam-node-insert)
                 ("w" . org-roam-refile)
                 ("j" . my/org-roam-logger-capture-current)
+                ("c" . org-roam-capture)
                 :map org-mode-map
                 ("C-M-i" . completion-at-point))
     :init
@@ -689,6 +690,9 @@
     (setq org-roam-capture-templates
           '(("d" "default" plain "%?" :target
              (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+             :unnarrowed t)
+            ("j" "Journal" entry "* %<%H:%M> %?" :target
+             (file+datetree "%<%Y%m%d%H%M%S>-${slug}.org" 'day)
              :unnarrowed t)
             ("t" "tech tips" plain "%?" :target
              (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: techtips\n")

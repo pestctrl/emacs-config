@@ -165,7 +165,18 @@
 
   (advice-add #'mu4e~headers-thread-prefix
               :override
-              #'my/mu4e~headers-thread-prefix))
+              #'my/mu4e~headers-thread-prefix)
+
+  (defun mu4e-print-path ()
+    (interactive)
+    (-->
+     (mu4e-message-at-point)
+     (mu4e-message-field it :path)
+     (progn
+       (kill-new it)
+       (message "Path Copied: %s" it))))
+
+  (define-key mu4e-search-minor-mode-map (kbd "l") #'mu4e-print-path))
 
 (provide 'mu4e-configuration)
 ;;; mu4e-config.el ends here

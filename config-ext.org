@@ -696,3 +696,9 @@
 
   (define-key dired-mode-map (kbd "V") #'dired-open-with-vterm)
 #+end_src
+* direnv
+#+begin_src emacs-lisp
+  (use-package direnv
+   :config
+   (direnv-mode))
+#+end_src

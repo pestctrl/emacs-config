@@ -762,8 +762,8 @@
                          (or (ibuffer-buffer-file-name)
                              ""))))))
         (not
-         (string-lessp (downcase (or (exwm-name-or-directory (car a)) ""))
-                       (downcase (or (exwm-name-or-directory (car b)) "")))))))
+         (string-greaterp (downcase (or (exwm-name-or-directory (car a)) ""))
+                          (downcase (or (exwm-name-or-directory (car b)) "")))))))
 
   (add-to-list 'ibuffer-never-show-predicates
                #'(lambda (buf)

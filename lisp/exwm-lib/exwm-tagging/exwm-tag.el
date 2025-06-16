@@ -71,11 +71,11 @@
 
 ;; Add these hooks in a suitable place (e.g., as done in exwm-config-default)
 
-(defun simulate-C-t (arg)
-  (interactive "*p")
+(defun simulate-C-t ()
+  (interactive)
   (if (eq major-mode 'exwm-mode)
       (exwm-input--fake-key ?\C-t)
-    (transpose-chars arg)))
+    (call-interactively #'transpose-chars)))
 
 ;; (key-binding (kbd "C-t C-t"))
 

@@ -72,7 +72,7 @@
 ;; Add these hooks in a suitable place (e.g., as done in exwm-config-default)
 
 (defun simulate-C-t (arg)
-  (interactive "P")
+  (interactive "*p")
   (if (eq major-mode 'exwm-mode)
       (exwm-input--fake-key ?\C-t)
     (transpose-chars arg)))

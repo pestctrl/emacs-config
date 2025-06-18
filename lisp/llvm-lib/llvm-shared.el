@@ -331,26 +331,20 @@
         #'lls/default-target-init))
 
 (defun lls/guess-root-dir-fun ()
-  (let ((repo-remotes
-         '("https://github.com/llvm/llvm-project.git"
-           "git@github.com:llvm/llvm-project"
-           "git@github.com:llvm/llvm-project.git"
-           "https://github.com/MPACT-ORG/llvm-project"
-           "https://github.com/Xilinx/llvm-aie")))
-    (if (-->
-         (shell-command-to-string "git remote get-url origin")
-         (string-trim it)
-         (member it repo-remotes))
-        (vc-root-dir)
-      (--> (directory-files "~/workspace" t "^[^.]")
-           (remove-if-not #'(lambda (it)
-                              (let ((default-directory it))
-                                (-->
-                                 (shell-command-to-string "git remote get-url origin")
-                                 (string-trim it)
-                                 (member it repo-remotes))))
-                          it)
-           (completing-read "Repo directory? " it)))))
+  (if (-->
+       (shell-command-to-string "git remote get-url origin")
+       (string-trim it)
+       (string-match-p ".*llvm.*" it))
+      (vc-root-dir)
+    (--> (directory-files "~/workspace" t "^[^.]")
+         (remove-if-not #'(lambda (it)
+                            (let ((default-directory it))
+                              (-->
+                               (shell-command-to-string "git remote get-url origin")
+                               (string-trim it)
+                               (member it repo-remotes))))
+                        it)
+         (completing-read "Repo directory? " it))))
 
 (defun lls/guess-build-dirs-fun (root-dir)
   (lambda ()

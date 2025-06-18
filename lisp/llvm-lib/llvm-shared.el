@@ -225,8 +225,9 @@
                                        (or (and (eq 'string (type-of directories))
                                                 (list directories))
                                            directories))
-                         (concat (file-name-nondirectory (ti/current-tools-directory))
-                                 " ")))))
+                         (awhen (ti/current-tools-directory)
+                           (concat (file-name-nondirectory it)
+                                   " "))))))
 
 (defun lls/get-tool (tool-regexp &optional directories)
   (cl-mapcan #'(lambda (dir)

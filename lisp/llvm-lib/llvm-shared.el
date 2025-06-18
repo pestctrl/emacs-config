@@ -188,6 +188,9 @@
                   (lls/get-llvm-build-dirs))
           (funcall (lls/conf-get 'bin-dirs-fun))))
 
+(defun lls/prompt-llvm-build-dir ()
+  (completing-read "Which directory? " (lls/get-llvm-build-dirs)))
+
 (defun lls/get-llvm-build-dir ()
   (car (lls/get-llvm-build-dirs)))
 

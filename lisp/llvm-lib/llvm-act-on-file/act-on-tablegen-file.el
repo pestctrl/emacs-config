@@ -24,24 +24,24 @@
 
 ;;; Code:
 
-(defun ll-tblgen/get-includes (file)
+(defun ll-tblgen/get-includes (file build-dir)
   (-->
    (list "llvm/include"
          "llvm/include/llvm/IR")
    (mapcar #'(lambda (x) (expand-file-name x (lls/get-llvm-root-dir))) it)
    ;; TODO Hard coding this value
-   (cons (lls/get-llvm-build-dir) it)
+   (cons build-dir it)
    (reverse it)
    (cons (file-name-directory file) it)
    (mapcar #'(lambda (x) (concat "-I" (lls/un-trampify x))) it)
    (string-join it " ")))
 
-(defun ll-tblgen/gen-command (file flags output-file)
-  (let ((bin (car (lls/get-tool "llvm-tblgen$"))))
+(defun ll-tblgen/gen-command (file flags output-file build-dir)
+  (let ((bin (car (lls/get-tool "llvm-tblgen$" (list (expand-file-name "bin" build-dir))))))
     (format "%s %s %s %s"
             bin
             (lls/un-trampify file)
-            (ll-tblgen/get-includes file)
+            (ll-tblgen/get-includes file build-dir)
             (string-join
              (list
               "--write-if-changed"
@@ -49,7 +49,7 @@
               )
              " "))))
 
-(defun ll-tblgen/cmake-extract-tblgen-commands (&optional buffer)
+(defun ll-tblgen/cmake-extract-tblgen-commands (&optional buffer build-dir)
   (interactive
    (list (current-buffer)))
   (with-current-buffer buffer
@@ -108,13 +108,13 @@
                        (file-name-directory (buffer-file-name buffer))
                        (replace-regexp-in-string
                         (expand-file-name "llvm" (lls/get-llvm-root-dir))
-                        (lls/get-llvm-build-dir)
+                        (or build-dir (lls/get-llvm-build-dir))
                         it)
                        (expand-file-name out it)))
                 (set-text-properties 0 (length out) nil out)
                 (set-text-properties 0 (length flags) nil flags)
                 (push (list (string-join (list (file-name-nondirectory file) flags (file-name-nondirectory out)) " => ")
-                            (ll-tblgen/gen-command file (split-string flags " ") out)
+                            (ll-tblgen/gen-command file (split-string flags " ") out (or build-dir (lls/get-llvm-build-dir)))
                             out)
                       commands)))))
 
@@ -131,9 +131,9 @@
     (let* ((action (read-key "[c]ompile [p]rint-records")))
       (when (not (member action '(?c ?p)))
         (error "Unknown action"))
-      (let* ((commands (ll-tblgen/cmake-extract-tblgen-commands f))
+      (let* ((build-dir (lls/prompt-llvm-build-dir))
+             (commands (ll-tblgen/cmake-extract-tblgen-commands f build-dir))
              (key (completing-read "Which tablegen command? " (mapcar #'car commands)))
-             (build-dir (lls/get-llvm-build-dir))
              (out-comm (alist-get key commands nil nil #'equal))
              (comm (car out-comm))
              (out (cadr out-comm)))

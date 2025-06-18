@@ -112,6 +112,11 @@
         localname)
     path))
 
+(defun lls/default-initialize ()
+  (interactive)
+  (let ((lls/target-init-fun #'lls/default-target-init))
+    (lls/initialize)))
+
 (defun lls/initialize ()
   (interactive)
   (lls/set-llvm-config
@@ -294,6 +299,7 @@
            binary)))
 
 (defun lls/default-target-init ()
+  (interactive)
   (let ((root-dir (lls/guess-root-dir-fun))
         tramp-conn)
     (when (tramp-tramp-file-p root-dir)

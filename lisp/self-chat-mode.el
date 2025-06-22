@@ -3,6 +3,8 @@
 (require 'cl)
 
 (defvar self-chat-num 0)
+(defvar self-chat-characters nil)
+(defvar self-chat-random-list nil)
 (defvar self-chat-last nil)
 (defvar self-chat-last2 nil)
 (defvar self-chat-highlights nil)
@@ -77,16 +79,35 @@
         (t
          (call-interactively #'delete-backward-char))))
 
+(defun swap (LIST el1 el2)
+  "in LIST swap indices EL1 and EL2 in place"
+  (let ((tmp (elt LIST el1)))
+    (setf (elt LIST el1) (elt LIST el2))
+    (setf (elt LIST el2) tmp)))
+
+
+(defun shuffle (LIST)
+  "Shuffle the elements in LIST.
+shuffling is done in place."
+  (loop for i in (reverse (number-sequence 1 (1- (length LIST))))
+        do (let ((j (random (+ i 1))))
+             (swap LIST i j)))
+  LIST)
+
 (defmacro define-users (list)
   `(progn
      (setq self-chat-num 0
            self-chat-last nil
            self-chat-last2 nil
            self-chat-highlights nil
-           self-chat-alist nil)
+           self-chat-alist nil
+           self-chat-characters
+           ',(remove-if-not (lambda (char)
+                              (cadddr char))
+                            list))
      (defhydra user-chat (:exit t
-                          :body-pre (chat-pre)
-                          :after-exit (chat-post))
+                                :body-pre (chat-pre)
+                                :after-exit (chat-post))
        ""
        ("RET" nil "Same")
        ("TAB" (when self-chat-last2 (setq self-chat-num self-chat-last2)) "Switch")
@@ -97,7 +118,15 @@
                          (prog1 `(,key (setq self-chat-num ,num) ,name)
                            (cl-incf num))))
                    list))
-       ("r" (setq self-chat-num (random ,(length list))) "Random"))
+       ("r" (setq self-chat-num
+                  (progn
+                    (unless self-chat-random-list
+                      (setq self-chat-random-list
+                            (--> (length self-chat-characters)
+                                 (number-sequence 0 (1- it))
+                                 (shuffle it))))
+                    (pop self-chat-random-list)))
+        "Random"))
      ,@(let ((num 0))
          (mapcan #'(lambda (triple)
                      (let* ((name (car triple))
@@ -113,15 +142,16 @@
                              (cl-incf num))))
                  list))))
 
-(define-users (("Tau" "t" "turquoise1")
-               ("Arc" "a" "gold")
-               ("Tom" "T" "rosy brown")
-               ("Dan" "d" "spring green")
-               ("Ver" "v" "white")
-               ("Coop" "c" "cornsilk")
-               ("Net" "n" "magenta")
-               ("Someone" "s" "dim gray")
-               ("Everyone" "e" "pale green")
-               ("Note" "N" "dim gray")))
+(define-users (("Tau" "t" "turquoise1" t)
+               ("Arc" "a" "gold" t)
+               ("Tom" "T" "rosy brown" t)
+               ("Dan" "d" "spring green" t)
+               ("Ver" "v" "white" t)
+               ("Coop" "c" "cornsilk" t)
+               ("Net" "n" "magenta" t)
+
+               ("Someone" "s" "dim gray" nil)
+               ("Everyone" "e" "pale green" nil)
+               ("Note" "N" "dim gray" nil)))
 
 (provide 'self-chat-mode)

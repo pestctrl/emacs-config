@@ -10,7 +10,8 @@
 
 (define-derived-mode self-chat-mode fundamental-mode "self-chat"
   "This is a mode where I become crazy and talk to myself."
-  (setq font-lock-defaults '(self-chat-highlights)))
+  (setq font-lock-defaults '(self-chat-highlights))
+  (olivetti-mode 1))
 
 (modify-syntax-entry ?\" " " self-chat-mode-syntax-table)
 

@@ -29,15 +29,16 @@
             (not (= self-chat-num self-chat-last)))
     (setq self-chat-last2 self-chat-last
           self-chat-last self-chat-num))
-  ;; Are we fixing up an old line, or creating a new one?
-  (if (save-excursion
-        (beginning-of-line)
-        (not (looking-at (rx (+ nonl) ":"))))
-      (progn
-        (beginning-of-line)
-        (kill-line))
-    (call-interactively #'newline)
-    (call-interactively #'newline))
+  (unless (and (eobp) (bobp))
+    ;; Are we fixing up an old line, or creating a new one?
+    (if (save-excursion
+          (beginning-of-line)
+          (not (looking-at (rx (+ nonl) ":"))))
+        (progn
+          (beginning-of-line)
+          (kill-line))
+      (call-interactively #'newline)
+      (call-interactively #'newline)))
   (insert "> "))
 
 (defun chat-post ()

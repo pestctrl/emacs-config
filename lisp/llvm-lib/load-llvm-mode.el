@@ -45,7 +45,7 @@
                  `(,(regexp-opt '("nnan" "ninf" "nsz" "arcp" "contract" "afn" "reassoc" "fast") 'symbols) . 'shadow)))
 
   (add-to-list 'llvm-font-lock-keywords
-               `(,(rx line-start (optional "# ") "***" (+ nonl) "***" (optional ":") "\n") . 'llvm-separator-face))
+               `(,(rx line-start (optional (any "#;") " ") "***" (+ nonl) "***" (optional ":") "\n") . 'llvm-separator-face))
 
   (-->
    "\\b[-]?[0-9]+\\b"

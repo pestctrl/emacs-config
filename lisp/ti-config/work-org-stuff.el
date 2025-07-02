@@ -252,16 +252,11 @@
 (setq org-outline-path-complete-in-steps nil)
 (setq org-refile-use-outline-path t)
 
-(setq org-agenda-files
+(require 'org-roam-update-agenda)
+
+(setq orua/agenda-files
       (list "~/org/refile.org"
             "~/org/all.org"))
-
-(defun my/update-org-agenda-files ()
-  (interactive)
-  (setq org-agenda-files
-        (cons "~/org/refile.org"
-              (cons "~/org/all.org"
-                    (my/get-org-roam-files-by-tags '("Project" "active"))))))
 
 (setq org-refile-targets `((nil :maxlevel . 9)
                            (org-agenda-files :maxlevel . 9)))

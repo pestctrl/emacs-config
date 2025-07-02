@@ -79,12 +79,14 @@
               :compiler compiler
               :file file
               :action compiler-action
-              :output output)
-             (pcase action
-               ('debug (format "-mllvm -debug-only=%s" (ll/read-pass-name "Which pass? ")))
-               ('before-after (let ((pass (ll/read-pass-name "Which pass? ")))
-                                (format "-mllvm -print-before=%s -mllvm -print-after=%s" pass pass)))
-               ('changed "-mllvm -print-before-all"))
+              :output output
+              :flags
+              (list
+               (pcase action
+                 ('debug (format "-mllvm -debug-only=%s" (ll/read-pass-name "Which pass? ")))
+                 ('before-after (let ((pass (ll/read-pass-name "Which pass? ")))
+                                  (format "-mllvm -print-before=%s -mllvm -print-after=%s" pass pass)))
+                 ('changed "-mllvm -print-before-all"))))
              " ")
        " "))))
 

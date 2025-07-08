@@ -38,5 +38,33 @@
             :before
             #'my/update-org-agenda-files)
 
+(defun my/view-org-agenda-files ()
+  (interactive)
+  (find-file
+   (consult--read
+    org-agenda-files
+    :prompt "org-agenda-files: "
+    :sort nil ;; cands are already sorted
+    :require-match t
+    :state (consult--preview-org-agenda-files)
+    :category 'org-roam-node)))
+
+(defun consult--preview-org-agenda-files ()
+  "Create preview function for nodes."
+  (let ((open (consult--temporary-files))
+        (preview (consult--buffer-preview))
+        (state  (window-state-get)))
+    (lambda (action cand)
+      (when (eq action 'exit)
+        (progn
+          ;; Restore saved window state
+          ;; To move point to the original position
+          (window-state-put state)
+          (funcall open)))
+      (funcall preview action
+               (and cand
+                    (eq action 'preview)
+                    (funcall open cand))))))
+
 (provide 'org-roam-update-agenda)
 ;;; org-roam-update-agenda.el ends here

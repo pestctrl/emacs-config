@@ -120,97 +120,14 @@
             :override
             #'my/magit-transient-read-person)
 
-(defun my/transient--show ()
-  (transient--timer-cancel)
-  (setq transient--showp t)
-  (let ((transient--shadowed-buffer (current-buffer))
-        (focus nil))
-    (setq transient--buffer (get-buffer-create transient--buffer-name))
-    (with-current-buffer transient--buffer
-      (when transient-enable-popup-navigation
-        (setq focus (or (button-get (point) 'command)
-                        (and (not (bobp))
-                             (button-get (1- (point)) 'command))
-                        (transient--heading-at-point))))
-      (erase-buffer)
-      (run-hooks 'transient-setup-buffer-hook)
-      (when transient-force-fixed-pitch
-        (transient--force-fixed-pitch))
-      (setq window-size-fixed 'width)
-      (when (bound-and-true-p tab-line-format)
-        (setq tab-line-format nil))
-      (setq header-line-format nil)
-      (setq mode-line-format
-            (if (or (natnump transient-mode-line-format)
-                    (eq transient-mode-line-format 'line))
-                nil
-              transient-mode-line-format))
-      (setq mode-line-buffer-identification
-            (symbol-name (oref transient--prefix command)))
-      (if transient-enable-popup-navigation
-          (setq-local cursor-in-non-selected-windows 'box)
-        (setq cursor-type nil))
-      (setq display-line-numbers nil)
-      (setq show-trailing-whitespace nil)
-      (transient--insert-groups)
-      (when (or transient--helpp transient--editp)
-        (transient--insert-help))
-      (when-let ((line (transient--separator-line)))
-        (insert line)))
-    (unless (window-live-p transient--window)
-      (setq transient--window
-            (display-buffer transient--buffer
-                            transient-display-buffer-action)))
-    (when (window-live-p transient--window)
-      (with-selected-window transient--window
-        ;; Save the previous value of the 'no-other-window window parameter.
-        (set-window-parameter nil 'prev--no-other-window
-                              (window-parameter nil 'no-other-window))
-        (goto-char (point-min))
-        (when transient-enable-popup-navigation
-          (transient--goto-button focus))
-        (transient--fit-window-to-buffer transient--window)))))
+(defun my/transient--show-post ()
+  (setq transient--buffer (get-buffer-create transient--buffer-name))
+  (with-current-buffer transient--buffer
+    (setq window-size-fixed 'width)))
 
 (advice-add #'transient--show
-            :override
-            #'my/transient--show)
-
-;; What's so great about the above advice? Why can't the below work?!
-;;
-;; (defun my/transient--show-post ()
-;;   (let ((transient--shadowed-buffer (current-buffer))
-;;         (focus nil))
-;;     (setq transient--buffer (get-buffer-create transient--buffer-name))
-;;     (with-current-buffer transient--buffer
-;;       (when transient-enable-popup-navigation
-;;         (setq focus (or (button-get (point) 'command)
-;;                         (and (not (bobp))
-;;                              (button-get (1- (point)) 'command))
-;;                         (transient--heading-at-point)))))
-;;     (when (window-live-p transient--window)
-;;       (with-selected-window transient--window
-;;         (set-window-parameter nil 'prev--no-other-window
-;;                               (window-parameter nil 'no-other-window))
-;;         (set-window-parameter nil 'no-other-window t)
-;;         (goto-char (point-min))
-;;         (when transient-enable-popup-navigation
-;;           (transient--goto-button focus))
-;;         (transient--fit-window-to-buffer transient--window)))))
-
-;; (advice-add #'transient--show
-;;             :after
-;;             #'my/transient--show-post)
-
-(defun my/transient--delete-win-restore-window-param (&rest ignore)
-  (when (window-live-p transient--window)
-    (with-selected-window transient--window
-      ;; Restore the value
-      (set-window-parameter nil 'no-other-window
-                            (window-parameter nil 'prev--no-other-window)))))
-
-(advice-add #'transient--delete-window
-            :before
-            #'my/transient--delete-win-restore-window-param)
+            :after
+            #'my/transient--show-post)
 
 (provide 'magit-overrides)
 ;;; magit-overrides.el ends here

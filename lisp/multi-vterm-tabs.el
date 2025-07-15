@@ -70,14 +70,24 @@
        it))))
 
 (defun mvt/get-all-buffers (tab-name)
-  (let* ((tab-sym (intern tab-name))
-         (mvti (mvt/get-or-create-info tab-sym))
-         (max-num (slot-value mvti 'max-number))
-         buffs)
-    (dotimes (i max-num)
-      (awhen (get-buffer (mvt/format-buffer-name tab-name i))
-        (push it buffs)))
-    (reverse buffs)))
+  (->> (buffer-list)
+       (remove-if-not
+        (lambda (buff)
+          (with-current-buffer buff
+            (and (eq major-mode 'vterm-mode)
+                 (string-match-p
+                  (rx "*" (literal tab-name) "-vterm<" (+ digit) ">*")
+                  (buffer-name buff))))))))
+
+;; (defun mvt/get-all-buffers (tab-name)
+;;   (let* ((tab-sym (intern tab-name))
+;;          (mvti (mvt/get-or-create-info tab-sym))
+;;          (max-num (slot-value mvti 'max-number))
+;;          buffs)
+;;     (dotimes (i max-num)
+;;       (awhen (get-buffer (mvt/format-buffer-name tab-name i))
+;;         (push it buffs)))
+;;     (reverse buffs)))
 
 ;; (mvt/get-all-buffers (alist-get 'name (tab-bar--current-tab)))
 

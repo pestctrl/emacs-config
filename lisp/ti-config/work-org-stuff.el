@@ -252,19 +252,18 @@
 (setq org-outline-path-complete-in-steps nil)
 (setq org-refile-use-outline-path t)
 
-(setq org-agenda-files
+(require 'org-roam-update-agenda)
+
+(setq orua/agenda-files
       (list "~/org/refile.org"
             "~/org/all.org"))
 
-(defun my/update-org-agenda-files ()
-  (interactive)
-  (setq org-agenda-files
-        (cons "~/org/refile.org"
-              (cons "~/org/all.org"
-                    (my/get-org-roam-files-by-tags '("Project" "active"))))))
-
 (setq org-refile-targets `((nil :maxlevel . 9)
                            (org-agenda-files :maxlevel . 9)))
+
+(global-set-key (kbd "C-c n a") #'my/view-org-agenda-files)
+
+(setq org-agenda-sticky t)
 
 (require 'org-protocol)
 
@@ -518,10 +517,12 @@
 
   (defun my/org-roam-find-active-projects ()
     (interactive)
-    ;; Select a project file to open, creating it if necessary
-    (org-roam-node-find nil nil
-                        (my/org-roam-filter-by-tag '("Project" "active"))
-                        nil :templates my/project-templates))
+    (cl-letf (((symbol-function 'org-roam-node-read)
+               (symbol-function 'consult-org-roam-node-read)))
+      ;; Select a project file to open, creating it if necessary
+      (org-roam-node-find nil nil
+                          (my/org-roam-filter-by-tag '("Project" "active"))
+                          nil :templates my/project-templates)))
 
   (defun org-agenda-insert-breaks-between (str1 str2)
     (let ((r (rx line-start

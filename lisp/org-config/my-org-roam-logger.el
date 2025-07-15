@@ -26,7 +26,7 @@
 (require 'org-roam)
 (require 'org-roam-util)
 
-(defvar my/current-logger-cache nil)
+(defvar my/current-logger-cache (make-hash-table))
 (defvar my/org-roam-logger-filter-fun nil)
 
 (defvar my/org-roam-logger-templates
@@ -51,36 +51,41 @@
 
 (defun my/org-roam-logger-capture-current (arg)
   (interactive "P")
-  (when (or (null my/current-logger-cache)
-            (equal arg '(16))
-            (equal arg '(64)))
-    (setq my/current-logger-cache
-          (org-roam-node-read
-           nil
-           (when (not (equal arg '(64)))
-             my/org-roam-logger-filter-fun))))
+  (let* ((tab-sym (intern (alist-get 'name (tab-bar--current-tab))))
+         (node
+          (or (and (not (equal arg '(16)))
+                   (not (equal arg '(64)))
+                   (gethash tab-sym my/current-logger-cache))
+              (puthash tab-sym
+                       (org-roam-node-read
+                        nil
+                        (when (not (equal arg '(64)))
+                          my/org-roam-logger-filter-fun))
+                       my/current-logger-cache))))
+    ;; On NEW nodes, org-roam-node-read generates an empty struct with
+    ;; only a few things, one of which being an id. Do a sanity check to
+    ;; make sure that we re-init the current node with a node that has
+    ;; the file name. Only do this initialization if we have an ID for
+    ;; the org-roam.
+    ;;
+    ;; ASSUMPTION: org-roam-capture- initializes node with
+    ;; org-roam-node-id field.
+    ;;
+    ;; TODO: Ummm, this doesn't work in the case where the file gets deleted
+    ;; after a first capture + capture abort.
+    (when (and (null (org-roam-node-file node))
+               (org-roam-node-id node))
+      (setq node
+            (org-roam-node-from-id (org-roam-node-id node))))
 
-  ;; On NEW nodes, org-roam-node-read generates an empty struct with
-  ;; only a few things, one of which being an id. Do a sanity check to
-  ;; make sure that we re-init the current node with a node that has
-  ;; the file name. Only do this initialization if we have an ID for
-  ;; the org-roam.
-  ;;
-  ;; ASSUMPTION: org-roam-capture- initializes node with
-  ;; org-roam-node-id field.
-  (when (and (null (org-roam-node-file my/current-logger-cache))
-             (org-roam-node-id my/current-logger-cache))
-    (setq my/current-logger-cache
-          (org-roam-node-from-id (org-roam-node-id my/current-logger-cache))))
-
-  (if (equal arg '(4))
-      (-> my/current-logger-cache
-          (org-roam-node-file)
-          (find-file-noselect)
-          (pop-to-buffer-same-window))
-    (org-roam-capture-
-     :node my/current-logger-cache
-     :templates my/org-roam-logger-templates)))
+    (if (equal arg '(4))
+        (-> node
+            (org-roam-node-file)
+            (find-file-noselect)
+            (pop-to-buffer-same-window))
+      (org-roam-capture-
+       :node node
+       :templates my/org-roam-logger-templates))))
 
 (provide 'my-org-roam-logger)
 ;;; my-org-roam-logger.el ends here

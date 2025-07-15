@@ -45,7 +45,7 @@
                  `(,(regexp-opt '("nnan" "ninf" "nsz" "arcp" "contract" "afn" "reassoc" "fast") 'symbols) . 'shadow)))
 
   (add-to-list 'llvm-font-lock-keywords
-               `(,(rx line-start (optional "# ") "***" (+ nonl) "***" (optional ":") "\n") . 'llvm-separator-face))
+               `(,(rx line-start (optional (any "#;") " ") "***" (+ nonl) "***" (optional ":") "\n") . 'llvm-separator-face))
 
   (-->
    "\\b[-]?[0-9]+\\b"
@@ -53,7 +53,15 @@
    (cl-position it llvm-font-lock-keywords)
    (nth it llvm-font-lock-keywords)
    (setf it
-         `(,(rx word-boundary (optional "-") )))))
+         `(,(rx word-boundary (optional "-") ))))
+
+  (pop c-mode-common-hook)
+  (add-hook 'c-mode-common-hook
+	        (function
+	         (lambda nil
+	           (if (and buffer-file-name (string-match "llvm" buffer-file-name))
+		           (progn
+		             (c-set-style "llvm.org")))))))
 
 (provide 'load-llvm-mode)
 ;;; load-llvm-mode.el ends here

@@ -247,8 +247,8 @@
   (apply (lls/conf-get 'dis-command-fun) args))
 
 ;; ========================= LLVM Build Dirs =========================
-(cl-defun lls/default-comp-fun (&key compiler file action output rest)
-  (string-join
+(cl-defun lls/default-comp-fun (&key compiler file action output flags)
+  (-->
    (list compiler
          (lls/get-clang-options)
          (string-join rest " ")
@@ -259,11 +259,13 @@
            ('preprocess "-E")
            ('llvm-ir "-S -emit-llvm")
            ('executable ""))
+         flags
          "-o -"
          (or (and output
                   (format "| tee %s" output))
              ""))
-   " "))
+   (flatten-list it)
+   (string-join it " ")))
 
 (defun ll/read-pass ()
   (completing-read "Which pass? "

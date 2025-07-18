@@ -295,16 +295,29 @@
 #+end_src
 * navigation
 #+begin_src emacs-lisp
-  (setq next-screen-context-lines 30)
+  (defun update-window-third-height (&optional arg)
+    (let ((win
+           (cond ((framep arg)
+                  (frame-selected-window arg))
+                 ((windowp arg)
+                  arg)
+                 ((null arg) (selected-window)))))
+      ;; (message "Updating window height for %s" (window-buffer win))
+      (when (not (active-minibuffer-window))
+        (setq next-screen-context-lines
+              (max 1 (* 2 (/ (window-height win) 3)))))))
 
-  (defun update-window-third-height (win &rest args)
-    ;; (message "Updating window height for %s" (window-buffer win))
-    (setq next-screen-context-lines
-          (max 1 (* 2 (/ (window-height win) 3)))))
+  (update-window-third-height)
 
-  (advice-add #'select-window
-              :after
-              'update-window-third-height)
+  (add-hook 'window-selection-change-functions
+            #'update-window-third-height)
+
+  (add-hook 'window-configuration-change-hook
+            #'update-window-third-height)
+
+  ;; (advice-add #'select-window
+  ;;             :after
+  ;;             'update-window-third-height)
 
   ;; Word navigation
   (global-set-key (kbd "M-f") 'forward-to-word)

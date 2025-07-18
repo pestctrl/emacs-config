@@ -295,33 +295,16 @@
 #+end_src
 * navigation
 #+begin_src emacs-lisp
-  ;; Scrollkeeper is helpful for scrolling up and down
-  (defvar window-third-height nil)
+  (setq next-screen-context-lines 30)
 
   (defun update-window-third-height (win &rest args)
     ;; (message "Updating window height for %s" (window-buffer win))
-    (setq window-third-height
-          (max 1 (/ (window-height win) 3))))
+    (setq next-screen-context-lines
+          (max 1 (* 2 (/ (window-height win) 3)))))
 
   (advice-add #'select-window
               :after
               'update-window-third-height)
-
-  (defun scroll-up-third ()
-    (interactive)
-    ;; (pulse-momentary-highlight-one-line (point))
-    (scroll-up (or window-third-height 10)))
-
-  (defun scroll-down-third ()
-    (interactive)
-    ;; (pulse-momentary-highlight-one-line (point))
-    (scroll-down (or window-third-height 10)))
-
-  (global-set-key (kbd "C-v") 'scroll-up-third)
-  (global-set-key (kbd "M-v") 'scroll-down-third)
-  ;; (use-package scrollkeeper)
-  ;; (global-set-key (kbd "C-v") 'scrollkeeper-down)
-  ;; (global-set-key (kbd "M-v") 'scrollkeeper-up)
 
   ;; Word navigation
   (global-set-key (kbd "M-f") 'forward-to-word)

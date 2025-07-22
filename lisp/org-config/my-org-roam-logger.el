@@ -25,6 +25,7 @@
 ;;; Code:
 (require 'org-roam)
 (require 'org-roam-util)
+(require 'my-extra-template-type)
 
 (defvar my/current-logger-cache (make-hash-table))
 (defvar my/org-roam-logger-filter-fun nil)
@@ -36,7 +37,7 @@
      (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
                     "#+title: ${title}\n"
                     ("Journal" "%<%b %d, %Y>")))
-    ("J" "Journal with source" entry "* %<%H:%M> %?\n:PROPERTIES:\n:LOCATION: %a\n:END:"
+    ("J" "Journal with source" entry "* %<%H:%M> %?\n:PROPERTIES:\n:LOCATION: %a\n:END:\n\n%s"
      :unnarrowed t
      :target
      (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"

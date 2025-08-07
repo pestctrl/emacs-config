@@ -43,7 +43,7 @@
                            (find-file-noselect file))
     (save-excursion
       (goto-char (point-min))
-      (let ((r (rx line-start (+ (or "|" ";" "/" "#")) (+ " ") "RUN:" (+ space) (group(+ nonl) line-end)))
+      (let ((r (rx line-start (+ (or "|" ";" "/" "#")) (+ " ") "RUN:" (+ space) (group (+ nonl) line-end)))
             (temp "")
             l)
         (while (re-search-forward r nil t)

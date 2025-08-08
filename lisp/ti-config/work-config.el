@@ -226,5 +226,16 @@
 (when my-ec/enable-mail
   (require 'work-mail))
 
+(defun always-expand-mail-abbrevs-in-commit-buffer (orig)
+  (or with-editor-mode
+      (funcall orig)))
+
+(add-hook 'with-editor-mode-hook
+          #'mail-abbrevs-setup)
+
+(advice-add #'mail-abbrev-in-expansion-header-p
+            :around
+            #'always-expand-mail-abbrevs-in-commit-buffer)
+
 (provide 'work-config)
 ;;; work-config.el ends here

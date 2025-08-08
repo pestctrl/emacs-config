@@ -1038,6 +1038,6 @@
 #+end_src
 * Terminal compatibility
 #+begin_src emacs-lisp
-  (global-set-key (kbd "M-[ emacs-C-SPC") #'set-mark-command)
-  (global-set-key (kbd "M-[ emacs-C-/") #'undo)
+  (when (null window-system)
+    (require 'term-compat))
 #+end_src

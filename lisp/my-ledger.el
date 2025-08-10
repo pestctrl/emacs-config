@@ -247,6 +247,33 @@
   ;; (advice-add #'ledger-reconcile
   ;;             :before
   ;;             #'my/ledger-reconcile-switch-to-master)
+
+  (defface ledger-starting-monthly-face
+    `((t ,(list
+           :background "gray25"
+           :extend t
+           :inherit font-lock-comment-face
+           :box `(:line-width 1 :color "gray30" :style ,(if (>= emacs-major-version 30) 'released-button 'raised)))))
+    nil)
+
+  (defun ledger-apply-month-separator ()
+    (interactive)
+    (remove-overlays nil nil 'face 'ledger-starting-monthly-face)
+    (save-excursion
+      (beginning-of-buffer)
+      (while (not (eobp))
+        (when (looking-at-p (rx line-start
+                                (separated " - "
+                                           (separated "-" (= 2 digit) (= 3 alpha) (= 2 digit))
+                                           (separated "-" (= 2 digit) (= 3 alpha) (= 2 digit)))
+                                (+ nonl)))
+          (let ((ol (make-overlay (point) (line-end-position))))
+            (overlay-put ol 'face 'ledger-starting-monthly-face)
+            (overlay-put ol 'priority 5)))
+        (next-line))))
+
+  (add-hook 'ledger-report-mode-hook
+            'ledger-apply-month-separator)
   )
 
 (fset 'credit_card_statement

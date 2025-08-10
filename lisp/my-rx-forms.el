@@ -26,5 +26,10 @@
 
 (rx-define separated-list (sep &rest match) (seq match (* sep match)))
 
+(rx-define separated (sep &rest matches)
+  (eval `(seq ,@(cdr (mapcon (lambda (x)
+                               (list sep (car x)))
+                             '(matches))))))
+
 (provide 'my-rx-forms)
 ;;; my-rx-forms.el ends here

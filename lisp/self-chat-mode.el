@@ -15,6 +15,16 @@
   (setq font-lock-defaults '(self-chat-highlights))
   (olivetti-mode 1))
 
+(defun self-chat-buffer ()
+  (interactive)
+  (--> (let ((org-time-was-given t))
+         (org-read-date t nil ""))
+       (format "*self-chat-%s*"
+               it)
+       (get-buffer-create it)
+       (switch-to-buffer it))
+  (self-chat-mode))
+
 (modify-syntax-entry ?\" " " self-chat-mode-syntax-table)
 
 (define-key self-chat-mode-map (kbd "RET") #'self-chat-insert-next)

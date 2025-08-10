@@ -70,12 +70,22 @@
   (org-roam-setup)
   (setq org-roam-dailies-directory "daily/")
 
+  (defvar-keymap org-capture-self-chat-keymap
+    "C-c C-k" #'(lambda ()
+                  (interactive)
+                  (call-interactively #'org-edit-src-abort)
+                  (call-interactively #'org-cut-special)
+                  (call-interactively #'delete-window)))
+
   (defun self-chat-capture-template-display-src ()
     (with-current-buffer (org-capture-get :buffer)
       (goto-char (org-capture-get :insertion-point))
       (let ((src-buffer (save-window-excursion
                           (org-edit-special)
-                          (current-buffer))))
+                          (setq-local minor-mode-overriding-map-alist
+                                      `((org-src-mode . ,org-capture-self-chat-keymap)))
+                          (current-buffer)
+                          )))
         (org-display-buffer-split src-buffer nil))))
 
   (setq org-roam-dailies-capture-templates

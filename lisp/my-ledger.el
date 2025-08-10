@@ -272,8 +272,9 @@
             (overlay-put ol 'priority 5)))
         (next-line))))
 
-  (add-hook 'ledger-report-mode-hook
-            'ledger-apply-month-separator)
+  ;; ;; Need some other way to do this
+  ;; (add-hook 'ledger-report-mode-hook
+  ;;           'ledger-apply-month-separator)
   )
 
 (fset 'credit_card_statement

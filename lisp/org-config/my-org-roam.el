@@ -69,6 +69,15 @@
   :config
   (org-roam-setup)
   (setq org-roam-dailies-directory "daily/")
+
+  (defun self-chat-capture-template-display-src ()
+    (with-current-buffer (org-capture-get :buffer)
+      (goto-char (org-capture-get :insertion-point))
+      (let ((src-buffer (save-window-excursion
+                          (org-edit-special)
+                          (current-buffer))))
+        (org-display-buffer-split src-buffer nil))))
+
   (setq org-roam-dailies-capture-templates
         '(("j" "Journal" entry "* %<%H:%M> %?"
            :unnarrowed t
@@ -86,7 +95,9 @@
            :target
            (file+head+olp "%<%Y-%m-%d>.org"
                           "#+title: %<%Y-%m-%d>\n#+filetags: :dailies:%<%Y:%B:>\n"
-                          ("Journal")))
+                          ("Journal"))
+           :after-finalize self-chat-capture-template-display-src
+           :immediate-finish)
           ;; ("m" "Most Important Thing" entry "* TODO %? :mit:"
           ;;  :target (file+head+olp "%<%Y-%m-%d>.org"
           ;;                         "#+title: %<%Y-%m-%d>\n#+filetags: %<:%Y:%B:>\n"

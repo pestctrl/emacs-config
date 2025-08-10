@@ -27,26 +27,41 @@
 (defun my/side-window-p (window)
   (window-parameter window 'window-side))
 
-(defun my/org-capture-shouldnt-mess-windows (fun &rest args)
-  (set-window-parameter (selected-window) 'window-side nil)
-  (cl-letf* ((original-pop-to-buffer
-              (symbol-function 'pop-to-buffer))
+(defun my/org-capture-display-use-side-window (buffer alist)
+  ;; I think the alist argument is never used
+  (pop-to-buffer
+   buffer
 
-             ((symbol-function 'pop-to-buffer)
-              (lambda (buffer &optional action norecord)
-                (if (equal action '(org-display-buffer-split))
-                    (funcall original-pop-to-buffer buffer)
-                  (funcall original-pop-to-buffer buffer action norecord)))))
-    (let ((window--sides-inhibit-check t))
-      (apply fun args))))
+   '(display-buffer-in-side-window
+     (side . left)
+     (window-width . 85)
+     (window-parameters
+      . ((no-delete-other-windows . t)
+         ;;(dedicated . t)
+         )))))
 
-(advice-add #'org-capture
+(advice-add #'org-display-buffer-split
+            :override
+            #'my/org-capture-display-use-side-window)
+
+(defun my/window-dedicated-p (orig &optional window)
+  ;; Excuse me? Side windows are not dedicated.
+  (or (and (not org-capture-mode)
+           (funcall orig window))
+      (eq (funcall orig window)
+          t)))
+
+(advice-add #'window-dedicated-p
             :around
-            #'my/org-capture-shouldnt-mess-windows)
+            #'my/window-dedicated-p)
 
 (defun my/org-capture-finalize-shouldnt-mess-windows (orig &rest args)
-  (cl-letf (((symbol-function 'set-window-configuration)
-             #'ignore))
+  (cl-letf* ((orig-set-window-configuration (symbol-function 'set-window-configuration))
+
+             ((symbol-function 'set-window-configuration)
+              #'(lambda (&rest args)
+                  (unless (equal (car args) (org-capture-get :return-to-wconf 'local))
+                    (apply orig-set-window-configuration args)))))
     (apply orig args)))
 
 (advice-add #'org-capture-finalize

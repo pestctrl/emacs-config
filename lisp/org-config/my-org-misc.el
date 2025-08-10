@@ -129,11 +129,6 @@
   (setq org-html-table-default-attributes
         '(:border "2" :cellspacing "0" :cellpadding "6")))
 
-(when (eq window-system 'x)
-  (define-key org-mode-map
-    (kbd "C-S-b")
-    #'(lambda () (interactive) (org-back-to-heading))))
-
 (define-key org-mode-map (kbd "M-g o") (lambda () (interactive) (org-back-to-heading)))
 (define-key org-mode-map (kbd "C-M-a") (lambda () (interactive) (org-back-to-heading)))
 
@@ -257,6 +252,9 @@
     (org-agenda nil "paw"))
   (my/org-agenda-save)
   (close-tab-switch))
+
+(require 'my-org-edit-special)
+(define-key org-mode-map (kbd "C-c \"") #'my/org-edit-special)
 
 (provide 'my-org-misc)
 ;;; my-org-misc.el ends here

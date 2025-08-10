@@ -45,5 +45,7 @@
 
 (require 'org-table-convert)
 
+(require 'my-org-roam)
+
 (provide 'my-org)
 ;;; my-org.el ends here

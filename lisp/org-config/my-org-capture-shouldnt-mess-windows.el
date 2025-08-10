@@ -28,35 +28,29 @@
   (window-parameter window 'window-side))
 
 (defun my/org-capture-shouldnt-mess-windows (fun &rest args)
-  (let ((buffer
-         (save-window-excursion
-           (set-window-parameter (selected-window) 'window-side nil)
-           (let ((window--sides-inhibit-check t))
-             (apply fun args)
-             (current-buffer)))))
-    (pop-to-buffer buffer)))
+  (set-window-parameter (selected-window) 'window-side nil)
+  (cl-letf* ((original-pop-to-buffer
+              (symbol-function 'pop-to-buffer))
+
+             ((symbol-function 'pop-to-buffer)
+              (lambda (buffer &optional action norecord)
+                (if (equal action '(org-display-buffer-split))
+                    (funcall original-pop-to-buffer buffer)
+                  (funcall original-pop-to-buffer buffer action norecord)))))
+    (let ((window--sides-inhibit-check t))
+      (apply fun args))))
 
 (advice-add #'org-capture
             :around
             #'my/org-capture-shouldnt-mess-windows)
 
-(defun my/org-capture-finalize-shouldnt-mess-windows (&rest args)
-  (save-window-excursion
-    (let ((buffer (current-buffer)))
-      ;; This basically means that we don't change window configurations when
-      ;; there are previous buffers to be seen. IDK if this will have unintended
-      ;; consequences, because...
-      (if (zerop (length (window-prev-buffers)))
-          (delete-window)
-        (previous-buffer))
-      ;; current-window-configuration will encode a buffer that's about to be
-      ;; deleted. I tested it, and it does what I want, so maybe there's no
-      ;; problem?
-      (with-current-buffer buffer
-        (org-capture-put :return-to-wconf (current-window-configuration))))))
+(defun my/org-capture-finalize-shouldnt-mess-windows (orig &rest args)
+  (cl-letf (((symbol-function 'set-window-configuration)
+             #'ignore))
+    (apply orig args)))
 
 (advice-add #'org-capture-finalize
-            :before
+            :around
             #'my/org-capture-finalize-shouldnt-mess-windows)
 
 (defun my/org-todo-side-window-hack (fun &rest args)

@@ -56,7 +56,8 @@
 (require 'quelpa)
 (require 'quelpa-use-package)
 
-(require 'term-compat)
+(when (null window-system)
+  (require 'term-compat))
 
 (when (native-comp-available-p)
   (require 'comp)

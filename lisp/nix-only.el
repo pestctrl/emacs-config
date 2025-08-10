@@ -23,9 +23,21 @@
 ;;; Commentary:
 
 ;;; Code:
+(require 'anaphora)
 
-;; TODO: Figure out how to get ledger manual path
-;; /nix/store/nqqlrdgiz1xl6cilxn089275p3ja599s-ledger-3.3.2/share/info
+;; TODO: Need to know if home-manager config is deployed or not
+(defun nix-present-p ()
+  (executable-find "nix"))
+
+(when (nix-present-p)
+  (aand (executable-find "ledger")
+        (--> (file-truename it)
+             (file-name-parent-directory it)
+             (directory-file-name it)
+             (file-name-parent-directory it)
+             (directory-file-name it)
+             (expand-file-name "share/info" it)
+             (add-to-list 'Info-directory-list it))))
 
 (provide 'nix-only)
 ;;; nix-only.el ends here

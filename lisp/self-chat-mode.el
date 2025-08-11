@@ -148,7 +148,8 @@ shuffling is done in place."
                                                                                        "'s face for self-chat-mode"))
                                (defvar ,face-sym ',face-sym)
                                (add-to-list 'self-chat-highlights
-                                            '(,(rx symbol-start (literal name) symbol-end) 0 ,face-sym prepend))
+                                            '(,(rx symbol-start (literal name) symbol-end) 0 ,face-sym prepend)
+                                            t)
                                (add-to-list 'self-chat-highlights
                                             '(,(format "^> %s:.*$" name) . ,face-sym)))
                              (cl-incf num))))

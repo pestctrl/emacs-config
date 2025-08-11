@@ -44,16 +44,16 @@
             :override
             #'my/org-capture-display-use-side-window)
 
-(defun my/window-dedicated-p (orig &optional window)
-  ;; Excuse me? Side windows are not dedicated.
-  (or (and (not org-capture-mode)
-           (funcall orig window))
-      (eq (funcall orig window)
-          t)))
+;; (defun my/window-dedicated-p (orig &optional window)
+;;   ;; Excuse me? Side windows are not dedicated.
+;;   (or (and (not org-capture-mode)
+;;            (funcall orig window))
+;;       (eq (funcall orig window)
+;;           t)))
 
-(advice-add #'window-dedicated-p
-            :around
-            #'my/window-dedicated-p)
+;; (advice-add #'window-dedicated-p
+;;             :around
+;;             #'my/window-dedicated-p)
 
 (defun my/org-capture-finalize-shouldnt-mess-windows (orig &rest args)
   (cl-letf* ((orig-set-window-configuration (symbol-function 'set-window-configuration))

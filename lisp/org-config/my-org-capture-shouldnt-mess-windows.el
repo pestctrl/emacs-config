@@ -24,6 +24,8 @@
 
 ;;; Code:
 
+(require 'org)
+
 (defun my/side-window-p (window)
   (window-parameter window 'window-side))
 

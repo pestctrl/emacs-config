@@ -44,8 +44,11 @@
     (add-to-list 'llvm-font-lock-keywords
                  `(,(regexp-opt '("nnan" "ninf" "nsz" "arcp" "contract" "afn" "reassoc" "fast") 'symbols) . 'shadow)))
 
+  (defvar llvm-ir-dump-regexp
+    (rx line-start (optional (any "#;") " ") "*** IR Dump" (+ nonl) "***" (optional ":") "\n"))
+
   (add-to-list 'llvm-font-lock-keywords
-               `(,(rx line-start (optional (any "#;") " ") "***" (+ nonl) "***" (optional ":") "\n") . 'llvm-separator-face))
+               `(,llvm-ir-dump-regexp 0 'llvm-separator-face prepend))
 
   (-->
    "\\b[-]?[0-9]+\\b"

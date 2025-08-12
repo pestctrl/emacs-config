@@ -25,7 +25,28 @@
 ;;; Code:
 
 (require 'term/xterm)
-(xterm--init-modify-other-keys)
+
+(let ((ascii-start 97))
+  (dotimes (n 26)
+    (message "%d" n)
+    (define-key xterm-function-map
+                (format "\e[27;5;%d~" (+ ascii-start n))
+                (vector (1+ n)))))
+
+(define-key xterm-function-map
+            "\e[27;5;32~"
+            [?\C-\s]  ;; Or (kbd "C-SPC") ;; Or [?\C- ]
+            )
+
+(define-key xterm-function-map
+            "\e[32;2u"
+            [?\S-\s]
+            )
+
+;; (xterm--init-modify-other-keys)
+(send-string-to-terminal "\e[>4;2m")
+(push "\e[>4m" (terminal-parameter nil 'tty-mode-reset-strings))
+(push "\e[>4;1m" (terminal-parameter nil 'tty-mode-set-strings))
 
 (xterm-mouse-mode 1)
 

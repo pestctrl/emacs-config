@@ -28,7 +28,6 @@
 
 (let ((ascii-start 97))
   (dotimes (n 26)
-    (message "%d" n)
     (define-key xterm-function-map
                 (format "\e[27;5;%d~" (+ ascii-start n))
                 (vector (1+ n)))))

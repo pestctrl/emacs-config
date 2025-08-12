@@ -46,15 +46,22 @@
             )
 
 (define-key xterm-function-map
-            "\e[32;2;32~"
+            "\e[27;2;32~"
             [?\S-\s])
 
 ;; (xterm--init-modify-other-keys)
-(send-string-to-terminal "\e[>4;2m")
-(push "\e[>4m" (terminal-parameter nil 'tty-mode-reset-strings))
-(push "\e[>4;2m" (terminal-parameter nil 'tty-mode-set-strings))
+(defun my/xterm--init-modify-other-keys ()
+  "Terminal initialization for xterm's modifyOtherKeys support."
+  (send-string-to-terminal "\e[>4;2m")
+  (push "\e[>4m" (terminal-parameter nil 'tty-mode-reset-strings))
+  (push "\e[>4;2m" (terminal-parameter nil 'tty-mode-set-strings)))
+
+(advice-add #'xterm--init-modify-other-keys
+            :override
+            #'my/xterm--init-modify-other-keys)
 
 (xterm-mouse-mode 1)
+(terminal-init-xterm)
 
 ;; (global-set-key (kbd "M-[ emacs-C-SPC") #'set-mark-command)
 ;; (global-set-key (kbd "M-[ emacs-M-SPC") #'cycle-spacing)

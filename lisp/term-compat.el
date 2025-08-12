@@ -26,11 +26,15 @@
 
 (require 'term/xterm)
 
-(let ((ascii-start 97))
+(let ((ascii-start 97)
+      (C-M-start ?\C-\M-a))
   (dotimes (n 26)
     (define-key xterm-function-map
                 (format "\e[27;5;%d~" (+ ascii-start n))
-                (vector (1+ n)))))
+                (vector (1+ n)))
+    (define-key xterm-function-map
+                (format "\e[27;7;%d~" (+ ascii-start n))
+                (vector (+ n C-M-start)))))
 
 (define-key xterm-function-map
             "\e[27;5;8~"

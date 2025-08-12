@@ -29,8 +29,8 @@
   '((assembly :key ?a  :major-mode asm-mode  :buffer-string "assembly" :description "[a]ssembly")))
 
 (defun ll/is-dump-file (fname)
-  (and (string= "/tmp/"
-                (file-name-directory fname))
+  (and (string-match-p (rx line-start "/tmp/")
+                       (file-name-directory fname))
        (string-match-p (rx "/" (+ (not "/")) "-" (= 6 alphanumeric) "." (+ anything))
                        fname)))
 

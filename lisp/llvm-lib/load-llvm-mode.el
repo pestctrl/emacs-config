@@ -50,6 +50,17 @@
   (add-to-list 'llvm-font-lock-keywords
                `(,llvm-ir-dump-regexp 0 'llvm-separator-face prepend))
 
+  (defun llvm-previous-IR-dump ()
+    (interactive)
+    (re-search-backward llvm-ir-dump-regexp))
+
+  (defun llvm-next-IR-dump ()
+    (interactive)
+    (re-search-forward llvm-ir-dump-regexp))
+
+  (define-key llvm-mode-map (kbd "C-M-a") #'llvm-previous-IR-dump)
+  (define-key llvm-mode-map (kbd "C-M-e") #'llvm-next-IR-dump)
+
   (-->
    "\\b[-]?[0-9]+\\b"
    (assoc it llvm-font-lock-keywords)

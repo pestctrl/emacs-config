@@ -42,9 +42,8 @@
             )
 
 (define-key xterm-function-map
-            "\e[32;2u"
-            [?\S-\s]
-            )
+            "\e[32;2;32~"
+            [?\S-\s])
 
 ;; (xterm--init-modify-other-keys)
 (send-string-to-terminal "\e[>4;2m")

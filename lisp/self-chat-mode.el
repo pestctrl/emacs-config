@@ -12,7 +12,7 @@
 
 (define-derived-mode self-chat-mode fundamental-mode "self-chat"
   "This is a mode where I become crazy and talk to myself."
-  (setq font-lock-defaults '(self-chat-highlights))
+  (setq font-lock-defaults '(self-chat-highlights nil t))
   (olivetti-mode 1))
 
 (defun self-chat-buffer ()
@@ -148,10 +148,10 @@ shuffling is done in place."
                                                                                        "'s face for self-chat-mode"))
                                (defvar ,face-sym ',face-sym)
                                (add-to-list 'self-chat-highlights
-                                            '(,(rx symbol-start (literal name) symbol-end) 0 ,face-sym prepend)
-                                            t)
+                                            '(,(rx symbol-start (literal name) symbol-end) . ,face-sym))
                                (add-to-list 'self-chat-highlights
-                                            '(,(format "^> %s:.*$" name) . ,face-sym)))
+                                            '(,(format "^> %s:.*$" name) 0 ,face-sym keep)
+                                            t))
                              (cl-incf num))))
                  list))))
 

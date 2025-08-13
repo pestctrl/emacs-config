@@ -63,6 +63,16 @@
 (xterm-mouse-mode 1)
 (terminal-init-xterm)
 
+(defun my/org--mks-read-key-use-read-key (orig &rest args)
+  (cl-letf (((symbol-function 'read-char-exclusive)
+             (lambda (&optional prompt inherit-input-method seconds)
+               (read-key prompt nil))))
+    (apply orig args)))
+
+(advice-add #'org--mks-read-key
+            :around
+            #'my/org--mks-read-key-use-read-key)
+
 ;; (global-set-key (kbd "M-[ emacs-C-SPC") #'set-mark-command)
 ;; (global-set-key (kbd "M-[ emacs-M-SPC") #'cycle-spacing)
 ;; (global-set-key (kbd "M-[ emacs-C-/") #'undo)

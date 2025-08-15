@@ -78,33 +78,21 @@
                  (slot . 6)
                  (window-width . 80)))
 
-  ;; (require 'org-capture)
+  (require 'org-capture)
 
-  ;; (defun my/is-org-capture-buffer (buffer &optional _rest)
-  ;;   (with-current-buffer (get-buffer buffer)
-  ;;     (and (eq major-mode 'org-mode)
-  ;;          org-capture-mode)))
+  (defun my/is-org-capture-buffer (buffer &optional _rest)
+    (with-current-buffer buffer
+      org-capture-mode))
 
-  ;; (add-to-list 'display-buffer-alist
-  ;;              `(my/is-org-capture-buffer
-  ;;                display-buffer-in-side-window
-  ;;                (side . left)
-  ;;                (select . t)
-  ;;                (window-width . 85)
-  ;;                (window-parameters
-  ;;                 . ((no-delete-other-windows . t)
-  ;;                    (dedicated . t)))))
-
-  ;; (defun my/is-org-capture-buffer (buffer &optional _rest)
-  ;;   (with-current-buffer buffer
-  ;;     org-capture-mode))
-
-  ;; (add-to-list 'display-buffer-alist
-  ;;              `(my/is-org-capture-buffer
-  ;;                display-buffer-in-side-window
-  ;;                (side . left)
-  ;;                (slot . 0)
-  ;;                (window-width . 80)))
+  (add-to-list 'display-buffer-alist
+               `(my/is-org-capture-buffer
+                 display-buffer-in-side-window
+                 (side . left)
+                 (select . t)
+                 (window-width . 85)
+                 (window-parameters
+                  . ((no-delete-other-windows . t)
+                     (dedicated . t)))))
 
   ;; (pop display-buffer-alist)
 #+end_src

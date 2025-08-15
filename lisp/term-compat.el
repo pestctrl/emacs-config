@@ -27,14 +27,22 @@
 (require 'term/xterm)
 
 (let ((ascii-start 97)
-      (C-M-start ?\C-\M-a))
+      (C-M-start ?\C-\M-a)
+      (M-S-start ?\M-\S-a))
   (dotimes (n 26)
     (define-key xterm-function-map
                 (format "\e[27;5;%d~" (+ ascii-start n))
                 (vector (1+ n)))
     (define-key xterm-function-map
+                (format "\e[27;4;%d~" (+ ascii-start n))
+                (vector (+ n M-S-start)))
+    (define-key xterm-function-map
                 (format "\e[27;7;%d~" (+ ascii-start n))
                 (vector (+ n C-M-start)))))
+
+(define-key xterm-function-map
+            "\e[27;4;13~"
+            [M-S-return])
 
 (define-key xterm-function-map
             "\e[27;5;8~"

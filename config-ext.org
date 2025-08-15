@@ -136,8 +136,6 @@
 ** font-lock-studio
 #+begin_src emacs-lisp
   (use-package font-lock-studio)
-  (when (>= emacs-major-version 29)
-    (define-obsolete-function-alias 'font-lock-fontify-syntactically-region #'font-lock-default-fontify-syntactically "29.1"))
 #+end_src
 * pdf-tools use isearch
 #+BEGIN_SRC emacs-lisp

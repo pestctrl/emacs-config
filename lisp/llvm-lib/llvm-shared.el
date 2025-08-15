@@ -37,11 +37,16 @@
 (defvar llvm-core-count
   (nprocs))
 
-(defun lls/ninja-build-tools (build-dir tools-list &optional verbose)
-  (format "set -o pipefail && CLICOLOR_FORCE=1 ninja -C %s -j %d %s %s 2>&1 | tee ninja.log"
-          build-dir llvm-core-count
-          (if verbose "-v" "")
-          (string-join tools-list " ")))
+(defun lls/ninja-build-tools (build-dir targets &optional verbose)
+  (let ((cmake-make-program
+         (if (string= "Makefile" (car (directory-files build-dir nil "^\\(build\\.ninja$\\|Makefile\\)$")))
+             "make"
+           "ninja")))
+    (format "set -o pipefail && CLICOLOR_FORCE=1 %s -C %s -j %d %s %s 2>&1 | tee ninja.log"
+            cmake-make-program
+            build-dir llvm-core-count
+            (if verbose "-v" "")
+            (string-join targets " "))))
 
 ;; =============================== Init ==============================
 

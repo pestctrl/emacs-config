@@ -468,3 +468,7 @@
    :config
    (direnv-mode))
 #+end_src
+* ledger
+#+begin_src emacs-lisp
+  (require 'my-ledger)
+#+end_src

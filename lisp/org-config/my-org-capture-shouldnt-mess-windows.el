@@ -59,10 +59,9 @@
 
 (defun my/org-capture-finalize-shouldnt-mess-windows (orig &rest args)
   (cl-letf* ((orig-set-window-configuration (symbol-function 'set-window-configuration))
-
              ((symbol-function 'set-window-configuration)
               #'(lambda (&rest args)
-                  (unless (equal (car args) (org-capture-get :return-to-wconf 'local))
+                  (unless (equal (car args) (org-capture-get :return-to-wconf))
                     (apply orig-set-window-configuration args)))))
     (apply orig args)))
 

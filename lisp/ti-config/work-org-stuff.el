@@ -137,6 +137,17 @@
      ,(org-agenda-weekly-view tag))
     ,@additional))
 
+(setq org-agenda-time-grid
+      '((daily today)
+        (800 1000 1200 1400 1600 1800 2000)
+        " ┄┄┄┄┄ "
+        "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄"))
+
+(setq org-agenda-prefix-format
+      '((agenda . " %i %-15:c%?-12t% s")
+        (todo . " %i %-15:c")
+        (tags . " %i %-15:c")
+        (search . " %i %-15:c")))
 
 (defun org-agenda-weekly-view (tag)
   `((my/org-ql-stuck-projects ,tag
@@ -149,16 +160,18 @@
             ((org-agenda-span (car (work/last-week-wednesday)))
              (org-agenda-start-day (cdr (work/last-week-wednesday)))
              (org-agenda-start-on-weekday 3)
-             (org-agenda-show-log '(clock state))
-             (org-agenda-skip-function (lambda ()
-                                         (let ((tags (org-get-tags)))
-                                           (unless (and (or (member ,tag tags)
-                                                            (member "PLAN" tags))
-                                                        (let ((delayed (org-entry-get (point) "DELAYED")))
-                                                          (or (null delayed)
-                                                              (org-time< delayed (org-matcher-time "<now>"))))
-                                                        (not (member (org-get-todo-state) '("HOLD" "TICKLER"))))
-                                             (outline-next-heading)))))))))
+             (org-agenda-show-log t)
+             (org-agenda-include-inactive-timestamps t)
+             ;; (org-agenda-skip-function (lambda ()
+             ;;                             (let ((tags (org-get-tags)))
+             ;;                               (unless (and (or (member ,tag tags)
+             ;;                                                (member "PLAN" tags))
+             ;;                                            (let ((delayed (org-entry-get (point) "DELAYED")))
+             ;;                                              (or (null delayed)
+             ;;                                                  (org-time< delayed (org-matcher-time "<now>"))))
+             ;;                                            (not (member (org-get-todo-state) '("HOLD" "TICKLER"))))
+             ;;                                 (outline-next-heading)))))
+             ))))
 
 (defun work/last-week-wednesday ()
   (let ((num (+ 4 (string-to-number (format-time-string "%u")))))
@@ -459,18 +472,23 @@
            :target (file+head+olp "%<%Y-%m-%d>.org"
                                   "#+title: %<%Y-%m-%d>\n#+filetags: :dailies:%<%Y:%B:>\n"
                                   ("Journal")))
+          ("t" "Timed Journal" entry "* %<%H:%M> %?\n%U"
+           :unnarrowed t
+           :target (file+head+olp "%<%Y-%m-%d>.org"
+                                  "#+title: %<%Y-%m-%d>\n#+filetags: :dailies:%<%Y:%B:>\n"
+                                  ("Journal")))
           ("J" "Journal with source" entry "* %<%H:%M> %?\n:PROPERTIES:\n:LOCATION: %a\n:END:"
            :unnarrowed t
            :target
            (file+head+olp "%<%Y-%m-%d>.org"
                           "#+title: %<%Y-%m-%d>\n#+filetags: :dailies:%<%Y:%B:>\n"
                           ("Journal")))
-          ("E" "Entry Interrupt" entry (file "~/org/templates/entry-interrupt.org")
+          ("e" "Entry Interrupt" entry (file "~/org/templates/entry-interrupt.org")
            :unnarrowed t
            :target (file+head+olp "%<%Y-%m-%d>.org"
                                   "#+title: %<%Y-%m-%d>\n#+filetags: :dailies:%<%Y:%B:>\n"
                                   ("Journal")))
-          ("e" "Exit Interrupt" entry (file "~/org/templates/exit-interrupt.org")
+          ("E" "Exit Interrupt" entry (file "~/org/templates/exit-interrupt.org")
            :unnarrowed t
            :target (file+head+olp "%<%Y-%m-%d>.org"
                                   "#+title: %<%Y-%m-%d>\n#+filetags: :dailies:%<%Y:%B:>\n"
@@ -491,7 +509,13 @@
            (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
                           "#+title: ${title}\n"
                           ("Journal" "%<%b %d, %Y>")))
-          ("J" "Journal with source" entry "* %<%H:%M> %?\n:PROPERTIES:\n:LOCATION: %a\n:END:"
+          ("t" "Timed Journal" entry "* %<%H:%M> %?\n%U"
+           :unnarrowed t
+           :target
+           (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"
+                          "#+title: ${title}\n"
+                          ("Journal" "%<%b %d, %Y>")))
+          ("J" "Journal with source" entry "* %<%H:%M> %?\n:PROPERTIES:\n:LOCATION: %a\n:END:\n"
            :unnarrowed t
            :target
            (file+head+olp "%<%Y%m%d%H%M%S>-${slug}.org"

@@ -11,13 +11,17 @@
 
 (defvar llvm-mode-syntax-table
   (let ((table (make-syntax-table)))
-    (modify-syntax-entry ?% "_" table)
+    (modify-syntax-entry ?% "-" table)
     (modify-syntax-entry ?. "_" table)
+    (modify-syntax-entry ?- "_" table)
+    (modify-syntax-entry ?: "-" table)
     (modify-syntax-entry ?\; "< " table)
     (modify-syntax-entry ?\n "> " table)
     (modify-syntax-entry ?/  ". 124b" table)
     (modify-syntax-entry ?*  ". 23" table)
-    table)
+    ;; (setq llvm-mode-syntax-table table)
+    table
+    )
   "Syntax table used while in LLVM mode.")
 
 (defvar llvm-font-lock-keyword-words
@@ -81,14 +85,14 @@
     (,(regexp-opt '("nnan" "ninf" "nsz" "arcp" "contract" "afn" "reassoc" "fast") 'symbols) . font-lock-keyword-face)
     ;; Use-list order directives
     (,(regexp-opt '("uselistorder" "uselistorder_bb") 'symbols) . font-lock-keyword-face)
-    (,(rx "@" symbol-start (+? nonl) symbol-end) . font-lock-function-name-face)
+    (,(rx "@" symbol-start (+? (or (syntax symbol) (syntax word))) symbol-end) . font-lock-function-name-face)
     ;; Integer literals
     ("\\b[-]?[0-9]+\\b" . font-lock-preprocessor-face)
     ))
 
 (defvar llvm-pre-opcode-attributes
   (rx symbol-start
-      (or "nnan" "ninf" "nsz" "arcp" "contract" "afn" "reassoc" "fast" "nsw" "nuw")
+      (or "nnan" "ninf" "nsz" "arcp" "contract" "afn" "reassoc" "fast" "nsw" "nuw" "mc-replicate")
       symbol-end))
 
 (defvar llvm-font-lock-keywords
@@ -116,7 +120,7 @@
           (+ (or alphanumeric (any "_."))))
      . font-lock-variable-name-face)
     ;; Variables
-    (,(rx symbol-start (any "%$") (+ (or alphanumeric (any "_.")))) . font-lock-variable-name-face)
+    (,(rx (any "%$") symbol-start (+? (or (syntax symbol) (syntax word))) symbol-end) . font-lock-variable-name-face)
     ;; Attributes
     (,(rx "!" (+ (or alphanumeric (any "._")))) . 'shadow)
     ;; Machine Opcodes
@@ -141,16 +145,19 @@
               "type" "label" "opaque" "token")
           symbol-end)
      . font-lock-type-face)
+    ;; Other Attributes
+    (,(rx (or "renamable" "killed " "implicit-def" "implicit" "debug-location" "nsw" "nuw" "align" "dead" "early-clobber")) . 'shadow)
+
+    ,@llvm-font-lock-keyword-words
+
+    (,(rx "$" (+ (or (syntax symbol) (syntax word))) symbol-end) . 'font-lock-variable-use-face)
+
     ;; Floating point constants
     ("\\b[-+]?[0-9]+.[0-9]*\\([eE][-+]?[0-9]+\\)?\\b" . font-lock-preprocessor-face)
     ;; Hex constants
     ("\\b0x[0-9A-Fa-f]+\\b" . font-lock-preprocessor-face)
     ;; Integer literals
     ("\\b[-]?[0-9]+\\b" . font-lock-preprocessor-face)
-    ;; Other Attributes
-    (,(rx (or "renamable" "killed " "implicit-def" "implicit" "debug-location" "nsw" "nuw" "align" "dead")) . 'shadow)
-
-    ,@llvm-font-lock-keyword-words
     )
   "Syntax highlighting for LLVM.")
 

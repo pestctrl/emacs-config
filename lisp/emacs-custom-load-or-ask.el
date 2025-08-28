@@ -83,6 +83,18 @@
   (dolist (prompt ec/my-variables-list)
     (ec/rerun-prompt prompt)))
 
+(defun ec/get-one-prompt-result ()
+  (interactive)
+  (let ((resp (completing-read "Which prompt? "
+                               (mapcar #'(lambda (a)
+                                           (last a))
+                                       ec/my-variables-list))))
+    (cl-loop for i in ec/my-variables-list
+             until (member resp i)
+             finally
+             do
+             (message "%s" (eval (cadr i))))))
+
 (defun ec/rerun-one-prompt ()
   (interactive)
   (let ((resp (completing-read "Which prompt? "

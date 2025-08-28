@@ -60,14 +60,14 @@
          (let ((path (match-string 3)))
            (save-match-data
              (format "|\\1|\\2|%s:\\4|[[\\3::\\4][Link]]|"
-                     (cond ((string-match (rx (and "/scratch/benson/tools"
+                     (cond ((string-match (rx (and "/scratch/benson/_repos-work/tools"
                                                    (* digit)
                                                    "/llvm_cgt/llvm-project/"
                                                    (group
                                                     (+ nonl))))
                                           path)
                             (format "$LLVM_PROJECT/%s" (match-string 1 path)))
-                           ((string-match (rx (and "/scratch/benson/tools"
+                           ((string-match (rx (and "/scratch/benson/_repos-work/tools"
                                                    (* digit)
                                                    "/"
                                                    (group

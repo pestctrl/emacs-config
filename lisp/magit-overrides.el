@@ -58,7 +58,7 @@
 (defun magit-show-ancestor-merges (revs &optional args files)
   (interactive (cons (magit-read-starting-point "Ancestry path for: ")
                      (magit-diff-arguments)))
-  (let ((flags "--merges --oneline --reverse --first-parent"))
+  (let ((flags "--merges --oneline --reverse --ancestry-path"))
     (async-shell-command
      (shell-and
       (format "git --no-pager log --oneline %s~1..%s"

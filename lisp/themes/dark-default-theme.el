@@ -40,6 +40,7 @@
    'dark-default
  
    '(default ((t (:foreground "#70FF00" :background "gray8"))))
+   '(fringe ((t (:background "grey20"))))
    '(mode-line-inactive ((t :foreground "gray60" :background "#404045" :inverse-video nil)))
    '(mode-line     ((t :foreground "gray60" :background "black" :inverse-video nil)))
    '(eldoc-highlight-function-argument ((t :foreground "dodger blue")))

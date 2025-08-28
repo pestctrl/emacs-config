@@ -441,6 +441,7 @@
          ("C-c n t" . org-roam-dailies-capture-today)
          ("C-c n i" . org-roam-node-insert)
          ("C-c n j" . my/org-roam-logger-capture-current)
+         ("C-c n s" . consult-org-roam-search)
          :map org-mode-map
          ("C-M-i" . completion-at-point))
   :commands my/get-org-roam-files-by-tags

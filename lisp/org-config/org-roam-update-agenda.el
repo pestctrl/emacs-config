@@ -32,7 +32,14 @@
   (setq org-agenda-files
         (append
          orua/agenda-files
-         (my/get-org-roam-files-by-tags '("Project" "active")))))
+         (my/get-org-roam-files-by-tags '("Project" "active"))
+         (my/get-org-roam-most-recent-dailies))))
+
+(defun my/get-org-roam-most-recent-dailies ()
+  (let ((roam-daily-directory
+         (expand-file-name "daily" org-roam-directory)))
+    (when (file-exists-p roam-daily-directory)
+      (last (directory-files roam-daily-directory t "^[^#\\.]") 10))))
 
 (advice-add #'org-agenda
             :before

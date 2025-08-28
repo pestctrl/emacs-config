@@ -37,11 +37,12 @@
                                (+ alnum)
                                " in "))
                          ;; Function Name
-                         (group (+? nonl))
+                         (group (+ nonl))
                          (optional " ")
                          "("
-                         (*? nonl)
-                         ") at "
+                         (*? anything)
+                         ")"
+                         (* space)  "at "
                          ;; File name
                          (group
                           ;;"/"

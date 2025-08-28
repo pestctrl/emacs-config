@@ -25,8 +25,7 @@
 ;;; Code:
 (require 'cl-lib)
 
-(if (and (<= 30 emacs-major-version)
-         (< 0 emacs-minor-version))
+(if (and (<= 30 emacs-major-version))
     (message "No longer need this patch, hopefully!")
   (require 'tab-bar-patch))
 

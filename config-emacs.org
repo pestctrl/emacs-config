@@ -1,5 +1,8 @@
 * buffer-window management
 #+begin_src emacs-lisp
+  (setq split-width-threshold 160)
+  (setq split-height-threshold 80)
+
   (defun switch-to-buffer-force-same-window (buffer)
     (interactive
      (list (read-buffer-to-switch "Switch to buffer: ")))

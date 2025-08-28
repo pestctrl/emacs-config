@@ -295,7 +295,7 @@
 #+end_src
 * navigation
 #+begin_src emacs-lisp
-  (defun update-window-third-height (&optional arg)
+  (defun update-window-third-height (&optional arg &rest ignore)
     (let ((win
            (cond ((framep arg)
                   (frame-selected-window arg))
@@ -315,9 +315,9 @@
   (add-hook 'window-configuration-change-hook
             #'update-window-third-height)
 
-  ;; (advice-add #'select-window
-  ;;             :after
-  ;;             'update-window-third-height)
+  (advice-add #'select-window
+              :after
+              'update-window-third-height)
 
   ;; Word navigation
   (global-set-key (kbd "M-f") 'forward-to-word)

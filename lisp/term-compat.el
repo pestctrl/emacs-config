@@ -49,6 +49,10 @@
             [C-backspace])
 
 (define-key xterm-function-map
+            "\e[27;2;127~"
+            [S-backspace])
+
+(define-key xterm-function-map
             "\e[27;5;32~"
             [?\C-\s] ;; Or (kbd "C-SPC") ;; Or [?\C- ]
             )

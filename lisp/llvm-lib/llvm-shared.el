@@ -237,6 +237,8 @@
 (defun lls/get-tool (tool-regexp &optional directories)
   (cl-mapcan #'(lambda (dir)
                  (when (file-exists-p dir)
+                   (when (string-match-p "/sim/sds11.*" dir)
+                     (message "Checking %s..." dir))
                    (directory-files dir t tool-regexp)))
              (or directories
                  (lls/get-llvm-bin-dirs))))

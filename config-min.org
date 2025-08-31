@@ -979,7 +979,7 @@
     :hook ((prog-mode . olivetti-mode)
            (org-mode . olivetti-mode)
            (dired-mode . olivetti-mode)
-           (org-agenda . olivetti-mode)
+           (org-agenda-mode . olivetti-mode)
            (Info-mode . olivetti-mode)
            (message-mode . olivetti-mode)
            (markdown-mode . olivetti-mode))

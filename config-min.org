@@ -931,9 +931,6 @@
 
       (setq vterm-kill-buffer-on-exit t)))
 #+end_src
-** wgrep
-#+begin_src emacs-lisp
-#+end_src
 ** Query replace rx
 #+begin_src emacs-lisp
   (defun my/query-replace-rx (&rest _)

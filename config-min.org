@@ -991,6 +991,14 @@
                 :before
                 'olivetti-reset-all-windows)
 
+    (advice-add 'olivetti-reset-window
+                :after
+                (lambda (window)
+                  (set-window-parameter
+                   window
+                   'min-margins
+                   (cons 0 0))))
+
     (setq-default olivetti-body-width 140)
 
     (with-eval-after-load 'mu4e

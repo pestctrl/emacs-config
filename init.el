@@ -1,11 +1,11 @@
 (setq package-list '(org use-package quelpa quelpa-use-package))
 ;; list the repositories containing them
 (setq package-archives '(("melpa" . "http://melpa.org/packages/")
-;;                         ("org" . "https://orgmode.org/elpa/")
+                         ;; ("org" . "https://orgmode.org/elpa/")
                          ("gnu" . "http://elpa.gnu.org/packages/")
                          ("nongnu" . "https://elpa.nongnu.org/nongnu/")
-                         ("elpa" . "http://tromey.com/elpa/")
-                         ;;("marmalade" . "http://marmalade-repo.org/packages/")
+                         ;; ("elpa" . "http://tromey.com/elpa/")
+                         ;; ("marmalade" . "http://marmalade-repo.org/packages/")
                          ))
 
 ;; activate all the packages (in particular autoloads)

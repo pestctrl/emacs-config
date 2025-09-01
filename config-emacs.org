@@ -1,7 +1,7 @@
 * buffer-window management
 #+begin_src emacs-lisp
-  (setq split-width-threshold 160)
-  (setq split-height-threshold 80)
+  (setq split-width-threshold 120)
+  (setq split-height-threshold 4)
 
   (defun switch-to-buffer-force-same-window (buffer)
     (interactive

@@ -57,7 +57,8 @@
     (advice-add #'doom-modeline-project-p
                 :around
                 #'my/dont-check-project-samba)
-    )
+
+    (require 'erc-doom-modeline-hack))
 
   ;; Modeline display useful information
   (setq global-mode-string '(" "))

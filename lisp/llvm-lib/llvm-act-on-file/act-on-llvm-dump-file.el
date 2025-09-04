@@ -42,19 +42,26 @@
                (file-name-sans-extension)))
    (file-name-directory fname)))
 
-(defun ll/dump-extract-command (fname)
+(defun ll/dump-extract-command-flags (fname)
   (with-current-buffer (find-file-noselect fname)
     (save-excursion
       (goto-char (point-min))
-      (re-search-forward "^[^#]")
-      (kill-ring-save (point-at-bol) (point-at-eol))
-      (current-kill 0))))
+      (re-search-forward
+       (rx line-start (not "#")
+           (group  "\"" (+? nonl) "\"")
+           (group (+ nonl))
+           line-end))
+      (match-string 2))))
 
 (defun ll/act-on-llvm-dump-file (fname)
   (let* ((action (aml/read-action-map ll/dump-file-action-map))
-         (command (ll/dump-extract-command (ll/dump-to-sh-file fname))))
+         (command-flags (ll/dump-extract-command-flags (ll/dump-to-sh-file fname)))
+         (clang (lls/prompt-tool "clang$")))
     (compilation-start
-     (concat command " -S -o -")
+     (concat
+      (when (y-or-n-p "Would you like to `rr record`? ")
+        "rr record ")
+      clang command-flags " -S -o -")
      'asm-mode
      `(lambda (_)
         ,(format "*%s*" fname)))))

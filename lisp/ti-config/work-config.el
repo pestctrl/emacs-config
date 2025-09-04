@@ -37,6 +37,14 @@
 (require 'bisect-mode)
 (require 'deadgrep-rejump-mode)
 
+(use-package editorconfig
+  :config
+  (editorconfig-mode 1)
+
+  (advice-add #'editorconfig-set-trailing-ws
+              :override
+              #'ignore))
+
 (put 'magit-log-mode 'magit-log-default-arguments
      '("--graph" "-n64" "--decorate"))
 

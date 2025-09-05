@@ -68,6 +68,7 @@
    `(orderless-match-face-3 ((t :foreground "#f0ce43" :background "#555555")))
 
    '(org-todo ((t (:foreground "Pink" :bold t))))
+   '(org-agenda-date-weekend ((t (:foreground "orange" :bold t :inherit org-agenda-structure))))
 
    '(opr/STUFF-todo-face ((t :foreground "goldenrod")))
    '(opr/FUTURE-todo-face ((t :foreground "medium spring green")))

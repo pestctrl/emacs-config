@@ -29,6 +29,7 @@
 (custom-theme-set-faces
  'light-default
 
+ '(default ((t (:foreground "#000000" :background "#FFFFFF"))))
  '(org-todo ((t :foreground "Red1" :bold t)))
  
  `(rainbow-delimiters-depth-1-face ((t :foreground "#000000")))

@@ -101,6 +101,13 @@
                   . ((no-delete-other-windows . t)
                      (dedicated . t)))))
 
+  (add-to-list 'display-buffer-alist
+               `("*org-roam*"
+                 display-buffer-in-side-window
+                 (side . left)
+                 (select . t)
+                 (window-width . 85)))
+
   ;; (pop display-buffer-alist)
 #+end_src
 * Tramp configuration

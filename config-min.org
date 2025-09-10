@@ -506,7 +506,7 @@
           (dedicated . t)
           (inhibit-same-window . t)))
   (global-set-key (kbd "C-x g") 'magit-status)
-  (global-set-key (kbd "C-x M-g") 'magit-dispatch)
+  (global-set-key (kbd "C-x M-g") 'magit-file-dispatch)
   (require 'magit-overrides)
 
   ;; Magit uses ediff

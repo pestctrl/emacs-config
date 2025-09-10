@@ -162,6 +162,7 @@
              (org-agenda-start-on-weekday 3)
              (org-agenda-show-log t)
              (org-agenda-include-inactive-timestamps t)
+             (org-agenda-hide-tags-regexp ".*")
              ;; (org-agenda-skip-function (lambda ()
              ;;                             (let ((tags (org-get-tags)))
              ;;                               (unless (and (or (member ,tag tags)
@@ -631,7 +632,8 @@
 (setq org-agenda-hide-tags-regexp
       (rx (or "prod"
               (and symbol-start "_" (+ nonl) "_" symbol-end)
-              "Project" "active")))
+              "Project" "active"
+              "dailies")))
 
 (defun ti/generate-org-exit-interrupt ()
   (-->

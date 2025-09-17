@@ -26,7 +26,7 @@
 (defvar exwm-startup-programs
   '(("megasync" "QT_SCALE_FACTOR=1 megasync")
     "/usr/lib/kdeconnectd"
-    ("compton" "compton -f -i .7 -b")
+    ("compton" "picom --backend=glx -f -i .7 -b")
     ;; ("compton -f -i .7 -b --backend glx --blur-background --blur-method kawase --blur-strength 2")
     "start-pulseaudio-x11;pactl upload-sample /usr/share/sounds/gnome/default/alerts/drip.ogg beep; pactl load-module module-x11-bell sample=beep; xset b 100"
     "kdeconnect-indicator"

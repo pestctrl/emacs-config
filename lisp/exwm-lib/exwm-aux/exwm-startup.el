@@ -46,6 +46,7 @@
       (start-process-shell-command (file-name-nondirectory program) nil program))))
 
 (defun call-startup-programs ()
+  (interactive)
   (start-minimum-programs)
   (when (y-or-n-p "Run startup programs? ")
     (dolist (program exwm-startup-programs)

@@ -27,15 +27,15 @@
 
 (deftheme dark-default)
 
-
-(let ((rainbow-purple  "#9E1CB2")
-      (rainbow-green   "#47B04B")
-      (rainbow-blue    "#1194f6")
-      (rainbow-red     "#C90067")
-      (rainbow-yellow  "#FFED18")
-      (rainbow-orange  "#E7B500")
-      (rainbow-7       "#00AA5D")
-      (rainbow-8       "#FE7380"))
+(let* ((rainbow-purple  "#9E1CB2")
+       (rainbow-green   "#47B04B")
+       (rainbow-red     "#C90067")
+       (rainbow-blue    "#1194f6")
+       (rainbow-yellow  "#FFED18")
+       (rainbow-white   "#FFFFFF")
+       (rainbow-pink    "#FE7380")
+       (rainbow-cyan    "Cyan")
+       (rainbow-orange  "#E7B500"))
   (custom-theme-set-faces
    'dark-default
  
@@ -56,7 +56,7 @@
    `(rainbow-delimiters-depth-5-face ((t :foreground ,rainbow-yellow)))
    `(rainbow-delimiters-depth-6-face ((t :foreground ,rainbow-blue)))
    `(rainbow-delimiters-depth-7-face ((t :foreground ,rainbow-red)))
-   `(rainbow-delimiters-depth-8-face ((t :foreground ,rainbow-8)))
+   `(rainbow-delimiters-depth-8-face ((t :foreground ,rainbow-pink)))
 
    ;; '(vertico-current ((t :foreground "black" :background "#65a7e2")))
    '(vertico-current ((t :background "gray30")))

@@ -259,9 +259,21 @@
 
 (setq org-agenda-span 'day)
 
+(defun days-since (date)
+  (let ((target-date (date-to-time date))
+        (current-date (current-time)))
+    (ceiling
+     (time-to-number-of-days
+      (time-subtract current-date target-date)))))
+
 (setq org-agenda-custom-commands
       `(("p" . "\tprod")
-        ,@(agenda-suite "all" "pa" "prod")))
+        ,@(agenda-suite "all" "pa" "prod")
+        ("w" "\tWindows Diary"
+         ((agenda ""
+                  ((org-agenda-start-day "2025-10-29")
+                   (org-agenda-start-on-weekday 3)
+                   (org-agenda-span (days-since "2025-10-29"))))))))
 
 (setq org-outline-path-complete-in-steps nil)
 (setq org-refile-use-outline-path t)

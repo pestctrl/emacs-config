@@ -25,6 +25,29 @@
 ;;; Code:
 (require 'org)
 
+(defclass debugger-stacktrace-data ()
+  ((file-name    :initarg :file-name    :type string)
+   (line-number  :initarg :line-number  :type number)
+   (func-name    :initarg :func-name    :type string)
+   (stack-number :initarg :stack-number :type number)))
+
+(defun stacktrace-to-org-table (stacktrace)
+  (save-excursion
+    (beginning-of-buffer)
+    (insert "|-\n|#|Function Name|Link|\n|-\n")
+    (dolist (stack-entry stacktrace)
+      (insert (format "|%s|%s|%s|\n"
+                      (slot-value stack-entry 'stack-number)
+                      (slot-value stack-entry 'func-name)
+                      (let ((fname (slot-value stack-entry 'file-name)))
+                        (format "[[%s:%d][%s]]"
+                                fname
+                                (slot-value stack-entry 'line-number)
+                                (file-name-nondirectory fname))))))
+    (insert "|-")
+    (org-table-align)
+    (org-table-sort-lines nil ?N)))
+
 (defun gdb-stacktrace-to-org-table ()
   (interactive)
   (let ((regexp (rx (and line-start
@@ -52,35 +75,20 @@
                          (group
                           (+ digit))
                          line-end
-                         ))))
-    (beginning-of-buffer)
+                         )))
+        stacktrace)
     (save-excursion
+      (beginning-of-buffer)
       (while (re-search-forward regexp nil 'noerror)
-        (replace-match
-         (let ((path (match-string 3)))
-           (save-match-data
-             (format "|\\1|\\2|%s:\\4|[[\\3::\\4][Link]]|"
-                     (cond ((string-match (rx (and "/scratch/benson/_repos-work/tools"
-                                                   (* digit)
-                                                   "/llvm_cgt/llvm-project/"
-                                                   (group
-                                                    (+ nonl))))
-                                          path)
-                            (format "$LLVM_PROJECT/%s" (match-string 1 path)))
-                           ((string-match (rx (and "/scratch/benson/_repos-work/tools"
-                                                   (* digit)
-                                                   "/"
-                                                   (group
-                                                    (+ nonl))))
-                                          path)
-                            (format "$SANDBOX/%s" (match-string 1 path)))
-                           (t path))))))))
-    (org-table-sort-lines nil ?N)
-    (save-excursion
-      (insert "|-\n|#|Function Name|File & Line Number|Link|\n|-\n")
-      (end-of-buffer)
-      (insert "\n|-"))
-    (org-table-align)))
+        (push
+         (make-instance 'debugger-stacktrace-data
+                        :stack-number (string-to-number (match-string 1))
+                        :func-name (match-string 2)
+                        :file-name (match-string 3)
+                        :line-number (string-to-number (match-string 4)))
+         stacktrace))
+      (erase-buffer))
+    (stacktrace-to-org-table stacktrace)))
 
 (defun lldb-filename-to-org-link (filename)
   (setq filename

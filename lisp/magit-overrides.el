@@ -58,13 +58,22 @@
 (defun magit-show-ancestor-merges (revs &optional args files)
   (interactive (cons (magit-read-starting-point "Ancestry path for: ")
                      (magit-diff-arguments)))
-  (let ((flags "--merges --oneline --reverse --ancestry-path"))
+  (let ((flags "--merges --oneline --reverse --ancestry-path")
+        (tip (->>
+              (magit-list-remote-branches)
+              (remove-if-not
+               (lambda (x)
+                 (string-match-p "origin/master\\|main" x)))
+              (car))))
     (async-shell-command
      (shell-and
       (format "git --no-pager log --oneline %s~1..%s"
               revs revs)
-      (format "git --no-pager log %s %s..origin/main | cut -c -70 | head -n 10"
-              flags revs)))))
+      (format "git --no-pager log %s %s..%s -- | cut -c -70 | head -n 10"
+              flags revs
+              (progn
+                (string-match "^refs/remotes/\\(.*\\)" tip)
+                (match-string 1 tip)))))))
 
 (transient-append-suffix 'magit-worktree "b"
   '("B" "[async] worktree" my/magit-worktree-checkout))

@@ -75,18 +75,21 @@
     (let ((compiler-action (aml/get-map-prop ll/c-file-action-map action :compiler-action))
           (compiler (lls/prompt-tool "clang$")))
       (string-join
-       (list (lls/get-clang-command-fun
-              :compiler compiler
-              :file file
-              :action compiler-action
-              :output output
-              :flags
-              (list
-               (pcase action
-                 ('debug (format "-mllvm -debug-only=%s" (ll/read-pass-name "Which pass? ")))
-                 ('before-after (let ((pass (ll/read-pass-name "Which pass? ")))
-                                  (format "-mllvm -print-before=%s -mllvm -print-after=%s" pass pass)))
-                 ('changed "-mllvm -print-before-all"))))
+       (list
+        (when (y-or-n-p "Would you like to `rr record`? ")
+          "rr record ")
+        (lls/get-clang-command-fun
+         :compiler compiler
+         :file file
+         :action compiler-action
+         :output output
+         :flags
+         (list
+          (pcase action
+            ('debug (format "-mllvm -debug-only=%s" (ll/read-pass-name "Which pass? ")))
+            ('before-after (let ((pass (ll/read-pass-name "Which pass? ")))
+                             (format "-mllvm -print-before=%s -mllvm -print-after=%s" pass pass)))
+            ('changed "-mllvm -print-before-all"))))
              " ")
        " "))))
 

@@ -9,13 +9,13 @@
                                       (setf old-beg (point-min) old-end (point-max)
                                             narrow-p t)
                                       (narrow-to-region org-agenda-restrict-begin org-agenda-restrict-end)))))))
-      (let* ((org-todo-keywords-1 '("EMPTY" "ONE" "META" "META1" "TODO"))
+      (let* ((org-todo-keywords-1 '("EMPTY" "ONE" "META" "META1" "TODO" "TASK"))
              (items (mapcan #'my/get-project-stuck-displayables
                             (org-ql-select from
                               `(and ,@(when (and tag
                                                  (not (zerop (length tag))))
                                         `((tags ,tag)))
-                                    (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
+                                    (todo "TODO" "TASK" "ONE" "META" "META1" "EMPTY" "SEQ")
                                     (my/top-level)
                                     (not (property "DELAYED"))
                                     (or (eq 'stuck (opr/type-of-task))

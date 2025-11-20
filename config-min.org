@@ -974,6 +974,7 @@
   (use-package olivetti
     :commands (olivetti-mode)
     :hook ((prog-mode . olivetti-mode)
+           (conf-mode . olivetti-mode)
            (org-mode . olivetti-mode)
            (dired-mode . olivetti-mode)
            (org-agenda-mode . olivetti-mode)

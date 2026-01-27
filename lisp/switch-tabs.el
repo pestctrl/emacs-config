@@ -74,9 +74,10 @@
 (defun close-tab-switch ()
   (interactive)
   (let ((old-name (alist-get 'name (tab-bar--current-tab))))
-    (when (y-or-n-p (format "Close tab \"%s\"? "
-                            old-name))
-      (tab-bar-close-tab))))
+    (aprog1 (y-or-n-p (format "Close tab \"%s\"? "
+                              old-name))
+      (when it
+        (tab-bar-close-tab)))))
 
 (defun tab-bar-report ()
   (interactive)

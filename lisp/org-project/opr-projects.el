@@ -51,7 +51,7 @@
          ;; All todo children are done? Stuck!
          (not (olc/any-todo-children?
                 (not (member (cdr (opr/get-type-and-state))
-                             '(done wait invis))))))
+                             '(done wait invis hold))))))
         'stuck
       'active)))
 

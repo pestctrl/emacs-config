@@ -62,13 +62,17 @@
                     (let ((type (opr/get-type)))
                       (pcase type
                         ('project
-                         (when (eq 'stuck (opr/type-of-project))
-                           (let ((res (-> (point)
-                                          (org-element-headline-parser)
-                                          (org-ql--add-markers)
-                                          (my/get-project-stuck-displayables)
-                                          (reverse))))
-                             (setf display (append res display)))))
+                         (pcase (opr/type-of-project)
+                           ('stuck
+                            (let ((res (-> (point)
+                                           (org-element-headline-parser)
+                                           (org-ql--add-markers)
+                                           (my/get-project-stuck-displayables)
+                                           (reverse))))
+                              (setf display (append res display))))
+                           ('hold
+                            (push (org-ql--add-markers (org-element-headline-parser (point)))
+                                  nothing))))
                         ('task
                          (cond
                           ((eq 'stuck (opr/type-of-task))

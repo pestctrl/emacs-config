@@ -319,8 +319,8 @@
               :after
               'update-window-third-height)
 
-  (global-set-key (kbd "C-V") #'(lambda () (interactive) (scroll-down-command 1)))
-  (global-set-key (kbd "M-V") #'(lambda () (interactive) (scroll-up-command 1)))
+  ;; (global-set-key (kbd "C-V") #'(lambda () (interactive "") (scroll-down-command 1)))
+  ;; (global-set-key (kbd "M-V") #'(lambda () (interactive) (scroll-up-command 1)))
 
   ;; Word navigation
   (global-set-key (kbd "M-f") 'forward-to-word)

@@ -49,6 +49,36 @@
 (defvar mvt/regex
   (rx (and "*" (group (+ nonl)) "-vterm<" (group (+ digit)) ">" "*")))
 
+;; Maybe instead of this, we should do an add-buffer instead
+(defun mvt/find-available-name (tab-name)
+  (let ((mvti (gethash (intern tab-name) mvt/info))
+        final-name)
+    (while (not final-name)
+      (let* ((index (or (pop (slot-value mvti 'free-numbers))
+                        (cl-incf (slot-value mvti 'max-number))))
+             (name (mvt/format-buffer-name tab-name index)))
+        (when (not (get-buffer name))
+          (setq final-name name))))
+    final-name))
+
+(defun mvt/add-buffer (tab-name vterm-buffer)
+  (interactive
+   (list (alist-get 'name (tab-bar--current-tab))
+         (vterm--internal #'ignore)))
+  (let* ((mvti (gethash (intern tab-name) mvt/info))
+         (name (mvt/find-available-name tab-name))
+         vterm-name)
+    (with-current-buffer vterm-buffer
+      (mvt/minor-mode)
+      (rename-buffer name))
+    (-->
+     vterm-buffer
+     (setf (slot-value mvti 'recent-buffer)
+           it)
+     (if (called-interactively-p)
+         (switch-to-buffer it)
+       it))))
+
 (defun mvt/create-buffer (tab-name)
   (interactive
    (list (alist-get 'name (tab-bar--current-tab))))
@@ -70,14 +100,23 @@
        it))))
 
 (defun mvt/get-all-buffers (tab-name)
-  (->> (buffer-list)
+  (--> (buffer-list)
        (remove-if-not
         (lambda (buff)
           (with-current-buffer buff
             (and (eq major-mode 'vterm-mode)
                  (string-match-p
                   (rx "*" (literal tab-name) "-vterm<" (+ digit) ">*")
-                  (buffer-name buff))))))))
+                  (buffer-name buff)))))
+        it)
+       (sort
+        it
+        :key
+        (lambda (buff)
+          (let ((name (buffer-name buff)))
+            (string-match (rx "*" (literal tab-name) "-vterm<" (group (+ digit)) ">*")
+                          name)
+            (string-to-number (match-string 1 name)))))))
 
 ;; (defun mvt/get-all-buffers (tab-name)
 ;;   (let* ((tab-sym (intern tab-name))
@@ -147,7 +186,7 @@
 (defvar mvt/minor-mode-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "M-n") #'mvt/next)
-    (define-key map (kbd "M-c") #'mvt/create-buffer)
+    (define-key map (kbd "M-c") #'mvt/add-buffer)
     map))
 
 (define-minor-mode mvt/minor-mode ""
@@ -168,7 +207,7 @@
                 (buffer-live-p buffer)
                 (not arg)
                 buffer)
-           (mvt/create-buffer tab-name))))))
+           (call-interactively #'mvt/add-buffer))))))
 
 (defun mvt/find-all-terms-in-tab (tab-name)
   (remove-if-not #'(lambda (b)
@@ -198,7 +237,7 @@
 (defun mvt/close-tab (orig)
   (let ((current-tab-name (alist-get 'name (tab-bar--current-tab))))
     (when (funcall orig)
-      (dolist (b (mvt/find-all-terms-in-tab old-tab-name))
+      (dolist (b (mvt/find-all-terms-in-tab current-tab-name))
         (with-current-buffer b
           (vterm-send-C-d))))))
 

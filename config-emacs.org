@@ -37,7 +37,8 @@
                  display-buffer-in-side-window
                  (side . right)
                  (slot . 1)
-                 (window-parameters . ((no-delete-other-windows . t)))
+                 (window-parameters . ((no-delete-other-windows . t)
+                                       (dedicated . t)))
                  (window-width . 80)))
 
   (add-to-list 'display-buffer-alist
@@ -45,7 +46,8 @@
                  display-buffer-in-side-window
                  (side . right)
                  (slot . 2)
-                 (window-parameters . ((no-delete-other-windows . t)))
+                 (window-parameters . ((no-delete-other-windows . t)
+                                       (dedicated . t)))
                  (window-width . 100)))
 
   ;; TODO: This should be fixed in future versions of emacs
@@ -60,7 +62,8 @@
                  display-buffer-in-side-window
                  (side . right)
                  (slot . 3)
-                 (window-parameters . ((no-delete-other-windows . t)))
+                 (window-parameters . ((no-delete-other-windows . t)
+                                       (dedicated . t)))
                  (window-width . 100)))
 
   (add-to-list 'display-buffer-alist
@@ -68,7 +71,8 @@
                  display-buffer-in-side-window
                  (side . right)
                  (slot . 4)
-                 (window-parameters . ((no-delete-other-windows . t)))
+                 (window-parameters . ((no-delete-other-windows . t)
+                                       (dedicated . t)))
                  (window-width . 80)))
 
   (add-to-list 'display-buffer-alist

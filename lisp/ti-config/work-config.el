@@ -37,6 +37,8 @@
 (require 'bisect-mode)
 (require 'deadgrep-rejump-mode)
 
+(require 'work-mail)
+
 (use-package editorconfig
   :config
   (editorconfig-mode 1)

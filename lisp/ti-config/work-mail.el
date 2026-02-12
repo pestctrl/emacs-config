@@ -171,6 +171,7 @@
 (add-hook 'mu4e-headers-found-hook #'mu4e-thread-fold-all)
 
 (define-key mu4e-headers-mode-map (kbd "C-M-a") #'mu4e-view-thread-goto-root)
+(define-key mu4e-thread-mode-map (kbd "<tab>") #'mu4e-thread-fold-toggle)
 
 (provide 'work-mail)
 ;;; work-mail.el ends here

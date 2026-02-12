@@ -53,8 +53,6 @@
 
 (setq mu4e-maildir-shortcuts
       '((:key ?i :maildir "/work/INBOX")
-        (:key ?c :maildir "/work/INBOX/C29")
-        (:key ?j :maildir "/work/INBOX/Jira")
         (:key ?a :maildir "/work/Done")))
 
 (setq mu4e-bookmarks

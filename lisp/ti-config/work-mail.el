@@ -183,5 +183,8 @@
 
 (setq mu4e-attachment-dir "/scratch/benson/mail_attachments")
 
+(require 'mu4e-contrib)
+(define-key mu4e-headers-mode-map (kbd "M") #'mu4e-headers-mark-all)
+
 (provide 'work-mail)
 ;;; work-mail.el ends here

@@ -57,19 +57,19 @@
 
 (setq mu4e-bookmarks
       '(( :name  "Unread messages"
-          :query "flag:unread AND NOT maildir:/work/INBOX/llvm/* AND NOT flag:trashed"
+          :query "flag:unread AND NOT maildir:/work/INBOX/llvm* AND NOT flag:trashed"
           :key ?u)
         ( :name  "Inbox"
           :query "maildir:/work/INBOX AND NOT flag:trashed"
           :key ?i)
         ( :name  "mailing_lists"
-          :query "maildir:/work/INBOX/mailing_lists/* AND NOT flag:trashed"
+          :query "maildir:/work/INBOX/mailing_lists* AND NOT flag:trashed"
           :key ?m)
         ( :name  "Services"
-          :query "maildir:/work/INBOX/Services/* AND NOT flag:trashed"
+          :query "maildir:/work/INBOX/Services* AND NOT flag:trashed"
           :key ?s)
         ( :name  "automation"
-          :query "maildir:/work/INBOX/automation/* AND NOT flag:trashed"
+          :query "maildir:/work/INBOX/automation* AND NOT flag:trashed"
           :key ?a)
         ( :name "Today's messages"
           :query "date:today..now"

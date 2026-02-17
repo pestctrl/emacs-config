@@ -186,5 +186,24 @@
 (require 'mu4e-contrib)
 (define-key mu4e-headers-mode-map (kbd "M") #'mu4e-headers-mark-all)
 
+;; Prevent automatic baseline resets to keep (+x) indicators persistent
+(defvar my/mu4e-allow-baseline-reset nil
+  "When non-nil, allow baseline resets. Otherwise, preserve the baseline.")
+
+(defun my/mu4e--query-items-refresh-no-auto-reset (orig-fun &optional reset-baseline)
+  "Advice for `mu4e--query-items-refresh' to prevent automatic baseline resets.
+Only reset the baseline if `my/mu4e-allow-baseline-reset' is non-nil."
+  (funcall orig-fun (and reset-baseline my/mu4e-allow-baseline-reset)))
+
+(advice-add 'mu4e--query-items-refresh :around
+            #'my/mu4e--query-items-refresh-no-auto-reset)
+
+(defun my/mu4e-reset-baseline ()
+  "Manually reset the mu4e baseline to clear all (+x) indicators."
+  (interactive)
+  (let ((my/mu4e-allow-baseline-reset t))
+    (mu4e--query-items-refresh 'reset-baseline))
+  (message "mu4e baseline reset - (+x) indicators cleared"))
+
 (provide 'work-mail)
 ;;; work-mail.el ends here

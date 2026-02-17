@@ -181,5 +181,7 @@
 (define-key mu4e-headers-mode-map (kbd "C-M-a") #'mu4e-view-thread-goto-root)
 (define-key mu4e-thread-mode-map (kbd "<tab>") #'mu4e-thread-fold-toggle)
 
+(setq mu4e-attachment-dir "/scratch/benson/mail_attachments")
+
 (provide 'work-mail)
 ;;; work-mail.el ends here

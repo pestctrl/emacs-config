@@ -31,14 +31,14 @@
 
 (custom-theme-set-faces
  'same-defaults
- `(default ((t (:family "Roboto Mono" :height ,my/fixed-pitch-height
+ `(default ((t (:family "Commit Mono" :height ,my/fixed-pitch-height
                         ))))
- `(fixed-pitch ((t (:family "Roboto Mono" :height ,my/fixed-pitch-height
+ `(fixed-pitch ((t (:family "Commit Mono" :height ,my/fixed-pitch-height
                             ))))
  `(variable-pitch ((t (:family "Linux Libertine" :height ,my/variable-pitch-height
                                ))))
- `(mode-line ((t (:family "Roboto Mono" :height ,my/fixed-pitch-height))))
- `(mode-line-inactive ((t (:family "Roboto Mono" :height ,my/fixed-pitch-height))))
+ `(mode-line ((t (:family "Commit Mono" :height ,my/fixed-pitch-height))))
+ `(mode-line-inactive ((t (:family "Commit Mono" :height ,my/fixed-pitch-height))))
  `(tab-bar-tab ((t (:box (:line-width 2 :color "gray6")))))
  ;; '(org-todo ((((class color) (min-colors 16) (background light)) (:foreground "Red1" :bold t :inherit fixed-pitch))
  ;;             (((class color) (min-colors 16) (background dark))  (:foreground "Pink" :bold t :inherit fixed-pitch))

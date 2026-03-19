@@ -162,7 +162,29 @@
   :config
   (setq realgud-window-split-orientation 'horizontal)
   (setq realgud:pdb-command-name "python3 -m pdb"
-        realgud:remake-command-name "/db/sds/packages2/remake/bin/remake"))
+        realgud:remake-command-name "/db/sds/packages2/remake/bin/remake")
+
+  (defun rename-gdb-replay-buffer ()
+    (when-let ((buff (get-buffer "*gdb replay shell*")))
+      (let ((i 1)
+            name)
+        (while (progn
+                 (setq name
+                       (format "*gdb replay shell<%d>*" i))
+                 (get-buffer name))
+          (cl-incf i))
+        (with-current-buffer buff
+          (rename-buffer name)))))
+
+  (defun realgud:rr ()
+    (interactive)
+    (rename-gdb-replay-buffer)
+    (call-interactively #'realgud:gdb))
+
+  (defun realgud:rr-replay ()
+    (interactive)
+    (rename-gdb-replay-buffer)
+    (realgud:gdb "rr replay")))
 
 (use-package realgud-lldb)
 

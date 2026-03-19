@@ -26,13 +26,24 @@
 
 (require 'term/xterm)
 
+(let ((ascii-start ? )
+      (M-start ?\M-\s)
+      (C-M-start ?\C-\M-\s)
+      (M-S-start ?\M-\S-\s))
+  (dotimes (n (1+ (- ?~ ? )))
+    ))
+
 (let ((ascii-start 97)
+      (M-start ?\M-a)
       (C-M-start ?\C-\M-a)
       (M-S-start ?\M-\S-a))
   (dotimes (n 26)
     (define-key xterm-function-map
                 (format "\e[27;5;%d~" (+ ascii-start n))
                 (vector (1+ n)))
+    (define-key xterm-function-map
+                (format "\e[27;3;%d~" (+ ascii-start n))
+                (vector (+ n M-start)))
     (define-key xterm-function-map
                 (format "\e[27;4;%d~" (+ ascii-start n))
                 (vector (+ n M-S-start)))
@@ -61,19 +72,43 @@
             "\e[27;2;32~"
             [?\S-\s])
 
+(defun tmux-wrap-escape-sequence (sequence)
+  (concat "\ePtmux;"
+          (-->
+           sequence
+           (replace-regexp-in-string "\e" "\e\e" it))
+          "\e\\"))
+
+(defun tmux-p ()
+  (not (string-empty-p (getenv "TMUX")))
+  nil)
+
 ;; (xterm--init-modify-other-keys)
 (defun my/xterm--init-modify-other-keys ()
   "Terminal initialization for xterm's modifyOtherKeys support."
-  (send-string-to-terminal "\e[>4;2m")
-  (push "\e[>4m" (terminal-parameter nil 'tty-mode-reset-strings))
-  (push "\e[>4;2m" (terminal-parameter nil 'tty-mode-set-strings)))
+  (let ((set-modify-other-keys
+         (if (not (tmux-p))
+             "\e[>4;2m"
+           (tmux-wrap-escape-sequence "\e[>4;2m")))
+        (unset-modify-other-keys
+         (if (not (tmux-p))
+             "\e[>4m"
+           (tmux-wrap-escape-sequence "\e[>4m"))))
+    (send-string-to-terminal set-modify-other-keys)
+    (push unset-modify-other-keys (terminal-parameter nil 'tty-mode-reset-strings))
+    (push set-modify-other-keys (terminal-parameter nil 'tty-mode-set-strings))))
 
 (advice-add #'xterm--init-modify-other-keys
             :override
             #'my/xterm--init-modify-other-keys)
 
-(xterm-mouse-mode 1)
-(terminal-init-xterm)
+(setq xterm-extra-capabilities
+      '(modifyOtherKeys))
+
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (xterm-mouse-mode 1)
+            (terminal-init-xterm)))
 
 (defun my/org--mks-read-key-use-read-key (orig &rest args)
   (cl-letf (((symbol-function 'read-char-exclusive)

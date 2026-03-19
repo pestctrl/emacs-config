@@ -116,7 +116,7 @@
                          (save-excursion
                            (and (string-match "\\`[\s\t]+[0-9]+\t" line)
                                 (list (substring line (match-end 0))))))
-                       (magit-git-lines "shortlog" "-n" "-s" "-e" "HEAD"))
+                       (magit-git-lines "shortlog" "-n" "-s" "-e" "--all"))
                my/magit-authors)))
 
 (defun my/magit-transient-read-person (prompt initial-input history)

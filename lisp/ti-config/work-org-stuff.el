@@ -157,9 +157,9 @@
                                           ((org-ql-block-header "Active Projects")
                                            (org-ql-indent-levels t)))
     (agenda ""
-            ((org-agenda-span (car (work/last-week-wednesday)))
-             (org-agenda-start-day (cdr (work/last-week-wednesday)))
-             (org-agenda-start-on-weekday 3)
+            ((org-agenda-span ,(car (work/last-week-monday)))
+             (org-agenda-start-day ,(cdr (work/last-week-monday)))
+             (org-agenda-start-on-weekday 1)
              (org-agenda-show-log t)
              (org-agenda-include-inactive-timestamps t)
              (org-agenda-hide-tags-regexp ".*")
@@ -173,6 +173,11 @@
              ;;                                            (not (member (org-get-todo-state) '("HOLD" "TICKLER"))))
              ;;                                 (outline-next-heading)))))
              ))))
+
+(defun work/last-week-monday ()
+  (let ((num (+ 6 (string-to-number (format-time-string "%u")))))
+    (cons (1+ num)
+          (format "-%dd" num))))
 
 (defun work/last-week-wednesday ()
   (let ((num (+ 4 (string-to-number (format-time-string "%u")))))

@@ -29,6 +29,14 @@
 (require 'ti-mail-identity)
 (require 'gnus-article-hack)
 
+(defun my/goto-mail ()
+  (interactive)
+  (switch-or-create-tab "mail")
+  (delete-other-windows)
+  (mu4e))
+
+(global-set-key (kbd "C-x m") #'my/goto-mail)
+
 (with-eval-after-load 'mu4e-view
   (add-hook 'mu4e-view-mode-hook
             #'olivetti-mode))

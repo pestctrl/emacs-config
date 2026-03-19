@@ -51,8 +51,8 @@
       (set-fontset-font "fontset-default"
                         (cons
                          (decode-char 'ucs #x2500)
-                         (decode-char 'ucs #x257F))
-                        (font-spec :name "Latin Modern Math" :size 12))
+                         (decode-char 'ucs #x25CF))
+                        (font-spec :name "DejaVu Sans"))
       (set-fontset-font "fontset-default"
                         (cons
                          (decode-char 'ucs #x2997)

@@ -269,5 +269,14 @@
             :around
             #'always-expand-mail-abbrevs-in-commit-buffer)
 
+(use-package claude-code
+  :config
+  (defun claude-code-write-to-file ()
+    (interactive)
+    (let ((str (buffer-string)))
+      (with-temp-buffer
+        (insert str)
+        (call-interactively #'write-file)))))
+
 (provide 'work-config)
 ;;; work-config.el ends here

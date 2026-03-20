@@ -386,3 +386,35 @@
 #+begin_src emacs-lisp
   (require 'rgrep-patch)
 #+end_src
+* Delete-region
+#+begin_src emacs-lisp
+  (defun my/delete-region (beg end &optional region)
+    ;; Pass mark first, then point, because the order matters when
+    ;; calling `kill-append'.
+    (interactive (progn
+                   (let ((beg (mark))
+                         (end (point)))
+                     (unless (and beg end)
+                       (user-error "The mark is not set now, so there is no region"))
+                     (list beg end 'region))))
+    (condition-case nil
+        (let ((string (if region
+                          (funcall region-extract-function 'delete-only)
+                        (filter-buffer-substring beg end 'delete))))
+  	    (when (or string (eq last-command 'kill-region))
+  	      (setq this-command 'kill-region))
+  	    (setq deactivate-mark t)
+  	    nil)
+      ((buffer-read-only text-read-only)
+       ;; Set this-command now, so it will be set even if we get an error.
+       (setq this-command 'kill-region)
+       ;; This should barf, if appropriate, and give us the correct error.
+       (if kill-read-only-ok
+  	     (progn (message "Read only text copied to kill ring") nil)
+         ;; Signal an error if the buffer is read-only.
+         (barf-if-buffer-read-only)
+         ;; If the buffer isn't read-only, the text is.
+         (signal 'text-read-only (list (current-buffer)))))))
+
+  (global-set-key (kbd "C-M-w") #'my/delete-region)
+#+end_src

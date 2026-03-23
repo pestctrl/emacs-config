@@ -29,6 +29,8 @@
 (require 'ti-mail-identity)
 (require 'gnus-article-hack)
 
+(setq mu4e-update-interval (* 60 5))
+
 (defun my/goto-mail ()
   (interactive)
   (switch-or-create-tab "mail")

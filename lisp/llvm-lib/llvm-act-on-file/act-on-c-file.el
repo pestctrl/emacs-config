@@ -43,7 +43,7 @@
 (defun ll/ensure-clang-binary-built (dir)
   ;; TODO: assumed build-dir constant, should take as argument and prompt
   ;; further up
-  (lls/ninja-build-tools dir '("clang")))
+  (lls/run-build-command dir '("clang")))
 
 (defun ll/clang-output-disassemble-command (file)
   (let ((compiler (lls/prompt-tool "clang$"))

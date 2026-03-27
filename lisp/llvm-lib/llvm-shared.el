@@ -37,7 +37,7 @@
 (defvar llvm-core-count
   (nprocs))
 
-(defun lls/ninja-build-tools (build-dir targets &optional verbose)
+(defun lls/run-build-command (build-dir targets &optional verbose)
   (let ((cmake-make-program
          (if (string= "Makefile" (car (directory-files build-dir nil "^\\(build\\.ninja$\\|Makefile\\)$")))
              "make"

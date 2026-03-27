@@ -37,7 +37,7 @@
     (compilation-start (-->
                         (list
                          (format "touch %s" file)
-                         (lls/ninja-build-tools
+                         (lls/run-build-command
                           build-dir (list (format "%s^" file)) t))
                         (string-join it " && "))
                        nil

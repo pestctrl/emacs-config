@@ -140,9 +140,12 @@
   (load-llvm-mode (lls/conf-get 'root-dir))
   (message "llvm-lib initialize!"))
 
+(defun lls/initialized? ()
+  (and (lls/get-llvm-config)
+       (llvm-config-p (lls/get-llvm-config))))
+
 (defun lls/ensure-initialized ()
-  (when (or (not (lls/get-llvm-config))
-            (not (llvm-config-p (lls/get-llvm-config))))
+  (when (not (lls/initialized?))
     (if (not (functionp lls/target-init-fun))
         (error "Please register an init function for llvm")
       (lls/initialize))))

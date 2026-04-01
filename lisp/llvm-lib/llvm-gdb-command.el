@@ -25,7 +25,7 @@
 ;;; Code:
 
 (require 'act-on-c-file)
-(require 'llvm-shared)
+(require 'lib-comp-dev)
 (require 'anaphora)
 
 (defun ll/get-cc1-command (clang command)

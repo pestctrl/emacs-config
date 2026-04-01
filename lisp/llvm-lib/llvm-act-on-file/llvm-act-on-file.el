@@ -23,7 +23,7 @@
 ;;; Commentary:
 
 ;;; Code:
-(require 'llvm-shared)
+(require 'lib-comp-dev)
 (require 'my-comp-minor-mode)
 (require 'act-on-test-file)
 (require 'act-on-c-file)

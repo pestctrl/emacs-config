@@ -1,4 +1,4 @@
-;;; clang-option-sets.el ---  -*- lexical-binding: t -*-
+;;; compiler-option-sets.el ---  -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2024 Benson Chu
 
@@ -24,7 +24,7 @@
 
 ;;; Code:
 
-(defclass clang-option-config ()
+(defclass compiler-option-config ()
   ((target-str          :initarg :target-str   :type string :initform "")
    (binary-path         :initarg :binary       :type string :initform "")
    (target-options      :initarg :target       :type string :initform "")
@@ -37,57 +37,35 @@
 (defmacro register-prebaked-optionset (hashmap target-str key &rest options)
   (declare (indent 3))
   `(puthash ',key
-            (make-instance 'clang-option-config
+            (make-instance 'compiler-option-config
                            :target-str ,target-str
                            ,@options)
             ,hashmap))
 
-(defun cos/clang-options-merge (primary secondary)
-  (make-instance
-   'clang-option-config
-   :target-str     (slot-value primary 'target-str)
-   :binary         (or (slot-value primary 'binary-path)
-                       (car (mapcar #'(lambda (x) (slot-value x 'binary-path))) ))
-   :target         (slot-value primary 'target-options)
-   :lang           (slot-value primary 'lang-options)
-   :optimization   (slot-value primary 'optimization-level)
-   :other          (-->
-                    (cons primary secondary)
-                    (mapconcat
-                     (lambda (x)
-                       (when (slot-boundp x 'other-options)
-                         (slot-value x 'other-options)))
-                     it
-                     " "))
-   :include-dirs   (-->
-                    (cons primary secondary)
-                    (apply #'append
-                           (mapcar
-                            (lambda (x)
-                              (when (slot-boundp x 'include-dirs)
-                                (slot-value x 'include-dirs)))
-                            it)))))
+(defun cos/edit-compiler-options (optionset current-name)
+  (dolist (slot (cddr (eieio-class-slots 'compiler-option-config)))
+    (let* ((slot-sym (eieio-slot-descriptor-name slot))
+           (slot-val (and (slot-boundp optionsset slot-sym)
+                          (slot-value optionsset slot-sym))))
+      (when slot-val
+        (pcase (cl--slot-descriptor-type slot)
+          ('list
+           (when (or prefix
+                     (not (zerop (length slot-val))))
+             (setf (slot-value optionsset slot-sym)
+                   (read
+                    (read-string (format "Edit '%s' for optionset '%s': "
+                                         (symbol-name slot-sym)
+                                         current-name)
+                                 (prin1-to-string slot-val))))))
+          ('string
+           (when (or prefix
+                     (not (string= slot-val "")))
+             (setf (slot-value optionsset slot-sym)
+                   (read-string (format "Edit '%s' for optionset '%s': "
+                                        (symbol-name slot-sym)
+                                        current-name)
+                                slot-val)))))))))
 
-(defun cos/clang-options->string (opts)
-  (with-slots
-      (binary-path
-       target-options lang-options
-       other-options optimization-level
-       include-dirs)
-      opts
-    (-->
-     (list
-      (or binary-path "")
-      target-options
-      lang-options
-      optimization-level
-      other-options
-      (mapconcat (lambda (x)
-                   (format "-I\"%s\"" x))
-                 include-dirs
-                 " "))
-     (remove-if #'string-empty-p it)
-     (string-join it " "))))
-
-(provide 'clang-option-sets)
-;;; clang-option-sets.el ends here
+(provide 'compiler-option-sets)
+;;; compiler-option-sets.el ends here

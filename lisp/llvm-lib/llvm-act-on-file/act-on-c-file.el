@@ -24,26 +24,27 @@
 
 ;;; Code:
 (require 'llvm-ir-mode)
-(require 'llvm-shared)
+(require 'lib-comp-dev)
 (require 'action-map-lib)
 (require 'anaphora)
 (require 'make-tmp-output-file)
 
 (defvar ll/c-file-action-map
-  '((debug        :key ?d    :major-mode llvm-mode :buffer-string "debug"              :description "[d]ebug pass"             :compiler-action assemble)
-    (assembly     :key ?a    :major-mode asm-mode  :buffer-string "assembly"           :description "[a]ssembly"               :compiler-action assemble)
-    (output-dis   :key ?A    :major-mode asm-mode  :buffer-string "dissasembly"        :description "output-dis[A]ssemble"     :compiler-action nil)
-    (preprocess   :key ?e    :major-mode c-mode    :buffer-string "preprocess"         :description "pr[e]process"             :compiler-action preprocess)
-    (LLVMIR       :key ?l    :major-mode llvm-mode :buffer-string "llvm-ir"            :description "[l]lvm-ir"                :compiler-action llvm-ir)
-    (before-after :key ?p    :major-mode llvm-mode :buffer-string "print-before-after" :description "[p]rint before/after"     :compiler-action assemble)
-    (changed      :key ?P    :major-mode llvm-mode :buffer-string "print-changed"      :description "[P]rint before/after all" :compiler-action assemble)
-    (executable   :key ?\^M  :major-mode nil       :buffer-string "executable"         :description "[RET]Executable"          :compiler-action executable)
-    (diff         :key ?D    :major-mode nil       :buffer-string "diff"               :description "[D]iff"                   :compiler-action assemble)))
+  '((preprocess   :key ?e    :major-mode c-mode    :buffer-string "preprocess"         :description "pr[e]process"    :end-state pp-c)
+    (diff         :key ?D    :major-mode nil       :buffer-string "diff"               :description "[D]iff"          :end-state asm)))
+
+;; (executable   :key ?\^M  :major-mode nil       :buffer-string "executable"         :description "[RET]Executable"          :compiler-action executable)
 
 (defun ll/ensure-clang-binary-built (dir)
   ;; TODO: assumed build-dir constant, should take as argument and prompt
   ;; further up
   (lls/run-build-command dir '("clang")))
+
+(defun ll/get-c-action-map ()
+  (append
+   (comp-dev/get-c-action-table
+    (comp-dev/get-config))
+   ll/c-file-action-map))
 
 (defun ll/clang-output-disassemble-command (file)
   (let ((compiler (lls/prompt-tool "clang$"))
@@ -72,25 +73,25 @@
 (defun ll/build-clang-command (file action &optional output)
   (if (eq action 'output-dis)
       (ll/clang-output-disassemble-command file)
-    (let ((compiler-action (aml/get-map-prop ll/c-file-action-map action :compiler-action))
-          (compiler (lls/prompt-tool "clang$")))
+    (let ((end (aml/get-map-prop
+                (ll/get-c-action-map)
+                action :end-state))
+          (compiler (lls/prompt-tool (comp-dev/tool-name (comp-dev/get-config) 'compiler))))
       (string-join
        (list
         (when (y-or-n-p "Would you like to `rr record`? ")
           "rr record ")
-        (lls/get-clang-command-fun
-         :compiler compiler
-         :file file
-         :action compiler-action
-         :output output
-         :flags
-         (list
-          (pcase action
-            ('debug (format "-mllvm -debug-only=%s" (ll/read-pass-name "Which pass? ")))
-            ('before-after (let ((pass (ll/read-pass-name "Which pass? ")))
-                             (format "-mllvm -print-before=%s -mllvm -print-after=%s" pass pass)))
-            ('changed "-mllvm -print-before-all"))))
-             " ")
+        (-->
+         (comp-dev/get-config)
+         (comp-dev/process-file
+          it 'c end compiler file output
+          (list
+           (pcase action
+             ('debug (format "-mllvm -debug-only=%s" (ll/read-pass-name "Which pass? ")))
+             ('before-after (let ((pass (ll/read-pass-name "Which pass? ")))
+                              (format "-mllvm -print-before=%s -mllvm -print-after=%s" pass pass)))
+             ('changed "-mllvm -print-before-all")))))
+        " ")
        " "))))
 
 (defun ll/buffer-has-include-error (buffer)
@@ -152,13 +153,14 @@
       (_ (error "Invalid choice")))))
 
 (defun ll/act-on-c-file (file)
-  (let* ((action (aml/read-action-map ll/c-file-action-map))
+  (let* ((action-map (ll/get-c-action-map))
+         (action (aml/read-action-map action-map))
          (output (ll/make-tmp-file
                   file
                   (cond
-                   ((eq 'assemble
-                        (aml/get-map-prop ll/c-file-action-map action
-                                          :compiler-action))
+                   ((eq 'asm
+                        (aml/get-map-prop action-map action
+                                          :end-state))
                     ".S")
                    (t ".ll")))))
     (if (eq action 'diff)
@@ -167,11 +169,11 @@
         (aprog1
             (compilation-start
              comm
-             (aml/get-map-prop ll/c-file-action-map action :major-mode)
+             (aml/get-map-prop action-map action :major-mode)
              (lambda (x)
                (format "*%s-%s*"
                        (file-name-nondirectory file)
-                       (aml/get-map-prop ll/c-file-action-map action
+                       (aml/get-map-prop action-map action
                                          :buffer-string))))
           (with-current-buffer it
             (setq ll/act-on-file-output output)))))))

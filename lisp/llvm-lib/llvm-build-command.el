@@ -23,7 +23,7 @@
 ;;; Commentary:
 
 ;;; Code:
-(require 'llvm-shared)
+(require 'lib-comp-dev)
 
 (defun ll/get-llvm-source-build-command (file)
   (interactive

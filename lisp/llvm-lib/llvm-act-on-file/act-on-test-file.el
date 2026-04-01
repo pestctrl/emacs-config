@@ -23,7 +23,7 @@
 ;;; Commentary:
 
 ;;; Code:
-(require 'llvm-shared)
+(require 'lib-comp-dev)
 (require 'action-map-lib)
 (require 'dash)
 

@@ -23,7 +23,7 @@
 ;;; Commentary:
 
 ;;; Code:
-(require 'llvm-shared)
+(require 'lib-comp-dev)
 (require 'tmux-cmd)
 
 (defvar lls/name-llvm-build-buffer

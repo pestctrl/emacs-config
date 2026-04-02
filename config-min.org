@@ -985,6 +985,8 @@
            (message-mode . olivetti-mode)
            (markdown-mode . olivetti-mode))
     :config
+    (setq olivetti-mode-on-hook nil)
+
     (add-to-list 'window-persistent-parameters
                  '(spilt-window . t))
 

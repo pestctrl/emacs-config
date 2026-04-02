@@ -28,7 +28,7 @@
 (require 'work-commentor)
 (require 'work-asm-config)
 (require 'ti-keymap)
-(require 'ti-lib)
+(require 'ti-comp-dev)
 (require 'ti-tools-backup)
 (require 'argo-fastsim-dump-mode)
 (require 'machine-scheduler-debug-mode)
@@ -36,6 +36,7 @@
 (require 'ti-config)
 (require 'bisect-mode)
 (require 'deadgrep-rejump-mode)
+(require 'ti-asm)
 
 (require 'work-mail)
 

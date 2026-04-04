@@ -23,10 +23,31 @@
 ;;; Commentary:
 
 ;;; Code:
-(require 'compiler-option-sets)
+(require 'c-compiler-option-sets)
 
 (defclass clang-option-config (compiler-option-config)
   nil)
+
+(cl-defmethod cos/to-string ((config clang-option-config))
+  (with-slots
+      (binary-path
+       target-options lang-options
+       other-options optimization-level
+       include-dirs)
+      opts
+    (-->
+     (list
+      (or binary-path "")
+      target-options
+      lang-options
+      optimization-level
+      other-options
+      (mapconcat (lambda (x)
+                   (format "-I\"%s\"" x))
+                 include-dirs
+                 " "))
+     (remove-if #'string-empty-p it)
+     (string-join it " "))))
 
 (defvar clang-subtargets
   (make-hash-table :test #'equal))
@@ -68,7 +89,7 @@
         primary extensions)
     (setq primary
           (my/completing-read-formatter
-           #'clang/clang-options->string
+           #'cos/to-string
            "Primary Subtarget? "
            (remove-if-not (lambda (x)
                             (string= target
@@ -83,7 +104,7 @@
          (alist-get option-name target-options nil nil #'equal))))
 
 (defun clang/reinitialize-clang-options (target)
-  (interactive (list (intern (lls/conf-get 'target))))
+  (interactive (list (intern (comp-dev/conf-get 'target))))
   (let ((option-name (or (gethash target clang/current-target-optionset)
                          (puthash target "default" clang/current-target-optionset))))
     (aprog1 (clang/make-clang-option-set target)
@@ -103,21 +124,21 @@
 
 ;; (defun clang/new-clang-option-set (target name &optional optionset)
 ;;   (interactive
-;;    (list (intern (lls/conf-get 'target))
+;;    (list (intern (comp-dev/conf-get 'target))
 ;;          (read-string "Name for new optionset? ")))
 ;;   (let ((optionset (or optionset (clang/make-clang-option-set target))))
 ;;     (clang/add-and-set-target-option target name optionset)))
 
 ;; (defun clang/copy-clang-option-set (target name &optional optionset)
 ;;   (interactive
-;;    (list (intern (lls/conf-get 'target))
+;;    (list (intern (comp-dev/conf-get 'target))
 ;;          (read-string "Name for new optionset? ")))
 ;;   (let ((optionset (clang/get-clang-options-for-target target)))
 ;;     (clang/add-and-set-target-option target name optionset)))
 
 ;; (defun clang/file-specific-option-set (target &optional optionset)
 ;;   (interactive
-;;    (list (intern (lls/conf-get 'target))))
+;;    (list (intern (comp-dev/conf-get 'target))))
 ;;   ;; TODO: might need to garbage collect these
 ;;   (or (gethash (buffer-file-name)
 ;;                clang/file-specific-options)
@@ -130,7 +151,7 @@
 
 (defun clang/switch-clang-option-set (target name)
   (interactive
-   (let ((target lls/conf-get 'target))
+   (let ((target comp-dev/conf-get 'target))
      (list target
            (--> (intern target)
                 (gethash it clang/all-target-options)
@@ -143,7 +164,7 @@
 
 (defun clang/edit-clang-options (prefix)
   (interactive "P")
-  (let* ((target (intern (lls/conf-get 'target)))
+  (let* ((target (intern (comp-dev/conf-get 'target)))
          (options-config
           (->>
            target
@@ -181,40 +202,19 @@
                                 (slot-value x 'include-dirs)))
                             it)))))
 
-(defun clang/clang-options->string (opts)
-  (with-slots
-      (binary-path
-       target-options lang-options
-       other-options optimization-level
-       include-dirs)
-      opts
-    (-->
-     (list
-      (or binary-path "")
-      target-options
-      lang-options
-      optimization-level
-      other-options
-      (mapconcat (lambda (x)
-                   (format "-I\"%s\"" x))
-                 include-dirs
-                 " "))
-     (remove-if #'string-empty-p it)
-     (string-join it " "))))
-
 (defvar clang/detect-extensions-function nil)
 
 (cl-defun clang/get-clang-options (&key filename compiler action)
   (interactive)
   (let* ((filename (or filename (buffer-file-name)))
-         (target-str (lls/conf-get 'target))
+         (target-str (comp-dev/conf-get 'target))
          (target (intern target-str))
          (options-config
           (clang/get-clang-options-for-target target))
          (detected-extensions
           (awhen clang/detect-extensions-function
             (funcall it compiler action filename target-str))))
-    (clang/clang-options->string
+    (cos/to-string
      (clang/clang-options-merge
       (car options-config)
       (append detected-extensions (cdr options-config))))))

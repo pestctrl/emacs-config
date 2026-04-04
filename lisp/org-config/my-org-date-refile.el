@@ -1,9 +1,9 @@
-;;; llvm-lib.el ---  -*- lexical-binding: t -*-
+;;; my-org-date-refile.el ---  -*- lexical-binding: t -*-
 
-;; Copyright (C) 2022 Benson Chu
+;; Copyright (C) 2025 Benson Chu
 
 ;; Author: Benson Chu <bensonchu457@gmail.com>
-;; Created: [2022-12-17 12:54]
+;; Created: [2025-09-08 15:51]
 
 ;; This file is not part of GNU Emacs
 
@@ -23,23 +23,23 @@
 ;;; Commentary:
 
 ;;; Code:
-(require 'llvm-act-on-file)
-(require 'llvm-build-tool)
-(require 'llvm-gdb-command)
-(require 'llvm-show-instr-info)
-(require 'llvm-jump-to-tablegen)
+(require 'org)
 
-(require 'llvm-comp-dev)
+;; (format-time-string "%d" (org-read-date t t))
 
-(define-prefix-command '*llvm-map*)
-(define-key *root-map* (kbd "C-w") '*llvm-map*)
+(defun modr/parse-timestamp (string)
+  (org-read-date t t string))
 
-(define-key *llvm-map* (kbd "a") #'ll/act-on-file)
-(define-key *llvm-map* (kbd "c") #'ll/llvm-build-tool)
-(define-key *llvm-map* (kbd "M-w") #'ll/kill-gdb-command)
-(define-key *llvm-map* (kbd "i") #'ll/prompt-for-instr-info)
-(define-key *llvm-map* (kbd "I") #'comp-dev/initialize)
-(define-key *llvm-map* (kbd "t") #'ll/jump-to-tablegen)
+(defun modr/create-single-datetree (subtree-marker modr)
+  (with-current-buffer (marker-buffer subtree-marker)
+    (save-excursion
+      (goto-char (marker-position subtree-marker))
+      (save-restriction
+        (org-narrow-to-subtree)
+        (if (re-search-forward (rx "** "
+                                   (literal
+                                    (format-time-string "%b %d, %Y" modr))))
+            (point))))))
 
-(provide 'llvm-lib)
-;;; llvm-lib.el ends here
+(provide 'my-org-date-refile)
+;;; my-org-date-refile.el ends here

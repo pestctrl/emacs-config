@@ -1,4 +1,4 @@
-;;; compiler-option-sets.el ---  -*- lexical-binding: t -*-
+;;; c-compiler-option-sets.el ---  -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2024 Benson Chu
 
@@ -42,6 +42,8 @@
                            ,@options)
             ,hashmap))
 
+(cl-defgeneric cos/to-string (config))
+
 (defun cos/edit-compiler-options (optionset current-name)
   (dolist (slot (cddr (eieio-class-slots 'compiler-option-config)))
     (let* ((slot-sym (eieio-slot-descriptor-name slot))
@@ -67,5 +69,5 @@
                                         current-name)
                                 slot-val)))))))))
 
-(provide 'compiler-option-sets)
-;;; compiler-option-sets.el ends here
+(provide 'c-compiler-option-sets)
+;;; c-compiler-option-sets.el ends here

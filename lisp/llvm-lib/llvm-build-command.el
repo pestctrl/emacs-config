@@ -37,7 +37,7 @@
     (compilation-start (-->
                         (list
                          (format "touch %s" file)
-                         (lls/run-build-command
+                         (comp-dev/build-target
                           build-dir (list (format "%s^" file)) t))
                         (string-join it " && "))
                        nil

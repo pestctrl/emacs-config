@@ -36,7 +36,7 @@
   (let ((dir (lls/get-llvm-build-dir)))
     (--> file
          (list (format "touch %s" it)
-               (lls/run-build-command dir (list (concat it "^")) t))
+               (comp-dev/build-target dir (list (concat it "^")) t))
          (string-join it " && ")
          (compilation-start it nil
                             (lambda (_)

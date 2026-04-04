@@ -72,7 +72,7 @@
   ;; further up
   (let ((dir (lls/get-llvm-build-dir))
         (tools (ll/get-required-binaries-for-test file)))
-    (lls/run-build-command dir tools)))
+    (comp-dev/build-target dir tools)))
 
 (defun ll/build-lit-command (file action)
   (format "%s %s %s"
@@ -164,7 +164,7 @@
     (when tools
       (-->
        ;; TODO: Assuming debug folder, (lls/get-llvm-build-dir) doesn't work
-       (lls/run-build-command "/scratch/benson/tools3/llvm_cgt/build/Debug/llvm" (seq-uniq tools))
+       (comp-dev/build-target "/scratch/benson/tools3/llvm_cgt/build/Debug/llvm" (seq-uniq tools))
        (compilation-start
         it
         nil

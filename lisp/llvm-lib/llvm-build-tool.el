@@ -42,7 +42,7 @@
 ;;                                  "llc")))))
 ;;   (let* ((buffer-name (funcall lls/name-llvm-build-buffer directory tools)))
 ;;     (compilation-start
-;;      (lls/run-build-command (lls/un-trampify directory) tools)
+;;      (comp-dev/build-target directory tools)
 ;;      nil
 ;;      (lambda (_) buffer-name))))
 
@@ -56,7 +56,7 @@
                                   "llc")))))
   (name (funcall lls/name-llvm-build-buffer directory tools))
 
-  (lls/run-build-command (lls/un-trampify directory) tools))
+  (comp-dev/build-target directory tools))
 
 (provide 'llvm-build-tool)
 ;;; llvm-build-tool.el ends here

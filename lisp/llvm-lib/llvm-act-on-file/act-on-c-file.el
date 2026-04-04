@@ -38,7 +38,7 @@
 (defun ll/ensure-clang-binary-built (dir)
   ;; TODO: assumed build-dir constant, should take as argument and prompt
   ;; further up
-  (lls/run-build-command dir '("clang")))
+  (comp-dev/build-target dir '("clang")))
 
 (defun ll/get-c-action-map ()
   (append
@@ -122,7 +122,7 @@
         (call-interactively #'recompile)))))
 
 (defun ll/diff-on-optionset (file action)
-  (let ((comm (ll/build-clang-command (lls/un-trampify file) action))
+  (let ((comm (ll/build-clang-command file action))
         (extra-option (read-string "Extra option? "))
         (pipe (if (y-or-n-p "Diff assembly (y) or debug (n)? ")
                   ">" "2>")))

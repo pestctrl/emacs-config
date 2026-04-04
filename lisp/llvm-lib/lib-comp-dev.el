@@ -32,19 +32,20 @@
 (require 'use-package)
 (use-package realgud-lldb)
 
-;; =========================== LLVM Rebuild ==========================
+;; =========================== Rebuild ==========================
 
-(defvar llvm-core-count
+(defvar comp-dev/default-parallelism
   (nprocs))
 
-(defun lls/run-build-command (build-dir targets &optional verbose)
+(defun comp-dev/build-target (build-dir targets &optional verbose)
   (let ((cmake-make-program
-         (if (string= "Makefile" (car (directory-files build-dir nil "^\\(build\\.ninja$\\|Makefile\\)$")))
+         (if (string= "Makefile" (car (directory-files build-dir nil
+                                                       (rx line-start (or "build.ninja" "Makefile") line-end))))
              "make"
            "ninja")))
     (format "set -o pipefail && CLICOLOR_FORCE=1 %s -C %s -j %d %s %s 2>&1 | tee ninja.log"
             cmake-make-program
-            build-dir llvm-core-count
+            build-dir comp-dev/default-parallelism
             (if verbose "-v" "")
             (string-join targets " "))))
 

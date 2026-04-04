@@ -156,29 +156,6 @@
   (or (lls/conf-get key)
       (lls/conf-set key (funcall fun))))
 
-(require 'projectile)
-
-(defun projectile-dont-switch-when-conf-available (x)
-  (if-let ((dir (lls/conf-get-safe 'root-dir))
-           (tools-dir
-            (when (string-match (rx line-start
-                                    "/scratch"
-                                    (group "/benson/_repos-work/tools" (* (not "/")) "/"))
-                                dir)
-              (match-string 1 dir))))
-      (remove-if #'(lambda (path)
-                     (and (string-match-p (rx "/benson/_repos-work/tools")
-                                          path)
-                          (not (string-match-p tools-dir path))))
-                 x)
-    x))
-
-(when my-ec/at-ti
-  (advice-add 'projectile-relevant-known-projects
-              :filter-return
-              #'projectile-dont-switch-when-conf-available))
-
-
 ;;===---------------------------------------------------------------------===;;
 
 (defun lls/get-llvm-root-dir ()

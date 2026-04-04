@@ -54,7 +54,7 @@
 (defclass comp-dev-config ()
   ((root-dir :initarg :root-dir :type string)
    (target :initarg :target :type string)
-   (tramp-connection :initarg :tramp :type list :initform nil)
+   ;; (tramp-connection :initarg :tramp :type list :initform nil)
 
    (aux-props :initarg :aux-props :type list :initform nil)))
 
@@ -104,20 +104,6 @@
   (comp-dev/ensure-initialized)
   (setf (slot-value (comp-dev/get-config) key)
         val))
-
-(defun lls/tramp-connection ()
-  (lls/conf-get 'tramp-connection))
-
-(defun lls/trampify (path)
-  (if-let ((vec (lls/tramp-connection)))
-      (tramp-make-tramp-file-name vec path)
-    path))
-
-(defun lls/un-trampify (path)
-  (if-let ((vec (lls/tramp-connection)))
-      (with-parsed-tramp-file-name path nil
-        localname)
-    path))
 
 (defun lls/default-initialize ()
   (interactive)
@@ -200,17 +186,16 @@
                               collection nil nil initial-input)))))
 
 (defun lls/prompt-tool (tool-regexp &optional directories)
-  (lls/un-trampify
-   (let (;;(vertico-sort-function nil)
-         )
-     (my/completing-read tool-regexp
-                         (lls/get-tool tool-regexp
-                                       (or (and (eq 'string (type-of directories))
-                                                (list directories))
-                                           directories))
-                         (awhen (ti/current-tools-directory)
-                           (concat (file-name-nondirectory it)
-                                   " "))))))
+  (let (;;(vertico-sort-function nil)
+        )
+    (my/completing-read tool-regexp
+                        (lls/get-tool tool-regexp
+                                      (or (and (eq 'string (type-of directories))
+                                               (list directories))
+                                          directories))
+                        (awhen (ti/current-tools-directory)
+                          (concat (file-name-nondirectory it)
+                                  " ")))))
 
 (defun lls/get-tool (tool-regexp &optional directories)
   (cl-mapcan #'(lambda (dir)

@@ -134,8 +134,8 @@
     (ediff-files "/tmp/no-option.asm" "/tmp/yes-option.asm")))
 
 (defun ll/diff-on-compiler (file action)
-  (let ((comm (ll/build-clang-command (lls/un-trampify file) action))
-        (second-command (ll/build-clang-command (lls/un-trampify file) action))
+  (let ((comm (ll/build-clang-command file action))
+        (second-command (ll/build-clang-command file action))
         (pipe (if (y-or-n-p "Diff assembly (y) or debug (n)? ")
                   ">" "2>")))
     (when (save-window-excursion
@@ -165,7 +165,7 @@
                    (t ".ll")))))
     (if (eq action 'diff)
         (ll/diff-c-on-two-compilations file action)
-      (let ((comm (ll/build-clang-command (lls/un-trampify file) action output)))
+      (let ((comm (ll/build-clang-command file action output)))
         (aprog1
             (compilation-start
              comm

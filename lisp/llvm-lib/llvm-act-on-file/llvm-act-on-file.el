@@ -46,24 +46,24 @@
   (let ((file (or (buffer-file-name)
                   (aprog1 (make-temp-file nil nil ".ll")
                     (write-file it)))))
-    (when-let ((vec (lls/tramp-connection))
-               ((not (file-remote-p file))))
-      ;; If there's a cache entry, and the cache timestamp matches,
-      ;; then we just reuse the file
-      (-->
-       (if-let* ((cache (gethash file ll/buffer-map))
-                 (time (visited-file-modtime))
-                 ((equal time (car cache))))
-           (cdr cache)
-         ;; Otherwise, generate a new tmp file, copy that over, and
-         ;; update the cache.
-         (let ((tmp (concat (tramp-make-tramp-temp-name vec)
-                            "." (file-name-extension file))))
-           (puthash file (cons time tmp) ll/buffer-map)
-           (copy-file file tmp)
-           tmp))
-       (setq file it)))
-    ;; Let further compilation-commands be run over tramp
+    ;; (when-let ((vec (lls/tramp-connection))
+    ;;            ((not (file-remote-p file))))
+    ;;   ;; If there's a cache entry, and the cache timestamp matches,
+    ;;   ;; then we just reuse the file
+    ;;   (-->
+    ;;    (if-let* ((cache (gethash file ll/buffer-map))
+    ;;              (time (visited-file-modtime))
+    ;;              ((equal time (car cache))))
+    ;;        (cdr cache)
+    ;;      ;; Otherwise, generate a new tmp file, copy that over, and
+    ;;      ;; update the cache.
+    ;;      (let ((tmp (concat (tramp-make-tramp-temp-name vec)
+    ;;                         "." (file-name-extension file))))
+    ;;        (puthash file (cons time tmp) ll/buffer-map)
+    ;;        (copy-file file tmp)
+    ;;        tmp))
+    ;;    (setq file it)))
+    ;; ;; Let further compilation-commands be run over tramp
     (let ((default-directory (file-name-directory file)))
       (pcase (file-name-extension file)
         ((and _ (guard (ll/is-test-file file)))

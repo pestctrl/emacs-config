@@ -33,14 +33,14 @@
    (cons build-dir it)
    (reverse it)
    (cons (file-name-directory file) it)
-   (mapcar #'(lambda (x) (concat "-I" (lls/un-trampify x))) it)
+   (mapcar #'(lambda (x) (concat "-I" x)) it)
    (string-join it " ")))
 
 (defun ll-tblgen/gen-command (file flags output-file build-dir)
   (let ((bin (car (lls/get-tool "llvm-tblgen$" (list (expand-file-name "bin" build-dir))))))
     (format "%s %s %s %s"
             bin
-            (lls/un-trampify file)
+            file
             (ll-tblgen/get-includes file build-dir)
             (string-join
              (list
@@ -142,11 +142,11 @@
           (setq comm (concat comm " --print-records")))
          ((eq action ?c)
           (setq comm (concat (format "mkdir -p %s"
-                                     (lls/un-trampify (diredp-parent-dir out)))
+                                     (diredp-parent-dir out))
                              " && "
                              comm
                              (format " -o %s"
-                                     (lls/un-trampify out))))))
+                                     out)))))
 
         (compilation-start
          comm

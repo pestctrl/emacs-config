@@ -37,14 +37,14 @@
      (list
       (string-join
        (list
-        (lls/prompt-tool "clang$")
+        (comp-dev/prompt-tool "clang$")
         file
         "-target c29 -c -o"
         temp-file)
        " ")
       (string-join
        (list
-        (lls/prompt-tool "objdump$")
+        (comp-dev/prompt-tool "objdump$")
         "-d"
         temp-file)
        " "))

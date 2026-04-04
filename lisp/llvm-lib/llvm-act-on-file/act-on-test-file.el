@@ -76,7 +76,7 @@
 
 (defun ll/build-lit-command (file action)
   (format "%s %s %s"
-          (lls/prompt-tool "llvm-lit")
+          (comp-dev/prompt-tool "llvm-lit")
           (pcase action
             ('verbose "-v")
             ('all "-a")
@@ -121,7 +121,7 @@
                                     (resolved
                                      (save-match-data
                                        (or (gethash tool lookups)
-                                           (aprog1 (lls/prompt-tool (concat tool "$"))
+                                           (aprog1 (comp-dev/prompt-tool (concat tool "$"))
                                              (puthash tool it lookups))))))
                                (replace-match resolved nil nil res 1))))
                        it)

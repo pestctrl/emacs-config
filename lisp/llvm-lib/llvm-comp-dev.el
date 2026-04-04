@@ -189,7 +189,7 @@
 
 (defun lls/lldb (binary)
   (interactive
-   (list (lls/prompt-tool (rx (or "clang" "llc") line-end))))
+   (list (comp-dev/prompt-tool (rx (or "clang" "llc") line-end))))
   (realgud--lldb
    (format "lldb %s"
            binary)))

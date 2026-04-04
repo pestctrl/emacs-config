@@ -56,7 +56,7 @@
 (defun ll/act-on-llvm-dump-file (fname)
   (let* ((action (aml/read-action-map ll/dump-file-action-map))
          (command-flags (ll/dump-extract-command-flags (ll/dump-to-sh-file fname)))
-         (clang (lls/prompt-tool "clang$")))
+         (clang (comp-dev/prompt-tool "clang$")))
     (compilation-start
      (concat
       (when (y-or-n-p "Would you like to `rr record`? ")

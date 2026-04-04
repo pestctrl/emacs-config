@@ -55,7 +55,7 @@
   (interactive)
   (let* ((buf (current-buffer))
          (fname (buffer-file-name buf))
-         (clang (lls/prompt-tool "clang$"))
+         (clang (comp-dev/prompt-tool "clang$"))
          (command
           (with-current-buffer buf
             (cond ((or compilation-minor-mode

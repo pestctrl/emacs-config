@@ -37,7 +37,7 @@
    (string-join it " ")))
 
 (defun ll-tblgen/gen-command (file flags output-file build-dir)
-  (let ((bin (car (lls/get-tool "llvm-tblgen$" (list (expand-file-name "bin" build-dir))))))
+  (let ((bin (car (comp-dev/prompt-tool "llvm-tblgen$" (list (expand-file-name "bin" build-dir))))))
     (format "%s %s %s %s"
             bin
             file

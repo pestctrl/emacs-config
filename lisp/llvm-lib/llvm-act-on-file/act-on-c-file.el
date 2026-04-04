@@ -47,7 +47,7 @@
    ll/c-file-action-map))
 
 (defun ll/clang-output-disassemble-command (file)
-  (let ((compiler (lls/prompt-tool "clang$"))
+  (let ((compiler (comp-dev/prompt-tool "clang$"))
         (tmp-file (make-temp-file (file-name-sans-extension (file-name-nondirectory file)))))
     (string-join
      (list (lls/get-clang-command-fun :compiler compiler
@@ -76,7 +76,7 @@
     (let ((end (aml/get-map-prop
                 (ll/get-c-action-map)
                 action :end-state))
-          (compiler (lls/prompt-tool (comp-dev/tool-name (comp-dev/get-config) 'compiler))))
+          (compiler (comp-dev/prompt-tool (comp-dev/tool-name (comp-dev/get-config) 'compiler))))
       (string-join
        (list
         (when (y-or-n-p "Would you like to `rr record`? ")

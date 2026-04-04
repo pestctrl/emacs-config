@@ -158,19 +158,7 @@
           (t (completing-read (format "Which %s? " prompt)
                               collection nil nil initial-input)))))
 
-(defun lls/prompt-tool (tool-regexp &optional directories)
-  (let (;;(vertico-sort-function nil)
-        )
-    (my/completing-read tool-regexp
-                        (lls/get-tool tool-regexp
-                                      (or (and (eq 'string (type-of directories))
-                                               (list directories))
-                                          directories))
-                        (awhen (ti/current-tools-directory)
-                          (concat (file-name-nondirectory it)
-                                  " ")))))
-
-(defun lls/get-tool (tool-regexp &optional directories)
+(defun comp-dev/prompt-tool (tool-regexp &optional directories)
   (cl-mapcan #'(lambda (dir)
                  (when (file-exists-p dir)
                    (when (string-match-p "/sim/sds11.*" dir)
@@ -178,3 +166,11 @@
                    (directory-files dir t tool-regexp)))
              (or directories
                  (comp-dev/get-bin-dirs (comp-dev/get-config)))))
+
+(defun comp-dev/prompt-tool (tool-regexp &optional directories)
+  (let (;;(vertico-sort-function nil)
+        )
+    (my/completing-read tool-regexp
+                        (comp-dev/prompt-tool tool-regexp
+                                      (or (and (eq 'string (type-of directories))
+                                               (list directories)))))))

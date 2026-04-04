@@ -38,7 +38,7 @@
 
 (defun ll/build-llc-command (file action &optional output pass)
   (lls/get-llc-command-fun :file file :action action :output output :pass pass
-                           :llc (lls/prompt-tool "llc$")))
+                           :llc (comp-dev/prompt-tool "llc$")))
 
 (defun ll/ll-file-diff-action (file action) )
 

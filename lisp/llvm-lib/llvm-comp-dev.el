@@ -225,9 +225,5 @@
                    (format comm-temp directory build-type target))))
     (compile command)))
 
-(provide 'lib-comp-dev)
-;;; lib-comp-dev.el ends here
-
-
 (provide 'llvm-comp-dev)
 ;;; llvm-comp-dev.el ends here

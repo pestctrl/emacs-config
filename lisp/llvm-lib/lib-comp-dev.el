@@ -174,3 +174,6 @@
                         (comp-dev/prompt-tool tool-regexp
                                       (or (and (eq 'string (type-of directories))
                                                (list directories)))))))
+
+(provide 'lib-comp-dev)
+;;; lib-comp-dev.el ends here

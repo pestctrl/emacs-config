@@ -64,7 +64,8 @@
   (setq global-mode-string '(" "))
   (setq display-time-day-and-date t)
 
-  (display-battery-mode t)
+  (when (ec/load-or-ask-pred 'my-ec/display-battery "Display battery? ")
+    (display-battery-mode t))
   (display-time-mode t)
   (unless (or (eq 'windows-nt system-type)
               (not (executable-find "df")))

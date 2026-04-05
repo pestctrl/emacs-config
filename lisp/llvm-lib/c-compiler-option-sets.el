@@ -44,17 +44,17 @@
 
 (cl-defgeneric cos/to-string (config))
 
-(defun cos/edit-compiler-options (optionset current-name)
+(defun cos/edit-compiler-options (prefix optionset current-name)
   (dolist (slot (cddr (eieio-class-slots 'compiler-option-config)))
     (let* ((slot-sym (eieio-slot-descriptor-name slot))
-           (slot-val (and (slot-boundp optionsset slot-sym)
-                          (slot-value optionsset slot-sym))))
+           (slot-val (and (slot-boundp optionset slot-sym)
+                          (slot-value optionset slot-sym))))
       (when slot-val
         (pcase (cl--slot-descriptor-type slot)
           ('list
            (when (or prefix
                      (not (zerop (length slot-val))))
-             (setf (slot-value optionsset slot-sym)
+             (setf (slot-value optionset slot-sym)
                    (read
                     (read-string (format "Edit '%s' for optionset '%s': "
                                          (symbol-name slot-sym)
@@ -63,7 +63,7 @@
           ('string
            (when (or prefix
                      (not (string= slot-val "")))
-             (setf (slot-value optionsset slot-sym)
+             (setf (slot-value optionset slot-sym)
                    (read-string (format "Edit '%s' for optionset '%s': "
                                         (symbol-name slot-sym)
                                         current-name)

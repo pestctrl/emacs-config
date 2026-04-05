@@ -174,7 +174,7 @@
           (or (and (gethash (buffer-file-name) clang/file-specific-options )
                    "file-specific")
               (gethash target clang/current-target-optionset))))
-    (cos/edit-compiler-options options-config current-name)))
+    (cos/edit-compiler-options prefix options-config current-name)))
 
 (defun clang/clang-options-merge (primary secondary)
   (make-instance

@@ -1,6 +1,3 @@
-[submodule "submodule/mu"]
-	path = submodule/mu
-	url = https://github.com/djcb/mu
 [submodule "submodule/youtube-dl-emacs"]
 	path = submodule/youtube-dl-emacs
 	url = https://github.com/skeeto/youtube-dl-emacs

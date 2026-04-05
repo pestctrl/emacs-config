@@ -23,12 +23,14 @@
 
      ;; System tray
      (require 'exwm-systemtray)
-     (exwm-systemtray-enable)
+     (exwm-systemtray-mode t)
 
      ;; Multi monitor support
      (require 'exwm-randr)
-     (exwm-enable)
-     (exwm-randr-enable)
+     (exwm-randr-mode t)
+
+     (add-hook 'emacs-startup-hook
+               'exwm-wm-mode)
 
      ;; This is a new-frame hack. Don't copy faces for floating windows
      (require 'face-copier)
@@ -76,9 +78,6 @@
      ;; Reminder: Hooks execute in order. Make sure megasync launches after systemtray is enabled
      (require 'exwm-startup)
      (add-hook 'exwm-init-hook 'call-startup-programs)
-
-     (require 'exwm-systemtray)
-     (exwm-systemtray-enable)
 
      ;; Setup screens before anything else
      (require 'exwm-screens)

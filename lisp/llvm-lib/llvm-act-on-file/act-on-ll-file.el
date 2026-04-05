@@ -28,17 +28,17 @@
 (require 'make-tmp-output-file)
 
 (defvar ll/ll-file-action-map
-  '((assembly      :key ?a  :major-mode asm-mode  :buffer-string "assembly"  :description "[a]ssembly")
-    (run-pass      :key ?o  :major-mode llvm-mode :buffer-string "run-%s"  :description "run-[o]ne-pass")
-    (run-pass-diff :key ?d  :major-mode llvm-mode :buffer-string "diff-%s"  :description "[d]iff-one-pass")
-    (stop-after    :key ?a  :major-mode llvm-mode :buffer-string "stop-after-%s"  :description "stop-[a]fter")
-    (stop-before   :key ?b  :major-mode llvm-mode :buffer-string "stop-before-%s" :description "stop-[b]efore")
-    (start-after   :key ?A  :major-mode llvm-mode :buffer-string "start-after-%s"  :description "start-[A]fter")
-    (start-before  :key ?B  :major-mode llvm-mode :buffer-string "start-before-%s" :description "start-[B]efore")))
+  '((assembly      :key ?a  :major-mode asm-mode  :end-state 'asm     :buffer-string "assembly"  :description "[a]ssembly")
+    (run-pass      :key ?o  :major-mode llvm-mode :end-state 'llvm-ir :buffer-string "run-%s"  :description "run-[o]ne-pass")
+    (run-pass-diff :key ?d  :major-mode llvm-mode :end-state 'llvm-ir :buffer-string "diff-%s"  :description "[d]iff-one-pass")
+    (stop-after    :key ?a  :major-mode llvm-mode :end-state 'llvm-ir :buffer-string "stop-after-%s"  :description "stop-[a]fter")
+    (stop-before   :key ?b  :major-mode llvm-mode :end-state 'llvm-ir :buffer-string "stop-before-%s" :description "stop-[b]efore")
+    (start-after   :key ?A  :major-mode llvm-mode :end-state 'llvm-ir :buffer-string "start-after-%s"  :description "start-[A]fter")
+    (start-before  :key ?B  :major-mode llvm-mode :end-state 'llvm-ir :buffer-string "start-before-%s" :description "start-[B]efore")))
 
-(defun ll/build-llc-command (file action &optional output pass)
-  (lls/get-llc-command-fun :file file :action action :output output :pass pass
-                           :llc (comp-dev/prompt-tool "llc$")))
+(defun ll/build-llc-command (file end-state &optional output pass)
+  (comp-dev/process-file
+   (comp-dev/get-config) 'llvm-ir end-state (comp-dev/prompt-tool "llc$") file output nil))
 
 (defun ll/ll-file-diff-action (file action) )
 
@@ -57,7 +57,8 @@
                    (t ".mir")))))
     (aprog1
         (compilation-start
-         (ll/build-llc-command file action output pass)
+         (ll/build-llc-command
+          file (aml/get-map-prop ll/ll-file-action-map action :end-state) output pass)
          (aml/get-map-prop ll/ll-file-action-map action :major-mode)
          (lambda (_)
            (format "*%s-%s*"

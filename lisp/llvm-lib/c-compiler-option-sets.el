@@ -34,10 +34,10 @@
    (include-dirs        :initarg :include-dirs :type list   :initform nil)
    (system-include-dirs :initarg :isystem      :type list   :initform nil)))
 
-(defmacro register-prebaked-optionset (hashmap target-str key &rest options)
+(defmacro register-prebaked-optionset (hashmap type target-str key &rest options)
   (declare (indent 3))
   `(puthash ',key
-            (make-instance 'compiler-option-config
+            (make-instance ,type
                            :target-str ,target-str
                            ,@options)
             ,hashmap))

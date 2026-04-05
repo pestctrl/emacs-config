@@ -62,8 +62,8 @@
      'llvm-comp-dev-config
      :root-dir root-dir
      :target (completing-read "Which target? " '("X86" "ARM" "Hexagon" "AIE" "RISCV"))
-     :tramp tramp-conn
 
+     ;; :tramp tramp-conn
      ;; :build-dirs-fun (lls/guess-build-dirs-fun root-dir)
      ;; :cc #'lls/default-comp-fun
      ;; :dc #'lls/default-dis-comm
@@ -74,46 +74,70 @@
 (add-to-list 'comp-dev/init-functions
              'llvm/default-target-init)
 
+(defun lls/llvm-build-dirs (root-dir)
+  (let ((build-dir (expand-file-name "build" root-dir)))
+    (when (file-exists-p build-dir)
+      (--> build-dir
+           (directory-files it t)
+           (remove-if-not #'(lambda (dir)
+                              (file-exists-p
+                               (expand-file-name "build.ninja" dir)))
+                          it)
+           (sort it #'(lambda (x y)
+                        (cond ((string-match-p "^Release$" (file-name-nondirectory y)) nil)
+                              ((string-match-p "^Release$" (file-name-nondirectory x)) t)
+                              (t (string< x y)))))))))
+
+(defun lls/llvm-bin-dirs (root-dir)
+  (mapcar #'(lambda (dir)
+              (expand-file-name "bin" dir))
+          (lls/llvm-build-dirs root-dir)))
+
 (cl-defmethod comp-dev/get-bin-dirs ((config llvm-comp-dev-config))
-  (list
-   "/usr/bin/"))
+  (cons
+   "/usr/bin/"
+   (lls/llvm-bin-dirs (comp-dev/conf-get 'root-dir))))
 
 (cl-defmethod comp-dev/get-file-types ((config llvm-comp-dev-config))
   '(c pp-c llvm-ir asm obj exe))
 
 (cl-defmethod comp-dev/get-c-action-table ((config llvm-comp-dev-config))
-  '((assembly     :key ?a    :major-mode asm-mode  :buffer-string "assembly"           :description "[a]ssembly"      :end-state asm)
+  '((assembly     :key ?a :major-mode asm-mode  :buffer-string "assembly"           :description "[a]ssembly"               :end-state asm)
     (debug        :key ?d :major-mode llvm-mode :buffer-string "debug"              :description "[d]ebug pass"             :end-state asm)
     (LLVMIR       :key ?l :major-mode llvm-mode :buffer-string "llvm-ir"            :description "[l]lvm-ir"                :end-state llvm-ir)
     (before-after :key ?p :major-mode llvm-mode :buffer-string "print-before-after" :description "[p]rint before/after"     :end-state asm)
-    (changed      :key ?P :major-mode llvm-mode :buffer-string "print-changed"      :description "[P]rint before/after all" :end-state asm)
-    (assembly     :key ?a :major-mode asm-mode  :buffer-string "assembly"           :description "[a]ssembly"               :end-state asm)))
+    (changed      :key ?P :major-mode llvm-mode :buffer-string "print-changed"      :description "[P]rint before/after all" :end-state asm)))
+
+(cl-defmethod comp-dev/tool-name ((config llvm-comp-dev-config) type)
+  (pcase type
+    ('compiler "clang")))
 
 ;; (output-dis   :key ?A    :major-mode asm-mode  :buffer-string "dissasembly"        :description "output-dis[A]ssemble"     :end-state nil)
 
-(cl-defmethod comp-dev/process-file ((config llvm-comp-dev-config) start-type end-type compiler file output flags)
-  (pcase start
+(cl-defmethod comp-dev/process-file ((config llvm-comp-dev-config) start-type end-type tool file output flags)
+  (pcase start-type
     ('c
      (-->
-      (list compiler
+      (list tool
             (clang/get-clang-options)
-            (string-join rest " ")
             file
+            flags
             (pcase end-type
               ('pp-c "-E")
               ('llvm-ir "-S -emit-llvm")
               ('asm "-S")
               ('obj "-c")
               ('exe (error "unimplemented")))
-            flags
             "-o -"
             (or (and output
                      (format "| tee %s" output))
                 ""))
       (flatten-list it)
+      (string-join it " ")))
+    ('llvm-ir
+     (-->
+      (list tool file "-o -")
       (string-join it " ")))))
-
-
 
 (defun lls/get-llvm-root-dir ()
   (comp-dev/ensure-initialized)
@@ -193,21 +217,6 @@
   (realgud--lldb
    (format "lldb %s"
            binary)))
-
-(defun lls/guess-build-dirs-fun (root-dir)
-  (lambda ()
-    (let ((build-dir (expand-file-name "build" root-dir)))
-      (when (file-exists-p build-dir)
-        (--> build-dir
-             (directory-files it t)
-             (remove-if-not #'(lambda (dir)
-                                (file-exists-p
-                                 (expand-file-name "build.ninja" dir)))
-                            it)
-             (sort it #'(lambda (x y)
-                          (cond ((string-match-p "^Release$" (file-name-nondirectory y)) nil)
-                                ((string-match-p "^Release$" (file-name-nondirectory x)) t)
-                                (t (string< x y))))))))))
 
 (defun lls/cmake-here (directory build-type target)
   (interactive

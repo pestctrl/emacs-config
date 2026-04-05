@@ -34,7 +34,7 @@
        target-options lang-options
        other-options optimization-level
        include-dirs)
-      opts
+      config
     (-->
      (list
       (or binary-path "")

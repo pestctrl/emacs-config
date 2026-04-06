@@ -130,7 +130,7 @@
 
 (defun comp-dev/ensure-initialized ()
   (when (not (comp-dev/initialized?))
-    (if (not (functionp lls/target-init-fun))
+    (if (null comp-dev/init-functions)
         (error "Please register an init function for llvm")
       (comp-dev/initialize))))
 

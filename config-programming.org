@@ -95,7 +95,7 @@
                    ;;     (y-or-n-p "Should I start LSP? "))
                    )
           (when (string-match-p "llvm-project" project-root)
-            (lls/ensure-initialized))
+            (comp-dev/ensure-initialized))
           (lsp))))
     :config
 

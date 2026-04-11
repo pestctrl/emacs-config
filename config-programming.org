@@ -376,3 +376,57 @@
 #+begin_src emacs-lisp
   (use-package 0x0)
 #+end_src
+* realgud
+#+begin_src emacs-lisp
+  (use-package realgud
+    :config
+    (setq realgud-window-split-orientation 'horizontal)
+
+    (defun rename-gdb-replay-buffer ()
+      (when-let ((buff (get-buffer "*gdb replay shell*")))
+        (let ((i 1)
+              name)
+          (while (progn
+                   (setq name
+                         (format "*gdb replay shell<%d>*" i))
+                   (get-buffer name))
+            (cl-incf i))
+          (with-current-buffer buff
+            (rename-buffer name)))))
+
+    (defun realgud:rr ()
+      (interactive)
+      (rename-gdb-replay-buffer)
+      (call-interactively #'realgud:gdb))
+
+    (defun realgud:rr-replay ()
+      (interactive)
+      (rename-gdb-replay-buffer)
+      (realgud:gdb "rr replay"))
+
+    (defun realgud:rr-reverse-next (&optional arg)
+      (interactive "p")
+      (let* ((buffer (current-buffer))
+             (cmdbuf (realgud-get-cmdbuf))
+             (cmd "rn"))
+        (progn
+          ;; Set flag to know which buffer to jump back to
+          (with-current-buffer-safe cmdbuf
+            (realgud-cmdbuf-info-in-srcbuf?= (not (realgud-cmdbuf? buffer))))
+          ;; Run actual command
+  	    (realgud-command cmd arg nil nil nil))))
+
+    (defun realgud:rr-reverse-continue ()
+      (let* ((buffer (current-buffer))
+             (cmdbuf (realgud-get-cmdbuf))
+             (cmd "rc"))
+        (progn
+          ;; Set flag to know which buffer to jump back to
+          (with-current-buffer-safe cmdbuf
+            (realgud-cmdbuf-info-in-srcbuf?= (not (realgud-cmdbuf? buffer))))
+          ;; Run actual command
+  	    (realgud-command nil arg nil nil nil))))
+
+    (define-key realgud:shortkey-mode-map (kbd "p") #'realgud:rr-reverse-next)
+    (define-key realgud:shortkey-mode-map (kbd "C") #'realgud:rr-reverse-continue))
+#+end_src

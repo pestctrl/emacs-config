@@ -30,7 +30,7 @@
 (defclass llvm-comp-dev-config (comp-dev-config)
   nil)
 
-(cl-defgeneric comp-dev/tool-name ((config llvm-comp-dev-config) tool)
+(cl-defmethod comp-dev/tool-name ((config llvm-comp-dev-config) tool)
   (pcase tool
     ('compiler "clang$")))
 

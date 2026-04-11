@@ -408,7 +408,7 @@
       (interactive "p")
       (let* ((buffer (current-buffer))
              (cmdbuf (realgud-get-cmdbuf))
-             (cmd "rn"))
+             (cmd "reverse-next"))
         (progn
           ;; Set flag to know which buffer to jump back to
           (with-current-buffer-safe cmdbuf
@@ -417,16 +417,19 @@
   	    (realgud-command cmd arg nil nil nil))))
 
     (defun realgud:rr-reverse-continue ()
+      (interactive)
       (let* ((buffer (current-buffer))
              (cmdbuf (realgud-get-cmdbuf))
-             (cmd "rc"))
+             (cmd "reverse-continue"))
         (progn
           ;; Set flag to know which buffer to jump back to
           (with-current-buffer-safe cmdbuf
             (realgud-cmdbuf-info-in-srcbuf?= (not (realgud-cmdbuf? buffer))))
           ;; Run actual command
-  	    (realgud-command nil arg nil nil nil))))
+  	    (realgud-command cmd nil nil nil nil))))
 
     (define-key realgud:shortkey-mode-map (kbd "p") #'realgud:rr-reverse-next)
-    (define-key realgud:shortkey-mode-map (kbd "C") #'realgud:rr-reverse-continue))
+    (define-key realgud:shortkey-mode-map (kbd "C") #'realgud:rr-reverse-continue)
+
+    (require 'realgud-hack))
 #+end_src

@@ -31,5 +31,7 @@
                                (list sep (car x)))
                              '(matches))))))
 
+(rx-define symbol (+ (or (syntax word) (syntax symbol))))
+
 (provide 'my-rx-forms)
 ;;; my-rx-forms.el ends here

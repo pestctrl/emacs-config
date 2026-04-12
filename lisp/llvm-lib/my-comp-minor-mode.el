@@ -25,6 +25,7 @@
 ;;; Code:
 (require 'anaphora)
 (require 'llvm-buffer-chain)
+(require 'comp-mode-locus-override)
 
 (define-minor-mode compilation-minor-mode
   "Toggle Compilation minor mode.

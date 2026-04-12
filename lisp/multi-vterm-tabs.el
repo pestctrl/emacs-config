@@ -25,7 +25,8 @@
 ;;; Code:
 (require 'cl-lib)
 (require 'dash)
-(require 'vterm)
+(require 'use-package)
+(use-package vterm)
 (require 'tab-bar)
 
 (defclass multi-vterm-tab-info ()

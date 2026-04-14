@@ -29,6 +29,8 @@
 (require 'ti-mail-identity)
 (require 'gnus-article-hack)
 
+(define-key mu4e-headers-mode-map (kbd "R") #'mu4e-compose-wide-reply)
+
 (setq mu4e-update-interval (* 60 5))
 
 (defun my/goto-mail ()

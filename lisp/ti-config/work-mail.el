@@ -69,7 +69,7 @@
 
 (setq mu4e-bookmarks
       '(( :name  "Unread messages"
-          :query "flag:unread AND NOT maildir:/work/INBOX/llvm* AND NOT flag:trashed"
+          :query "flag:unread AND NOT maildir:/work/Other* AND NOT flag:trashed"
           :key ?u)
         ( :name  "Inbox"
           :query "maildir:/work/INBOX AND NOT flag:trashed"

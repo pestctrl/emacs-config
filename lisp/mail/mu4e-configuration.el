@@ -40,24 +40,22 @@
 
 (setq mu4e-maildir-shortcuts
       '(("/fastmail/INBOX" . ?i)
-        ("/fastmail/INBOX/tracking" . ?t)
-        ("/fastmail/INBOX/unsorted" . ?u)
+        ("/fastmail/important.Development" . ?d)
+        ("/fastmail/important.Puppet" . ?p)
+        ("/fastmail/important.VIPs" . ?v)
         ("/fastmail/Archive" . ?a)))
 
 (setq mu4e-bookmarks
-      '(( :name  "Unread messages"
-          :query "flag:unread AND NOT flag:trashed"
-          :key ?u)
+      '(( :name  "Inbox"
+          :query "maildir:/fastmail/INBOX AND NOT flag:trashed"
+          :key ?i)
         ( :name "Today's messages"
           :query "date:today..now"
           :key ?t)
         ( :name "Last 7 days"
           :query "date:7d..now"
           :hide-unread t
-          :key ?w)
-        ( :name "Messages with images"
-          :query "mime:image/*"
-          :key ?p)))
+          :key ?w)))
 
 (setq mu4e-bookmarks
       (mapcar (lambda (x)
@@ -74,7 +72,9 @@
     "bensonchu457@gmail.com"
     "me@mail.pestctrl.io"
     "dev@mail.pestctrl.io"
-    "accounts@mail.pestctrl.io"))
+    "accounts@mail.pestctrl.io"
+    "chuan.chu01@fastmail.com"
+    "julie.chu01@fastmail.com"))
 
 (defun my/mu-init ()
   (interactive)

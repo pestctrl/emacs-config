@@ -1,9 +1,9 @@
-;;; mu4e-config.el ---  -*- lexical-binding: t -*-
+;;; mu4e-generic.el ---  -*- lexical-binding: t -*-
 
-;; Copyright (C) 2023 Benson Chu
+;; Copyright (C) 2026 Benson Chu
 
 ;; Author: Benson Chu <bensonchu457@gmail.com>
-;; Created: [2023-03-12 09:51]
+;; Created: [2026-04-19 20:10]
 
 ;; This file is not part of GNU Emacs
 
@@ -24,85 +24,59 @@
 
 ;;; Code:
 (require 'mu4e)
-(require 'mu4e-generic)
+(require 'mu4e-contrib)
+
+(define-key mu4e-headers-mode-map (kbd "M") #'mu4e-headers-mark-all)
+
+(defun mu4e-print-path ()
+  (interactive)
+  (-->
+   (mu4e-message-at-point)
+   (mu4e-message-field it :path)
+   (progn
+     (kill-new it)
+     (message "Path Copied: %s" it))))
+
+(define-key mu4e-search-minor-mode-map (kbd "l") #'mu4e-print-path)
+
+(add-hook 'mu4e-headers-found-hook #'mu4e-thread-fold-all)
+
+(define-key mu4e-headers-mode-map (kbd "C-M-a") #'mu4e-view-thread-goto-root)
+(define-key mu4e-thread-mode-map (kbd "<tab>") #'mu4e-thread-fold-toggle)
+
+;; Prevent automatic baseline resets to keep (+x) indicators persistent
+(defvar my/mu4e-allow-baseline-reset nil
+  "When non-nil, allow baseline resets. Otherwise, preserve the baseline.")
+
+(defun my/mu4e--query-items-refresh-no-auto-reset (orig-fun &optional reset-baseline)
+  "Advice for `mu4e--query-items-refresh' to prevent automatic baseline resets.
+Only reset the baseline if `my/mu4e-allow-baseline-reset' is non-nil."
+  (funcall orig-fun (and reset-baseline my/mu4e-allow-baseline-reset)))
+
+(advice-add 'mu4e--query-items-refresh :around
+            #'my/mu4e--query-items-refresh-no-auto-reset)
+
+(defun my/mu4e-reset-baseline ()
+  "Manually reset the mu4e baseline to clear all (+x) indicators."
+  (interactive)
+  (let ((my/mu4e-allow-baseline-reset t))
+    (mu4e--query-items-refresh 'reset-baseline))
+  (message "mu4e baseline reset - (+x) indicators cleared"))
+
+(defun my/goto-mail ()
+  (interactive)
+  (switch-or-create-tab "mail")
+  (delete-other-windows)
+  (mu4e))
+
+(global-set-key (kbd "C-x m") #'my/goto-mail)
+
+(with-eval-after-load 'mu4e-view
+  (add-hook 'mu4e-view-mode-hook
+            #'olivetti-mode))
 
 (add-to-list 'mu4e-view-actions
              '("ViewInBrowser" . mu4e-action-view-in-browser) t)
-
-  ;; (global-set-key (kbd "<f8>") 'mu4e)
-
-
-(setq mu4e-maildir "~/.mail"
-      mu4e-sent-folder   "/fastmail/Sent"
-      mu4e-drafts-folder "/fastmail/Drafts"
-      mu4e-refile-folder "/fastmail/Archive"
-      mu4e-trash-folder "/fastmail/Trash")
-
-(setq mu4e-maildir-shortcuts
-      '(("/fastmail/INBOX" . ?i)
-        ("/fastmail/INBOX/tracking" . ?t)
-        ("/fastmail/INBOX/unsorted" . ?u)
-        ("/fastmail/Archive" . ?a)))
-
-(setq mu4e-bookmarks
-      '(( :name  "Unread messages"
-          :query "flag:unread AND NOT flag:trashed"
-          :key ?u)
-        ( :name "Today's messages"
-          :query "date:today..now"
-          :key ?t)
-        ( :name "Last 7 days"
-          :query "date:7d..now"
-          :hide-unread t
-          :key ?w)
-        ( :name "Messages with images"
-          :query "mime:image/*"
-          :key ?p)))
-
-(setq mu4e-bookmarks
-      (mapcar (lambda (x)
-                (let ((str (plist-get x :query)))
-                  (when (not (string-match-p "Unnecessary/mailing_lists" str))
-                    (setf (plist-get x :query)
-                          (concat str " AND NOT maildir:/Unnecessary/mailing_lists*"))))
-                x)
-              mu4e-bookmarks))
-
-(defvar my/email-accounts
-  '("bensonchu457@fastmail.com"
-    "bensonchu@fastmail.com"
-    "bensonchu457@gmail.com"
-    "me@mail.pestctrl.io"
-    "dev@mail.pestctrl.io"
-    "accounts@mail.pestctrl.io"))
-
-(defun my/mu-init ()
-  (interactive)
-  (async-shell-command
-   (format "mu init --maildir=~/.mail/ %s"
-           (--> my/email-accounts
-                (mapcar #'(lambda (x) (concat "--my-address=" x)) it)
-                (string-join it " ")))))
-
-(defun my-mu4e-set-account ()
-  (setq user-mail-address
-        (or (and mu4e-compose-parent-message
-                 (mu4e-contact-email
-                  (-any
-                   #'(lambda (x)
-                       (mu4e-message-contact-field-matches-me mu4e-compose-parent-message
-                                                              x))
-                   '(:to :cc :bcc :from))))
-            (completing-read "Compose with account: "
-                             my/email-accounts
-                             nil t))))
-
-(add-hook 'mu4e-compose-pre-hook 'my-mu4e-set-account)
-
-  ;; (setcar mu4e-headers-thread-last-child-prefix "╰┬►")
-  ;; (setcar mu4e-headers-thread-first-child-prefix "├┬►")
-  ;; (setcar mu4e-headers-thread-connection-prefix "│")
-
 
 (defun my/mu4e~headers-thread-prefix (thread)
   "Calculate the thread prefix based on thread info THREAD."
@@ -150,7 +124,7 @@
                 (append mu4e~headers-thread-state '(t))))
       ;; Return the thread prefix.
       (format "%s%s"
-              (propertize prefix 'face 'mu4e-related-face)
+              prefix
               (if duplicate
                   (mu4e~headers-thread-prefix-map 'duplicate) "")))))
 
@@ -158,5 +132,21 @@
             :override
             #'my/mu4e~headers-thread-prefix)
 
-(provide 'mu4e-configuration)
-;;; mu4e-config.el ends here
+(defun my/mu4e-compose-edit-ignore-draft()
+  "Edit an existing draft message."
+  (interactive)
+  (let* ((msg (mu4e-message-at-point)))
+    (mu4e--draft
+     'edit
+     (lambda ()
+       (with-current-buffer
+           (find-file-noselect (mu4e-message-readable-path msg))
+         (mu4e--delimit-headers)
+         (current-buffer))))))
+
+(advice-add #'mu4e-compose-edit
+            :override
+            #'my/mu4e-compose-edit-ignore-draft)
+
+(provide 'mu4e-generic)
+;;; mu4e-generic.el ends here

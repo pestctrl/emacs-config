@@ -45,7 +45,7 @@
    '(mode-line     ((t :foreground "gray60" :background "black" :inverse-video nil)))
    '(eldoc-highlight-function-argument ((t :foreground "dodger blue")))
 
-   '(highlight ((t :background "gray17")))
+   '(highlight ((t :background "gray20")))
 
    '(sml/charging ((t (:inherit sml/global :foreground "forest green"))))
 

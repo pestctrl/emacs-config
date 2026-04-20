@@ -50,12 +50,12 @@
         (:key ?a :maildir "/work/Done")))
 
 (setq mu4e-bookmarks
-      '(( :name  "Unread messages"
-          :query "flag:unread AND NOT maildir:/work/Other* AND NOT flag:trashed"
-          :key ?u)
-        ( :name  "Inbox"
+      '(( :name  "Inbox"
           :query "maildir:/work/INBOX AND NOT flag:trashed"
           :key ?i)
+        ( :name  "Unread messages"
+          :query "flag:unread AND NOT maildir:/work/Other* AND NOT flag:trashed"
+          :key ?u)
         ( :name  "mailing_lists"
           :query "maildir:/work/INBOX/mailing_lists* AND NOT flag:trashed"
           :key ?m)

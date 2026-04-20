@@ -162,10 +162,7 @@
 * colorful compilation buffer
 #+begin_src emacs-lisp
   (require 'ansi-color)
-  (defun colorize-compilation-buffer ()
-    (let ((buffer-read-only nil))
-      (ansi-color-apply-on-region (point-min) (point-max))))
-  (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
+  (add-hook 'compilation-filter-hook 'ansi-color-compilation-filter)
 #+end_src
 * World time
 #+begin_src emacs-lisp

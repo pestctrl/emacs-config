@@ -190,7 +190,13 @@
         (projectile--run-project-cmd command projectile-compilation-cmd-map
                                      :show-prompt arg
                                      :prompt-prefix "Compile command: "
-                                     :save-buffers t))))
+                                     :save-buffers t)))
+
+    (defun projectile-back-to-root ()
+      (interactive)
+      (dired (projectile-project-root)))
+
+    (global-set-key (kbd "C-x C-d") #'projectile-back-to-root))
 #+end_src
 * Slime mode
 #+BEGIN_SRC emacs-lisp

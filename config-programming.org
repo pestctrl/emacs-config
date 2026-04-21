@@ -196,7 +196,8 @@
       (interactive)
       (dired (projectile-project-root)))
 
-    (global-set-key (kbd "C-x C-d") #'projectile-back-to-root))
+    (global-set-key (kbd "C-x C-d") #'projectile-back-to-root)
+    (global-set-key (kbd "C-x C-i") #'projectile-ibuffer))
 #+end_src
 * Slime mode
 #+BEGIN_SRC emacs-lisp

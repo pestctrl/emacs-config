@@ -401,15 +401,39 @@
           (with-current-buffer buff
             (rename-buffer name)))))
 
+    (defun rr-command (&optional recording)
+      (let* ((recording-space
+              (if (not recording)
+                  ""
+                (concat " " recording)))
+             (processes
+              (--> (shell-command-to-string (concat "rr ps" recording-space))
+                   (string-trim it)
+                   (string-split it "\n")
+                   (cdr it))))
+        (if (= 1 (length processes))
+            (concat "rr replay" recording-space)
+          (let ((selection (completing-read "Which process? " processes)))
+            (string-match (rx line-start (group (+ digit))) selection)
+            (realgud:gdb (format "rr replay%s --onprocess=%s"
+                                 recording-space
+                                 (match-string 1 selection)))))))
+
+    (defun prompt-rr-recording ()
+      (completing-read
+       "Which recording? "
+       (directory-files "~/.local/share/rr"
+                        nil "^[^.]")))
+
     (defun realgud:rr ()
       (interactive)
       (rename-gdb-replay-buffer)
-      (call-interactively #'realgud:gdb))
+      (realgud:gdb (rr-command (prompt-rr-recording))))
 
     (defun realgud:rr-replay ()
       (interactive)
       (rename-gdb-replay-buffer)
-      (realgud:gdb "rr replay"))
+      (realgud:gdb (rr-command)))
 
     (defun realgud:rr-reverse-next (&optional arg)
       (interactive "p")

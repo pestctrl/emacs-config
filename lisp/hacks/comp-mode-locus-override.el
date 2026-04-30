@@ -43,7 +43,8 @@
            `(display-buffer-use-some-window
              (inhibit-same-window . t)
              (some-window . ,(my/compile-locus-some-window (current-buffer))))))
-      (apply orig args))))
+      (apply orig args)
+      (recenter nil t))))
 
 (advice-add #'compilation-goto-locus
             :around

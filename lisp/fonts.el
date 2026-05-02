@@ -26,6 +26,9 @@
 (require 'hoagie-adjust)
 (require 'emacs-custom-load-or-ask)
 
+;; AAAAAAAAAAAAAAAAAAAAAAHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH
+(setq use-default-font-for-symbols nil)
+
 ;; If I reeaaaally wanted to do this property, I would use
 ;; #'new-fontset, but that requires LOTS of background knowledge. Just
 ;; look at the #'setup-default-fontset function.

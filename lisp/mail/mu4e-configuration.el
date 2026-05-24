@@ -43,12 +43,34 @@
         ("/fastmail/important.Development" . ?d)
         ("/fastmail/important.Puppet" . ?p)
         ("/fastmail/important.VIPs" . ?v)
-        ("/fastmail/Archive" . ?a)))
+        ("/fastmail/important.unsorted" . ?u)
+        ("/fastmail/important.tracking" . ?t)
+        ("/fastmail/important.tracking.receipts" . ?r)
+        ("/fastmail/corpo" . ?c)
+        ("/fastmail/Archive" . ?a)
+        ("/fastmail/Unnecessary.mailing_lists.emacs.emacs-devel" . ?e)
+        ("/fastmail/Unnecessary.mailing_lists.emacs.emacs-devel.kept" . ?k)
+        ("/fastmail/Unnecessary.mailing_lists.emacs.emacs-orgmode" . ?O)
+        ("/fastmail/Unnecessary.mailing_lists.emacs.bug-gnu-emacs" . ?b)
+        ("/fastmail/Unnecessary.mailing_lists.emacs.help-gnu-emacs" . ?h)
+        ("/fastmail/Unnecessary.mailing_lists.notmuch" . ?n)))
 
 (setq mu4e-bookmarks
       '(( :name  "Inbox"
           :query "maildir:/fastmail/INBOX AND NOT flag:trashed"
           :key ?i)
+        ( :name  "Unsorted"
+          :query "(maildir:/fastmail/important.unsorted OR maildir:/fastmail/corpo)"
+          :key ?u)
+        ( :name  "New emacs-devel"
+          :query "maildir:/fastmail/Unnecessary.mailing_lists.emacs.emacs-devel AND flag:unread AND date:2026/03/01.."
+          :key ?e)
+        ( :name  "All emacs-devel"
+          :query "maildir:/fastmail/Unnecessary.mailing_lists.emacs.emacs-devel AND flag:unread"
+          :key ?E)
+        ( :name  "Kept emacs-devel"
+          :query "maildir:/fastmail/Unnecessary.mailing_lists.emacs.emacs-devel.kept"
+          :key ?k)
         ( :name "Today's messages"
           :query "date:today..now"
           :key ?t)
@@ -56,15 +78,6 @@
           :query "date:7d..now"
           :hide-unread t
           :key ?w)))
-
-(setq mu4e-bookmarks
-      (mapcar (lambda (x)
-                (let ((str (plist-get x :query)))
-                  (when (not (string-match-p "Unnecessary/mailing_lists" str))
-                    (setf (plist-get x :query)
-                          (concat str " AND NOT maildir:/Unnecessary/mailing_lists*"))))
-                x)
-              mu4e-bookmarks))
 
 (defvar my/email-accounts
   '("bensonchu457@fastmail.com"

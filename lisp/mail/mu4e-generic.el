@@ -26,7 +26,15 @@
 (require 'mu4e)
 (require 'mu4e-contrib)
 
-(define-key mu4e-headers-mode-map (kbd "M") #'mu4e-headers-mark-all)
+(defun my/mu4e-headers-mark-all ()
+  "Mark all headers for some action.
+Ask user what action to execute."
+  (interactive)
+  (mu4e-headers-mark-for-each-if
+   (cons 'something nil)
+   (lambda (_msg _param) t)))
+
+(define-key mu4e-headers-mode-map (kbd "M") #'my/mu4e-headers-mark-all)
 
 (defun mu4e-print-path ()
   (interactive)

@@ -19,5 +19,8 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Check out elpa submodule
+        run: git submodule update --init --depth 1 elpa
+
       - name: Run ERT test suite
         run: emacs -Q --batch -l run-tests-batch.el

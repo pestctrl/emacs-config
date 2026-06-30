@@ -31,6 +31,7 @@
 (require 'my-org-agenda-misc)
 (require 'my-org-tags)
 (require 'all-the-icons)
+(require 'my-org-priority-filter)
 
 (use-package org-super-agenda)
 (org-super-agenda-mode)
@@ -94,7 +95,7 @@
 
 (defun my/valid-todo ()
   (let (seen-non-todo)
-    (save-excursion 
+    (save-excursion
       (not
        (catch 'break
          (while (org-up-heading-safe)
@@ -115,8 +116,6 @@
 (defun my/ambiguous-todo ()
   (and (opr/type-of-project)
        (opr/type-of-task)))
-
-(require 'org-dev-level)
 
 (advice-add #'org-agenda-redo
             :around
@@ -213,6 +212,22 @@
               (point)))))
       (eval `(function ,skip-fun-name))))
 
+  (defun my/org-agenda-skip-function-with-priority (tag)
+    (let ((skip-fun-name (intern (format "my/org-agenda-skip-unless-%s-tag-priority" tag))))
+      (eval
+       `(defun ,skip-fun-name ()
+          (let ((tags (org-get-tags)))
+            (unless (and (or (member ,tag tags)
+                             (member "PLAN" tags))
+                         (let ((delayed (org-entry-get (point) "DELAYED")))
+                           (or (null delayed)
+                               (org-time< delayed (org-matcher-time "<now>"))))
+                         (not (member (org-get-todo-state) '("HOLD" "TICKLER")))
+                         (>= (my/org-get-priority-with-inheritance) my/org-priority-filter-level))
+              (outline-next-heading)
+              (point)))))
+      (eval `(function ,skip-fun-name))))
+
   (defun org-agenda-minimal-view (tag)
     `((org-ql-block '(and (tags ,tag)
                           (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
@@ -249,7 +264,8 @@
     `((org-ql-block '(and (tags ,tag)
                           (todo "TODO" "ONE" "META" "META1" "EMPTY" "SEQ")
                           (property "DELAYED")
-                          (org-time< (property "DELAYED") (org-matcher-time "<now>")))
+                          (org-time< (property "DELAYED") (org-matcher-time "<now>"))
+                          (>= (my/org-get-priority-with-inheritance) my/org-priority-filter-level))
                     ((org-ql-block-header "Previously Delayed")))
       (my/org-ql-stuck-projects ,tag
                                 ((org-ql-block-header "Stuck Projects")
@@ -260,14 +276,15 @@
       (org-ql-block '(and (tags "pinned")
                           (not (done))
                           (or (my/top-level)
-                              (eq (opr/get-type) 'project)))
+                              (eq (opr/get-type) 'project))
+                          (>= (my/org-get-priority-with-inheritance) my/org-priority-filter-level))
                     ((org-ql-block-header "Pinned Projects")
                      (org-ql-indent-levels t)
                      (org-use-tag-inheritance nil)
                      (org-ql-indentor-function #'my/pinned-indent-level)))
       (agenda ""
               ((org-agenda-show-log '(closed clock))
-               (org-agenda-skip-function #',(my/org-agenda-skip-function tag))
+               (org-agenda-skip-function #',(my/org-agenda-skip-function-with-priority tag))
                (org-super-agenda-groups '((:name "Delayed" :pred
                                                  ((lambda (item)
                                                     (when-let (marker (or (get-text-property 0 'org-marker item)
@@ -535,6 +552,18 @@
               #'org-save-all-org-buffers)
 
   (run-at-time 60 nil #'org-save-all-org-buffers))
+
+(defun my/org-agenda-skip-unless-prod-tag-priority ()
+  (let ((tags (org-get-tags)))
+    (unless (and (or (member "prod" tags)
+                     (member "PLAN" tags))
+                 (let ((delayed (org-entry-get (point) "DELAYED")))
+                   (or (null delayed)
+                       (org-time< delayed (org-matcher-time "<now>"))))
+                 (not (member (org-get-todo-state) '("HOLD" "TICKLER")))
+                 (>= (my/org-get-priority-with-inheritance) my/org-priority-filter-level))
+      (outline-next-heading)
+      (point))))
 
 (provide 'my-org-agenda-commands)
 ;;; my-org-agenda-commands.el ends here
